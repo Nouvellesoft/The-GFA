@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "901585674848",
+    "project_id": "cov-phoenix-fc",
+    "storage_bucket": "cov-phoenix-fc.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:901585674848:android:c08e77212960c6064c1905",
+        "android_client_info": {
+          "package_name": "com.nouvellesoft.thegfa"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "901585674848-5673srlpn6veedn7j8opa4fjgqvimtj2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAGleKvSKz9bGpn6ljFMLll2JfYja1tRTc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "901585674848-5673srlpn6veedn7j8opa4fjgqvimtj2.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "901585674848-0db0r7sgfqo244up4gavv0oef7ho42lb.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.icdatinnovations.coventryPhoenixFc"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
