@@ -1399,6 +1399,7 @@ DEPENDENCIES:
   - Firebase/Analytics
   - Firebase/Auth
   - Firebase/Crashlytics
+  - Firebase/Messaging
   - Firebase/Performance
   - firebase_analytics (from `.symlinks/plugins/firebase_analytics/ios`)
   - firebase_auth (from `.symlinks/plugins/firebase_auth/ios`)
@@ -1590,6 +1591,6 @@ SPEC CHECKSUMS:
   Toast: 1f5ea13423a1e6674c4abdac5be53587ae481c4e
   url_launcher_ios: 5334b05cef931de560670eeae103fd3e431ac3fe
 
-PODFILE CHECKSUM: ec8b561404d9813bfaee6c20e3ba0ca05a50d612
+PODFILE CHECKSUM: 4ef07affe0e0f7508affd573bbea74b339488a26
 
 COCOAPODS: 1.15.2
