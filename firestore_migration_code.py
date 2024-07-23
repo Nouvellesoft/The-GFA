@@ -7,7 +7,7 @@ def migrate_collection(old_client, new_client, old_collection_name, new_collecti
 
     for doc in docs:
         doc_data = doc.to_dict()
-        club_id = doc_data.get('clubId', 'coventryphoenixfc')  # Ensure there's a default clubId
+        club_id = doc_data.get('clubId', 'covedntryphoenixfc')  # Ensure there's a default clubId
 
         # Define the new document path
         new_doc_ref = new_client.collection(new_collection_root).document(club_id).collection(
