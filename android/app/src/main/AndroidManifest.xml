@@ -86,6 +86,7 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
+<!--                <category android:name="android.intent.category.LEANBACK_LAUNCHER"/>  // This is to remove the launcher icon from the home screen.-->
                 <action android:name="android.intent.action.VIEW"/>
             </intent-filter>
 
