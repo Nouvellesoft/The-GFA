@@ -10,21 +10,21 @@
 
     <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
 
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
 
     <!-- Mandatory permissions for Android 12 and above.-->
     <!-- Also, they should be asked in runtime. -->
     <uses-permission
         android:name="android.permission.BLUETOOTH_SCAN"
-        android:minSdkVersion="31"
+        android:minSdkVersion="33"
         android:usesPermissionFlags="neverForLocation" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADVERTISE" />
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
 
     <!-- Mandatory permissions for Android 13 and above. -->
     <!-- Also, should be asked in runtime. -->
-    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <queries>
         <!-- If your app opens https URLs -->
@@ -51,19 +51,19 @@
     </queries>
 
     <application
-        android:label="The GFA"
         android:name="${applicationName}"
-        android:fullBackupContent="true"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
-        android:icon="@mipmap/ic_launcher">
+        android:fullBackupContent="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="The GFA">
         <activity
             android:name=".MainActivity"
+            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
             android:exported="true"
+            android:hardwareAccelerated="true"
             android:launchMode="singleTop"
             android:theme="@style/NormalTheme"
-            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
-            android:hardwareAccelerated="true"
             android:windowSoftInputMode="adjustResize">
             <!-- Specifies an Android theme to apply to this Activity as soon as
                  the Android process has started. This theme is visible to the user
@@ -73,20 +73,18 @@
 
             <meta-data
                 android:name="io.flutter.embedding.android.NormalTheme"
-                android:resource="@style/NormalTheme"
-                />
+                android:resource="@style/NormalTheme" />
 
             <meta-data
                 android:name="io.flutter.embedding.android.SplashScreenDrawable"
-                android:resource="@drawable/launch_background"
-                />
+                android:resource="@drawable/launch_background" />
 
 
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
-<!--                <category android:name="android.intent.category.LEANBACK_LAUNCHER"/>  // This is to remove the launcher icon from the home screen.-->
-                <action android:name="android.intent.action.VIEW"/>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+                <!--                <category android:name="android.intent.category.LEANBACK_LAUNCHER"/>  // This is to remove the launcher icon from the home screen.-->
+                <action android:name="android.intent.action.VIEW" />
             </intent-filter>
 
             <intent-filter>
@@ -110,13 +108,17 @@
                 android:resource="@xml/provider_paths" />
         </provider>
 
-        <receiver android:exported="false" android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver" />
-        <receiver android:exported="false" android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationBootReceiver">
+        <receiver
+            android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver"
+            android:exported="false" />
+        <receiver
+            android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationBootReceiver"
+            android:exported="false">
             <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED"/>
-                <action android:name="android.intent.action.MY_PACKAGE_REPLACED"/>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
                 <action android:name="android.intent.action.QUICKBOOT_POWERON" />
-                <action android:name="com.htc.intent.action.QUICKBOOT_POWERON"/>
+                <action android:name="com.htc.intent.action.QUICKBOOT_POWERON" />
             </intent-filter>
         </receiver>
     </application>

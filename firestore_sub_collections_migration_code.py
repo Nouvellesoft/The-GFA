@@ -19,12 +19,12 @@ def migrate_subcollections(client, old_club_id, new_club_id):
     print(f'Migration of subcollections from club {old_club_id} to {new_club_id} complete!')
 
 
-# def create_club_document(client, club_id):
-#     club_ref = client.collection('clubs').document(club_id)
-#     # club_ref.set({
-#     #     'name': club_id,  # You can add more initial data as required
-#     # })
-#     print(f'Created new club document: {club_id}')
+def create_club_document(client, club_id):
+    club_ref = client.collection('clubs').document(club_id)
+    club_ref.set({
+        'name': club_id,  # You can add more initial data as required
+    })
+    print(f'Created new club document: {club_id}')
 
 
 def migrate_data():
@@ -33,10 +33,10 @@ def migrate_data():
 
     # Specify the old and new club IDs
     old_club_id = 'coventryphoenixfc'  # Existing club ID to migrate data from
-    new_club_id = 'patriciafc'  # New club ID to migrate data to
+    new_club_id = 'josephfc'  # New club ID to migrate data to
 
     print(f'Creating new club document: {new_club_id}')
-    # create_club_document(client, new_club_id)
+    create_club_document(client, new_club_id)
 
     print(f'Starting migration of subcollections from {old_club_id} to {new_club_id}')
     migrate_subcollections(client, old_club_id, new_club_id)

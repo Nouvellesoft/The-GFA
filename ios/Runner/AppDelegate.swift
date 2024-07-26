@@ -1,32 +1,38 @@
 import UIKit
 import Flutter
 import Firebase
-import UserNotifications
 
 @main
-@objc class AppDelegate: FlutterAppDelegate, MessagingDelegate {
-
-    lazy var flutterEngine = FlutterEngine(name: "MyApp")
-
-    override func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        UIApplication.shared.isStatusBarHidden = false
-
-        flutterEngine.run()
-        FirebaseApp.configure()
-        Messaging.messaging().delegate = self
-        GeneratedPluginRegistrant.register(with: self.flutterEngine)
-
-        application.registerForRemoteNotifications()
-
-        return super.application(application, didFinishLaunchingWithOptions: launchOptions)
-    }
-
-    // MARK: - MessagingDelegate
-
-    override func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable: Any],
-                         fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
-        // Handle notification received
-        Messaging.messaging().appDidReceiveMessage(userInfo)
-        completionHandler(UIBackgroundFetchResult.newData)
-    }
+@objc class AppDelegate: FlutterAppDelegate {
+  var flutterViewController: FlutterViewController!
+  
+  override func application(
+    _ application: UIApplication,
+    didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
+  ) -> Bool {
+    FirebaseApp.configure()
+    
+    self.flutterViewController = FlutterViewController(project: nil, nibName: nil, bundle: nil)
+    let navigationController = UINavigationController(rootViewController: self.flutterViewController)
+    navigationController.setNavigationBarHidden(true, animated: false)
+    self.window = UIWindow(frame: UIScreen.main.bounds)
+    self.window?.rootViewController = navigationController
+    self.window?.makeKeyAndVisible()
+    
+    GeneratedPluginRegistrant.register(with: self.flutterViewController)
+    
+    return super.application(application, didFinishLaunchingWithOptions: launchOptions)
+  }
+  
+  override func registrar(forPlugin pluginKey: String) -> FlutterPluginRegistrar? {
+    return flutterViewController.registrar(forPlugin: pluginKey)
+  }
+  
+  override func hasPlugin(_ pluginKey: String) -> Bool {
+    return flutterViewController.hasPlugin(pluginKey)
+  }
+  
+  override func valuePublished(byPlugin pluginKey: String) -> NSObject? {
+    return flutterViewController.valuePublished(byPlugin: pluginKey)
+  }
 }

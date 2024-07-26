@@ -1,12 +1,21 @@
+import 'dart:async';
+
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:the_gfa/thrown_pages/club_lists.dart';
 
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  runApp(const MyApp());
+  FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
+  FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterError;
+  runZonedGuarded(() async {
+    // WidgetsFlutterBinding.ensureInitialized();
+    // await Firebase.initializeApp();
+    runApp(const MyApp());
+  }, FirebaseCrashlytics.instance.recordError);
 }
 
 class MyApp extends StatelessWidget {

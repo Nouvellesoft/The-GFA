@@ -44,8 +44,7 @@ target 'Runner' do
   flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
 end
 
-
-target 'TheGFA ImageNotification' do
+target 'The GFA ImageNotification' do
   use_frameworks!
   pod 'Firebase/Auth' #, :modular_headers => true  # Add Firebase Authentication
   pod 'Firebase/Messaging'
@@ -54,7 +53,6 @@ target 'TheGFA ImageNotification' do
   pod 'OneSignalXCFramework', '>= 5.0.0', '< 6.0'
 #   pod 'OneSignal/OneSignalInAppMessages', '>= 5.0.0', '< 6.0'
 end
-
 
 post_install do |installer|
   installer.pods_project.targets.each do |target|
@@ -66,9 +64,11 @@ post_install do |installer|
       xcconfig = File.read(xcconfig_path)
       xcconfig_mod = xcconfig.gsub(/DT_TOOLCHAIN_DIR/, "TOOLCHAIN_DIR")
       File.open(xcconfig_path, "w") { |file| file << xcconfig_mod }
-      
-      # Use $(inherited) flag for overridden settings
-      config.build_settings['CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER'] = '$(inherited)'
+
+#      config.build_settings['APPLICATION_EXTENSION_API_ONLY'] = 'No'
+#      config.build_settings['ONLY_ACTIVE_ARCH'] = 'NO'
+
     end
   end
+#  set_run_script_to_always_run_when_no_input_or_output_files_exist(project: installer.pods_project)
 end
