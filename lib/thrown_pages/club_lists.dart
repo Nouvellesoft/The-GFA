@@ -1,6 +1,8 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+
+import '../api/all_clubs_api.dart';
+import 'club_detail_page.dart'; // Make sure this import matches the file location of ClubDetailPage
 
 class ClubSelectionPage extends StatefulWidget {
   const ClubSelectionPage({super.key});
@@ -10,34 +12,38 @@ class ClubSelectionPage extends StatefulWidget {
 }
 
 class _ClubSelectionPageState extends State<ClubSelectionPage> {
-  Future<List<String>> getClubIds() async {
-    try {
-      QuerySnapshot snapshot = await FirebaseFirestore.instance.collection('clubs').get();
-      List<String> clubIds = snapshot.docs.map((doc) => doc.id).toList();
-      return clubIds;
-    } catch (e) {
-      print('Error fetching club IDs: $e');
-      return [];
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Select a Club')),
+      appBar: AppBar(title: const Text('Select a Club')),
       body: FutureBuilder<List<String>>(
-        future: getClubIds(),
+        future: getClubs(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
             return Center(child: Text('Error fetching clubs: ${snapshot.error}'));
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(child: Text('No clubs found'));
+            return const Center(child: Text('No clubs found'));
           } else {
-            List<String> clubIds = snapshot.data!;
-            return Column(
-              children: clubIds.map((id) => Text(id)).toList(),
+            List<String> clubs = snapshot.data!;
+            return ListView.builder(
+              itemCount: clubs.length,
+              itemBuilder: (context, index) {
+                var clubId = clubs[index];
+                return ListTile(
+                  title: Text(clubId), // Display the club ID or any other relevant information
+                  onTap: () {
+                    // Navigate to the ClubDetailPage with the selected clubId
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ClubDetailPage(clubId: clubId),
+                      ),
+                    );
+                  },
+                );
+              },
             );
           }
         },
