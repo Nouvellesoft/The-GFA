@@ -180,14 +180,17 @@ class _MyManagementBodyPage extends State<MyManagementBodyPage> {
     Navigator.push(context, MaterialPageRoute(builder: (context) => const ManagementBodyDetailsPage()));
   }
 
-  Future navigateTablesAndStatsDetails(context) async {
+  Future navigateTablesAndStatsDetails(BuildContext context, String clubId) async {
     Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => const BottomNavigator(
-                  mainPage: PlayersTablePage(),
-                  initialPage: 0,
-                )));
+      context,
+      MaterialPageRoute(
+        builder: (context) => BottomNavigator(
+          mainPage: PlayersTablePage(clubId: clubId), // Ensure that clubId is provided
+          initialPage: 0, // Set the initial page as needed
+          clubId: clubId, // Pass the clubId to BottomNavigator
+        ),
+      ),
+    );
   }
 
   Future navigateToAboutAppDetailsPage(context) async {
@@ -399,6 +402,27 @@ class _MyManagementBodyPage extends State<MyManagementBodyPage> {
     setState(() {}); // Refresh the UI if needed
   }
 
+  Future<void> fetchTablesAndStatsDetailsAndNavigate(BuildContext context) async {
+    try {
+      // Example Firestore collection/document query
+      QuerySnapshot snapshot = await FirebaseFirestore.instance.collection('clubs').get();
+
+      if (snapshot.docs.isNotEmpty) {
+        // Assuming you want the first document's ID for this example
+        String clubId = snapshot.docs.first.id;
+
+        // Call the navigate function with the fetched clubId
+        navigateTablesAndStatsDetails(context, clubId);
+      } else {
+        // Handle case where no documents are found
+        print('No clubs found');
+      }
+    } catch (e) {
+      // Handle any errors that occur during the fetch
+      print('Error fetching clubId: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     ManagementBodyNotifier managementBodyNotifier = Provider.of<ManagementBodyNotifier>(context);
@@ -607,7 +631,7 @@ class _MyManagementBodyPage extends State<MyManagementBodyPage> {
         ),
         floatingActionButton: FloatingActionButton.extended(
           onPressed: () {
-            navigateTablesAndStatsDetails(context);
+            fetchTablesAndStatsDetailsAndNavigate(context);
           },
           label: Text(
             fabStats,

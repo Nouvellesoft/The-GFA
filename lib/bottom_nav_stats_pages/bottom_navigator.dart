@@ -50,10 +50,11 @@ Color? appBarIconColor = const Color.fromRGBO(255, 141, 41, 1);
 Color? appBarBackgroundColor = const Color.fromRGBO(34, 40, 49, 1);
 
 class BottomNavigator extends StatefulWidget {
-  const BottomNavigator({super.key, required this.mainPage, required this.initialPage});
+  const BottomNavigator({super.key, required this.mainPage, required this.initialPage, required this.clubId});
 
   final Widget mainPage;
   final int initialPage;
+  final String clubId;
 
   @override
   State<BottomNavigator> createState() => _BottomNavigatorState();
@@ -63,14 +64,7 @@ class _BottomNavigatorState extends State<BottomNavigator> {
   bool toggle = false;
   int selectedPage = 0;
 
-  final _pageOption = [
-    const PlayersTablePage(),
-    const PlayersStatsAndInfoPage(),
-    const TabviewMatchesPage(initialPage: 1),
-    // const SeasonTimeline(),
-    const TabviewSocialMediaPage(),
-    TrainingsAndGamesReelsPage(),
-  ];
+  late List<Widget> _pageOption;
 
   @override
   Widget build(BuildContext context) {
@@ -173,6 +167,19 @@ class _BottomNavigatorState extends State<BottomNavigator> {
 
   @override
   void initState() {
+    super.initState();
+
+    _pageOption = [
+      PlayersTablePage(
+        clubId: widget.clubId,
+      ), // Pass the clubId here
+      const PlayersStatsAndInfoPage(),
+      const TabviewMatchesPage(initialPage: 1),
+      // const SeasonTimeline(),
+      const TabviewSocialMediaPage(),
+      TrainingsAndGamesReelsPage(),
+    ];
+
     TrainingsAndGamesReelsNotifier trainingsAndGamesNotifier = Provider.of<TrainingsAndGamesReelsNotifier>(context, listen: false);
     _fetchTrainingsAndGamesReelsAndUpdateNotifier(trainingsAndGamesNotifier);
 
@@ -206,8 +213,6 @@ class _BottomNavigatorState extends State<BottomNavigator> {
     setState(() {
       selectedPage = widget.initialPage;
     });
-
-    super.initState();
 
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,

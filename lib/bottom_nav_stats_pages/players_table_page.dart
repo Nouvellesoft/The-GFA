@@ -34,7 +34,9 @@ FirstTeamClassNotifier? firstTeamClassNotifier;
 SecondTeamClassNotifier? secondTeamClassNotifier;
 
 class PlayersTablePage extends StatefulWidget {
-  const PlayersTablePage({Key? key}) : super(key: key);
+  final String clubId;
+
+  const PlayersTablePage({super.key, required this.clubId});
 
   @override
   State<PlayersTablePage> createState() => PlayersTablePageState();
@@ -45,15 +47,20 @@ class PlayersTablePageState extends State<PlayersTablePage> {
 
   late PlayersTableDataSource playersTableDataSource;
 
-  Stream<QuerySnapshot> getDataFromFirestore() {
-    return FirebaseFirestore.instance.collection('PllayersTable').orderBy('goals_scored', descending: true).snapshots();
+  Stream<QuerySnapshot> getDataFromFirestore(String clubId) {
+    return FirebaseFirestore.instance
+        .collection('clubs')
+        .doc(clubId)
+        .collection('PllayersTable')
+        .orderBy('goals_scored', descending: true)
+        .snapshots();
   }
 
-  _buildDataGrid() {
+  Widget _buildDataGrid() {
     firstTeamClassNotifier = Provider.of<FirstTeamClassNotifier>(context, listen: false);
     secondTeamClassNotifier = Provider.of<SecondTeamClassNotifier>(context, listen: false);
     return StreamBuilder(
-        stream: getDataFromFirestore(),
+        stream: getDataFromFirestore(widget.clubId),
         builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
           if (snapshot.hasData) {
             if (playersTableList.isNotEmpty && !snapshot.data!.metadata.isFromCache) {
@@ -330,7 +337,8 @@ class PlayersTablePageState extends State<PlayersTablePage> {
         appBar: AppBar(
           centerTitle: true,
           title: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-              stream: FirebaseFirestore.instance.collection('SliversPages').doc('non_slivers_pages').snapshots(),
+              stream:
+                  FirebaseFirestore.instance.collection('clubs').doc(widget.clubId).collection('SliversPages').doc('non_slivers_pages').snapshots(),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   return Text(snapshot.data?.data()!['players_table'], style: TextStyle(color: appBarIconColor, fontSize: 17));

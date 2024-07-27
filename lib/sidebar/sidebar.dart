@@ -75,7 +75,9 @@ Color textColorTwo = const Color.fromRGBO(24, 26, 36, 1.0);
 Color textShadowColor = Colors.white;
 
 class SideBar extends StatefulWidget {
-  const SideBar({Key? key}) : super(key: key);
+  final String clubId;
+
+  const SideBar({super.key, required this.clubId});
 
   @override
   State<StatefulWidget> createState() => _SideBarState();
@@ -461,7 +463,11 @@ class _SideBarState extends State<SideBar> with SingleTickerProviderStateMixin<S
                                               Navigator.push(
                                                 context,
                                                 MaterialPageRoute(
-                                                  builder: (context) => const BottomNavigator(mainPage: TabviewSocialMediaPage(), initialPage: 3),
+                                                  builder: (context) => BottomNavigator(
+                                                    mainPage: const TabviewSocialMediaPage(),
+                                                    initialPage: 3,
+                                                    clubId: widget.clubId,
+                                                  ),
                                                 ),
                                               );
                                             },
@@ -484,7 +490,11 @@ class _SideBarState extends State<SideBar> with SingleTickerProviderStateMixin<S
                                               Navigator.push(
                                                 context,
                                                 MaterialPageRoute(
-                                                  builder: (context) => const BottomNavigator(mainPage: PlayersTablePage(), initialPage: 0),
+                                                  builder: (context) => BottomNavigator(
+                                                    mainPage: PlayersTablePage(clubId: widget.clubId),
+                                                    initialPage: 0,
+                                                    clubId: widget.clubId,
+                                                  ),
                                                 ),
                                               );
                                             },
@@ -507,7 +517,11 @@ class _SideBarState extends State<SideBar> with SingleTickerProviderStateMixin<S
                                               Navigator.push(
                                                 context,
                                                 MaterialPageRoute(
-                                                  builder: (context) => const BottomNavigator(mainPage: PlayersStatsAndInfoPage(), initialPage: 1),
+                                                  builder: (context) => BottomNavigator(
+                                                    mainPage: const PlayersStatsAndInfoPage(),
+                                                    initialPage: 1,
+                                                    clubId: widget.clubId,
+                                                  ),
                                                 ),
                                               );
                                             },
@@ -555,9 +569,11 @@ class _SideBarState extends State<SideBar> with SingleTickerProviderStateMixin<S
                                               Navigator.push(
                                                 context,
                                                 MaterialPageRoute(
-                                                  builder: (context) => const BottomNavigator(
-                                                      mainPage: TabviewMatchesPage(initialPage: 1),
-                                                      initialPage: 2), // Set initialPage to 1 for 'Fixtures'
+                                                  builder: (context) => BottomNavigator(
+                                                    mainPage: const TabviewMatchesPage(initialPage: 1),
+                                                    initialPage: 2,
+                                                    clubId: widget.clubId,
+                                                  ), // Set initialPage to 1 for 'Fixtures'
                                                 ),
                                               );
                                             },

@@ -7,7 +7,9 @@ import '../notifier/sidebar_notifier.dart';
 import 'sidebar.dart';
 
 class SideBarLayout extends StatelessWidget {
-  const SideBarLayout({Key? key}) : super(key: key);
+  final String clubId; // Add this line
+
+  const SideBarLayout({super.key, required this.clubId});
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +27,7 @@ class SideBarLayout extends StatelessWidget {
                 },
               ),
             ),
-            const SideBar(),
+            SideBar(clubId: clubId), // Pass clubId here
           ],
         ),
       ),

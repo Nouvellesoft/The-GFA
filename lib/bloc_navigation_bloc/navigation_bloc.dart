@@ -23,13 +23,18 @@ enum NavigationEvents {
 abstract class NavigationStates {}
 
 class NavigationBloc extends Bloc<NavigationEvents, NavigationStates> {
-  NavigationBloc() : super(MyFirstTeamClassPage());
+  NavigationBloc()
+      : super(MyFirstTeamClassPage(
+          clubId: 'davidfc',
+        ));
 
   @override
   Stream<NavigationStates> mapEventToState(NavigationEvents event) async* {
     switch (event) {
       case NavigationEvents.myFirstTeamClassPageClickedEvent:
-        yield MyFirstTeamClassPage();
+        yield MyFirstTeamClassPage(
+          clubId: 'davidfc',
+        );
         break;
       case NavigationEvents.mySecondTeamClassPageClickedEvent:
         yield MySecondTeamClassPage();
@@ -47,7 +52,10 @@ class NavigationBloc extends Bloc<NavigationEvents, NavigationStates> {
         yield MyCaptainsPage();
         break;
       case NavigationEvents.myClubSponsorsPageClickedEvent:
-        yield MyClubSponsorsPage(fromPage1: false);
+        yield MyClubSponsorsPage(
+          fromPage1: false,
+          clubId: '',
+        );
         break;
       case NavigationEvents.myYouTubePageClickedEvent:
         yield MyYouTubePage();

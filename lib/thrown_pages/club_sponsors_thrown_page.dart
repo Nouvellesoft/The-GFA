@@ -44,8 +44,9 @@ Color backgroundColor = const Color.fromRGBO(147, 165, 193, 1.0);
 
 class MyClubSponsorsPage extends StatefulWidget implements NavigationStates {
   final bool fromPage1;
+  final String clubId; // Add this line
 
-  MyClubSponsorsPage({Key? key, this.title, required this.fromPage1}) : super(key: key);
+  const MyClubSponsorsPage({Key? key, required this.fromPage1, required this.clubId, this.title}) : super(key: key);
   final String? title;
 
   @override
@@ -297,7 +298,12 @@ class _MyClubSponsorsPageState extends State<MyClubSponsorsPage> with SingleTick
                         if (widget.fromPage1) {
                           Navigator.push(context, SlideTransition1(MyClubAdminPage()));
                         } else {
-                          Navigator.push(context, MaterialPageRoute(builder: (context) => const SideBarLayout()));
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => SideBarLayout(
+                                        clubId: widget.clubId,
+                                      )));
                         }
                       },
                       child: Container(

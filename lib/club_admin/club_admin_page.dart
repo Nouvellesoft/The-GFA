@@ -103,7 +103,7 @@ Color deepOrangeColor = Colors.deepOrange;
 Color tealColor = Colors.teal;
 
 class MyClubAdminPage extends StatefulWidget implements NavigationStates {
-  MyClubAdminPage({Key? key}) : super(key: key);
+  const MyClubAdminPage({Key? key}) : super(key: key);
 
   @override
   State<MyClubAdminPage> createState() => MyClubAdminPageState();
@@ -305,7 +305,7 @@ class MyClubAdminPageState extends State<MyClubAdminPage> {
                                   ),
                                   onTap: () {
                                     Navigator.pop(context);
-                                    navigateToClubSponsors(context);
+                                    fetchClubSponsorsAndNavigate(context);
                                   },
                                 ),
                                 ListTile(
@@ -1132,6 +1132,27 @@ class MyClubAdminPageState extends State<MyClubAdminPage> {
     // Optionally, notify listeners or update UI after fetching
     setState(() {});
   }
+
+  Future<void> fetchClubSponsorsAndNavigate(BuildContext context) async {
+    try {
+      // Fetch the clubs from Firestore
+      QuerySnapshot snapshot = await FirebaseFirestore.instance.collection('clubs').get();
+
+      if (snapshot.docs.isNotEmpty) {
+        // Get the first document's ID for this example
+        String clubId = snapshot.docs.first.id;
+
+        // Call the navigate function with the fetched clubId
+        navigateToClubSponsors(context, clubId);
+      } else {
+        // Handle case where no documents are found
+        print('No clubs found');
+      }
+    } catch (e) {
+      // Handle any errors that occur during the fetch
+      print('Error fetching clubId: $e');
+    }
+  }
 }
 
 void showConfirmationDialog(BuildContext context) {
@@ -1203,8 +1224,13 @@ Future navigateToCreateNewSponsorsShoutOutSMPost(context) async {
   Navigator.push(context, MaterialPageRoute(builder: (context) => CreateNewSponsorsShoutOutSMPost()));
 }
 
-Future navigateToClubSponsors(context) async {
-  Navigator.push(context, MaterialPageRoute(builder: (context) => MyClubSponsorsPage(fromPage1: true)));
+Future navigateToClubSponsors(context, String clubId) async {
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) => MyClubSponsorsPage(fromPage1: true, clubId: clubId), // Pass clubId here
+    ),
+  );
 }
 
 Future navigateToModifyClubSponsors(context) async {

@@ -1,15 +1,17 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:the_gfa/sidebar/sidebar_layout.dart';
-import 'package:the_gfa/thrown_pages/club_lists.dart';
 
 import '/notifier/a_upcoming_matches_notifier.dart';
 import '/notifier/all_club_members_notifier.dart';
@@ -23,6 +25,7 @@ import '/notifier/club_sponsors_notifier.dart';
 import '/notifier/players_notifier.dart';
 import '/notifier/players_table_notifier.dart';
 import 'api/PushNotificationService.dart';
+import 'api/club_sponsors_api.dart';
 import 'club_admin/club_admin_page.dart';
 import 'notifier/a_past_matches_notifier.dart';
 import 'notifier/achievement_images_notifier.dart';
@@ -176,51 +179,132 @@ void main() async {
   OneSignal.Notifications.requestPermission(true);
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Football Clubs App',
-      theme: ThemeData(
-        primarySwatch: Colors.deepOrange,
-      ),
-      home: const HomePage(),
-    );
+  State<StatefulWidget> createState() {
+    return MyAppState();
+    // return PandCTransitions();
   }
 }
 
-class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+class MyAppState extends State<MyApp> {
+  static Map<int, Color> color = {
+    50: const Color.fromRGBO(136, 14, 79, .1),
+    100: const Color.fromRGBO(136, 14, 79, .2),
+    200: const Color.fromRGBO(136, 14, 79, .3),
+    300: const Color.fromRGBO(136, 14, 79, .4),
+    400: const Color.fromRGBO(136, 14, 79, .5),
+    500: const Color.fromRGBO(136, 14, 79, .6),
+    600: const Color.fromRGBO(136, 14, 79, .7),
+    700: const Color.fromRGBO(136, 14, 79, .8),
+    800: const Color.fromRGBO(136, 14, 79, .9),
+    900: const Color.fromRGBO(136, 14, 79, 1),
+  };
+  MaterialColor primeColor = MaterialColor(0xFF337C36, color);
+  MaterialColor accentColor = MaterialColor(0xFF337C36, color);
+
+  @override
+  void initState() {
+    super.initState();
+    Firebase.initializeApp().whenComplete(() {
+      if (kDebugMode) {
+        print("completed");
+      }
+      setState(() {});
+    });
+
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
+  }
+
+  @override
+  void didChangeDependencies() {
+    ClubSponsorsNotifier clubSponsorsNotifier = Provider.of<ClubSponsorsNotifier>(context, listen: true);
+    _fetchClubSponsorsAndUpdateNotifier(clubSponsorsNotifier);
+    super.didChangeDependencies();
+  }
+
+  Future<void> _fetchClubSponsorsAndUpdateNotifier(ClubSponsorsNotifier notifier) async {
+    // Fetch the collection of club IDs from Firestore
+    QuerySnapshot clubSnapshot = await FirebaseFirestore.instance.collection('clubs').get();
+    List<String> clubIds = clubSnapshot.docs.map((doc) => doc.id).toList();
+
+    // Process each club ID
+    for (String clubId in clubIds) {
+      await getClubSponsors(notifier, clubId);
+    }
+
+    // Optionally, notify listeners or update UI after fetching
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Football Clubs App')),
-      body: Center(
-        child: ElevatedButton(
-          onPressed: () {
-            Fluttertoast.showToast(
-              msg: 'Welcome, Admin',
-              toastLength: Toast.LENGTH_LONG,
-              gravity: ToastGravity.BOTTOM,
-              backgroundColor: Colors.blueAccent,
-              textColor: Colors.white,
-              fontSize: 16.0,
-            );
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const ClubSelectionPage()),
-            );
-          },
-          child: const Text('Select a Club'),
-        ),
+    FirebaseAnalytics analytics = FirebaseAnalytics.instance;
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'Flutter Demo',
+      theme: ThemeData(
+        primarySwatch: Colors.deepOrange,
       ),
+      home: const PandCTransitions(),
+      // home: const SideBarLayout(),
+      navigatorObservers: [
+        FirebaseAnalyticsObserver(analytics: analytics),
+      ],
     );
   }
 }
+
+// class MyApp extends StatelessWidget {
+//   const MyApp({super.key});
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return MaterialApp(
+//       debugShowCheckedModeBanner: false,
+//       title: 'Football Clubs App',
+//       theme: ThemeData(
+//         primarySwatch: Colors.deepOrange,
+//       ),
+//       home: const HomePage(),
+//     );
+//   }
+// }
+//
+// class HomePage extends StatelessWidget {
+//   const HomePage({super.key});
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(title: const Text('Football Clubs App')),
+//       body: Center(
+//         child: ElevatedButton(
+//           onPressed: () {
+//             Fluttertoast.showToast(
+//               msg: 'Welcome, Admin',
+//               toastLength: Toast.LENGTH_LONG,
+//               gravity: ToastGravity.BOTTOM,
+//               backgroundColor: Colors.blueAccent,
+//               textColor: Colors.white,
+//               fontSize: 16.0,
+//             );
+//             Navigator.push(
+//               context,
+//               MaterialPageRoute(builder: (context) => const ClubSelectionPage()),
+//             );
+//           },
+//           child: const Text('Select a Club'),
+//         ),
+//       ),
+//     );
+//   }
+// }
 
 class PandCTransitions extends StatelessWidget {
   const PandCTransitions({super.key});
@@ -311,7 +395,9 @@ class PandCTransitions extends StatelessWidget {
               );
               Navigator.push(
                 context,
-                SlideTransition1(const SideBarLayout()),
+                SlideTransition1(const SideBarLayout(
+                  clubId: '',
+                )),
               );
               // You can navigate here if needed
             },
