@@ -2,6 +2,33 @@
 class Assets {
   Assets._();
 
+  static const String assetsImagesBaller = 'assets/images/baller.png';
+  static const String assetsImagesCpfcLogoAndroidIos = 'assets/images/cpfc_logo_android_ios.jpeg';
+  static const String assetsImagesCpfcSmBanner = 'assets/images/cpfc_sm_banner.jpeg';
+  static const String imagesAboutAppSp = 'assets/images/about_app_sp.png';
+  static const String imagesBackField = 'assets/images/back_field.png';
+  static const String imagesBaller = 'assets/images/baller.gif';
+  static const String imagesCaptainsPageSliver = 'assets/images/captains_page_sliver.gif';
+  static const String imagesCoachPageSliver = 'assets/images/coach_page_sliver.gif';
+  static const String imagesCpfcBackBack = 'assets/images/cpfc_back_back.jpeg';
+  static const String imagesCpfcLogo = 'assets/images/cpfc_logo.jpeg';
+  static const String imagesCpfcLogoAndroid = 'assets/images/cpfc_logo_android.jpeg';
+  static const String imagesCpfcLogoAndroidIos = 'assets/images/cpfc_logo_android_ios.png';
+  static const String imagesCpfcLogoAndroidIos2 = 'assets/images/cpfc_logo_android_ios_2.png';
+  static const String imagesCpfcLogoApple = 'assets/images/cpfc_logo_apple.jpeg';
+  static const String imagesCpfcLogoBackBlurred = 'assets/images/cpfc_logo_back_blurred.png';
+  static const String imagesCpfcNewSponsorBanner = 'assets/images/cpfc_new_sponsor_banner.png';
+  static const String imagesCpfcSmBanner = 'assets/images/cpfc_sm_banner.jpg';
+  static const String imagesCpfcSponsorSoBanner = 'assets/images/cpfc_sponsor_so_banner.png';
+  static const String imagesFirstPageSliver = 'assets/images/first_page_sliver.gif';
+  static const String imagesMVPBlooded3 = 'assets/images/MVP_Blooded_3.png';
+  static const String imagesMgmtPageSliver = 'assets/images/mgmt_page_sliver.gif';
+  static const String imagesMonthlyPhotos = 'assets/images/monthly_photos.gif';
+  static const String imagesNoClubImage = 'assets/images/no_club_image.jpeg';
+  static const String imagesNouvellesoftFrontPage = 'assets/images/nouvellesoft_front_page.jpg';
+  static const String imagesSecondPageSliver = 'assets/images/second_page_sliver.gif';
+  static const String imagesSidebarPageSliver = 'assets/images/sidebar_page_sliver.gif';
+  static const String imagesTimelineBack = 'assets/images/timeline_back.jpeg';
   static const String jsonAssistsGif = 'assets/json/assists_gif.json';
   static const String jsonBallsBounce = 'assets/json/balls_bounce.json';
   static const String jsonCoachesCommentGif = 'assets/json/coaches_comment_gif.json';

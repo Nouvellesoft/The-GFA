@@ -107,7 +107,13 @@ class _SideBarState extends State<SideBar> with SingleTickerProviderStateMixin<S
 
   Stream<DocumentSnapshot<Map<String, dynamic>>> getDataFromFirestore() {
     // return FirebaseFirestore.instance.collection('SliversPages').doc('non_slivers_pages').snapshots();
-    return FirebaseFirestore.instance.collection('SliversPages').doc('slivers_pages').snapshots();
+    return FirebaseFirestore.instance
+        .collection('clubs')
+        // .doc(clubId)
+        .doc('davidfc')
+        .collection('SliversPages')
+        .doc('slivers_pages')
+        .snapshots();
   }
 
   @override
