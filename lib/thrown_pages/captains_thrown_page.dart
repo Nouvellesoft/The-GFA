@@ -10,6 +10,7 @@ import 'package:launch_review/launch_review.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:provider/provider.dart';
 
+import '../home_page/home_page_deux.dart';
 import '/bottom_nav_stats_pages/players_table_page.dart';
 import '../about_menu_details_pages/about_app.dart';
 import '../about_menu_details_pages/about_club.dart';

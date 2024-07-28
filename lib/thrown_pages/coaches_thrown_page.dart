@@ -20,7 +20,7 @@ import '../bottom_nav_stats_pages/bottom_navigator.dart';
 import '../bottom_nav_stats_pages/players_table_page.dart';
 import '../club_admin/club_admin_page.dart';
 import '../details_pages/coaching_staff_details_page.dart';
-import '../main.dart';
+import '../home_page/home_page_deux.dart';
 import '../notifier/coaching_staff_notifier.dart';
 import '../thrown_searches/coaches_thrown_search.dart';
 

@@ -8,6 +8,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:provider/provider.dart';
 
+import '../home_page/home_page_deux.dart';
 import '/api/club_sponsors_api.dart';
 import '/bloc_navigation_bloc/navigation_bloc.dart';
 import '/notifier/club_sponsors_notifier.dart';
