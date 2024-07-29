@@ -1,8 +1,8 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:the_gfa/sidebar/sidebar_layout.dart';
 
 import '../api/all_clubs_api.dart';
-import 'club_detail_page.dart'; // Make sure this import matches the file location of ClubDetailPage
 
 class ClubSelectionPage extends StatefulWidget {
   const ClubSelectionPage({super.key});
@@ -38,7 +38,8 @@ class _ClubSelectionPageState extends State<ClubSelectionPage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => ClubDetailPage(clubId: clubId),
+                        // builder: (context) => ClubDetailPage(clubId: clubId),
+                        builder: (context) => SideBarLayout(clubId: clubId),
                       ),
                     );
                   },

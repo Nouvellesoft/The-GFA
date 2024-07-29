@@ -4,6 +4,7 @@ import '/bottom_nav_stats_pages/social_media/b_youtube_page.dart';
 import '../thrown_pages/captains_thrown_page.dart';
 import '../thrown_pages/club_sponsors_thrown_page.dart';
 import '../thrown_pages/coaches_thrown_page.dart';
+// import '../dummy_pages/dummy_first_thrown.dart';
 import '../thrown_pages/first_team_thrown_page.dart';
 import '../thrown_pages/management_thrown_page.dart';
 import '../thrown_pages/second_team_thrown_page.dart';
@@ -23,18 +24,15 @@ enum NavigationEvents {
 abstract class NavigationStates {}
 
 class NavigationBloc extends Bloc<NavigationEvents, NavigationStates> {
-  NavigationBloc()
-      : super(MyFirstTeamClassPage(
-          clubId: 'davidfc',
-        ));
+  final String clubId;
+
+  NavigationBloc({required this.clubId}) : super(MyFirstTeamClassPage(clubId: clubId));
 
   @override
   Stream<NavigationStates> mapEventToState(NavigationEvents event) async* {
     switch (event) {
       case NavigationEvents.myFirstTeamClassPageClickedEvent:
-        yield MyFirstTeamClassPage(
-          clubId: 'davidfc',
-        );
+        yield MyFirstTeamClassPage(clubId: clubId);
         break;
       case NavigationEvents.mySecondTeamClassPageClickedEvent:
         yield MySecondTeamClassPage();
@@ -52,10 +50,7 @@ class NavigationBloc extends Bloc<NavigationEvents, NavigationStates> {
         yield MyCaptainsPage();
         break;
       case NavigationEvents.myClubSponsorsPageClickedEvent:
-        yield MyClubSponsorsPage(
-          fromPage1: false,
-          clubId: '',
-        );
+        yield MyClubSponsorsPage(fromPage1: false, clubId: clubId);
         break;
       case NavigationEvents.myYouTubePageClickedEvent:
         yield MyYouTubePage();

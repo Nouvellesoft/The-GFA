@@ -12,7 +12,6 @@ import 'package:material_design_icons_flutter/material_design_icons_flutter.dart
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../home_page/home_page_deux.dart';
 import '/api/a_upcoming_matches_api.dart';
 import '/api/club_sponsors_api.dart';
 import '/api/second_team_class_api.dart';
@@ -50,7 +49,7 @@ import '../bottom_nav_stats_pages/bottom_navigator.dart';
 import '../bottom_nav_stats_pages/players_table_page.dart';
 import '../club_admin/club_admin_page.dart';
 import '../details_pages/first_team_details_page.dart';
-import '../main.dart';
+import '../home_page/home_page_deux.dart';
 import '../notifier/a_upcoming_matches_notifier.dart';
 import '../notifier/club_sponsors_notifier.dart';
 import '../notifier/cum_motm_players_stats_info_notifier.dart';
@@ -915,17 +914,8 @@ class _MyFirstTeamClassPage extends State<MyFirstTeamClassPage> {
   }
 
   Future<void> _fetchFirstTeamClassAndUpdateNotifier(FirstTeamClassNotifier firstTeamNotifier) async {
-    // Fetch the collection of club IDs from Firestore
-    QuerySnapshot clubSnapshot = await FirebaseFirestore.instance.collection('clubs').get();
-    List<String> clubIds = clubSnapshot.docs.map((doc) => doc.id).toList();
-
-    // Process each club ID
-    for (String clubId in clubIds) {
-      await getFirstTeamClass(firstTeamNotifier, clubId);
-    }
-
-    // Optionally, notify listeners or update UI after fetching
-    setState(() {}); // Refresh the UI if needed
+    await getFirstTeamClass(firstTeamNotifier, widget.clubId);
+    setState(() {}); // Refresh the UI after fetching the data
   }
 
   Future<void> _fetchSecondTeamClassAndUpdateNotifier(SecondTeamClassNotifier secondTeamNotifier) async {

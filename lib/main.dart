@@ -8,12 +8,10 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:provider/provider.dart';
-import 'package:the_gfa/sidebar/sidebar_layout.dart';
+import 'package:the_gfa/home_page/club_lists.dart';
 
-import '/notifier/a_upcoming_matches_notifier.dart';
 import '/notifier/all_club_members_notifier.dart';
 import '/notifier/all_fc_teams_notifier.dart';
 import '/notifier/b_youtube_notifier.dart';
@@ -26,9 +24,8 @@ import '/notifier/players_notifier.dart';
 import '/notifier/players_table_notifier.dart';
 import 'api/PushNotificationService.dart';
 import 'api/club_sponsors_api.dart';
-import 'club_admin/club_admin_page.dart';
-import 'home_page/home_page_deux.dart';
 import 'notifier/a_past_matches_notifier.dart';
+import 'notifier/a_upcoming_matches_notifier.dart';
 import 'notifier/achievement_images_notifier.dart';
 import 'notifier/club_arial_notifier.dart';
 import 'notifier/club_captains_notifier.dart';
@@ -252,8 +249,11 @@ class MyAppState extends State<MyApp> {
       theme: ThemeData(
         primarySwatch: Colors.deepOrange,
       ),
-      home: const PandCTransitions(),
-      // home: const SideBarLayout(),
+      // home: const PandCTransitions(),
+      home: const ClubSelectionPage(),
+      // home: const SideBarLayout(
+      //   clubId: '',
+      // ),
       navigatorObservers: [
         FirebaseAnalyticsObserver(analytics: analytics),
       ],
@@ -306,5 +306,3 @@ class MyAppState extends State<MyApp> {
 //     );
 //   }
 // }
-
-
