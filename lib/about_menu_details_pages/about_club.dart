@@ -74,7 +74,9 @@ Color secondRowColorTwo = const Color.fromRGBO(233, 66, 54, 1.0);
 Color thirdRowColor = const Color.fromRGBO(48, 50, 74, 1.0);
 
 class AboutClubDetails extends StatefulWidget {
-  const AboutClubDetails({super.key, this.title});
+  final String clubId;
+
+  const AboutClubDetails({super.key, this.title, required this.clubId});
 
   final String? title;
 
@@ -92,45 +94,18 @@ class _AboutClubDetailsState extends State<AboutClubDetails> {
   int touchedIndex = 0;
 
   Future<void> _fetchClubArialAndUpdateNotifier(ClubArialNotifier clubArialNotifier) async {
-    // Fetch the collection of club IDs from Firestore
-    QuerySnapshot clubSnapshot = await FirebaseFirestore.instance.collection('clubs').get();
-    List<String> clubIds = clubSnapshot.docs.map((doc) => doc.id).toList();
-
-    // Process each club ID
-    for (String clubId in clubIds) {
-      await getClubArial(clubArialNotifier, clubId);
-    }
-
-    // Optionally, notify listeners or update UI after fetching
-    setState(() {}); // Refresh the UI if needed
+    await getClubArial(clubArialNotifier, widget.clubId);
+    setState(() {}); // Refresh the UI after fetching the data
   }
 
   Future<void> _fetchAchievementsAndUpdateNotifier(AchievementsNotifier achievementsNotifier) async {
-    // Fetch the collection of club IDs from Firestore
-    QuerySnapshot clubSnapshot = await FirebaseFirestore.instance.collection('clubs').get();
-    List<String> clubIds = clubSnapshot.docs.map((doc) => doc.id).toList();
-
-    // Process each club ID
-    for (String clubId in clubIds) {
-      await getAchievements(achievementsNotifier, clubId);
-    }
-
-    // Optionally, notify listeners or update UI after fetching
-    setState(() {}); // Refresh the UI if needed
+    await getAchievements(achievementsNotifier, widget.clubId);
+    setState(() {}); // Refresh the UI after fetching the data
   }
 
   Future<void> _fetchFirstTeamClassAndUpdateNotifier(FirstTeamClassNotifier firstTeamNotifier) async {
-    // Fetch the collection of club IDs from Firestore
-    QuerySnapshot clubSnapshot = await FirebaseFirestore.instance.collection('clubs').get();
-    List<String> clubIds = clubSnapshot.docs.map((doc) => doc.id).toList();
-
-    // Process each club ID
-    for (String clubId in clubIds) {
-      await getFirstTeamClass(firstTeamNotifier, clubId);
-    }
-
-    // Optionally, notify listeners or update UI after fetching
-    setState(() {}); // Refresh the UI if needed
+    await getFirstTeamClass(firstTeamNotifier, widget.clubId);
+    setState(() {}); // Refresh the UI after fetching the data
   }
 
   Future<void> _fetchSecondTeamClassAndUpdateNotifier(SecondTeamClassNotifier secondTeamNotifier) async {
@@ -148,30 +123,14 @@ class _AboutClubDetailsState extends State<AboutClubDetails> {
   }
 
   Future<void> _fetchCoachesAndUpdateNotifier(CoachesNotifier coachesNotifier) async {
-    // Fetch the collection of club IDs from Firestore
-    QuerySnapshot clubSnapshot = await FirebaseFirestore.instance.collection('clubs').get();
-    List<String> clubIds = clubSnapshot.docs.map((doc) => doc.id).toList();
+    await getCoaches(coachesNotifier, widget.clubId);
 
-    // Process each club ID
-    for (String clubId in clubIds) {
-      await getCoaches(coachesNotifier, clubId);
-    }
-
-    // Optionally, notify listeners or update UI after fetching
     setState(() {}); // Refresh the UI if needed
   }
 
   Future<void> _fetchManagementBodyAndUpdateNotifier(ManagementBodyNotifier managementBodyNotifier) async {
-    // Fetch the collection of club IDs from Firestore
-    QuerySnapshot clubSnapshot = await FirebaseFirestore.instance.collection('clubs').get();
-    List<String> clubIds = clubSnapshot.docs.map((doc) => doc.id).toList();
+    await getManagementBody(managementBodyNotifier, widget.clubId);
 
-    // Process each club ID
-    for (String clubId in clubIds) {
-      await getManagementBody(managementBodyNotifier, clubId);
-    }
-
-    // Optionally, notify listeners or update UI after fetching
     setState(() {}); // Refresh the UI if needed
   }
 
@@ -232,7 +191,7 @@ class _AboutClubDetailsState extends State<AboutClubDetails> {
     int managersCount = allClubMembersNotifier.mgmtBodyClassList.length;
 
     return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-        stream: FirebaseFirestore.instance.collection('AboutClub').doc('about_club_page').snapshots(),
+        stream: FirebaseFirestore.instance.collection('clubs').doc(widget.clubId).collection('AboutClub').doc('about_club_page').snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Container();

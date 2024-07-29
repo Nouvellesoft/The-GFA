@@ -205,7 +205,7 @@ class _MyCaptainsPage extends State<MyCaptainsPage> {
   }
 
   Future navigateToAboutClubDetailsPage(context) async {
-    Navigator.push(context, MaterialPageRoute(builder: (context) => const AboutClubDetails()));
+    Navigator.push(context, MaterialPageRoute(builder: (context) => const AboutClubDetails(clubId: '',)));
   }
 
   Future navigateToWhoWeArePage(context) async {

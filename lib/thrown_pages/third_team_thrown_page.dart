@@ -218,7 +218,7 @@ class _MyThirdTeamClassPage extends State<MyThirdTeamClassPage> {
   }
 
   Future navigateToAboutClubDetailsPage(context) async {
-    Navigator.push(context, MaterialPageRoute(builder: (context) => const AboutClubDetails()));
+    Navigator.push(context, MaterialPageRoute(builder: (context) => const AboutClubDetails(clubId: 'widget.clubId')));
   }
 
   Future navigateToWhoWeArePage(context) async {
