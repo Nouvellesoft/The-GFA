@@ -85,6 +85,9 @@ class AboutClubDetails extends StatefulWidget {
 }
 
 class _AboutClubDetailsState extends State<AboutClubDetails> {
+  late Stream<DocumentSnapshot<Map<String, dynamic>>> firestoreStreamOne;
+  late Stream<DocumentSnapshot<Map<String, dynamic>>> firestoreStreamTwo;
+
   final controlla = PageController(
     initialPage: 0,
   );
@@ -109,33 +112,40 @@ class _AboutClubDetailsState extends State<AboutClubDetails> {
   }
 
   Future<void> _fetchSecondTeamClassAndUpdateNotifier(SecondTeamClassNotifier secondTeamNotifier) async {
-    // Fetch the collection of club IDs from Firestore
-    QuerySnapshot clubSnapshot = await FirebaseFirestore.instance.collection('clubs').get();
-    List<String> clubIds = clubSnapshot.docs.map((doc) => doc.id).toList();
-
-    // Process each club ID
-    for (String clubId in clubIds) {
-      await getSecondTeamClass(secondTeamNotifier, clubId);
-    }
-
-    // Optionally, notify listeners or update UI after fetching
+    await getSecondTeamClass(secondTeamNotifier, widget.clubId);
     setState(() {}); // Refresh the UI if needed
   }
 
   Future<void> _fetchCoachesAndUpdateNotifier(CoachesNotifier coachesNotifier) async {
     await getCoaches(coachesNotifier, widget.clubId);
-
     setState(() {}); // Refresh the UI if needed
   }
 
   Future<void> _fetchManagementBodyAndUpdateNotifier(ManagementBodyNotifier managementBodyNotifier) async {
     await getManagementBody(managementBodyNotifier, widget.clubId);
-
     setState(() {}); // Refresh the UI if needed
   }
 
   @override
   void initState() {
+    super.initState();
+
+    firestoreStreamOne = FirebaseFirestore.instance
+        .collection('clubs')
+        .doc(widget.clubId)
+        .collection('AboutClub')
+        .doc('about_club_page')
+        .snapshots()
+        .distinct(); // Ensure distinct events
+
+    firestoreStreamTwo = FirebaseFirestore.instance
+        .collection('clubs')
+        .doc(widget.clubId)
+        .collection('SliversPages')
+        .doc('slivers_pages')
+        .snapshots()
+        .distinct(); // Ensure distinct events
+
     Fluttertoast.showToast(
       msg: 'Please Note: Not fully updated',
       // Show success message (you can replace it with actual banner generation logic)
@@ -171,8 +181,6 @@ class _AboutClubDetailsState extends State<AboutClubDetails> {
       allClubMembersNotifier.setCoachesList(coachesNotifier.coachesList);
       allClubMembersNotifier.setMGMTBodyList(managementBodyNotifier.managementBodyList);
     });
-
-    super.initState();
   }
 
   @override
@@ -191,7 +199,7 @@ class _AboutClubDetailsState extends State<AboutClubDetails> {
     int managersCount = allClubMembersNotifier.mgmtBodyClassList.length;
 
     return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-        stream: FirebaseFirestore.instance.collection('clubs').doc(widget.clubId).collection('AboutClub').doc('about_club_page').snapshots(),
+        stream: firestoreStreamOne,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Container();
@@ -778,7 +786,7 @@ class _AboutClubDetailsState extends State<AboutClubDetails> {
                   ],
 
                   StreamBuilder<DocumentSnapshot>(
-                    stream: FirebaseFirestore.instance.collection(collectionName).doc(documentId).snapshots(),
+                    stream: firestoreStreamTwo,
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return const CircularProgressIndicator();

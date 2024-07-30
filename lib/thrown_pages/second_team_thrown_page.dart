@@ -63,7 +63,8 @@ Color paintColor = Colors.indigo;
 Color paintColorTwo = Colors.indigoAccent;
 
 class MySecondTeamClassPage extends StatefulWidget implements NavigationStates {
-  MySecondTeamClassPage({super.key, this.title});
+  final String clubId;
+  const MySecondTeamClassPage({super.key, this.title, required this.clubId});
 
   final String? title;
 
@@ -73,6 +74,8 @@ class MySecondTeamClassPage extends StatefulWidget implements NavigationStates {
 
 class _MySecondTeamClassPage extends State<MySecondTeamClassPage> {
   final TextEditingController bugController = TextEditingController();
+
+  late Stream<DocumentSnapshot<Map<String, dynamic>>> firestoreStream;
 
   bool _isVisible = true;
 
@@ -208,17 +211,18 @@ class _MySecondTeamClassPage extends State<MySecondTeamClassPage> {
     Navigator.push(context, MaterialPageRoute(builder: (context) => const SecondTeamClassDetailsPage()));
   }
 
-  Future navigateTablesAndStatsDetails(BuildContext context, String clubId) async {
+  Future navigateTablesAndStatsDetails(BuildContext context) async {
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => BottomNavigator(
-          mainPage: PlayersTablePage(clubId: clubId), // Ensure that clubId is provided
+          mainPage: PlayersTablePage(clubId: widget.clubId), // Ensure that clubId is provided
           initialPage: 0, // Set the initial page as needed
-          clubId: clubId, // Pass the clubId to BottomNavigator
+          clubId: widget.clubId, // Pass the clubId to BottomNavigator
         ),
       ),
     );
+    setState(() {}); // Refresh the UI if needed
   }
 
   Future navigateToAboutAppDetailsPage(context) async {
@@ -230,7 +234,13 @@ class _MySecondTeamClassPage extends State<MySecondTeamClassPage> {
   }
 
   Future navigateToAboutClubDetailsPage(context) async {
-    Navigator.push(context, MaterialPageRoute(builder: (context) => const AboutClubDetails(clubId: '',)));
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => AboutClubDetails(
+                  clubId: widget.clubId,
+                )));
+    setState(() {}); // Refresh the UI after fetching the data
   }
 
   Future navigateToWhoWeArePage(context) async {
@@ -406,9 +416,18 @@ class _MySecondTeamClassPage extends State<MySecondTeamClassPage> {
 
   @override
   void initState() {
+    super.initState();
+
+    firestoreStream = FirebaseFirestore.instance
+        .collection('clubs')
+        .doc(widget.clubId)
+        .collection('SliversPages')
+        .doc('slivers_pages')
+        .snapshots()
+        .distinct(); // Ensure distinct events
+
     SecondTeamClassNotifier secondTeamClassNotifier = Provider.of<SecondTeamClassNotifier>(context, listen: false);
     _fetchSecondTeamClassAndUpdateNotifier(secondTeamClassNotifier);
-    super.initState();
 
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
@@ -417,38 +436,8 @@ class _MySecondTeamClassPage extends State<MySecondTeamClassPage> {
   }
 
   Future<void> _fetchSecondTeamClassAndUpdateNotifier(SecondTeamClassNotifier secondTeamNotifier) async {
-    // Fetch the collection of club IDs from Firestore
-    QuerySnapshot clubSnapshot = await FirebaseFirestore.instance.collection('clubs').get();
-    List<String> clubIds = clubSnapshot.docs.map((doc) => doc.id).toList();
-
-    // Process each club ID
-    for (String clubId in clubIds) {
-      await getSecondTeamClass(secondTeamNotifier, clubId);
-    }
-
-    // Optionally, notify listeners or update UI after fetching
+    await getSecondTeamClass(secondTeamNotifier, widget.clubId);
     setState(() {}); // Refresh the UI if needed
-  }
-
-  Future<void> fetchTablesAndStatsDetailsAndNavigate(BuildContext context) async {
-    try {
-      // Example Firestore collection/document query
-      QuerySnapshot snapshot = await FirebaseFirestore.instance.collection('clubs').get();
-
-      if (snapshot.docs.isNotEmpty) {
-        // Assuming you want the first document's ID for this example
-        String clubId = snapshot.docs.first.id;
-
-        // Call the navigate function with the fetched clubId
-        navigateTablesAndStatsDetails(context, clubId);
-      } else {
-        // Handle case where no documents are found
-        print('No clubs found');
-      }
-    } catch (e) {
-      // Handle any errors that occur during the fetch
-      print('Error fetching clubId: $e');
-    }
   }
 
   @override
@@ -621,7 +610,7 @@ class _MySecondTeamClassPage extends State<MySecondTeamClassPage> {
                             textAlign: TextAlign.start, style: GoogleFonts.abel(color: appBarTextColor, fontSize: 26.0, fontWeight: FontWeight.bold)),
                       ),
                       background: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-                        stream: FirebaseFirestore.instance.collection('SliversPages').doc('slivers_pages').snapshots(),
+                        stream: firestoreStream,
                         builder: (context, snapshot) {
                           if (!snapshot.hasData) {
                             return const CircularProgressIndicator();
@@ -660,7 +649,7 @@ class _MySecondTeamClassPage extends State<MySecondTeamClassPage> {
         ),
         floatingActionButton: FloatingActionButton.extended(
           onPressed: () {
-            fetchTablesAndStatsDetailsAndNavigate(context);
+            navigateTablesAndStatsDetails(context);
           },
           label: Text(
             fabStats,

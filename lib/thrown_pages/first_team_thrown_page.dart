@@ -120,7 +120,7 @@ Color borderColor = Colors.black;
 
 class MyFirstTeamClassPage extends StatefulWidget implements NavigationStates {
   final String clubId;
-  MyFirstTeamClassPage({Key? key, this.title, required this.clubId}) : super(key: key);
+  const MyFirstTeamClassPage({Key? key, this.title, required this.clubId}) : super(key: key);
 
   final String? title;
 
@@ -130,6 +130,8 @@ class MyFirstTeamClassPage extends StatefulWidget implements NavigationStates {
 
 class _MyFirstTeamClassPage extends State<MyFirstTeamClassPage> {
   final TextEditingController bugController = TextEditingController();
+
+  late Stream<DocumentSnapshot<Map<String, dynamic>>> firestoreStream;
 
   bool _isVisible = true;
   bool isLoading = true;
@@ -212,7 +214,7 @@ class _MyFirstTeamClassPage extends State<MyFirstTeamClassPage> {
                                               ),
                                               onTap: () {
                                                 Navigator.of(context).pop(false);
-                                                fetchAboutClubDetailsAndNavigate(context);
+                                                navigateToAboutClubDetailsPage(context);
                                               },
                                             ),
                                             ListTile(
@@ -318,12 +320,7 @@ class _MyFirstTeamClassPage extends State<MyFirstTeamClassPage> {
                       ),
                       stretchModes: const [StretchMode.blurBackground],
                       background: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-                        stream: FirebaseFirestore.instance
-                            .collection('clubs')
-                            .doc(widget.clubId)
-                            .collection('SliversPages')
-                            .doc('slivers_pages')
-                            .snapshots(),
+                        stream: firestoreStream,
                         builder: (context, snapshot) {
                           if (!snapshot.hasData) {
                             return const CircularProgressIndicator();
@@ -362,7 +359,7 @@ class _MyFirstTeamClassPage extends State<MyFirstTeamClassPage> {
         ),
         floatingActionButton: FloatingActionButton.extended(
           onPressed: () {
-            fetchTablesAndStatsDetailsAndNavigate(context);
+            navigateTablesAndStatsDetails(context);
           },
           label: Text(
             fabStats,
@@ -501,38 +498,18 @@ class _MyFirstTeamClassPage extends State<MyFirstTeamClassPage> {
     Navigator.push(context, MaterialPageRoute(builder: (context) => const SubPage()));
   }
 
-  Future navigateTablesAndStatsDetails(BuildContext context, String clubId) async {
+  Future navigateTablesAndStatsDetails(BuildContext context) async {
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => BottomNavigator(
-          mainPage: PlayersTablePage(clubId: clubId), // Ensure that clubId is provided
+          mainPage: PlayersTablePage(clubId: widget.clubId), // Ensure that clubId is provided
           initialPage: 0, // Set the initial page as needed
-          clubId: clubId, // Pass the clubId to BottomNavigator
+          clubId: widget.clubId, // Pass the clubId to BottomNavigator
         ),
       ),
     );
-  }
-
-  Future<void> fetchTablesAndStatsDetailsAndNavigate(BuildContext context) async {
-    try {
-      // Example Firestore collection/document query
-      QuerySnapshot snapshot = await FirebaseFirestore.instance.collection('clubs').get();
-
-      if (snapshot.docs.isNotEmpty) {
-        // Assuming you want the first document's ID for this example
-        String clubId = snapshot.docs.first.id;
-
-        // Call the navigate function with the fetched clubId
-        navigateTablesAndStatsDetails(context, clubId);
-      } else {
-        // Handle case where no documents are found
-        print('No clubs found');
-      }
-    } catch (e) {
-      // Handle any errors that occur during the fetch
-      print('Error fetching clubId: $e');
-    }
+    setState(() {}); // Refresh the UI if needed
   }
 
   Future navigateToAboutAppDetailsPage(context) async {
@@ -543,29 +520,14 @@ class _MyFirstTeamClassPage extends State<MyFirstTeamClassPage> {
     Navigator.push(context, MaterialPageRoute(builder: (context) => const AcronymsMeanings()));
   }
 
-  Future navigateToAboutClubDetailsPage(context, String clubId) async {
-    Navigator.push(context, MaterialPageRoute(builder: (context) => AboutClubDetails(clubId: widget.clubId,)));
-  }
-
-  Future<void> fetchAboutClubDetailsAndNavigate(BuildContext context) async {
-    try {
-      // Example Firestore collection/document query
-      QuerySnapshot snapshot = await FirebaseFirestore.instance.collection('clubs').get();
-
-      if (snapshot.docs.isNotEmpty) {
-        // Assuming you want the first document's ID for this example
-        String clubId = snapshot.docs.first.id;
-
-        // Call the navigate function with the fetched clubId
-        navigateToAboutClubDetailsPage(context, clubId);
-      } else {
-        // Handle case where no documents are found
-        print('No clubs found');
-      }
-    } catch (e) {
-      // Handle any errors that occur during the fetch
-      print('Error fetching clubId: $e');
-    }
+  Future navigateToAboutClubDetailsPage(context) async {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => AboutClubDetails(
+                  clubId: widget.clubId,
+                )));
+    setState(() {}); // Refresh the UI after fetching the data
   }
 
   Future navigateToWhoWeArePage(context) async {
@@ -695,23 +657,44 @@ class _MyFirstTeamClassPage extends State<MyFirstTeamClassPage> {
               onPressed: () async {
                 String enteredPasscode = passcodeController.text.trim();
 
-                // Retrieve the stored passcode from Firestore
-                DocumentSnapshot<Map<String, dynamic>> snapshot = await FirebaseFirestore.instance
-                    .collection('SliversPages') // Replace with your Firestore collection
-                    .doc('non_slivers_pages') // Replace with your Firestore document
-                    .get();
+                try {
+                  // Retrieve the stored passcode from Firestore
+                  DocumentSnapshot<Map<String, dynamic>> snapshot = await FirebaseFirestore.instance
+                      .collection('clubs')
+                      .doc(widget.clubId)
+                      .collection('SliversPages')
+                      .doc('non_slivers_pages')
+                      .get();
 
-                String storedPasscode = snapshot.data()!['admin_passcode'] ?? '';
+                  // Check if the document exists and retrieve the passcode
+                  if (snapshot.exists) {
+                    String storedPasscode = snapshot.data()?['admin_passcode'] ?? '';
 
-                // Check if the entered passcode matches the stored passcode
-                if (enteredPasscode == storedPasscode) {
-                  Navigator.pop(context);
-                  _showAdminWelcomeToast();
-                  Navigator.push(context, SlideTransition1(MyClubAdminPage()));
-                } else {
-                  // Show a toast for incorrect passcode
+                    // Check if the entered passcode matches the stored passcode
+                    if (enteredPasscode == storedPasscode) {
+                      Navigator.pop(context);
+                      _showAdminWelcomeToast();
+                      Navigator.push(context, SlideTransition1(MyClubAdminPage()));
+                    } else {
+                      // Show a toast for incorrect passcode
+                      Fluttertoast.showToast(
+                        msg: 'Incorrect passcode',
+                        backgroundColor: Colors.red,
+                        textColor: Colors.white,
+                      );
+                    }
+                  } else {
+                    // Handle the case where the document does not exist
+                    Fluttertoast.showToast(
+                      msg: 'Passcode document does not exist',
+                      backgroundColor: Colors.red,
+                      textColor: Colors.white,
+                    );
+                  }
+                } catch (e) {
+                  // Handle any errors that occur during the fetch
                   Fluttertoast.showToast(
-                    msg: 'Incorrect passcode',
+                    msg: 'Error fetching passcode: $e',
                     backgroundColor: Colors.red,
                     textColor: Colors.white,
                   );
@@ -857,6 +840,16 @@ class _MyFirstTeamClassPage extends State<MyFirstTeamClassPage> {
 
   @override
   void initState() {
+    super.initState();
+
+    firestoreStream = FirebaseFirestore.instance
+        .collection('clubs')
+        .doc(widget.clubId)
+        .collection('SliversPages')
+        .doc('slivers_pages')
+        .snapshots()
+        .distinct(); // Ensure distinct events
+
     FirstTeamClassNotifier firstTeamClassNotifier = Provider.of<FirstTeamClassNotifier>(context, listen: false);
     _fetchFirstTeamClassAndUpdateNotifier(firstTeamClassNotifier);
 
@@ -923,8 +916,6 @@ class _MyFirstTeamClassPage extends State<MyFirstTeamClassPage> {
     setState(() {
       isLoading = false;
     });
-
-    super.initState();
 
     startTime(context);
 
@@ -1005,65 +996,55 @@ class _MyFirstTeamClassPage extends State<MyFirstTeamClassPage> {
   }
 
   Future<void> _fetchTopGKPlayersStatsAndUpdateNotifier(TopGKPlayersStatsAndInfoNotifier notifier) async {
-
-      await getTopGKPlayersStatsAndInfo(notifier, widget.clubId);
+    await getTopGKPlayersStatsAndInfo(notifier, widget.clubId);
 
     setState(() {});
   }
 
   Future<void> _fetchTopDefensivePlayersStatsAndUpdateNotifier(TopDefensivePlayersStatsAndInfoNotifier notifier) async {
-
-      await getTopDefensivePlayersStatsAndInfo(notifier, widget.clubId);
+    await getTopDefensivePlayersStatsAndInfo(notifier, widget.clubId);
 
     setState(() {});
   }
 
   Future<void> _fetchMOTMPlayersStatsAndUpdateNotifier(MOTMPlayersStatsAndInfoNotifier notifier) async {
-
-
-      await getMOTMPlayersStatsAndInfo(notifier, widget.clubId);
+    await getMOTMPlayersStatsAndInfo(notifier, widget.clubId);
 
     setState(() {});
   }
 
   Future<void> _fetchCumMOTMPlayersStatsAndUpdateNotifier(CumMOTMPlayersStatsAndInfoNotifier notifier) async {
-
-      await getCumMOTMPlayersStatsAndInfo(notifier, widget.clubId);
+    await getCumMOTMPlayersStatsAndInfo(notifier, widget.clubId);
 
     setState(() {});
   }
 
   Future<void> _fetchTrainingsAndGamesReelsAndUpdateNotifier(TrainingsAndGamesReelsNotifier notifier) async {
-
-      await getTrainingsAndGamesReels(notifier, widget.clubId);
+    await getTrainingsAndGamesReels(notifier, widget.clubId);
 
     setState(() {});
   }
 
   Future<void> _fetchPlayerOfTheMonthStatsAndUpdateNotifier(PlayerOfTheMonthStatsAndInfoNotifier notifier) async {
-
-      await getPlayerOfTheMonthStatsAndInfo(notifier, widget.clubId);
+    await getPlayerOfTheMonthStatsAndInfo(notifier, widget.clubId);
 
     setState(() {});
   }
 
   Future<void> _fetchFoundersReviewsCommentAndUpdateNotifier(FoundersReviewsCommentNotifier notifier) async {
-
-      await getFoundersReviewsComment(notifier, widget.clubId);
+    await getFoundersReviewsComment(notifier, widget.clubId);
 
     setState(() {});
   }
 
   Future<void> _fetchUpcomingMatchesAndUpdateNotifier(UpcomingMatchesNotifier notifier) async {
-
-      await getUpcomingMatches(notifier, widget.clubId);
+    await getUpcomingMatches(notifier, widget.clubId);
 
     setState(() {});
   }
 
   Future<void> _fetchClubSponsorsAndUpdateNotifier(ClubSponsorsNotifier notifier) async {
-
-      await getClubSponsors(notifier, widget.clubId);
+    await getClubSponsors(notifier, widget.clubId);
 
     setState(() {});
   }

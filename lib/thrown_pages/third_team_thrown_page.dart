@@ -54,7 +54,8 @@ Color dialogBackgroundColor = const Color.fromRGBO(237, 242, 244, 1);
 Color borderColor = Colors.black;
 
 class MyThirdTeamClassPage extends StatefulWidget implements NavigationStates {
-  MyThirdTeamClassPage({Key? key, this.title}) : super(key: key);
+  final String clubId;
+  const MyThirdTeamClassPage({super.key, this.title, required this.clubId});
 
   final String? title;
 
@@ -63,6 +64,8 @@ class MyThirdTeamClassPage extends StatefulWidget implements NavigationStates {
 }
 
 class _MyThirdTeamClassPage extends State<MyThirdTeamClassPage> {
+  late Stream<DocumentSnapshot<Map<String, dynamic>>> firestoreStream;
+
   bool _isVisible = true;
 
   void showToast() {
@@ -196,17 +199,18 @@ class _MyThirdTeamClassPage extends State<MyThirdTeamClassPage> {
     Navigator.push(context, MaterialPageRoute(builder: (context) => const ThirdTeamClassDetailsPage()));
   }
 
-  Future navigateTablesAndStatsDetails(BuildContext context, String clubId) async {
+  Future navigateTablesAndStatsDetails(BuildContext context) async {
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => BottomNavigator(
-          mainPage: PlayersTablePage(clubId: clubId), // Ensure that clubId is provided
+          mainPage: PlayersTablePage(clubId: widget.clubId), // Ensure that clubId is provided
           initialPage: 0, // Set the initial page as needed
-          clubId: clubId, // Pass the clubId to BottomNavigator
+          clubId: widget.clubId, // Pass the clubId to BottomNavigator
         ),
       ),
     );
+    setState(() {}); // Refresh the UI if needed
   }
 
   Future navigateToAboutAppDetailsPage(context) async {
@@ -218,7 +222,13 @@ class _MyThirdTeamClassPage extends State<MyThirdTeamClassPage> {
   }
 
   Future navigateToAboutClubDetailsPage(context) async {
-    Navigator.push(context, MaterialPageRoute(builder: (context) => const AboutClubDetails(clubId: 'widget.clubId')));
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => AboutClubDetails(
+                  clubId: widget.clubId,
+                )));
+    setState(() {}); // Refresh the UI after fetching the data
   }
 
   Future navigateToWhoWeArePage(context) async {
@@ -227,9 +237,18 @@ class _MyThirdTeamClassPage extends State<MyThirdTeamClassPage> {
 
   @override
   void initState() {
+    super.initState();
+
+    firestoreStream = FirebaseFirestore.instance
+        .collection('clubs')
+        .doc(widget.clubId)
+        .collection('SliversPages')
+        .doc('slivers_pages')
+        .snapshots()
+        .distinct(); // Ensure distinct events
+
     ThirdTeamClassNotifier thirdTeamClassNotifier = Provider.of<ThirdTeamClassNotifier>(context, listen: false);
     _fetchThirdTeamClassAndUpdateNotifier(thirdTeamClassNotifier);
-    super.initState();
 
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
@@ -238,38 +257,9 @@ class _MyThirdTeamClassPage extends State<MyThirdTeamClassPage> {
   }
 
   Future<void> _fetchThirdTeamClassAndUpdateNotifier(ThirdTeamClassNotifier thirdTeamClassNotifier) async {
-    // Fetch the collection of club IDs from Firestore
-    QuerySnapshot clubSnapshot = await FirebaseFirestore.instance.collection('clubs').get();
-    List<String> clubIds = clubSnapshot.docs.map((doc) => doc.id).toList();
+    await getThirdTeamClass(thirdTeamClassNotifier, widget.clubId);
 
-    // Process each club ID
-    for (String clubId in clubIds) {
-      await getThirdTeamClass(thirdTeamClassNotifier, clubId);
-    }
-
-    // Optionally, notify listeners or update UI after fetching
     setState(() {}); // Refresh the UI if needed
-  }
-
-  Future<void> fetchTablesAndStatsDetailsAndNavigate(BuildContext context) async {
-    try {
-      // Example Firestore collection/document query
-      QuerySnapshot snapshot = await FirebaseFirestore.instance.collection('clubs').get();
-
-      if (snapshot.docs.isNotEmpty) {
-        // Assuming you want the first document's ID for this example
-        String clubId = snapshot.docs.first.id;
-
-        // Call the navigate function with the fetched clubId
-        navigateTablesAndStatsDetails(context, clubId);
-      } else {
-        // Handle case where no documents are found
-        print('No clubs found');
-      }
-    } catch (e) {
-      // Handle any errors that occur during the fetch
-      print('Error fetching clubId: $e');
-    }
   }
 
   @override
@@ -316,7 +306,7 @@ class _MyThirdTeamClassPage extends State<MyThirdTeamClassPage> {
                                                 ),
                                                 onTap: () {
                                                   Navigator.of(context).pop(false);
-                                                  fetchTablesAndStatsDetailsAndNavigate(context);
+                                                  navigateTablesAndStatsDetails(context);
                                                 }),
                                             // ListTile(
                                             //     leading: Icon(MdiIcons.atom,
@@ -394,7 +384,7 @@ class _MyThirdTeamClassPage extends State<MyThirdTeamClassPage> {
                             textAlign: TextAlign.start, style: GoogleFonts.abel(color: appBarTextColor, fontSize: 26.0, fontWeight: FontWeight.bold)),
                       ),
                       background: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-                        stream: FirebaseFirestore.instance.collection('SliversPages').doc('slivers_pages').snapshots(),
+                        stream: firestoreStream,
                         builder: (context, snapshot) {
                           if (!snapshot.hasData) {
                             return const CircularProgressIndicator();
@@ -427,7 +417,7 @@ class _MyThirdTeamClassPage extends State<MyThirdTeamClassPage> {
         ),
         floatingActionButton: FloatingActionButton.extended(
           onPressed: () {
-            fetchTablesAndStatsDetailsAndNavigate(context);
+            navigateTablesAndStatsDetails(context);
           },
           label: Text(
             fabStats,

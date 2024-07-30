@@ -60,7 +60,8 @@ Color borderColor = Colors.black;
 Color nabColor = const Color.fromRGBO(24, 26, 36, 1.0);
 
 class MyManagementBodyPage extends StatefulWidget implements NavigationStates {
-  MyManagementBodyPage({Key? key, this.title}) : super(key: key);
+  final String clubId;
+  const MyManagementBodyPage({super.key, this.title, required this.clubId});
 
   final String? title;
 
@@ -70,6 +71,8 @@ class MyManagementBodyPage extends StatefulWidget implements NavigationStates {
 
 class _MyManagementBodyPage extends State<MyManagementBodyPage> {
   final TextEditingController bugController = TextEditingController();
+
+  late Stream<DocumentSnapshot<Map<String, dynamic>>> firestoreStream;
 
   Widget _buildProductItem(BuildContext context, int index) {
     ManagementBodyNotifier managementBodyNotifier = Provider.of<ManagementBodyNotifier>(context);
@@ -180,17 +183,18 @@ class _MyManagementBodyPage extends State<MyManagementBodyPage> {
     Navigator.push(context, MaterialPageRoute(builder: (context) => const ManagementBodyDetailsPage()));
   }
 
-  Future navigateTablesAndStatsDetails(BuildContext context, String clubId) async {
+  Future navigateTablesAndStatsDetails(BuildContext context) async {
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => BottomNavigator(
-          mainPage: PlayersTablePage(clubId: clubId), // Ensure that clubId is provided
+          mainPage: PlayersTablePage(clubId: widget.clubId), // Ensure that clubId is provided
           initialPage: 0, // Set the initial page as needed
-          clubId: clubId, // Pass the clubId to BottomNavigator
+          clubId: widget.clubId, // Pass the clubId to BottomNavigator
         ),
       ),
     );
+    setState(() {}); // Refresh the UI if needed
   }
 
   Future navigateToAboutAppDetailsPage(context) async {
@@ -205,9 +209,10 @@ class _MyManagementBodyPage extends State<MyManagementBodyPage> {
     Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (context) => const AboutClubDetails(
-                  clubId: '',
+            builder: (context) => AboutClubDetails(
+                  clubId: widget.clubId,
                 )));
+    setState(() {}); // Refresh the UI after fetching the data
   }
 
   Future navigateToWhoWeArePage(context) async {
@@ -383,9 +388,18 @@ class _MyManagementBodyPage extends State<MyManagementBodyPage> {
 
   @override
   void initState() {
+    super.initState();
+
+    firestoreStream = FirebaseFirestore.instance
+        .collection('clubs')
+        .doc(widget.clubId)
+        .collection('SliversPages')
+        .doc('slivers_pages')
+        .snapshots()
+        .distinct(); // Ensure distinct events
+
     ManagementBodyNotifier managementBodyNotifier = Provider.of<ManagementBodyNotifier>(context, listen: false);
     _fetchManagementBodyAndUpdateNotifier(managementBodyNotifier);
-    super.initState();
 
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
@@ -394,38 +408,9 @@ class _MyManagementBodyPage extends State<MyManagementBodyPage> {
   }
 
   Future<void> _fetchManagementBodyAndUpdateNotifier(ManagementBodyNotifier managementBodyNotifier) async {
-    // Fetch the collection of club IDs from Firestore
-    QuerySnapshot clubSnapshot = await FirebaseFirestore.instance.collection('clubs').get();
-    List<String> clubIds = clubSnapshot.docs.map((doc) => doc.id).toList();
+    await getManagementBody(managementBodyNotifier, widget.clubId);
 
-    // Process each club ID
-    for (String clubId in clubIds) {
-      await getManagementBody(managementBodyNotifier, clubId);
-    }
-
-    // Optionally, notify listeners or update UI after fetching
     setState(() {}); // Refresh the UI if needed
-  }
-
-  Future<void> fetchTablesAndStatsDetailsAndNavigate(BuildContext context) async {
-    try {
-      // Example Firestore collection/document query
-      QuerySnapshot snapshot = await FirebaseFirestore.instance.collection('clubs').get();
-
-      if (snapshot.docs.isNotEmpty) {
-        // Assuming you want the first document's ID for this example
-        String clubId = snapshot.docs.first.id;
-
-        // Call the navigate function with the fetched clubId
-        navigateTablesAndStatsDetails(context, clubId);
-      } else {
-        // Handle case where no documents are found
-        print('No clubs found');
-      }
-    } catch (e) {
-      // Handle any errors that occur during the fetch
-      print('Error fetching clubId: $e');
-    }
   }
 
   @override
@@ -597,7 +582,7 @@ class _MyManagementBodyPage extends State<MyManagementBodyPage> {
                             textAlign: TextAlign.start, style: GoogleFonts.abel(color: textColor, fontSize: 26.0, fontWeight: FontWeight.bold)),
                       ),
                       background: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-                        stream: FirebaseFirestore.instance.collection('SliversPages').doc('slivers_pages').snapshots(),
+                        stream: firestoreStream,
                         builder: (context, snapshot) {
                           if (!snapshot.hasData) {
                             return const CircularProgressIndicator();
@@ -636,7 +621,7 @@ class _MyManagementBodyPage extends State<MyManagementBodyPage> {
         ),
         floatingActionButton: FloatingActionButton.extended(
           onPressed: () {
-            fetchTablesAndStatsDetailsAndNavigate(context);
+            navigateTablesAndStatsDetails(context);
           },
           label: Text(
             fabStats,

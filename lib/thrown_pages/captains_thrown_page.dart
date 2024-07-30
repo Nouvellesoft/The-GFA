@@ -10,7 +10,6 @@ import 'package:launch_review/launch_review.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:provider/provider.dart';
 
-import '../home_page/home_page_deux.dart';
 import '/bottom_nav_stats_pages/players_table_page.dart';
 import '../about_menu_details_pages/about_app.dart';
 import '../about_menu_details_pages/about_club.dart';
@@ -21,7 +20,7 @@ import '../bloc_navigation_bloc/navigation_bloc.dart';
 import '../bottom_nav_stats_pages/bottom_navigator.dart';
 import '../club_admin/club_admin_page.dart';
 import '../details_pages/club_captains_details_page.dart';
-import '../main.dart';
+import '../home_page/home_page_deux.dart';
 import '../notifier/club_captains_notifier.dart';
 import '../thrown_searches/captains_thrown_search.dart';
 
@@ -62,7 +61,8 @@ Color borderColor = Colors.black;
 Color nabColor = const Color.fromRGBO(56, 56, 60, 1);
 
 class MyCaptainsPage extends StatefulWidget implements NavigationStates {
-  MyCaptainsPage({Key? key, this.title}) : super(key: key);
+  final String clubId;
+  const MyCaptainsPage({super.key, this.title, required this.clubId});
 
   final String? title;
 
@@ -72,6 +72,8 @@ class MyCaptainsPage extends StatefulWidget implements NavigationStates {
 
 class _MyCaptainsPage extends State<MyCaptainsPage> {
   final TextEditingController bugController = TextEditingController();
+
+  late Stream<DocumentSnapshot<Map<String, dynamic>>> firestoreStream;
 
   Widget _buildProductItem(BuildContext context, int index) {
     late CaptainsNotifier captainsNotifier = Provider.of<CaptainsNotifier>(context);
@@ -183,17 +185,18 @@ class _MyCaptainsPage extends State<MyCaptainsPage> {
     Navigator.push(context, MaterialPageRoute(builder: (context) => const CaptainsDetailsPage()));
   }
 
-  Future navigateTablesAndStatsDetails(BuildContext context, String clubId) async {
+  Future navigateTablesAndStatsDetails(BuildContext context) async {
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => BottomNavigator(
-          mainPage: PlayersTablePage(clubId: clubId), // Ensure that clubId is provided
+          mainPage: PlayersTablePage(clubId: widget.clubId), // Ensure that clubId is provided
           initialPage: 0, // Set the initial page as needed
-          clubId: clubId, // Pass the clubId to BottomNavigator
+          clubId: widget.clubId, // Pass the clubId to BottomNavigator
         ),
       ),
     );
+    setState(() {}); // Refresh the UI if needed
   }
 
   Future navigateToAboutAppDetailsPage(context) async {
@@ -205,7 +208,13 @@ class _MyCaptainsPage extends State<MyCaptainsPage> {
   }
 
   Future navigateToAboutClubDetailsPage(context) async {
-    Navigator.push(context, MaterialPageRoute(builder: (context) => const AboutClubDetails(clubId: '',)));
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => AboutClubDetails(
+                  clubId: widget.clubId,
+                )));
+    setState(() {}); // Refresh the UI after fetching the data
   }
 
   Future navigateToWhoWeArePage(context) async {
@@ -381,6 +390,16 @@ class _MyCaptainsPage extends State<MyCaptainsPage> {
 
   @override
   void initState() {
+    super.initState();
+
+    firestoreStream = FirebaseFirestore.instance
+        .collection('clubs')
+        .doc(widget.clubId)
+        .collection('SliversPages')
+        .doc('slivers_pages')
+        .snapshots()
+        .distinct(); // Ensure distinct events
+
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
@@ -388,46 +407,13 @@ class _MyCaptainsPage extends State<MyCaptainsPage> {
 
     CaptainsNotifier captainsNotifier = Provider.of<CaptainsNotifier>(context, listen: false);
     _fetchCaptainsAndUpdateNotifier(captainsNotifier);
-
-    super.initState();
   }
 
   Future<void> _fetchCaptainsAndUpdateNotifier(CaptainsNotifier captainsNotifier) async {
-    // Fetch the collection of club IDs from Firestore
-    QuerySnapshot clubSnapshot = await FirebaseFirestore.instance.collection('clubs').get();
-    List<String> clubIds = clubSnapshot.docs.map((doc) => doc.id).toList();
+    await getCaptains(captainsNotifier, widget.clubId);
 
-    // Process each club ID
-    for (String clubId in clubIds) {
-      await getCaptains(captainsNotifier, clubId);
-    }
-
-    // Optionally, notify listeners or update UI after fetching
     setState(() {}); // Refresh the UI if needed
   }
-
-  Future<void> fetchTablesAndStatsDetailsAndNavigate(BuildContext context) async {
-    try {
-      // Example Firestore collection/document query
-      QuerySnapshot snapshot = await FirebaseFirestore.instance.collection('clubs').get();
-
-      if (snapshot.docs.isNotEmpty) {
-        // Assuming you want the first document's ID for this example
-        String clubId = snapshot.docs.first.id;
-
-        // Call the navigate function with the fetched clubId
-        navigateTablesAndStatsDetails(context, clubId);
-      } else {
-        // Handle case where no documents are found
-        print('No clubs found');
-      }
-    } catch (e) {
-      // Handle any errors that occur during the fetch
-      print('Error fetching clubId: $e');
-    }
-  }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -609,7 +595,7 @@ class _MyCaptainsPage extends State<MyCaptainsPage> {
                             textAlign: TextAlign.start, style: GoogleFonts.abel(color: appBarTextColor, fontSize: 26.0, fontWeight: FontWeight.bold)),
                       ),
                       background: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-                        stream: FirebaseFirestore.instance.collection('SliversPages').doc('slivers_pages').snapshots(),
+                        stream: firestoreStream,
                         builder: (context, snapshot) {
                           if (!snapshot.hasData) {
                             return const CircularProgressIndicator();
@@ -649,7 +635,7 @@ class _MyCaptainsPage extends State<MyCaptainsPage> {
         floatingActionButton: FloatingActionButton.extended(
           onPressed: () {
             // Navigator.of(context).pop(true);
-            fetchTablesAndStatsDetailsAndNavigate(context);
+            navigateTablesAndStatsDetails(context);
           },
           label: Text(
             fabStats,

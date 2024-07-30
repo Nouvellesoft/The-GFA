@@ -35,25 +35,25 @@ class NavigationBloc extends Bloc<NavigationEvents, NavigationStates> {
         yield MyFirstTeamClassPage(clubId: clubId);
         break;
       case NavigationEvents.mySecondTeamClassPageClickedEvent:
-        yield MySecondTeamClassPage();
+        yield MySecondTeamClassPage(clubId: clubId);
         break;
       case NavigationEvents.myThirdTeamClassPageClickedEvent:
-        yield MyThirdTeamClassPage();
+        yield MyThirdTeamClassPage(clubId: clubId);
         break;
       case NavigationEvents.myCoachesPageClickedEvent:
-        yield MyCoachesPage();
+        yield MyCoachesPage(clubId: clubId);
         break;
       case NavigationEvents.myManagementBodyPageClickedEvent:
-        yield MyManagementBodyPage();
+        yield MyManagementBodyPage(clubId: clubId);
         break;
       case NavigationEvents.myCaptainsPageClickedEvent:
-        yield MyCaptainsPage();
+        yield MyCaptainsPage(clubId: clubId);
         break;
       case NavigationEvents.myClubSponsorsPageClickedEvent:
         yield MyClubSponsorsPage(fromPage1: false, clubId: clubId);
         break;
       case NavigationEvents.myYouTubePageClickedEvent:
-        yield MyYouTubePage();
+        yield MyYouTubePage(clubId: clubId);
         break;
     }
   }
