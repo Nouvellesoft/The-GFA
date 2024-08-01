@@ -120,7 +120,7 @@ Color borderColor = Colors.black;
 
 class MyFirstTeamClassPage extends StatefulWidget implements NavigationStates {
   final String clubId;
-  const MyFirstTeamClassPage({Key? key, this.title, required this.clubId}) : super(key: key);
+  const MyFirstTeamClassPage({super.key, this.title, required this.clubId});
 
   final String? title;
 
@@ -513,11 +513,11 @@ class _MyFirstTeamClassPage extends State<MyFirstTeamClassPage> {
   }
 
   Future navigateToAboutAppDetailsPage(context) async {
-    Navigator.push(context, MaterialPageRoute(builder: (context) => const AboutAppDetails()));
+    Navigator.push(context, MaterialPageRoute(builder: (context) => AboutAppDetails(clubId: widget.clubId)));
   }
 
   Future navigateToAcronymsMeaningsPage(context) async {
-    Navigator.push(context, MaterialPageRoute(builder: (context) => const AcronymsMeanings()));
+    Navigator.push(context, MaterialPageRoute(builder: (context) => AcronymsMeanings(clubId: widget.clubId)));
   }
 
   Future navigateToAboutClubDetailsPage(context) async {

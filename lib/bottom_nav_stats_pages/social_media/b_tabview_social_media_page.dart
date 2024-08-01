@@ -1,9 +1,10 @@
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+import '../../main.dart';
 import 'b_social_media_page.dart';
 import 'b_youtube_page.dart';
-import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-import '../../main.dart';
 
 
 String smTitle = 'Social Media';
@@ -15,7 +16,8 @@ Color? selectedTabColor = Colors.indigo[200];
 
 
 class TabviewSocialMediaPage extends StatefulWidget {
-  const TabviewSocialMediaPage({super.key});
+  final String clubId;
+  const TabviewSocialMediaPage({super.key, required this.clubId});
 
   @override
   State<TabviewSocialMediaPage> createState() => TabviewSocialMediaPageState();
@@ -75,8 +77,8 @@ class TabviewSocialMediaPageState extends State<TabviewSocialMediaPage> with Sin
       body: TabBarView(
         controller: _tabController,
         children: [
-          MySocialMediaPage(),
-          MyYouTubePage(),
+          MySocialMediaPage(clubId: widget.clubId),
+          MyYouTubePage(clubId: widget.clubId),
         ],
       ),
     );

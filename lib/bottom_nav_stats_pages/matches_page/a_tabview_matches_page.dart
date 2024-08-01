@@ -1,9 +1,9 @@
-import 'a_past_matches_page.dart';
-import './a_upcoming_matches_page.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../main.dart';
 
+import '../../main.dart';
+import './a_upcoming_matches_page.dart';
+import 'a_past_matches_page.dart';
 
 String fixturesTitle = 'Fixtures';
 String resultsTitle = 'Results';
@@ -12,9 +12,9 @@ String matchesTitle = 'Matches';
 Color? backgroundColor = const Color.fromRGBO(34, 40, 49, 1);
 Color? selectedTabColor = Colors.indigo[200];
 
-
 class TabviewMatchesPage extends StatefulWidget {
-  const TabviewMatchesPage({Key? key, required this.initialPage}) : super(key: key);
+  final String clubId;
+  const TabviewMatchesPage({super.key, required this.initialPage, required this.clubId});
 
   final int initialPage;
 
@@ -42,14 +42,7 @@ class TabviewMatchesPageState extends State<TabviewMatchesPage> with SingleTicke
     return Scaffold(
       appBar: AppBar(
         backgroundColor: backgroundColor,
-        title: Text(
-            matchesTitle,
-            style: GoogleFonts.jura(
-                fontSize: 23,
-                fontWeight: FontWeight.w800,
-                color: Colors.white
-            )
-        ),
+        title: Text(matchesTitle, style: GoogleFonts.jura(fontSize: 23, fontWeight: FontWeight.w800, color: Colors.white)),
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios, color: appBarIconColor),
           onPressed: () {
@@ -69,15 +62,14 @@ class TabviewMatchesPageState extends State<TabviewMatchesPage> with SingleTicke
       ),
       body: TabBarView(
         controller: _tabController,
-        children: const [
-          PastMatchesPage(),
-          UpcomingMatchesPage(),
+        children: [
+          PastMatchesPage(clubId: widget.clubId),
+          UpcomingMatchesPage(clubId: widget.clubId),
         ],
       ),
     );
   }
 }
-
 
 Future navigateMyApp(context) async {
   Navigator.of(context).pop(false);

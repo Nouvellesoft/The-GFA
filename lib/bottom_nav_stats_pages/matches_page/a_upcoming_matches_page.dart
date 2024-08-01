@@ -12,7 +12,8 @@ Color nabColor = const Color.fromRGBO(56, 56, 60, 1);
 Color splashColorTwo = Colors.black87;
 
 class UpcomingMatchesPage extends StatefulWidget {
-  const UpcomingMatchesPage({super.key});
+  final String clubId;
+  const UpcomingMatchesPage({super.key, required this.clubId});
 
   @override
   UpcomingMatchesPageState createState() => UpcomingMatchesPageState();
@@ -22,19 +23,13 @@ class UpcomingMatchesPageState extends State<UpcomingMatchesPage> with TickerPro
   late AnimationController _controller;
   late Animation<Color?> _color;
 
+  late Stream<DocumentSnapshot<Map<String, dynamic>>> firestoreStream;
+
   String results = 'Results';
 
   Future<void> _fetchUpcomingMatchesAndUpdateNotifier(UpcomingMatchesNotifier upcomingMatchesNotifier) async {
-    // Fetch the collection of club IDs from Firestore
-    QuerySnapshot clubSnapshot = await FirebaseFirestore.instance.collection('clubs').get();
-    List<String> clubIds = clubSnapshot.docs.map((doc) => doc.id).toList();
+    await getUpcomingMatches(upcomingMatchesNotifier, widget.clubId);
 
-    // Process each club ID
-    for (String clubId in clubIds) {
-      await getUpcomingMatches(upcomingMatchesNotifier, clubId);
-    }
-
-    // Optionally, notify listeners or update UI after fetching
     setState(() {}); // Refresh the UI if needed
   }
 
@@ -58,7 +53,7 @@ class UpcomingMatchesPageState extends State<UpcomingMatchesPage> with TickerPro
   }
 
   Future navigateTablesAndStatsDetails(context) async {
-    Navigator.push(context, MaterialPageRoute(builder: (context) => const PastMatchesPage()));
+    Navigator.push(context, MaterialPageRoute(builder: (context) => PastMatchesPage(clubId: widget.clubId)));
   }
 
   @override

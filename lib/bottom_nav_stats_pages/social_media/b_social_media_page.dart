@@ -36,13 +36,15 @@ dynamic _facebook;
 Color colorBack = const Color.fromRGBO(58, 56, 69, 1);
 
 class MySocialMediaPage extends StatefulWidget {
-  MySocialMediaPage({Key? key}) : super(key: key);
+  final String clubId;
+  const MySocialMediaPage({super.key, required this.clubId});
 
   @override
   State<MySocialMediaPage> createState() => MySocialMediaPageState();
 }
 
 class MySocialMediaPageState extends State<MySocialMediaPage> {
+  late Stream<DocumentSnapshot<Map<String, dynamic>>> firestoreStream;
 
   Future launchURL(String url) async {
     final scaffoldMessenger = ScaffoldMessenger.of(context);
@@ -58,7 +60,7 @@ class MySocialMediaPageState extends State<MySocialMediaPage> {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-        stream: FirebaseFirestore.instance.collection('SliversPages').doc('non_slivers_pages').snapshots(),
+        stream: firestoreStream,
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
             return const CircularProgressIndicator();
@@ -67,7 +69,6 @@ class MySocialMediaPageState extends State<MySocialMediaPage> {
           _twitter = snapshot.data?.data()?['twitter_handle'];
           _instagram = snapshot.data?.data()?['instagram_handle'];
           _facebook = snapshot.data?.data()?['facebook_handle'];
-
 
           return Scaffold(
             body: Stack(
@@ -223,6 +224,14 @@ class MySocialMediaPageState extends State<MySocialMediaPage> {
   @override
   void initState() {
     super.initState();
+
+    firestoreStream = FirebaseFirestore.instance
+        .collection('clubs')
+        .doc(widget.clubId)
+        .collection('SliversPages')
+        .doc('non_slivers_pages')
+        .snapshots()
+        .distinct(); // Ensure distinct events
 
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,

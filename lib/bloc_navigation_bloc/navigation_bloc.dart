@@ -4,7 +4,6 @@ import '/bottom_nav_stats_pages/social_media/b_youtube_page.dart';
 import '../thrown_pages/captains_thrown_page.dart';
 import '../thrown_pages/club_sponsors_thrown_page.dart';
 import '../thrown_pages/coaches_thrown_page.dart';
-// import '../dummy_pages/dummy_first_thrown.dart';
 import '../thrown_pages/first_team_thrown_page.dart';
 import '../thrown_pages/management_thrown_page.dart';
 import '../thrown_pages/second_team_thrown_page.dart';

@@ -29,7 +29,8 @@ Color phoneColor = const Color.fromRGBO(20, 134, 46, 1.0);
 Color backgroundColor = const Color.fromRGBO(147, 165, 193, 1.0);
 
 class MyYouTubePage extends StatefulWidget implements NavigationStates {
-  MyYouTubePage({super.key});
+  final String clubId;
+  const MyYouTubePage({super.key, required this.clubId});
 
   @override
   State<MyYouTubePage> createState() => MyYouTubePageState();
@@ -95,16 +96,8 @@ class MyYouTubePageState extends State<MyYouTubePage> {
   }
 
   Future<void> _fetchYoutubeVideosAndUpdateNotifier(YouTubeNotifier youTubeNotifier) async {
-    // Fetch the collection of club IDs from Firestore
-    QuerySnapshot clubSnapshot = await FirebaseFirestore.instance.collection('clubs').get();
-    List<String> clubIds = clubSnapshot.docs.map((doc) => doc.id).toList();
+    await getYouTube(youTubeNotifier, widget.clubId);
 
-    // Process each club ID
-    for (String clubId in clubIds) {
-      await getYouTube(youTubeNotifier, clubId);
-    }
-
-    // Optionally, notify listeners or update UI after fetching
     setState(() {}); // Refresh the UI if needed
   }
 

@@ -87,6 +87,8 @@ class _SideBarState extends State<SideBar> with SingleTickerProviderStateMixin<S
   int _currentNAVSelected = 0;
   bool _isClubSponsorsClicked = false; // New variable to track the "Club Sponsors" click
 
+  late Stream<DocumentSnapshot<Map<String, dynamic>>> firestoreStream;
+
   _onSelected(int index) {
     if (index == 7 /**|| index == 8 */) {
       // Check if the selected item is "Club Sponsors"
@@ -105,22 +107,17 @@ class _SideBarState extends State<SideBar> with SingleTickerProviderStateMixin<S
   final bool isSidebarOpened = true;
   final _animationDuration = const Duration(milliseconds: 500);
 
-  Stream<DocumentSnapshot<Map<String, dynamic>>> getDataFromFirestore() {
-    // return FirebaseFirestore.instance.collection('SliversPages').doc('non_slivers_pages').snapshots();
-    return FirebaseFirestore.instance
-        .collection('clubs')
-        // .doc(clubId)
-        .doc('davidfc')
-        .collection('SliversPages')
-        .doc('slivers_pages')
-        .snapshots();
-  }
-
   @override
   void initState() {
     super.initState();
 
-    getDataFromFirestore();
+    firestoreStream = FirebaseFirestore.instance
+        .collection('clubs')
+        .doc(widget.clubId)
+        .collection('SliversPages')
+        .doc('slivers_pages')
+        .snapshots()
+        .distinct(); // Ensure distinct events
 
     _animationController = AnimationController(vsync: this, duration: _animationDuration);
     isSidebarOpenedStreamController = PublishSubject<bool>();
@@ -196,7 +193,7 @@ class _SideBarState extends State<SideBar> with SingleTickerProviderStateMixin<S
                                   Opacity(
                                     opacity: 0.7,
                                     child: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-                                      stream: getDataFromFirestore(),
+                                      stream: firestoreStream,
                                       builder: (context, snapshot) {
                                         if (snapshot.connectionState == ConnectionState.waiting) {
                                           return const Center(child: CircularProgressIndicator());
@@ -470,7 +467,7 @@ class _SideBarState extends State<SideBar> with SingleTickerProviderStateMixin<S
                                                 context,
                                                 MaterialPageRoute(
                                                   builder: (context) => BottomNavigator(
-                                                    mainPage: const TabviewSocialMediaPage(),
+                                                    mainPage: TabviewSocialMediaPage(clubId: widget.clubId),
                                                     initialPage: 3,
                                                     clubId: widget.clubId,
                                                   ),
@@ -576,7 +573,7 @@ class _SideBarState extends State<SideBar> with SingleTickerProviderStateMixin<S
                                                 context,
                                                 MaterialPageRoute(
                                                   builder: (context) => BottomNavigator(
-                                                    mainPage: const TabviewMatchesPage(initialPage: 1),
+                                                    mainPage: TabviewMatchesPage(initialPage: 1, clubId: widget.clubId),
                                                     initialPage: 2,
                                                     clubId: widget.clubId,
                                                   ), // Set initialPage to 1 for 'Fixtures'

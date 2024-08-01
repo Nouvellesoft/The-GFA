@@ -4,8 +4,7 @@ import 'package:flutter/material.dart';
 
 String clubName = "Coventry Phoenix FC";
 String acronymTitle = "Acronym Meanings";
-String acronym =
-    "The following acronym(s) are used in the apps and their meanings are detailed.";
+String acronym = "The following acronym(s) are used in the apps and their meanings are detailed.";
 String icdat = "ICDAT - I Can Do All Things\n\n";
 String cpfc = "CPFC - Coventry Phoenix FC\n\n";
 String apt = "A.P.T. - All Players Table\n\n";
@@ -44,7 +43,9 @@ Color headingCardTextColor = const Color.fromRGBO(58, 31, 41, 1);
 Color cardTextColor = Colors.white;
 
 class AcronymsMeanings extends StatefulWidget {
-  const AcronymsMeanings({Key? key, this.title}) : super(key: key);
+  final String clubId;
+
+  const AcronymsMeanings({super.key, this.title, required this.clubId});
 
   final String? title;
 
@@ -53,6 +54,8 @@ class AcronymsMeanings extends StatefulWidget {
 }
 
 class _AcronymsMeaningsState extends State<AcronymsMeanings> {
+  late Stream<DocumentSnapshot<Map<String, dynamic>>> firestoreStream;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -83,14 +86,10 @@ class _AcronymsMeaningsState extends State<AcronymsMeanings> {
                 elevation: 10,
                 margin: const EdgeInsets.all(20),
                 child: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-                  stream: FirebaseFirestore.instance
-                      .collection('SliversPages')
-                      .doc('non_slivers_pages')
-                      .snapshots(),
+                  stream: firestoreStream,
                   builder: (context, snapshot) {
                     if (!snapshot.hasData) {
-                      return const SizedBox(
-                          height: 300, child: CircularProgressIndicator());
+                      return const SizedBox(height: 300, child: CircularProgressIndicator());
                     }
                     return Container(
                       height: 300,
@@ -116,24 +115,19 @@ class _AcronymsMeaningsState extends State<AcronymsMeanings> {
                       child: Card(
                         color: headingCardColor,
                         child: Padding(
-                          padding: const EdgeInsets.only(
-                              top: 15, bottom: 15, left: 30, right: 30),
+                          padding: const EdgeInsets.only(top: 15, bottom: 15, left: 30, right: 30),
                           child: Text(
                             acronymTitle,
                             textAlign: TextAlign.center,
                             style: TextStyle(
-                                fontSize: 25,
-                                fontStyle: FontStyle.italic,
-                                color: headingCardTextColor.withAlpha(220),
-                                fontWeight: FontWeight.w700),
+                                fontSize: 25, fontStyle: FontStyle.italic, color: headingCardTextColor.withAlpha(220), fontWeight: FontWeight.w700),
                           ),
                         ),
                       ),
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.only(
-                        left: 10, right: 10, top: 10, bottom: 30),
+                    padding: const EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 30),
                     child: Column(
                       children: <Widget>[
                         RichText(
@@ -369,5 +363,18 @@ class _AcronymsMeaningsState extends State<AcronymsMeanings> {
         ),
       ),
     );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    firestoreStream = FirebaseFirestore.instance
+        .collection('clubs')
+        .doc(widget.clubId)
+        .collection('SliversPages')
+        .doc('non_slivers_pages')
+        .snapshots()
+        .distinct(); // Ensure distinct events
   }
 }

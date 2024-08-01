@@ -85,23 +85,9 @@ class _SideBarState extends State<SideBar> with SingleTickerProviderStateMixin<S
   final bool isSidebarOpened = true;
   final _animationDuration = const Duration(milliseconds: 500);
 
-  // Stream<DocumentSnapshot<Map<String, dynamic>>> getDataFromFirestore() {
-  //   // return FirebaseFirestore.instance.collection('SliversPages').doc('non_slivers_pages').snapshots();
-  //   return FirebaseFirestore.instance
-  //       .collection('clubs')
-  //       .doc(widget.clubId)
-  //       // .doc('anafc')
-  //       .collection('SliversPages')
-  //       .doc('slivers_pages')
-  //       .snapshots()
-  //       .distinct(); // Ensure distinct events
-  // }
-
   @override
   void initState() {
     super.initState();
-
-    // getDataFromFirestore();
 
     firestoreStream = FirebaseFirestore.instance
         .collection('clubs')
@@ -185,7 +171,6 @@ class _SideBarState extends State<SideBar> with SingleTickerProviderStateMixin<S
                                   Opacity(
                                     opacity: 0.7,
                                     child: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-                                      // stream: getDataFromFirestore(),
                                       stream: firestoreStream,
                                       builder: (context, snapshot) {
                                         if (snapshot.connectionState == ConnectionState.waiting) {

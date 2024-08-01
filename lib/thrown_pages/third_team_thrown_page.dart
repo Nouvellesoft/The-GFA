@@ -214,11 +214,11 @@ class _MyThirdTeamClassPage extends State<MyThirdTeamClassPage> {
   }
 
   Future navigateToAboutAppDetailsPage(context) async {
-    Navigator.push(context, MaterialPageRoute(builder: (context) => const AboutAppDetails()));
+    Navigator.push(context, MaterialPageRoute(builder: (context) => AboutAppDetails(clubId: widget.clubId)));
   }
 
   Future navigateToAcronymsMeaningsPage(context) async {
-    Navigator.push(context, MaterialPageRoute(builder: (context) => const AcronymsMeanings()));
+    Navigator.push(context, MaterialPageRoute(builder: (context) => AcronymsMeanings(clubId: widget.clubId)));
   }
 
   Future navigateToAboutClubDetailsPage(context) async {

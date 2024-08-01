@@ -10,12 +10,9 @@ String title = "About Developer";
 String clubAlmanac = "$clubName App, 2023";
 String developerWebsite = "https://novelsoft.co.uk/";
 
-String googlePlayServicesPolicyWebsite =
-    "https://play.google.com/about/privacy-security-deception/";
-String googleAnalyticsFirebasePolicyWebsite =
-    "https://firebase.google.com/policies/analytics/";
-String firebaseCrashlyticsPolicyWebsite =
-    "https://firebase.google.com/support/privacy/";
+String googlePlayServicesPolicyWebsite = "https://play.google.com/about/privacy-security-deception/";
+String googleAnalyticsFirebasePolicyWebsite = "https://firebase.google.com/policies/analytics/";
+String firebaseCrashlyticsPolicyWebsite = "https://firebase.google.com/support/privacy/";
 String facebookPolicyWebsite = "https://web.facebook.com/about/privacy/";
 String twitterPolicyWebsite = "https://twitter.com/en/privacy";
 String instagramPolicyWebsite = "https://help.instagram.com/";
@@ -25,14 +22,12 @@ String gmailPolicyWebsite = "https://firebase.google.com/support/privacy/";
 String mailFIRST = "mailto:";
 String mailSECOND = "?subject=Hello ";
 
-String aboutApp =
-    "PLEASE READ CAREFULLY.\n\nThe GFA (Grassroot Football App) was engineered and developed by 'Nouvellesoft.io Inc.'";
+String aboutApp = "PLEASE READ CAREFULLY.\n\nThe GFA (Grassroot Football App) was engineered and developed by 'Nouvellesoft.io Inc.'";
 String blemish =
     '"Do not be concerned about the blemishes and imperfections you may notice on the software, it is those blemishes that prove that the app is authentic. :)"';
 String copyrightTerms =
     "This software is subject to copyright of Nouvellesoft.io Inc.. Hence should not be developed or replicated without due permission by any company or individual.";
-String termsEtConditions =
-    "The following are the terms and conditions attached to usage of this software;";
+String termsEtConditions = "The following are the terms and conditions attached to usage of this software;";
 String termsEtConditions2 =
     "$clubName and/or her subsidiaries are the owners or the licensee of the materials published on this software, and are at freewill by this permission to share with her stakeholders, parents, staff and players.";
 String termsEtConditions3 =
@@ -58,10 +53,8 @@ String privacyPolicy3 =
 String infoCollection = "Information Collection and Use";
 String infoCollection1 =
     "For a better experience, while using our Service, we may require you to provide us with certain personally identifiable information. The information that we request will be retained by us and used as described in this privacy policy.";
-String infoCollection2 =
-    "The app does use third party services that may collect information used to identify you.";
-String infoCollection3 =
-    "Link to privacy policy of third party service providers used by the app";
+String infoCollection2 = "The app does use third party services that may collect information used to identify you.";
+String infoCollection3 = "Link to privacy policy of third party service providers used by the app";
 String infoCollectionLink1 = "Google Play Services";
 String infoCollectionLink2 = "Google Analytics for Firebase";
 String infoCollectionLink3 = "Firebase Crashlytics";
@@ -74,8 +67,7 @@ String logData = "Log Data";
 String logData1 =
     "We want to inform you that whenever you use our Service, in a case of an error in the app we collect data and information (through third party products) on your phone called Log Data. \nThis Log Data may include information such as your device Internet Protocol (“IP”) address, device name, operating system version, the configuration of the app when utilizing our Service, the time and date of your use of the Service, and other statistics.";
 String serviceProviders = "Service Providers";
-String serviceProviders1 =
-    "We may employ third-party companies and individuals due to the following reasons:";
+String serviceProviders1 = "We may employ third-party companies and individuals due to the following reasons:";
 String serviceProviders2 = "To facilitate our Service;";
 String serviceProviders3 = "To provide the Service on our behalf;";
 String serviceProviders4 = "To perform Service-related services; or";
@@ -94,20 +86,20 @@ String privacyPolicyChanges1 =
 String contactUs = "Contact Us";
 String contactUs1 =
     "If you have any questions or suggestions about our Terms and Conditions, Disclaimer, Privacy Policy, Software do not hesitate to send an email by clicking me too.";
-String termsEtConditionsMore =
-    "For more information about our terms and conditions, please click me.";
+String termsEtConditionsMore = "For more information about our terms and conditions, please click me.";
 
 Color backgroundColor = const Color.fromRGBO(40, 38, 38, 1.0);
 Color appBarTextColor = Colors.white.withAlpha(250);
 Color appBarBackgroundColor = const Color.fromRGBO(40, 38, 38, 1.0);
 Color appBarIconColor = Colors.white.withAlpha(250);
-Color cardBackgroundColor =  const Color.fromRGBO(58, 55, 55, 1.0);
+Color cardBackgroundColor = const Color.fromRGBO(58, 55, 55, 1.0);
 Color headingCardColor = Colors.white.withAlpha(250);
 Color headingCardTextColor = const Color.fromRGBO(58, 55, 55, 1.0);
 Color cardTextColor = Colors.white.withAlpha(250);
 
 class AboutAppDetails extends StatefulWidget {
-  const AboutAppDetails({Key? key, this.title}) : super(key: key);
+  final String clubId;
+  const AboutAppDetails({super.key, this.title, required this.clubId});
   final String? title;
 
   @override
@@ -117,12 +109,12 @@ class AboutAppDetails extends StatefulWidget {
 // This class represents the stateful widget that displays the details about the app.
 class _AboutAppDetailsState extends State<AboutAppDetails> {
 
+
   final _email = "david.oludepo@gmail.com";
   final _instagram = "nouvellesoft";
   final _twitter = "novelsoftinc";
   final _facebook = "novelsoft";
   final _linkedIn = "nouvellesoft";
-
 
   String mailFIRST = "mailto:";
   String mailSECOND = "?subject=Hello ";
@@ -130,6 +122,8 @@ class _AboutAppDetailsState extends State<AboutAppDetails> {
   String urlFacebook = "https://facebook.com/";
   String urlLinkedIn = "https://linkedin.com/company/";
   String urlInstagram = "https://instagram.com/";
+
+  late Stream<DocumentSnapshot<Map<String, dynamic>>> firestoreStream;
 
 
   @override
@@ -244,10 +238,7 @@ class _AboutAppDetailsState extends State<AboutAppDetails> {
               // StreamBuilder widget listens to the Firestore collection and rebuilds itself whenever the collection changes.
               child: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
                 // Stream that emits snapshots of the current contents of the Firestore document.
-                stream: FirebaseFirestore.instance
-                    .collection('SliversPages')
-                    .doc('non_slivers_pages')
-                    .snapshots(),
+                stream: firestoreStream,
                 // Function that gets called each time a new snapshot is available.
                 builder: (context, snapshot) {
                   // Check if the snapshot has data.
@@ -296,17 +287,12 @@ class _AboutAppDetailsState extends State<AboutAppDetails> {
                       child: Card(
                         color: headingCardColor,
                         child: Padding(
-                          padding: const EdgeInsets.only(
-                              top: 15, bottom: 15, left: 30, right: 30),
+                          padding: const EdgeInsets.only(top: 15, bottom: 15, left: 30, right: 30),
                           child: Text(
                             // The app title
                             clubAlmanac,
                             textAlign: TextAlign.center,
-                            style: TextStyle(
-                                fontSize: 15,
-                                fontStyle: FontStyle.italic,
-                                color: headingCardTextColor,
-                                fontWeight: FontWeight.w700),
+                            style: TextStyle(fontSize: 15, fontStyle: FontStyle.italic, color: headingCardTextColor, fontWeight: FontWeight.w700),
                           ),
                         ),
                       ),
@@ -367,8 +353,7 @@ class _AboutAppDetailsState extends State<AboutAppDetails> {
                   const SizedBox(height: 20),
                   // Adds a RichText widget with multiple TextSpan widgets that contain legal terms and information
                   Padding(
-                    padding: const EdgeInsets.only(
-                        left: 10, right: 10, top: 10, bottom: 10),
+                    padding: const EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 10),
                     child: RichText(
                       // Aligns the text to be justified
                       textAlign: TextAlign.justify,
@@ -386,11 +371,7 @@ class _AboutAppDetailsState extends State<AboutAppDetails> {
                           // Displays a disclaimer text
                           TextSpan(
                             text: '$blemish\n\n\n',
-                            style: TextStyle(
-                                fontSize: 14,
-                                color: cardTextColor,
-                                fontWeight: FontWeight.w300,
-                                fontStyle: FontStyle.italic),
+                            style: TextStyle(fontSize: 14, color: cardTextColor, fontWeight: FontWeight.w300, fontStyle: FontStyle.italic),
                           ),
                           // Displays the terms and conditions text
                           TextSpan(
@@ -786,8 +767,7 @@ class _AboutAppDetailsState extends State<AboutAppDetails> {
                               ),
                               recognizer: TapGestureRecognizer()
                                 ..onTap = () {
-                                  launchURL(
-                                      "${mailFIRST}hello@nouvellesoft.io$mailSECOND");
+                                  launchURL("${mailFIRST}hello@nouvellesoft.io$mailSECOND");
                                 }),
                         ],
                       ),
@@ -800,6 +780,19 @@ class _AboutAppDetailsState extends State<AboutAppDetails> {
         ),
       ),
     );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    firestoreStream = FirebaseFirestore.instance
+        .collection('clubs')
+        .doc(widget.clubId)
+        .collection('SliversPages')
+        .doc('non_slivers_pages')
+        .snapshots()
+        .distinct(); // Ensure distinct events
   }
 
   void launchSocialMedia(String handle, String url) async {
@@ -817,7 +810,6 @@ class _AboutAppDetailsState extends State<AboutAppDetails> {
       );
     }
   }
-
 }
 
 class SocialMediaButton extends StatelessWidget {
@@ -830,11 +822,7 @@ class SocialMediaButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return ElevatedButton(
       onPressed: onPressed,
-      style: ElevatedButton.styleFrom(
-        shape: const CircleBorder(),
-        elevation: 5.0,
-        backgroundColor: const Color.fromRGBO(102, 97, 97, 1.0)
-      ),
+      style: ElevatedButton.styleFrom(shape: const CircleBorder(), elevation: 5.0, backgroundColor: const Color.fromRGBO(102, 97, 97, 1.0)),
       child: Padding(
         padding: const EdgeInsets.all(10.0),
         child: Icon(
