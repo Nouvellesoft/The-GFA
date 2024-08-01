@@ -38,7 +38,7 @@ late CaptainsNotifier captainsNotifier;
 var crossFadeView = CrossFadeState.showFirst;
 
 class CaptainsDetailsPage extends StatefulWidget {
-  const CaptainsDetailsPage({Key? key, this.title}) : super(key: key);
+  const CaptainsDetailsPage({super.key, this.title});
 
   final String? title;
 
@@ -93,17 +93,12 @@ class _CaptainsDetailsPage extends State<CaptainsDetailsPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[
-              if (captainsNotifier.currentCaptains.imageTwo
-                  .toString()
-                  .isEmpty) ...[
+              if (captainsNotifier.currentCaptains.imageTwo.toString().isEmpty) ...[
                 Tooltip(
                     message: captainsNotifier.currentCaptains.name,
                     child: GestureDetector(
                       onTap: () => setState(() {
-                        crossFadeView =
-                            crossFadeView == CrossFadeState.showFirst
-                                ? CrossFadeState.showSecond
-                                : CrossFadeState.showFirst;
+                        crossFadeView = crossFadeView == CrossFadeState.showFirst ? CrossFadeState.showSecond : CrossFadeState.showFirst;
                       }),
                       child: SizedBox(
                         height: MediaQuery.of(context).size.height * .64,
@@ -117,26 +112,19 @@ class _CaptainsDetailsPage extends State<CaptainsDetailsPage> {
                             borderRadius: BorderRadius.circular(10.0),
                           ),
                           child: AnimatedCrossFade(
-                            crossFadeState:
-                                crossFadeView == CrossFadeState.showFirst
-                                    ? CrossFadeState.showSecond
-                                    : CrossFadeState.showFirst,
+                            crossFadeState: crossFadeView == CrossFadeState.showFirst ? CrossFadeState.showSecond : CrossFadeState.showFirst,
                             duration: const Duration(milliseconds: 1000),
                             firstChild: CachedNetworkImage(
                               imageUrl: captainsNotifier.currentCaptains.image!,
                               fit: BoxFit.cover,
-                              placeholder: (context, url) =>
-                                  const CircularProgressIndicator(),
-                              errorWidget: (context, url, error) =>
-                                  Icon(MdiIcons.alertRhombus),
+                              placeholder: (context, url) => const CircularProgressIndicator(),
+                              errorWidget: (context, url, error) => Icon(MdiIcons.alertRhombus),
                             ),
                             secondChild: CachedNetworkImage(
                               imageUrl: captainsNotifier.currentCaptains.image!,
                               fit: BoxFit.cover,
-                              placeholder: (context, url) =>
-                                  const CircularProgressIndicator(),
-                              errorWidget: (context, url, error) =>
-                                  Icon(MdiIcons.alertRhombus),
+                              placeholder: (context, url) => const CircularProgressIndicator(),
+                              errorWidget: (context, url, error) => Icon(MdiIcons.alertRhombus),
                             ),
                           ),
                         ),
@@ -147,10 +135,7 @@ class _CaptainsDetailsPage extends State<CaptainsDetailsPage> {
                     message: captainsNotifier.currentCaptains.name,
                     child: GestureDetector(
                       onTap: () => setState(() {
-                        crossFadeView =
-                            crossFadeView == CrossFadeState.showFirst
-                                ? CrossFadeState.showSecond
-                                : CrossFadeState.showFirst;
+                        crossFadeView = crossFadeView == CrossFadeState.showFirst ? CrossFadeState.showSecond : CrossFadeState.showFirst;
                       }),
                       child: SizedBox(
                         width: MediaQuery.of(context).size.width,
@@ -163,27 +148,19 @@ class _CaptainsDetailsPage extends State<CaptainsDetailsPage> {
                             borderRadius: BorderRadius.circular(10.0),
                           ),
                           child: AnimatedCrossFade(
-                            crossFadeState:
-                                crossFadeView == CrossFadeState.showFirst
-                                    ? CrossFadeState.showSecond
-                                    : CrossFadeState.showFirst,
+                            crossFadeState: crossFadeView == CrossFadeState.showFirst ? CrossFadeState.showSecond : CrossFadeState.showFirst,
                             duration: const Duration(milliseconds: 1000),
                             firstChild: CachedNetworkImage(
                               imageUrl: captainsNotifier.currentCaptains.image!,
                               fit: BoxFit.cover,
-                              placeholder: (context, url) =>
-                                  const CircularProgressIndicator(),
-                              errorWidget: (context, url, error) =>
-                                  Icon(MdiIcons.alertRhombus),
+                              placeholder: (context, url) => const CircularProgressIndicator(),
+                              errorWidget: (context, url, error) => Icon(MdiIcons.alertRhombus),
                             ),
                             secondChild: CachedNetworkImage(
-                              imageUrl:
-                                  captainsNotifier.currentCaptains.imageTwo!,
+                              imageUrl: captainsNotifier.currentCaptains.imageTwo!,
                               fit: BoxFit.cover,
-                              placeholder: (context, url) =>
-                                  const CircularProgressIndicator(),
-                              errorWidget: (context, url, error) =>
-                                  Icon(MdiIcons.alertRhombus),
+                              placeholder: (context, url) => const CircularProgressIndicator(),
+                              errorWidget: (context, url, error) => Icon(MdiIcons.alertRhombus),
                             ),
                           ),
                         ),
@@ -199,27 +176,19 @@ class _CaptainsDetailsPage extends State<CaptainsDetailsPage> {
                     color: cardBackgroundColor,
                     elevation: 4,
                     shape: OutlineInputBorder(
-                      borderSide: BorderSide(
-                          color: shapeDecorationColor,
-                          width: 4.0,
-                          style: BorderStyle.solid),
+                      borderSide: BorderSide(color: shapeDecorationColor, width: 4.0, style: BorderStyle.solid),
                     ),
                     margin: const EdgeInsets.fromLTRB(16, 16, 16, 16),
                     child: Padding(
-                      padding: const EdgeInsets.only(
-                          left: 16.0, top: 16.0, right: 16.0, bottom: 16.0),
+                      padding: const EdgeInsets.only(left: 16.0, top: 16.0, right: 16.0, bottom: 16.0),
                       child: SingleChildScrollView(
                         scrollDirection: Axis.horizontal,
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: <Widget>[
                             Text(
-                              captainsNotifier.currentCaptains.name!
-                                  .toUpperCase(),
-                              style: GoogleFonts.blinker(
-                                  color: textColor,
-                                  fontSize: 30,
-                                  fontWeight: FontWeight.w500),
+                              captainsNotifier.currentCaptains.name!.toUpperCase(),
+                              style: GoogleFonts.blinker(color: textColor, fontSize: 30, fontWeight: FontWeight.w500),
                             ),
                             const SizedBox(width: 10),
                             Icon(
@@ -243,23 +212,19 @@ class _CaptainsDetailsPage extends State<CaptainsDetailsPage> {
                   borderRadius: BorderRadius.circular(10.0),
                 ),
                 child: Padding(
-                  padding: const EdgeInsets.only(
-                      top: 20, bottom: 20, left: 8.0, right: 8.0),
+                  padding: const EdgeInsets.only(top: 20, bottom: 20, left: 8.0, right: 8.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: <Widget>[
                       Container(
-                        decoration: BoxDecoration(
-                            color: shapeDecorationColor.withAlpha(120),
-                            borderRadius: BorderRadius.circular(10)),
+                        decoration: BoxDecoration(color: shapeDecorationColor.withAlpha(120), borderRadius: BorderRadius.circular(10)),
                         child: Material(
                           color: materialBackgroundColor,
                           child: InkWell(
                             splashColor: splashColor,
                             onTap: () {},
                             child: Padding(
-                              padding: const EdgeInsets.only(
-                                  bottom: 15, top: 15, left: 25),
+                              padding: const EdgeInsets.only(bottom: 15, top: 15, left: 25),
                               child: Text.rich(
                                 TextSpan(
                                   children: <TextSpan>[
@@ -271,8 +236,7 @@ class _CaptainsDetailsPage extends State<CaptainsDetailsPage> {
                                           fontWeight: FontWeight.bold,
                                         )),
                                     TextSpan(
-                                        text:
-                                            ' ${captainsNotifier.currentCaptains.teamCaptaining}',
+                                        text: ' ${captainsNotifier.currentCaptains.teamCaptaining}',
                                         style: GoogleFonts.trykker(
                                           color: textColor,
                                           fontSize: 19,
@@ -299,8 +263,7 @@ class _CaptainsDetailsPage extends State<CaptainsDetailsPage> {
 
   @override
   void initState() {
-    _confettiController =
-        ConfettiController(duration: const Duration(seconds: 7));
+    _confettiController = ConfettiController(duration: const Duration(seconds: 7));
     _confettiController?.play();
 
     super.initState();

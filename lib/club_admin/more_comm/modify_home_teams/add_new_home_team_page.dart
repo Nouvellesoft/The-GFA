@@ -5,7 +5,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import '../../../bloc_navigation_bloc/navigation_bloc.dart';
 
 class MyAddNewHomeTeamPage extends StatefulWidget implements NavigationStates {
-  MyAddNewHomeTeamPage({super.key});
+  const MyAddNewHomeTeamPage({super.key});
 
   @override
   State<MyAddNewHomeTeamPage> createState() => MyAddNewHomeTeamPageState();

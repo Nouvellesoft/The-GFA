@@ -7,6 +7,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:collection/collection.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
@@ -71,7 +72,7 @@ class ImageUrls {
 List<ImageUrls> recentImageUrls = [];
 
 class CreateMatchDaySocialMediaPost extends StatefulWidget implements NavigationStates {
-  CreateMatchDaySocialMediaPost({Key? key}) : super(key: key);
+  const CreateMatchDaySocialMediaPost({super.key});
 
   @override
   State<CreateMatchDaySocialMediaPost> createState() => CreateMatchDaySocialMediaPostState();
@@ -120,7 +121,7 @@ class CreateMatchDaySocialMediaPostState extends State<CreateMatchDaySocialMedia
   DateTime? date;
   TimeOfDay? time;
 
-  GlobalKey<State<StatefulWidget>> get boundaryKeyys => GlobalKey();
+  GlobalKey<State<StatefulWidget>> get boundaryKeyed => GlobalKey();
 
   String getFormattedDate(DateTime date) {
     String day = DateFormat('d').format(date);
@@ -164,13 +165,20 @@ class CreateMatchDaySocialMediaPostState extends State<CreateMatchDaySocialMedia
 
     clubSponsorsNotifier = Provider.of<ClubSponsorsNotifier>(context);
 
-    final hour = selectedDate.hour.toString().padLeft(2, '0');
-    final minute = selectedDate.minute.toString().padLeft(2, '0');
+    // final hour = selectedDate.hour.toString().padLeft(2, '0');
+    // final minute = selectedDate.minute.toString().padLeft(2, '0');
 
     formattedTime = DateFormat.jm().format(selectedDate); // Formats time in 12-hour format with AM/PM
 
-    return WillPopScope(
-      onWillPop: _onWillPop,
+    return PopScope(
+      onPopInvokedWithResult: (didPop, result) async {
+        if (!didPop) {
+          // return false;
+          Navigator.of(context).pop();
+        }
+        await _onWillPop();
+      },
+      canPop: true, // Allow the pop action
       child: Scaffold(
         backgroundColor: backgroundColor,
         appBar: AppBar(
@@ -182,7 +190,9 @@ class CreateMatchDaySocialMediaPostState extends State<CreateMatchDaySocialMedia
             onPressed: () async {
               bool shouldPop = await _onWillPop();
               if (shouldPop) {
-                Navigator.pop(context);
+                if (context.mounted) {
+                  Navigator.pop(context);
+                }
               }
             },
           ),
@@ -826,7 +836,10 @@ class CreateMatchDaySocialMediaPostState extends State<CreateMatchDaySocialMedia
                                                         // Remove the imageUrls object from the list
                                                         recentImageUrls.removeAt(index);
 
-                                                        Navigator.of(context).pop(); // Close the dialog
+                                                        if (context.mounted) {
+                                                          Navigator.of(context).pop(); // Close the dialog
+                                                        }
+
 
                                                         // Update the UI to reflect the deletion
                                                         setState(() {});
@@ -1007,7 +1020,9 @@ class CreateMatchDaySocialMediaPostState extends State<CreateMatchDaySocialMedia
                                   );
                                 } catch (error) {
                                   // Handle errors if needed
-                                  print('Error: $error');
+                                  if (kDebugMode) {
+                                    print('Error: $error');
+                                  }
                                 } finally {
                                   // Set the flag back to false when the process is complete
                                   setState(() {
@@ -1156,7 +1171,7 @@ class CreateMatchDaySocialMediaPostState extends State<CreateMatchDaySocialMedia
               itemCount: sortedFCClubs.length,
               itemBuilder: (BuildContext context, int index) {
                 final fcTeam = sortedFCClubs[index];
-                final memberClub = fcTeam.clubName ?? 'No Name';
+                // final memberClub = fcTeam.clubName ?? 'No Name';
                 final clubIcon = fcTeam.clubIcon; // Get the clubIcon
                 return ListTile(
                   onTap: () {
@@ -1349,7 +1364,9 @@ class CreateMatchDaySocialMediaPostState extends State<CreateMatchDaySocialMedia
                   int selectedCount = selectedSponsors.where((element) => element).length;
                   setState(() {
                     selectedSponsorsString = '$selectedCount/${clubSponsorsNotifier!.clubSponsorsList.length} sponsors chosen';
-                    print('Selected Sponsors String: $selectedSponsorsString');
+                    if (kDebugMode) {
+                      print('Selected Sponsors String: $selectedSponsorsString');
+                    }
                   });
                   Navigator.of(context).pop(selectedCount);
                 },
@@ -1759,8 +1776,7 @@ class CreateMatchDaySocialMediaPostState extends State<CreateMatchDaySocialMedia
                                                 height: 20,
                                               ),
                                             ),
-                                          )
-                                          .toList(),
+                                          ),
                                     ],
                                   ),
                                 ),
@@ -1795,8 +1811,10 @@ class CreateMatchDaySocialMediaPostState extends State<CreateMatchDaySocialMedia
                               // Generate or share images based on the availability of URLs
                               // await _shareImages();
 
-                              // Close the dialog
-                              Navigator.pop(context);
+                              if (context.mounted) {
+                                // Close the dialog
+                                Navigator.pop(context);
+                              }
 
                               // Reset isGenerating after completion
                               setState(() {
@@ -1911,7 +1929,7 @@ class CreateMatchDaySocialMediaPostState extends State<CreateMatchDaySocialMedia
       selectedBannerHighResImageUrl = highResDownloadURL;
     });
 
-    final box = context.findRenderObject() as RenderBox?;
+    // final box = context.findRenderObject() as RenderBox?;
 
     return [lowResDownloadURL, highResDownloadURL];
   }
@@ -1961,7 +1979,9 @@ ${selectedSponsorNames.isNotEmpty ? 'We are proudly sponsored by ${selectedSpons
     """
         .trim();
 
-    print(matchDayInfo);
+    if (kDebugMode) {
+      print(matchDayInfo);
+    }
 
     // Share all the downloaded images
     await Share.shareXFiles(localImagePaths, text: matchDayInfo, subject: 'Coventry Phoenix FC');
@@ -2023,7 +2043,7 @@ ${selectedSponsorNames.isNotEmpty ? 'We are proudly sponsored by ${selectedSpons
     }
 
     if (text.length <= 10) {
-      return 9.0; // Foont size for short text
+      return 9.0; // Font size for short text
     } else if (text.length <= 15) {
       return 9.0; // Font size for medium-length text
     } else if (text.length <= 20) {

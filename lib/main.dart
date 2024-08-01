@@ -59,6 +59,15 @@ void main() async {
   await PushNotificationService().setupInteractedMessage();
   FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
   FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterError;
+
+  OneSignal.Debug.setLogLevel(OSLogLevel.verbose);
+  OneSignal.Debug.setAlertLevel(OSLogLevel.none);
+  OneSignal.initialize("6b1cda87-62bf-44d0-9243-9088805b7909");
+  // OneSignal.shared.promptUserForPushNotificationPermission().then((accepted) {
+  //   // print("Accepted permission: $accepted");
+  // });
+  OneSignal.Notifications.requestPermission(true);
+
   runZonedGuarded(() async {
     runApp(MultiProvider(providers: [
       ChangeNotifierProvider(
@@ -162,19 +171,13 @@ void main() async {
       ),
     ], child: const MyApp()));
 
-    RemoteMessage? initialMessage = await FirebaseMessaging.instance.getInitialMessage();
-    if (initialMessage != null) {
-      // App received a notification when it was killed
-    }
+    // Handle initial message
+    FirebaseMessaging.instance.getInitialMessage().then((initialMessage) {
+      if (initialMessage != null) {
+        // Handle the initial message
+      }
+    });
   }, FirebaseCrashlytics.instance.recordError);
-
-  OneSignal.Debug.setLogLevel(OSLogLevel.verbose);
-  OneSignal.Debug.setAlertLevel(OSLogLevel.none);
-  OneSignal.initialize("6b1cda87-62bf-44d0-9243-9088805b7909");
-  // OneSignal.shared.promptUserForPushNotificationPermission().then((accepted) {
-  //   // print("Accepted permission: $accepted");
-  // });
-  OneSignal.Notifications.requestPermission(true);
 }
 
 class MyApp extends StatefulWidget {
@@ -188,6 +191,8 @@ class MyApp extends StatefulWidget {
 }
 
 class MyAppState extends State<MyApp> {
+  bool _isDataLoaded = false;
+
   static Map<int, Color> color = {
     50: const Color.fromRGBO(136, 14, 79, .1),
     100: const Color.fromRGBO(136, 14, 79, .2),
@@ -206,6 +211,7 @@ class MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
+
     Firebase.initializeApp().whenComplete(() {
       if (kDebugMode) {
         print("completed");
@@ -221,21 +227,24 @@ class MyAppState extends State<MyApp> {
 
   @override
   void didChangeDependencies() {
-    ClubSponsorsNotifier clubSponsorsNotifier = Provider.of<ClubSponsorsNotifier>(context, listen: true);
-    _fetchClubSponsorsAndUpdateNotifier(clubSponsorsNotifier);
     super.didChangeDependencies();
+    if (!_isDataLoaded) {
+      ClubSponsorsNotifier clubSponsorsNotifier = Provider.of<ClubSponsorsNotifier>(context, listen: false);
+      _fetchClubSponsorsAndUpdateNotifier(clubSponsorsNotifier).then((_) {
+        setState(() {
+          _isDataLoaded = true; // Data loading completed
+        });
+      });
+    }
   }
 
   Future<void> _fetchClubSponsorsAndUpdateNotifier(ClubSponsorsNotifier notifier) async {
-    // Fetch the collection of club IDs from Firestore
     QuerySnapshot clubSnapshot = await FirebaseFirestore.instance.collection('clubs').get();
     List<String> clubIds = clubSnapshot.docs.map((doc) => doc.id).toList();
 
-    // Process each club ID
     for (String clubId in clubIds) {
       await getClubSponsors(notifier, clubId);
     }
-
     // Optionally, notify listeners or update UI after fetching
     setState(() {});
   }

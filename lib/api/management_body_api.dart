@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../model/management_body.dart';
 import '../notifier/management_body_notifier.dart';
 
-getManagementBody(ManagementBodyNotifier managementBodyNotifier, String clubId) async {
+Future<void> getManagementBody(ManagementBodyNotifier managementBodyNotifier, String clubId) async {
   QuerySnapshot snapshot = await FirebaseFirestore.instance.collection('clubs').doc(clubId).collection('ManagementBody').orderBy('id').get();
 
   List<ManagementBody> managementBodyList = [];

@@ -10,7 +10,7 @@ Color backgroundColor = const Color.fromRGBO(187, 192, 195, 1.0);
 PlayersTableNotifier? playersTableNotifier;
 
 class MyDisplayedMVPHistoryPage extends StatefulWidget implements NavigationStates {
-  MyDisplayedMVPHistoryPage({Key? key}) : super(key: key);
+  const MyDisplayedMVPHistoryPage({super.key});
 
   @override
   State<MyDisplayedMVPHistoryPage> createState() => MyDisplayedMVPHistoryPageState();

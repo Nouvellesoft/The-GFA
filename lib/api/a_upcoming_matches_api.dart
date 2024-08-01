@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../model/a_upcoming_matches.dart';
 import '../notifier/a_upcoming_matches_notifier.dart';
 
-getUpcomingMatches(UpcomingMatchesNotifier upcomingMatchesNotifier, String clubId) async {
+Future<void> getUpcomingMatches(UpcomingMatchesNotifier upcomingMatchesNotifier, String clubId) async {
   // DateTime currentDate = DateTime.now();
   // double currentFractionalDays = currentDate.millisecondsSinceEpoch / (1000 * 60 * 60 * 24);
 

@@ -13,6 +13,8 @@ import '/notifier/players_table_notifier.dart';
 Color backgroundColor = const Color.fromRGBO(187, 192, 195, 1.0);
 
 class MyMVPPage extends StatefulWidget implements NavigationStates {
+  const MyMVPPage({super.key});
+
   @override
   State<MyMVPPage> createState() => MyMVPPageState();
 }

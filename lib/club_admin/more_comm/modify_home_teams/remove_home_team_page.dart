@@ -10,7 +10,7 @@ import '../../../notifier/c_match_day_banner_for_club_notifier.dart';
 late MatchDayBannerForClubNotifier matchDayBannerForClubNotifier;
 
 class MyRemoveNewHomeTeamPage extends StatefulWidget implements NavigationStates {
-  MyRemoveNewHomeTeamPage({super.key});
+  const MyRemoveNewHomeTeamPage({super.key});
 
   @override
   State<MyRemoveNewHomeTeamPage> createState() => MyRemoveNewHomeTeamPageState();
@@ -167,9 +167,9 @@ class MyRemoveNewHomeTeamPageState extends State<MyRemoveNewHomeTeamPage> {
       if (homeTeamsName != null) {
         // Delete management with matching names
         await firestore.collection('MatchDayBannerForClub').where('club_name', isEqualTo: homeTeamsName).get().then((querySnapshot) {
-          querySnapshot.docs.forEach((doc) {
+          for (var doc in querySnapshot.docs) {
             doc.reference.delete();
-          });
+          }
         });
 
         // Remove the clubCaptains from the updated list

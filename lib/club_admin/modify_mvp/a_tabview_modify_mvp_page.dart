@@ -28,7 +28,7 @@ String rcTitle = 'Previous MVPs';
 Color? selectedTabColor = Colors.indigo[200];
 
 class TabviewMVPPage extends StatefulWidget implements NavigationStates {
-  TabviewMVPPage({super.key});
+  const TabviewMVPPage({super.key});
 
   @override
   State<TabviewMVPPage> createState() => TabviewMVPPageState();
@@ -80,7 +80,7 @@ class TabviewMVPPageState extends State<TabviewMVPPage> with SingleTickerProvide
       ),
       body: TabBarView(
         controller: _tabController,
-        children: [
+        children: const [
           MyMVPPage(),
           MyDisplayedMVPHistoryPage(),
         ],

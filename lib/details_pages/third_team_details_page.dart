@@ -142,7 +142,7 @@ dynamic _twitter;
 dynamic _worstMoment;
 
 class ThirdTeamClassDetailsPage extends StatefulWidget {
-  const ThirdTeamClassDetailsPage({Key? key, this.title}) : super(key: key);
+  const ThirdTeamClassDetailsPage({super.key, this.title});
 
   final String? title;
 

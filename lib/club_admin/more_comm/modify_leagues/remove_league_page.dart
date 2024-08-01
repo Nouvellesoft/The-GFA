@@ -10,7 +10,7 @@ import '../../../notifier/c_match_day_banner_for_league_notifier.dart';
 late MatchDayBannerForLeagueNotifier matchDayBannerForLeagueNotifier;
 
 class MyRemoveNewLeaguePage extends StatefulWidget implements NavigationStates {
-  MyRemoveNewLeaguePage({super.key});
+  const MyRemoveNewLeaguePage({super.key});
 
   @override
   State<MyRemoveNewLeaguePage> createState() => MyRemoveNewLeaguePageState();
@@ -167,9 +167,9 @@ class MyRemoveNewLeaguePageState extends State<MyRemoveNewLeaguePage> {
       if (leaguesName != null) {
         // Delete leagues with matching names
         await firestore.collection('MatchDayBannerForLeague').where('league', isEqualTo: leaguesName).get().then((querySnapshot) {
-          querySnapshot.docs.forEach((doc) {
+          for (var doc in querySnapshot.docs) {
             doc.reference.delete();
-          });
+          }
         });
 
         // Remove the league from the updated list

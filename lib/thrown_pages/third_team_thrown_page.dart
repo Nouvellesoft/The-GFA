@@ -266,8 +266,15 @@ class _MyThirdTeamClassPage extends State<MyThirdTeamClassPage> {
   Widget build(BuildContext context) {
     ThirdTeamClassNotifier thirdTeamClassNotifier = Provider.of<ThirdTeamClassNotifier>(context);
 
-    return WillPopScope(
-      onWillPop: _onWillPop,
+    return PopScope(
+      onPopInvokedWithResult: (didPop, result) async {
+        if (!didPop) {
+          // return false;
+          Navigator.of(context).pop();
+        }
+        await _onWillPop();
+      },
+      canPop: true, // Allow the pop action
       child: Scaffold(
         body: Container(
           color: backgroundColor,

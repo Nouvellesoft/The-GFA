@@ -164,7 +164,7 @@ class MySocialMediaPageState extends State<MySocialMediaPage> {
                         elevation: 16,
                         height: MediaQuery.of(context).size.height * 0.6,
                         child: InAppWebView(
-                          initialOptions: InAppWebViewGroupOptions(crossPlatform: InAppWebViewOptions(transparentBackground: true)),
+                          initialSettings: InAppWebViewSettings(transparentBackground: true),
                           initialData: InAppWebViewInitialData(data: '''
                                           <!DOCTYPE html><html>
                                           <head>

@@ -27,7 +27,7 @@ Color phoneColor = const Color.fromRGBO(20, 134, 46, 1.0);
 Color backgroundColor = const Color.fromRGBO(147, 165, 193, 1.0);
 
 class TabviewHomeTeamPage extends StatefulWidget implements NavigationStates {
-  TabviewHomeTeamPage({super.key});
+  const TabviewHomeTeamPage({super.key});
 
   @override
   State<TabviewHomeTeamPage> createState() => _TabviewHomeTeamPageState();
@@ -79,7 +79,7 @@ class _TabviewHomeTeamPageState extends State<TabviewHomeTeamPage> with SingleTi
       ),
       body: TabBarView(
         controller: _tabController,
-        children: [
+        children: const [
           MyAddNewHomeTeamPage(),
           MyRemoveNewHomeTeamPage(),
         ],

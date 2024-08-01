@@ -29,7 +29,7 @@ String rcTitle = 'Remove Captains';
 Color? selectedTabColor = Colors.indigo[200];
 
 class TabviewCaptainsPage extends StatefulWidget implements NavigationStates {
-  TabviewCaptainsPage({super.key});
+  const TabviewCaptainsPage({super.key});
 
   @override
   State<TabviewCaptainsPage> createState() => TabviewCaptainsPageState();
@@ -81,7 +81,7 @@ class TabviewCaptainsPageState extends State<TabviewCaptainsPage> with SingleTic
       ),
       body: TabBarView(
         controller: _tabController,
-        children: [
+        children: const [
           MyModifyAddClubCaptainsPage(),
           MyModifyRemoveClubCaptainsPage(),
         ],

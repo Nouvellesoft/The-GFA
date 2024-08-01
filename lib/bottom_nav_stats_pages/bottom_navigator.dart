@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
@@ -170,14 +169,12 @@ class _BottomNavigatorState extends State<BottomNavigator> {
     super.initState();
 
     _pageOption = [
-      PlayersTablePage(
-        clubId: widget.clubId,
-      ), // Pass the clubId here
-      const PlayersStatsAndInfoPage(),
+      PlayersTablePage(clubId: widget.clubId,),
+      PlayersStatsAndInfoPage(clubId: widget.clubId),
       TabviewMatchesPage(initialPage: 1, clubId: widget.clubId),
       // const SeasonTimeline(),
       TabviewSocialMediaPage(clubId: widget.clubId),
-      TrainingsAndGamesReelsPage(),
+      TrainingsAndGamesReelsPage(clubId: widget.clubId),
     ];
 
     TrainingsAndGamesReelsNotifier trainingsAndGamesNotifier = Provider.of<TrainingsAndGamesReelsNotifier>(context, listen: false);
@@ -221,142 +218,53 @@ class _BottomNavigatorState extends State<BottomNavigator> {
   }
 
   Future<void> _fetchTrainingsAndGamesReelsAndUpdateNotifier(TrainingsAndGamesReelsNotifier notifier) async {
-    // Fetch the collection of club IDs from Firestore
-    QuerySnapshot clubSnapshot = await FirebaseFirestore.instance.collection('clubs').get();
-    List<String> clubIds = clubSnapshot.docs.map((doc) => doc.id).toList();
+    await getTrainingsAndGamesReels(notifier, widget.clubId);
 
-    // Process each club ID
-    for (String clubId in clubIds) {
-      await getTrainingsAndGamesReels(notifier, clubId);
-    }
-
-    // Optionally, notify listeners or update UI after fetching
     setState(() {});
   }
 
   Future<void> _fetchPlayerOfTheMonthStatsAndUpdateNotifier(PlayerOfTheMonthStatsAndInfoNotifier notifier) async {
-    // Fetch the collection of club IDs from Firestore
-    QuerySnapshot clubSnapshot = await FirebaseFirestore.instance.collection('clubs').get();
-    List<String> clubIds = clubSnapshot.docs.map((doc) => doc.id).toList();
-
-    // Process each club ID
-    for (String clubId in clubIds) {
-      await getPlayerOfTheMonthStatsAndInfo(notifier, clubId);
-    }
-
-    // Optionally, notify listeners or update UI after fetching
+    await getPlayerOfTheMonthStatsAndInfo(notifier, widget.clubId);
     setState(() {});
   }
 
   Future<void> _fetchMostFouledYCPlayersStatsAndUpdateNotifier(MostFouledYCPlayersStatsAndInfoNotifier notifier) async {
-    // Fetch the collection of club IDs from Firestore
-    QuerySnapshot clubSnapshot = await FirebaseFirestore.instance.collection('clubs').get();
-    List<String> clubIds = clubSnapshot.docs.map((doc) => doc.id).toList();
-
-    // Process each club ID
-    for (String clubId in clubIds) {
-      await getMostFouledYCPlayersStatsAndInfo(notifier, clubId);
-    }
-
-    // Optionally, notify listeners or update UI after fetching
+    await getMostFouledYCPlayersStatsAndInfo(notifier, widget.clubId);
     setState(() {});
   }
 
   Future<void> _fetchMostFouledRCPlayersStatsAndUpdateNotifier(MostFouledRCPlayersStatsAndInfoNotifier notifier) async {
-    // Fetch the collection of club IDs from Firestore
-    QuerySnapshot clubSnapshot = await FirebaseFirestore.instance.collection('clubs').get();
-    List<String> clubIds = clubSnapshot.docs.map((doc) => doc.id).toList();
-
-    // Process each club ID
-    for (String clubId in clubIds) {
-      await getMostFouledRCPlayersStatsAndInfo(notifier, clubId);
-    }
-
-    // Optionally, notify listeners or update UI after fetching
+    await getMostFouledRCPlayersStatsAndInfo(notifier, widget.clubId);
     setState(() {});
   }
 
   Future<void> _fetchTopGKPlayersStatsAndUpdateNotifier(TopGKPlayersStatsAndInfoNotifier notifier) async {
-    // Fetch the collection of club IDs from Firestore
-    QuerySnapshot clubSnapshot = await FirebaseFirestore.instance.collection('clubs').get();
-    List<String> clubIds = clubSnapshot.docs.map((doc) => doc.id).toList();
-
-    // Process each club ID
-    for (String clubId in clubIds) {
-      await getTopGKPlayersStatsAndInfo(notifier, clubId);
-    }
-
-    // Optionally, notify listeners or update UI after fetching
+    await getTopGKPlayersStatsAndInfo(notifier, widget.clubId);
     setState(() {});
   }
 
   Future<void> _fetchTopDefensivePlayersStatsAndUpdateNotifier(TopDefensivePlayersStatsAndInfoNotifier notifier) async {
-    // Fetch the collection of club IDs from Firestore
-    QuerySnapshot clubSnapshot = await FirebaseFirestore.instance.collection('clubs').get();
-    List<String> clubIds = clubSnapshot.docs.map((doc) => doc.id).toList();
-
-    // Process each club ID
-    for (String clubId in clubIds) {
-      await getTopDefensivePlayersStatsAndInfo(notifier, clubId);
-    }
-
-    // Optionally, notify listeners or update UI after fetching
+    await getTopDefensivePlayersStatsAndInfo(notifier, widget.clubId);
     setState(() {});
   }
 
   Future<void> _fetchMOTMPlayersStatsAndUpdateNotifier(MOTMPlayersStatsAndInfoNotifier notifier) async {
-    // Fetch the collection of club IDs from Firestore
-    QuerySnapshot clubSnapshot = await FirebaseFirestore.instance.collection('clubs').get();
-    List<String> clubIds = clubSnapshot.docs.map((doc) => doc.id).toList();
-
-    // Process each club ID
-    for (String clubId in clubIds) {
-      await getMOTMPlayersStatsAndInfo(notifier, clubId);
-    }
-
-    // Optionally, notify listeners or update UI after fetching
+    await getMOTMPlayersStatsAndInfo(notifier, widget.clubId);
     setState(() {});
   }
 
   Future<void> _fetchCumMOTMPlayersStatsAndUpdateNotifier(CumMOTMPlayersStatsAndInfoNotifier notifier) async {
-    // Fetch the collection of club IDs from Firestore
-    QuerySnapshot clubSnapshot = await FirebaseFirestore.instance.collection('clubs').get();
-    List<String> clubIds = clubSnapshot.docs.map((doc) => doc.id).toList();
-
-    // Process each club ID
-    for (String clubId in clubIds) {
-      await getCumMOTMPlayersStatsAndInfo(notifier, clubId);
-    }
-
-    // Optionally, notify listeners or update UI after fetching
+    await getCumMOTMPlayersStatsAndInfo(notifier, widget.clubId);
     setState(() {});
   }
 
   Future<void> _fetchTopGoalsPlayersStatsAndUpdateNotifier(TopGoalsPlayersStatsAndInfoNotifier notifier) async {
-    // Fetch the collection of club IDs from Firestore
-    QuerySnapshot clubSnapshot = await FirebaseFirestore.instance.collection('clubs').get();
-    List<String> clubIds = clubSnapshot.docs.map((doc) => doc.id).toList();
-
-    // Process each club ID
-    for (String clubId in clubIds) {
-      await getTopGoalsPlayersStatsAndInfo(notifier, clubId);
-    }
-
-    // Optionally, notify listeners or update UI after fetching
+    await getTopGoalsPlayersStatsAndInfo(notifier, widget.clubId);
     setState(() {});
   }
 
   Future<void> _fetchMostAssistsPlayersStatsAndUpdateNotifier(MostAssistsPlayersStatsAndInfoNotifier notifier) async {
-    // Fetch the collection of club IDs from Firestore
-    QuerySnapshot clubSnapshot = await FirebaseFirestore.instance.collection('clubs').get();
-    List<String> clubIds = clubSnapshot.docs.map((doc) => doc.id).toList();
-
-    // Process each club ID
-    for (String clubId in clubIds) {
-      await getMostAssistsPlayersStatsAndInfo(notifier, clubId);
-    }
-
-    // Optionally, notify listeners or update UI after fetching
+    await getMostAssistsPlayersStatsAndInfo(notifier, widget.clubId);
     setState(() {});
   }
 }

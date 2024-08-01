@@ -24,8 +24,8 @@ import '../notifier/management_body_notifier.dart';
 import '../notifier/second_team_class_notifier.dart';
 
 String clubName = '';
-String aboutClub = "About ${clubName ?? ''}";
-String whyClub = "WHY ${clubName ?? ''}?".toUpperCase();
+String aboutClub = "About $clubName";
+String whyClub = "WHY $clubName?".toUpperCase();
 
 String visionSwipe = "Swipe left on 'OUR VISION STATEMENT'  >>>";
 String visionTitle = "OUR VISION STATEMENT";
@@ -175,7 +175,9 @@ class _AboutClubDetailsState extends State<AboutClubDetails> {
       _fetchManagementBodyAndUpdateNotifier(managementBodyNotifier),
     ]).then((_) {
       // Set the data after fetching
+      if (!mounted) return;
       AllClubMembersNotifier allClubMembersNotifier = Provider.of<AllClubMembersNotifier>(context, listen: false);
+
       allClubMembersNotifier.setFirstTeamMembers(firstTeamNotifier.firstTeamClassList);
       allClubMembersNotifier.setSecondTeamMembers(secondTeamNotifier.secondTeamClassList);
       allClubMembersNotifier.setCoachesList(coachesNotifier.coachesList);
@@ -185,9 +187,6 @@ class _AboutClubDetailsState extends State<AboutClubDetails> {
 
   @override
   Widget build(BuildContext context) {
-    const String collectionName = 'SliversPages';
-    const String documentId = 'non_slivers_pages';
-
     AchievementsNotifier achievementsNotifier = Provider.of<AchievementsNotifier>(context);
 
     // Use the AllClubMembersNotifier to access the combined list of allClubMembers
@@ -207,8 +206,8 @@ class _AboutClubDetailsState extends State<AboutClubDetails> {
             clubName = snapshot.data!.data()!['club_name'];
 
             // Update whyClub after fetching clubName
-            whyClub = "WHY ${clubName ?? ''}?".toUpperCase();
-            aboutClub = "About ${clubName ?? ''}";
+            whyClub = "WHY $clubName?".toUpperCase();
+            aboutClub = "About $clubName";
             populationChart = "$clubName Population Chart";
           }
           return Scaffold(

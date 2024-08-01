@@ -103,7 +103,7 @@ Color deepOrangeColor = Colors.deepOrange;
 Color tealColor = Colors.teal;
 
 class MyClubAdminPage extends StatefulWidget implements NavigationStates {
-  const MyClubAdminPage({Key? key}) : super(key: key);
+  const MyClubAdminPage({super.key});
 
   @override
   State<MyClubAdminPage> createState() => MyClubAdminPageState();
@@ -1143,14 +1143,20 @@ class MyClubAdminPageState extends State<MyClubAdminPage> {
         String clubId = snapshot.docs.first.id;
 
         // Call the navigate function with the fetched clubId
-        navigateToClubSponsors(context, clubId);
+        if (context.mounted) {
+          navigateToClubSponsors(context, clubId);
+        }
       } else {
         // Handle case where no documents are found
-        print('No clubs found');
+        if (kDebugMode) {
+          print('No clubs found');
+        }
       }
     } catch (e) {
       // Handle any errors that occur during the fetch
-      print('Error fetching clubId: $e');
+      if (kDebugMode) {
+        print('Error fetching clubId: $e');
+      }
     }
   }
 }
@@ -1205,23 +1211,23 @@ void showConfirmationDialog(BuildContext context) {
 }
 
 Future navigateToCreateSMPost(context) async {
-  Navigator.push(context, MaterialPageRoute(builder: (context) => CreateMatchDaySocialMediaPost()));
+  Navigator.push(context, MaterialPageRoute(builder: (context) => const CreateMatchDaySocialMediaPost()));
 }
 
 Future navigateToCreateUpcomingEventSMPost(context) async {
-  Navigator.push(context, MaterialPageRoute(builder: (context) => CreateUpcomingEventSMPost()));
+  Navigator.push(context, MaterialPageRoute(builder: (context) => const CreateUpcomingEventSMPost()));
 }
 
 Future navigateToCreateAnnouncementSMPost(context) async {
-  Navigator.push(context, MaterialPageRoute(builder: (context) => CreateAnnouncementSMPost()));
+  Navigator.push(context, MaterialPageRoute(builder: (context) => const CreateAnnouncementSMPost()));
 }
 
 Future navigateToCreateSponsorsShoutOutSMPost(context) async {
-  Navigator.push(context, MaterialPageRoute(builder: (context) => CreateSponsorsShoutOutSMPost()));
+  Navigator.push(context, MaterialPageRoute(builder: (context) => const CreateSponsorsShoutOutSMPost()));
 }
 
 Future navigateToCreateNewSponsorsShoutOutSMPost(context) async {
-  Navigator.push(context, MaterialPageRoute(builder: (context) => CreateNewSponsorsShoutOutSMPost()));
+  Navigator.push(context, MaterialPageRoute(builder: (context) => const CreateNewSponsorsShoutOutSMPost()));
 }
 
 Future navigateToClubSponsors(context, String clubId) async {
@@ -1234,79 +1240,79 @@ Future navigateToClubSponsors(context, String clubId) async {
 }
 
 Future navigateToModifyClubSponsors(context) async {
-  Navigator.push(context, MaterialPageRoute(builder: (context) => TabviewClubSponsorsPage()));
+  Navigator.push(context, MaterialPageRoute(builder: (context) => const TabviewClubSponsorsPage()));
 }
 
 Future navigateToModifyClubCaptains(context) async {
-  Navigator.push(context, MaterialPageRoute(builder: (context) => TabviewCaptainsPage()));
+  Navigator.push(context, MaterialPageRoute(builder: (context) => const TabviewCaptainsPage()));
 }
 
 Future navigateToModifyCoaches(context) async {
-  Navigator.push(context, MaterialPageRoute(builder: (context) => MyModifyCoachesPage()));
+  Navigator.push(context, MaterialPageRoute(builder: (context) => const MyModifyCoachesPage()));
 }
 
 Future navigateToModifyManagementBody(context) async {
-  Navigator.push(context, MaterialPageRoute(builder: (context) => MyModifyManagementBodyPage()));
+  Navigator.push(context, MaterialPageRoute(builder: (context) => const MyModifyManagementBodyPage()));
 }
 
 Future navigateToModifyAllClubPlayers(context) async {
-  Navigator.push(context, MaterialPageRoute(builder: (context) => MyModifyClubPlayersPage()));
+  Navigator.push(context, MaterialPageRoute(builder: (context) => const MyModifyClubPlayersPage()));
 }
 
 Future navigateToAddClubMember(context) async {
-  Navigator.push(context, MaterialPageRoute(builder: (context) => TabviewClubMemberPage()));
+  Navigator.push(context, MaterialPageRoute(builder: (context) => const TabviewClubMemberPage()));
 }
 
 Future navigateToModifyHomeTeam(context) async {
-  Navigator.push(context, MaterialPageRoute(builder: (context) => TabviewHomeTeamPage()));
+  Navigator.push(context, MaterialPageRoute(builder: (context) => const TabviewHomeTeamPage()));
 }
 
 Future navigateToModifyOppTeam(context) async {
-  Navigator.push(context, MaterialPageRoute(builder: (context) => TabviewOppTeamPage()));
+  Navigator.push(context, MaterialPageRoute(builder: (context) => const TabviewOppTeamPage()));
 }
 
 Future navigateToModifyLeague(context) async {
-  Navigator.push(context, MaterialPageRoute(builder: (context) => TabviewLeaguePage()));
+  Navigator.push(context, MaterialPageRoute(builder: (context) => const TabviewLeaguePage()));
 }
 
 Future navigateToModifyLocation(context) async {
-  Navigator.push(context, MaterialPageRoute(builder: (context) => TabviewLocationPage()));
+  Navigator.push(context, MaterialPageRoute(builder: (context) => const TabviewLocationPage()));
 }
 
 Future navigateToModifyMVP(context) async {
-  Navigator.push(context, MaterialPageRoute(builder: (context) => TabviewMVPPage()));
+  Navigator.push(context, MaterialPageRoute(builder: (context) => const TabviewMVPPage()));
 }
 
 Future navigateToModifyPOTM(context) async {
-  Navigator.push(context, MaterialPageRoute(builder: (context) => TabviewMOTMPage()));
+  Navigator.push(context, MaterialPageRoute(builder: (context) => const TabviewMOTMPage()));
 }
 
 Future navigateToModifyYellowCard(context) async {
-  Navigator.push(context, MaterialPageRoute(builder: (context) => TabviewYellowCardPage()));
+  Navigator.push(context, MaterialPageRoute(builder: (context) => const TabviewYellowCardPage()));
 }
 
 Future navigateToModifyRedCard(context) async {
-  Navigator.push(context, MaterialPageRoute(builder: (context) => TabviewRedCardPage()));
+  Navigator.push(context, MaterialPageRoute(builder: (context) => const TabviewRedCardPage()));
 }
 
 Future navigateToAddMonthlyPhotos(context) async {
-  Navigator.push(context, MaterialPageRoute(builder: (context) => MyAddMonthlyPhotosPage()));
+  Navigator.push(context, MaterialPageRoute(builder: (context) => const MyAddMonthlyPhotosPage()));
 }
 
 Future navigateToChangePagesCoverPhoto(context) async {
-  Navigator.push(context, MaterialPageRoute(builder: (context) => MyChangePagesCoverPhotoPage()));
+  Navigator.push(context, MaterialPageRoute(builder: (context) => const MyChangePagesCoverPhotoPage()));
 }
 
 Future navigateToChangeVisionStatementAndMore(context) async {
-  Navigator.push(context, MaterialPageRoute(builder: (context) => MyChangeVisionStatementAndMorePage()));
+  Navigator.push(context, MaterialPageRoute(builder: (context) => const MyChangeVisionStatementAndMorePage()));
 }
 
 Future navigateToRecordClubAchievement(context) async {
-  Navigator.push(context, MaterialPageRoute(builder: (context) => MyRecordClubAchievementPage()));
+  Navigator.push(context, MaterialPageRoute(builder: (context) => const MyRecordClubAchievementPage()));
 }
 
 Future navigateToViewClubPopulation(context) async {
-  Navigator.push(context, MaterialPageRoute(builder: (context) => MyViewClubPopulationPage()));
+  Navigator.push(context, MaterialPageRoute(builder: (context) => const MyViewClubPopulationPage()));
 }
 
 Future navigateMyApp(context) async {

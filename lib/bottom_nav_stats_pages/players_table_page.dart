@@ -147,7 +147,7 @@ class PlayersTablePageState extends State<PlayersTablePage> {
 
                           Toast.show("Loading up $playerName", duration: Toast.lengthLong, gravity: Toast.bottom, backgroundRadius: 10);
                         } else {
-                          Toast.show("Ummmm, we can't find $playerName", duration: Toast.lengthLong, gravity: Toast.bottom, backgroundRadius: 10);
+                          Toast.show("We can't find $playerName", duration: Toast.lengthLong, gravity: Toast.bottom, backgroundRadius: 10);
                         }
                       }
                     },
@@ -327,11 +327,18 @@ class PlayersTablePageState extends State<PlayersTablePage> {
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
 
-    final useMaterial3 = Theme.of(context).useMaterial3;
-    final borderRadius = useMaterial3 ? const BorderRadius.all(Radius.circular(16)) : const BorderRadius.all(Radius.circular(4));
+    // final useMaterial3 = Theme.of(context).useMaterial3;
+    // final borderRadius = useMaterial3 ? const BorderRadius.all(Radius.circular(16)) : const BorderRadius.all(Radius.circular(4));
 
-    return WillPopScope(
-      onWillPop: _onWillPop,
+    return PopScope(
+      onPopInvokedWithResult: (didPop, result) async {
+        if (!didPop) {
+          // return false;
+          Navigator.of(context).pop();
+        }
+        await _onWillPop();
+      },
+      canPop: true, // Allow the pop action
       child: Scaffold(
         backgroundColor: backgroundColor,
         appBar: AppBar(
@@ -918,7 +925,7 @@ class PlayersTableDataSource extends DataGridSource {
 
                         Toast.show("Loading up $playerName", duration: Toast.lengthLong, gravity: Toast.bottom, backgroundRadius: 10);
                       } else {
-                        Toast.show("Ummmm, we can't find $playerName", duration: Toast.lengthLong, gravity: Toast.bottom, backgroundRadius: 10);
+                        Toast.show("We can't find $playerName", duration: Toast.lengthLong, gravity: Toast.bottom, backgroundRadius: 10);
                       }
                     },
                     child: Container(

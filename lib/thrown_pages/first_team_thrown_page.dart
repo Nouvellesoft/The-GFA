@@ -146,8 +146,15 @@ class _MyFirstTeamClassPage extends State<MyFirstTeamClassPage> {
   Widget build(BuildContext context) {
     FirstTeamClassNotifier firstTeamClassNotifier = Provider.of<FirstTeamClassNotifier>(context);
 
-    return WillPopScope(
-      onWillPop: _onWillPop,
+    return PopScope(
+      onPopInvokedWithResult: (didPop, result) async {
+        if (!didPop) {
+          // return false;
+          Navigator.of(context).pop();
+        }
+        await _onWillPop();
+      },
+      canPop: true, // Allow the pop action
       child: Scaffold(
         body: Container(
           color: backgroundColor,
@@ -584,18 +591,24 @@ class _MyFirstTeamClassPage extends State<MyFirstTeamClassPage> {
                 // Check if bugDescription is not empty before storing
                 if (bugDescription.isNotEmpty) {
                   // Store bug report in Firestore
-                  await FirebaseFirestore.instance.collection('BugReports').add({
+                  await FirebaseFirestore.instance
+                      .collection('clubs')
+                      .doc(widget.clubId)
+                      .collection('BugReports') // Collection under specific clubId
+                      .add({
                     'bug_description': bugDescription,
                     'timestamp': FieldValue.serverTimestamp(),
                   });
 
-                  Navigator.pop(context);
-                  // You can add a toast or any other UI feedback for successful bug submission
-                  Fluttertoast.showToast(
-                    msg: 'Bug report submitted!',
-                    backgroundColor: Colors.white,
-                    textColor: Colors.black,
-                  );
+                  if (context.mounted) {
+                    Navigator.pop(context);
+                    // You can add a toast or any other UI feedback for successful bug submission
+                    Fluttertoast.showToast(
+                      msg: 'Bug report submitted!',
+                      backgroundColor: Colors.white,
+                      textColor: Colors.black,
+                    );
+                  }
                 } else {
                   // Show a toast for empty bug description
                   Fluttertoast.showToast(
@@ -671,10 +684,10 @@ class _MyFirstTeamClassPage extends State<MyFirstTeamClassPage> {
                     String storedPasscode = snapshot.data()?['admin_passcode'] ?? '';
 
                     // Check if the entered passcode matches the stored passcode
-                    if (enteredPasscode == storedPasscode) {
+                    if (enteredPasscode == storedPasscode && context.mounted) {
                       Navigator.pop(context);
                       _showAdminWelcomeToast();
-                      Navigator.push(context, SlideTransition1(MyClubAdminPage()));
+                      Navigator.push(context, SlideTransition1(const MyClubAdminPage()));
                     } else {
                       // Show a toast for incorrect passcode
                       Fluttertoast.showToast(

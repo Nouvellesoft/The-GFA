@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../model/trainings_and_games_reels.dart';
 import '../notifier/trainings_games_reels_notifier.dart';
 
-getTrainingsAndGamesReels(TrainingsAndGamesReelsNotifier trainingsAndGamesReelsNotifier, String clubId) async {
+Future<void> getTrainingsAndGamesReels(TrainingsAndGamesReelsNotifier trainingsAndGamesReelsNotifier, String clubId) async {
   QuerySnapshot snapshot = await FirebaseFirestore.instance
       .collection('clubs')
       .doc(clubId)

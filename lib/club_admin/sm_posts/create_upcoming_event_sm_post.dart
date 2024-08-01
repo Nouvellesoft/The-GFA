@@ -51,7 +51,7 @@ class ImageUrls {
 List<ImageUrls> recentImageUrls = [];
 
 class CreateUpcomingEventSMPost extends StatefulWidget implements NavigationStates {
-  CreateUpcomingEventSMPost({super.key});
+  const CreateUpcomingEventSMPost({super.key});
 
   @override
   State<CreateUpcomingEventSMPost> createState() => _CreateUpcomingEventSMPostState();
@@ -61,7 +61,7 @@ class _CreateUpcomingEventSMPostState extends State<CreateUpcomingEventSMPost> {
   String? selectedBannerLowResImageUrl;
   String? selectedBannerHighResImageUrl;
 
-  final GlobalKey _bannerContentKey = GlobalKey();
+  // final GlobalKey _bannerContentKey = GlobalKey();
   final GlobalKey _bannerContentKeyed = GlobalKey();
 
   // Define variables to store form input
@@ -157,11 +157,13 @@ class _CreateUpcomingEventSMPostState extends State<CreateUpcomingEventSMPost> {
           );
         }
       } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error creating event: $e'),
-          ),
-        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Error creating event: $e'),
+            ),
+          );
+        }
       }
     }
   }
@@ -177,10 +179,17 @@ class _CreateUpcomingEventSMPostState extends State<CreateUpcomingEventSMPost> {
     matchDayBannerForLocationNotifier = Provider.of<MatchDayBannerForLocationNotifier>(context);
 
     // Create a GlobalKey for the RepaintBoundary
-    GlobalKey boundaryKey = GlobalKey();
+    // GlobalKey boundaryKey = GlobalKey();
 
-    return WillPopScope(
-      onWillPop: _onWillPop,
+    return PopScope(
+      onPopInvokedWithResult: (didPop, result) async {
+        if (!didPop) {
+          // return false;
+          Navigator.of(context).pop();
+        }
+        await _onWillPop();
+      },
+      canPop: true, // Allow the pop action
       child: Scaffold(
           backgroundColor: backgroundColor,
           appBar: AppBar(
@@ -192,7 +201,9 @@ class _CreateUpcomingEventSMPostState extends State<CreateUpcomingEventSMPost> {
               onPressed: () async {
                 bool shouldPop = await _onWillPop();
                 if (shouldPop) {
-                  Navigator.pop(context);
+                  if (context.mounted) {
+                    Navigator.pop(context);
+                  }
                 }
               },
             ),

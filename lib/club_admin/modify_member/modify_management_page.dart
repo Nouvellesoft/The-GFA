@@ -12,7 +12,7 @@ Color backgroundColor = const Color.fromRGBO(187, 192, 195, 1.0);
 late ManagementBodyNotifier managementBodyNotifier;
 
 class MyModifyManagementBodyPage extends StatefulWidget implements NavigationStates {
-  MyModifyManagementBodyPage({Key? key}) : super(key: key);
+  const MyModifyManagementBodyPage({super.key});
 
   @override
   State<MyModifyManagementBodyPage> createState() => MyModifyManagementBodyPageState();
@@ -159,9 +159,9 @@ class MyModifyManagementBodyPageState extends State<MyModifyManagementBodyPage> 
       if (managementBodyName != null) {
         // Delete management with matching names
         await firestore.collection('ManagementBody').where('name', isEqualTo: managementBodyName).get().then((querySnapshot) {
-          querySnapshot.docs.forEach((doc) {
+          for (var doc in querySnapshot.docs) {
             doc.reference.delete();
-          });
+          }
         });
 
         // Remove the managementBody from the updated list

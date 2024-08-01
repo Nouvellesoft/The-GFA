@@ -521,7 +521,7 @@ class _SideBarState extends State<SideBar> with SingleTickerProviderStateMixin<S
                                                 context,
                                                 MaterialPageRoute(
                                                   builder: (context) => BottomNavigator(
-                                                    mainPage: const PlayersStatsAndInfoPage(),
+                                                    mainPage: PlayersStatsAndInfoPage(clubId: widget.clubId),
                                                     initialPage: 1,
                                                     clubId: widget.clubId,
                                                   ),

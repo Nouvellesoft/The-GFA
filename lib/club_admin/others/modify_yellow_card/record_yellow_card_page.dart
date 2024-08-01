@@ -12,7 +12,7 @@ import '/notifier/players_table_notifier.dart';
 Color backgroundColor = const Color.fromRGBO(129, 140, 148, 1.0);
 
 class MyRecordYellowCardPage extends StatefulWidget implements NavigationStates {
-  MyRecordYellowCardPage({Key? key}) : super(key: key);
+  const MyRecordYellowCardPage({super.key});
 
   @override
   State<MyRecordYellowCardPage> createState() => MyRecordYellowCardPageState();

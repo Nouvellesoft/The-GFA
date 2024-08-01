@@ -1,11 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../../bloc_navigation_bloc/navigation_bloc.dart';
 
 class MyAddNewLocationPage extends StatefulWidget implements NavigationStates {
-  MyAddNewLocationPage({super.key});
+  const MyAddNewLocationPage({super.key});
 
   @override
   State<MyAddNewLocationPage> createState() => MyAddNewLocationPageState();

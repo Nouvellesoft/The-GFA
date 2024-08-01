@@ -12,7 +12,7 @@ Color backgroundColor = const Color.fromRGBO(187, 192, 195, 1.0);
 late CoachesNotifier coachesNotifier;
 
 class MyModifyCoachesPage extends StatefulWidget implements NavigationStates {
-  MyModifyCoachesPage({Key? key}) : super(key: key);
+  const MyModifyCoachesPage({super.key});
 
   @override
   State<MyModifyCoachesPage> createState() => MyModifyCoachesPageState();

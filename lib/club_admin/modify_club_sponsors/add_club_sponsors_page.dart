@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
@@ -11,7 +12,7 @@ import '../../bloc_navigation_bloc/navigation_bloc.dart';
 Color backgroundColor = const Color.fromRGBO(235, 238, 239, 1.0);
 
 class MyAddClubSponsorPage extends StatefulWidget implements NavigationStates {
-  MyAddClubSponsorPage({super.key});
+  const MyAddClubSponsorPage({super.key});
 
   @override
   State<MyAddClubSponsorPage> createState() => MyAddClubSponsorPageState();
@@ -170,7 +171,9 @@ class MyAddClubSponsorPageState extends State<MyAddClubSponsorPage> {
         'image_five': imageUrlFive ?? data['image_five'],
       });
     } catch (e) {
-      print('Error uploading images: $e');
+      if (kDebugMode) {
+        print('Error uploading images: $e');
+      }
     }
   }
 
@@ -183,7 +186,9 @@ class MyAddClubSponsorPageState extends State<MyAddClubSponsorPage> {
       final String imageUrl = await storageReference.getDownloadURL();
       return imageUrl;
     } catch (e) {
-      print('Error uploading image: $e');
+      if (kDebugMode) {
+        print('Error uploading image: $e');
+      }
       return null;
     }
   }
@@ -379,7 +384,7 @@ class MyAddClubSponsorPageState extends State<MyAddClubSponsorPage> {
               ElevatedButton(
                 onPressed: _isSubmitting ? null : _submitForm,
                 style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all<Color>(backgroundColor),
+                  backgroundColor: WidgetStateProperty.all<Color>(backgroundColor),
                 ),
                 child: _isSubmitting
                     ? const CircularProgressIndicator() // Show circular progress indicator

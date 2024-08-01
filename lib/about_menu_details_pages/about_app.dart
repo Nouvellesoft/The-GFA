@@ -108,8 +108,6 @@ class AboutAppDetails extends StatefulWidget {
 
 // This class represents the stateful widget that displays the details about the app.
 class _AboutAppDetailsState extends State<AboutAppDetails> {
-
-
   final _email = "david.oludepo@gmail.com";
   final _instagram = "nouvellesoft";
   final _twitter = "novelsoftinc";
@@ -124,7 +122,6 @@ class _AboutAppDetailsState extends State<AboutAppDetails> {
   String urlInstagram = "https://instagram.com/";
 
   late Stream<DocumentSnapshot<Map<String, dynamic>>> firestoreStream;
-
 
   @override
   Widget build(BuildContext context) {
@@ -816,7 +813,7 @@ class SocialMediaButton extends StatelessWidget {
   final IconData icon;
   final VoidCallback onPressed;
 
-  SocialMediaButton({required this.icon, required this.onPressed});
+  const SocialMediaButton({super.key, required this.icon, required this.onPressed});
 
   @override
   Widget build(BuildContext context) {

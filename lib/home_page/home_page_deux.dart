@@ -167,9 +167,12 @@ class PandCTransitions extends StatelessWidget {
 
                 // Check if the entered passcode matches the stored passcode
                 if (enteredPasscode == storedPasscode) {
-                  Navigator.pop(context);
-                  _showAdminWelcomeToast();
-                  Navigator.push(context, SlideTransition1(MyClubAdminPage()));
+                  if (context.mounted) {
+                    Navigator.pop(context);
+
+                    _showAdminWelcomeToast();
+                    Navigator.push(context, SlideTransition1(const MyClubAdminPage()));
+                  }
                 } else {
                   // Show a toast for incorrect passcode
                   Fluttertoast.showToast(

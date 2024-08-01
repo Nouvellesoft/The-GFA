@@ -13,7 +13,7 @@ Color appBackgroundColor = const Color.fromRGBO(147, 165, 193, 1.0);
 late ClubSponsorsNotifier clubSponsorsNotifier;
 
 class MyRemoveClubSponsorPage extends StatefulWidget implements NavigationStates {
-  MyRemoveClubSponsorPage({Key? key}) : super(key: key);
+  const MyRemoveClubSponsorPage({super.key});
 
   @override
   State<MyRemoveClubSponsorPage> createState() => MyRemoveClubSponsorPageState();
@@ -160,9 +160,9 @@ class MyRemoveClubSponsorPageState extends State<MyRemoveClubSponsorPage> {
       if (clubSponsorsName != null) {
         // Delete management with matching names
         await firestore.collection('ClubSponsors').where('name', isEqualTo: clubSponsorsName).get().then((querySnapshot) {
-          querySnapshot.docs.forEach((doc) {
+          for (var doc in querySnapshot.docs) {
             doc.reference.delete();
-          });
+          }
         });
 
         // Remove the clubSponsor from the updated list

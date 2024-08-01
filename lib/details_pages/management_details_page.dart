@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:confetti/confetti.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -128,7 +129,7 @@ dynamic _twitter;
 dynamic _linkedIn;
 
 class ManagementBodyDetailsPage extends StatefulWidget {
-  const ManagementBodyDetailsPage({Key? key, this.title}) : super(key: key);
+  const ManagementBodyDetailsPage({super.key, this.title});
 
   final String? title;
 
@@ -289,11 +290,13 @@ class _ManagementBodyDetailsPage extends State<ManagementBodyDetailsPage> {
           fontSize: 16.0,
         );
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Hmm, strange, Error updating profile'),
-          ),
-        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Hmm, strange, Error updating profile'),
+            ),
+          );
+        }
       }
     }
   }
@@ -309,7 +312,7 @@ class _ManagementBodyDetailsPage extends State<ManagementBodyDetailsPage> {
   Future<void> uploadImagesToStorageAndFirestore(List<File> imageFiles) async {
     try {
       // Find the document ID for the user with the specified name (_name)
-      String _queryName = _name.toLowerCase().replaceAll(" ", "");
+      String queryName = _name.toLowerCase().replaceAll(" ", "");
 
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('ManagementBody').get();
 
@@ -317,7 +320,7 @@ class _ManagementBodyDetailsPage extends State<ManagementBodyDetailsPage> {
 
       for (QueryDocumentSnapshot document in querySnapshot.docs) {
         String documentName = document['name'].toLowerCase().replaceAll(" ", "");
-        if (documentName == _queryName) {
+        if (documentName == queryName) {
           // Found the document with the matching name
           documentId = document.id;
           break; // Exit the loop since we found the document
@@ -326,10 +329,10 @@ class _ManagementBodyDetailsPage extends State<ManagementBodyDetailsPage> {
 
       if (documentId != null) {
         for (int i = 0; i < imageFiles.length; i++) {
-          String imageName = '$_queryName${i + 1}.jpg';
+          String imageName = '$queryName${i + 1}.jpg';
 
           // Upload each image to Firebase Storage
-          final Reference storageReference = FirebaseStorage.instance.ref().child('managers').child(_queryName).child(imageName);
+          final Reference storageReference = FirebaseStorage.instance.ref().child('managers').child(queryName).child(imageName);
           final UploadTask uploadTask = storageReference.putFile(imageFiles[i]);
           await uploadTask.whenComplete(() {});
 
@@ -354,12 +357,18 @@ class _ManagementBodyDetailsPage extends State<ManagementBodyDetailsPage> {
           textColor: Colors.white,
           fontSize: 16.0,
         );
-        print('Images uploaded and references stored successfully.');
+        if (kDebugMode) {
+          print('Images uploaded and references stored successfully.');
+        }
       } else {
-        print('User with name $_queryName not found.');
+        if (kDebugMode) {
+          print('User with name $queryName not found.');
+        }
       }
     } catch (e) {
-      print('Error uploading images and storing references: $e');
+      if (kDebugMode) {
+        print('Error uploading images and storing references: $e');
+      }
       // Show error toast
       Fluttertoast.showToast(
         msg: "Error uploading images and storing references.",
@@ -3099,10 +3108,14 @@ class _ManagementBodyDetailsPage extends State<ManagementBodyDetailsPage> {
           }
         });
       } else {
-        print('Document not found.');
+        if (kDebugMode) {
+          print('Document not found.');
+        }
       }
     } catch (e) {
-      print('Error loading form data: $e');
+      if (kDebugMode) {
+        print('Error loading form data: $e');
+      }
     }
   }
 
@@ -3117,7 +3130,9 @@ class _ManagementBodyDetailsPage extends State<ManagementBodyDetailsPage> {
         verificationCompleted: (PhoneAuthCredential credential) async {
           // Handle auto verification completed (if needed)
           await auth.signInWithCredential(credential);
-          print('Logged In Successfully');
+          if (kDebugMode) {
+            print('Logged In Successfully');
+          }
 
           Fluttertoast.showToast(
             msg: 'You’re Welcome',
@@ -3129,7 +3144,9 @@ class _ManagementBodyDetailsPage extends State<ManagementBodyDetailsPage> {
         },
         verificationFailed: (FirebaseAuthException e) {
           // Handle verification failed
-          print("Verification failed: ${e.message}");
+          if (kDebugMode) {
+            print("Verification failed: ${e.message}");
+          }
 
           Fluttertoast.showToast(
             msg: 'Hmm. Check your Internet Connection or maybe too many OTP requests',
@@ -3166,11 +3183,15 @@ class _ManagementBodyDetailsPage extends State<ManagementBodyDetailsPage> {
         },
         codeAutoRetrievalTimeout: (String verificationId) {
           // Handle timeout (if needed)
-          print('TimeOut');
+          if (kDebugMode) {
+            print('TimeOut');
+          }
         },
       );
     } catch (e) {
-      print('Error sending OTP: $e');
+      if (kDebugMode) {
+        print('Error sending OTP: $e');
+      }
       Fluttertoast.showToast(
         msg: 'Error sending OTP. Please try again.',
         gravity: ToastGravity.BOTTOM,
@@ -3190,7 +3211,9 @@ class _ManagementBodyDetailsPage extends State<ManagementBodyDetailsPage> {
     );
     try {
       await auth.signInWithCredential(credential).then((value) async {
-        print('User verification is Successful');
+        if (kDebugMode) {
+          print('User verification is Successful');
+        }
 
         // Save the verification timestamp only if it's not already set
         SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -3230,7 +3253,9 @@ class _ManagementBodyDetailsPage extends State<ManagementBodyDetailsPage> {
         }
       });
     } catch (e) {
-      print('Error verifying OTP: $e');
+      if (kDebugMode) {
+        print('Error verifying OTP: $e');
+      }
       Fluttertoast.showToast(
         msg: 'OTP incorrect. Please retype.',
         gravity: ToastGravity.BOTTOM,
@@ -3273,14 +3298,20 @@ class _ManagementBodyDetailsPage extends State<ManagementBodyDetailsPage> {
     showDialog<String>(
         // barrierColor: const Color.fromRGBO(66, 67, 69, 1.0),
         context: context,
-        builder: (BuildContext context) => WillPopScope(
-              onWillPop: () async {
-                // Clear the fields or perform any cleanup actions
+        builder: (BuildContext context) => PopScope(
+              onPopInvokedWithResult: (didPop, result) async {
+                // Perform your cleanup actions
                 otpCode = '';
                 isOTPComplete = false;
 
-                return true; // Allow the dialog to be popped
+                // Optionally handle the pop result
+                // You can do additional things based on `didPop` and `result`
+                if (didPop) {
+                  // Allow the pop to proceed
+                  Navigator.of(context).pop();
+                }
               },
+              canPop: true, // Allow the pop action
               child: AlertDialog(
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20.0),
@@ -3342,12 +3373,16 @@ class _ManagementBodyDetailsPage extends State<ManagementBodyDetailsPage> {
                           ),
                           codeLength: 6,
                           onCodeChanged: (code) {
-                            print("OnCodeChanged : $code");
+                            if (kDebugMode) {
+                              print("OnCodeChanged : $code");
+                            }
                             otpCode = code.toString();
                             isOTPComplete = code!.length == 6;
                           },
                           onCodeSubmitted: (val) {
-                            print("OnCodeSubmitted : $val");
+                            if (kDebugMode) {
+                              print("OnCodeSubmitted : $val");
+                            }
                             isOTPComplete = val.isEmpty;
                             otpCode = '';
                           },
@@ -3364,7 +3399,9 @@ class _ManagementBodyDetailsPage extends State<ManagementBodyDetailsPage> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? userProperties = prefs.getString('verificationUserProperties');
     String currentProperties = _name; // Adjust this combination based on what you used for verification
-    print("User properties from SharedPreferences: $userProperties");
+    if (kDebugMode) {
+      print("User properties from SharedPreferences: $userProperties");
+    }
 
     if (userProperties != null && userProperties == currentProperties) {
       // Check if the last verification was within the last 30 minutes
@@ -3613,7 +3650,9 @@ class _ManagementBodyDetailsPage extends State<ManagementBodyDetailsPage> {
                 ElevatedButton(
                   onPressed: () async {
                     await _submitForm();
-                    Navigator.pop(context); // Close the dialog
+                    if (context.mounted) {
+                      Navigator.pop(context); // Close the dialog
+                    }
                   },
                   child: const Text('Update Autobiography'),
                 ),
@@ -3765,7 +3804,7 @@ class _ManagementBodyDetailsPage extends State<ManagementBodyDetailsPage> {
             TextField(
               controller: commentController,
               decoration: const InputDecoration(
-                hintText: 'The performances of the players this past 3 weeks have been phenome...',
+                hintText: 'The performances of the players this past 3 weeks have been phenomenal.',
                 hintStyle: TextStyle(
                   color: Colors.white38,
                   fontSize: 11,
@@ -3798,13 +3837,15 @@ class _ManagementBodyDetailsPage extends State<ManagementBodyDetailsPage> {
                     'id': '10',
                   });
 
-                  Navigator.pop(context);
-                  // You can add a toast or any other UI feedback for successful bug submission
-                  Fluttertoast.showToast(
-                      msg: 'Thank you, your Club Review has been added!',
-                      backgroundColor: shapeDecorationColorTwo,
-                      textColor: Colors.white,
-                      toastLength: Toast.LENGTH_LONG);
+                  if (context.mounted) {
+                    Navigator.pop(context);
+                    // You can add a toast or any other UI feedback for successful bug submission
+                    Fluttertoast.showToast(
+                        msg: 'Thank you, your Club Review has been added!',
+                        backgroundColor: shapeDecorationColorTwo,
+                        textColor: Colors.white,
+                        toastLength: Toast.LENGTH_LONG);
+                  }
                 } else {
                   // Show a toast for empty bug description
                   Fluttertoast.showToast(

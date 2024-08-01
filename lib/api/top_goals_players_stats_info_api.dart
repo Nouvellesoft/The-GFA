@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../model/players_stats_and_info.dart';
 import '../notifier/top_goals_players_stats_info_notifier.dart';
 
-getTopGoalsPlayersStatsAndInfo(TopGoalsPlayersStatsAndInfoNotifier topGoalsPlayersStatsAndInfoNotifier, String clubId) async {
+Future<void> getTopGoalsPlayersStatsAndInfo(TopGoalsPlayersStatsAndInfoNotifier topGoalsPlayersStatsAndInfoNotifier, String clubId) async {
   QuerySnapshot snapshot = await FirebaseFirestore.instance
       .collection('clubs')
       .doc(clubId)

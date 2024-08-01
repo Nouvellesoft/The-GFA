@@ -10,7 +10,7 @@ import '../../../notifier/c_match_day_banner_for_location_notifier.dart';
 late MatchDayBannerForLocationNotifier matchDayBannerForLocationNotifier;
 
 class MyRemoveNewLocationPage extends StatefulWidget implements NavigationStates {
-  MyRemoveNewLocationPage({super.key});
+  const MyRemoveNewLocationPage({super.key});
 
   @override
   State<MyRemoveNewLocationPage> createState() => MyRemoveNewLocationPageState();
@@ -167,9 +167,9 @@ class MyRemoveNewLocationPageState extends State<MyRemoveNewLocationPage> {
       if (locationsName != null) {
         // Delete locations with matching names
         await firestore.collection('MatchDayBannerForLocation').where('location', isEqualTo: locationsName).get().then((querySnapshot) {
-          querySnapshot.docs.forEach((doc) {
+          for (var doc in querySnapshot.docs) {
             doc.reference.delete();
-          });
+          }
         });
 
         // Remove the location from the updated list

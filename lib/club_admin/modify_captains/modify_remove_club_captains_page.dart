@@ -24,7 +24,7 @@ Color backgroundColor = const Color.fromRGBO(20, 36, 62, 1.0);
 late CaptainsNotifier clubCaptainsNotifier;
 
 class MyModifyRemoveClubCaptainsPage extends StatefulWidget implements NavigationStates {
-  MyModifyRemoveClubCaptainsPage({Key? key}) : super(key: key);
+  const MyModifyRemoveClubCaptainsPage({super.key});
 
   @override
   State<MyModifyRemoveClubCaptainsPage> createState() => MyModifyRemoveClubCaptainsPageState();
@@ -87,7 +87,7 @@ class MyModifyRemoveClubCaptainsPageState extends State<MyModifyRemoveClubCaptai
                   final clubCaptains = clubCaptainsNotifier.captainsList[index];
                   return ListTile(
                     title: Text(
-                      '${clubCaptains.name!} (${clubCaptains.teamCaptaining!})' ?? 'No Name',
+                      '${clubCaptains.name!} (${clubCaptains.teamCaptaining!})',
                       style: const TextStyle(color: Colors.white),
                     ),
                     trailing: isEditing
@@ -184,9 +184,9 @@ class MyModifyRemoveClubCaptainsPageState extends State<MyModifyRemoveClubCaptai
       if (clubCaptainsName != null) {
         // Delete management with matching names
         await firestore.collection('Captains').where('name', isEqualTo: clubCaptainsName).get().then((querySnapshot) {
-          querySnapshot.docs.forEach((doc) {
+          for (var doc in querySnapshot.docs) {
             doc.reference.delete();
-          });
+          }
         });
 
         // Remove the clubCaptains from the updated list

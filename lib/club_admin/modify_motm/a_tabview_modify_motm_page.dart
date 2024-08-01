@@ -28,7 +28,7 @@ String rcTitle = 'Previous MOTMs';
 Color? selectedTabColor = Colors.indigo[200];
 
 class TabviewMOTMPage extends StatefulWidget implements NavigationStates {
-  TabviewMOTMPage({super.key});
+  const TabviewMOTMPage({super.key});
 
   @override
   State<TabviewMOTMPage> createState() => TabviewMOTMPageState();
@@ -80,7 +80,7 @@ class TabviewMOTMPageState extends State<TabviewMOTMPage> with SingleTickerProvi
       ),
       body: TabBarView(
         controller: _tabController,
-        children: [
+        children: const [
           MyMOTMPage(),
           MyDisplayedMOTMHistoryPage(),
         ],

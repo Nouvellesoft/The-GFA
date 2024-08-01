@@ -37,7 +37,7 @@ Color coachColor = phoneColor; // Change the color based on your preference
 Color managerColor = Colors.orange; // Change the color based on your preference
 
 class MyShowAllClubMemberPage extends StatefulWidget implements NavigationStates {
-  MyShowAllClubMemberPage({Key? key}) : super(key: key);
+  const MyShowAllClubMemberPage({super.key});
 
   @override
   State<MyShowAllClubMemberPage> createState() => MyShowAllClubMemberPageState();
@@ -95,8 +95,8 @@ class MyShowAllClubMemberPageState extends State<MyShowAllClubMemberPage> {
                   // Assign color based on the department
                   Color memberColor = _getMemberColor(deptForMember);
 
-                  final isCaptain = memberDept.containsKey(memberName);
-                  final isSelected = selectedMemberNames.contains(memberName);
+                  // final isCaptain = memberDept.containsKey(memberName);
+                  // final isSelected = selectedMemberNames.contains(memberName);
 
                   return ListTile(
                     title: Text(

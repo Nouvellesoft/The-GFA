@@ -27,7 +27,7 @@ Color phoneColor = const Color.fromRGBO(20, 134, 46, 1.0);
 Color backgroundColor = const Color.fromRGBO(147, 165, 193, 1.0);
 
 class TabviewClubSponsorsPage extends StatefulWidget implements NavigationStates {
-  TabviewClubSponsorsPage({super.key});
+  const TabviewClubSponsorsPage({super.key});
 
   @override
   State<TabviewClubSponsorsPage> createState() => _TabviewClubSponsorsPageState();
@@ -79,7 +79,7 @@ class _TabviewClubSponsorsPageState extends State<TabviewClubSponsorsPage> with 
       ),
       body: TabBarView(
         controller: _tabController,
-        children: [
+        children: const [
           MyAddClubSponsorPage(),
           MyRemoveClubSponsorPage(),
         ],

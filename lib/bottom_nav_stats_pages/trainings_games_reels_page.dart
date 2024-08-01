@@ -1,5 +1,4 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
@@ -13,15 +12,18 @@ late TrainingsAndGamesReelsNotifier trainingsAndGamesReelsNotifier;
 
 class TrainingsAndGamesReelsPage extends StatelessWidget implements PreferredSizeWidget {
   final ScrollController _scrollController = ScrollController();
+  final String clubId;
 
   @override
   final Size preferredSize;
 
-  TrainingsAndGamesReelsPage({super.key}) : preferredSize = const Size.fromHeight(60.0);
+  TrainingsAndGamesReelsPage({super.key, required this.clubId}) : preferredSize = const Size.fromHeight(60.0);
 
   @override
   Widget build(BuildContext context) {
     trainingsAndGamesReelsNotifier = Provider.of<TrainingsAndGamesReelsNotifier>(context);
+
+    // Fetch data when the widget is built
     _fetchTrainingsAndGamesReelsAndUpdateNotifier(trainingsAndGamesReelsNotifier);
 
     SystemChrome.setPreferredOrientations([
@@ -38,20 +40,24 @@ class TrainingsAndGamesReelsPage extends StatelessWidget implements PreferredSiz
               padding: const EdgeInsets.all(8.0),
               child: SingleChildScrollView(
                 controller: _scrollController,
-                child: StaggeredGrid.count(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 10,
-                  mainAxisSpacing: 12,
-                  children: List.generate(
-                    trainingsAndGamesReelsNotifier.trainingsAndGamesReelsList.length,
-                    (index) {
-                      return StaggeredGridTile.count(
-                        crossAxisCellCount: 1,
-                        mainAxisCellCount: index.isEven ? 1.2 : 1.8,
-                        child: _buildReels(context, index),
-                      );
-                    },
-                  ),
+                child: Consumer<TrainingsAndGamesReelsNotifier>(
+                  builder: (context, notifier, child) {
+                    return StaggeredGrid.count(
+                      crossAxisCount: 2,
+                      crossAxisSpacing: 10,
+                      mainAxisSpacing: 12,
+                      children: List.generate(
+                        notifier.trainingsAndGamesReelsList.length,
+                        (index) {
+                          return StaggeredGridTile.count(
+                            crossAxisCellCount: 1,
+                            mainAxisCellCount: index.isEven ? 1.2 : 1.8,
+                            child: _buildReels(context, index),
+                          );
+                        },
+                      ),
+                    );
+                  },
                 ),
               ),
             ),
@@ -93,9 +99,6 @@ class TrainingsAndGamesReelsPage extends StatelessWidget implements PreferredSiz
                       ),
                     ),
                   ),
-                  // SizedBox(
-                  //   width: 50,
-                  // ),
                   Hero(
                     tag: 'title',
                     transitionOnUserGestures: true,
@@ -119,7 +122,7 @@ class TrainingsAndGamesReelsPage extends StatelessWidget implements PreferredSiz
                             child: Padding(
                               padding: EdgeInsets.only(left: 30),
                               child: Text(
-                                'Monthly Photos', //ADD FOOTBALL ICON
+                                'Monthly Photos',
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 25,
@@ -142,17 +145,10 @@ class TrainingsAndGamesReelsPage extends StatelessWidget implements PreferredSiz
   }
 
   Future<void> _fetchTrainingsAndGamesReelsAndUpdateNotifier(TrainingsAndGamesReelsNotifier notifier) async {
-    // Fetch the collection of club IDs from Firestore
-    QuerySnapshot clubSnapshot = await FirebaseFirestore.instance.collection('clubs').get();
-    List<String> clubIds = clubSnapshot.docs.map((doc) => doc.id).toList();
-
-    // Process each club ID
-    for (String clubId in clubIds) {
-      await getTrainingsAndGamesReels(notifier, clubId);
-    }
+    await getTrainingsAndGamesReels(notifier, clubId);
   }
 
-  Future navigateMyApp(context) async {
+  Future navigateMyApp(BuildContext context) async {
     Navigator.of(context).pop(false);
   }
 

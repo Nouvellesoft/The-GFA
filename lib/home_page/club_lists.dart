@@ -1,4 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:the_gfa/sidebar/sidebar_layout.dart';
 
@@ -8,7 +9,7 @@ class ClubSelectionPage extends StatefulWidget {
   const ClubSelectionPage({super.key});
 
   @override
-  _ClubSelectionPageState createState() => _ClubSelectionPageState();
+  State<ClubSelectionPage> createState() => _ClubSelectionPageState();
 }
 
 class _ClubSelectionPageState extends State<ClubSelectionPage> {
@@ -56,7 +57,9 @@ class _ClubSelectionPageState extends State<ClubSelectionPage> {
   void initState() {
     super.initState();
     Firebase.initializeApp().whenComplete(() {
-      print("completed");
+      if (kDebugMode) {
+        print("completed");
+      }
       setState(() {});
     });
   }

@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../model/a_past_matches.dart';
 import '../notifier/a_past_matches_notifier.dart';
 
-getPastMatches(PastMatchesNotifier pastMatchesNotifier, String clubId) async {
+Future<void> getPastMatches(PastMatchesNotifier pastMatchesNotifier, String clubId) async {
   QuerySnapshot snapshot =
       await FirebaseFirestore.instance.collection('clubs').doc(clubId).collection('PastMatches').orderBy('id', descending: true).limit(20).get();
 

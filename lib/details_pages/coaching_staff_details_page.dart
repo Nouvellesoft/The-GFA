@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:confetti/confetti.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -127,7 +128,7 @@ dynamic _twitter;
 dynamic _linkedIn;
 
 class CoachesDetailsPage extends StatefulWidget {
-  const CoachesDetailsPage({Key? key, this.title}) : super(key: key);
+  const CoachesDetailsPage({super.key, this.title});
 
   final String? title;
 
@@ -288,11 +289,13 @@ class _CoachesDetailsPage extends State<CoachesDetailsPage> {
           fontSize: 16.0,
         );
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Hmm, strange, Error updating profile'),
-          ),
-        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Hmm, strange, Error updating profile'),
+            ),
+          );
+        }
       }
     }
   }
@@ -308,7 +311,7 @@ class _CoachesDetailsPage extends State<CoachesDetailsPage> {
   Future<void> uploadImagesToStorageAndFirestore(List<File> imageFiles) async {
     try {
       // Find the document ID for the user with the specified name (_name)
-      String _queryName = _name.toLowerCase().replaceAll(" ", "");
+      String queryName = _name.toLowerCase().replaceAll(" ", "");
 
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('Coaches').get();
 
@@ -316,7 +319,7 @@ class _CoachesDetailsPage extends State<CoachesDetailsPage> {
 
       for (QueryDocumentSnapshot document in querySnapshot.docs) {
         String documentName = document['name'].toLowerCase().replaceAll(" ", "");
-        if (documentName == _queryName) {
+        if (documentName == queryName) {
           // Found the document with the matching name
           documentId = document.id;
           break; // Exit the loop since we found the document
@@ -325,10 +328,10 @@ class _CoachesDetailsPage extends State<CoachesDetailsPage> {
 
       if (documentId != null) {
         for (int i = 0; i < imageFiles.length; i++) {
-          String imageName = '$_queryName${i + 1}.jpg';
+          String imageName = '$queryName${i + 1}.jpg';
 
           // Upload each image to Firebase Storage
-          final Reference storageReference = FirebaseStorage.instance.ref().child('coaches').child(_queryName).child(imageName);
+          final Reference storageReference = FirebaseStorage.instance.ref().child('coaches').child(queryName).child(imageName);
           final UploadTask uploadTask = storageReference.putFile(imageFiles[i]);
           await uploadTask.whenComplete(() {});
 
@@ -353,12 +356,18 @@ class _CoachesDetailsPage extends State<CoachesDetailsPage> {
           textColor: Colors.white,
           fontSize: 16.0,
         );
-        print('Images uploaded and references stored successfully.');
+        if (kDebugMode) {
+          print('Images uploaded and references stored successfully.');
+        }
       } else {
-        print('User with name $_queryName not found.');
+        if (kDebugMode) {
+          print('User with name $queryName not found.');
+        }
       }
     } catch (e) {
-      print('Error uploading images and storing references: $e');
+      if (kDebugMode) {
+        print('Error uploading images and storing references: $e');
+      }
       // Show error toast
       Fluttertoast.showToast(
         msg: "Error uploading images and storing references.",
@@ -536,8 +545,7 @@ class _CoachesDetailsPage extends State<CoachesDetailsPage> {
                     // );
 
                     addCoachesCommentDialog(context);
-                  }
-                  else {
+                  } else {
                     modifyProfile(); // Use modifyProfile function instead of _showAutobiographyModificationDialog or _showImageModificationDialog
                   }
                 }),
@@ -3108,10 +3116,14 @@ class _CoachesDetailsPage extends State<CoachesDetailsPage> {
           }
         });
       } else {
-        print('Document not found.');
+        if (kDebugMode) {
+          print('Document not found.');
+        }
       }
     } catch (e) {
-      print('Error loading form data: $e');
+      if (kDebugMode) {
+        print('Error loading form data: $e');
+      }
     }
   }
 
@@ -3126,7 +3138,9 @@ class _CoachesDetailsPage extends State<CoachesDetailsPage> {
         verificationCompleted: (PhoneAuthCredential credential) async {
           // Handle auto verification completed (if needed)
           await auth.signInWithCredential(credential);
-          print('Logged In Successfully');
+          if (kDebugMode) {
+            print('Logged In Successfully');
+          }
 
           Fluttertoast.showToast(
             msg: 'You’re Welcome',
@@ -3138,7 +3152,9 @@ class _CoachesDetailsPage extends State<CoachesDetailsPage> {
         },
         verificationFailed: (FirebaseAuthException e) {
           // Handle verification failed
-          print("Verification failed: ${e.message}");
+          if (kDebugMode) {
+            print("Verification failed: ${e.message}");
+          }
 
           Fluttertoast.showToast(
             msg: 'Hmm. Check your Internet Connection or maybe too many OTP requests',
@@ -3175,11 +3191,15 @@ class _CoachesDetailsPage extends State<CoachesDetailsPage> {
         },
         codeAutoRetrievalTimeout: (String verificationId) {
           // Handle timeout (if needed)
-          print('TimeOut');
+          if (kDebugMode) {
+            print('TimeOut');
+          }
         },
       );
     } catch (e) {
-      print('Error sending OTP: $e');
+      if (kDebugMode) {
+        print('Error sending OTP: $e');
+      }
       Fluttertoast.showToast(
         msg: 'Error sending OTP. Please try again.',
         gravity: ToastGravity.BOTTOM,
@@ -3199,7 +3219,9 @@ class _CoachesDetailsPage extends State<CoachesDetailsPage> {
     );
     try {
       await auth.signInWithCredential(credential).then((value) async {
-        print('User verification is Successful');
+        if (kDebugMode) {
+          print('User verification is Successful');
+        }
 
         // Save the verification timestamp only if it's not already set
         SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -3239,7 +3261,9 @@ class _CoachesDetailsPage extends State<CoachesDetailsPage> {
         }
       });
     } catch (e) {
-      print('Error verifying OTP: $e');
+      if (kDebugMode) {
+        print('Error verifying OTP: $e');
+      }
       Fluttertoast.showToast(
         msg: 'OTP incorrect. Please retype.',
         gravity: ToastGravity.BOTTOM,
@@ -3280,100 +3304,112 @@ class _CoachesDetailsPage extends State<CoachesDetailsPage> {
     final GlobalKey<FormState> dialogFormKey = GlobalKey<FormState>();
 
     showDialog<String>(
-      // barrierColor: const Color.fromRGBO(66, 67, 69, 1.0),
+        // barrierColor: const Color.fromRGBO(66, 67, 69, 1.0),
         context: context,
-        builder: (BuildContext context) => WillPopScope(
-          onWillPop: () async {
-            // Clear the fields or perform any cleanup actions
-            otpCode = '';
-            isOTPComplete = false;
+        builder: (BuildContext context) => PopScope(
+              onPopInvokedWithResult: (didPop, result) async {
+                // Perform your cleanup actions
+                otpCode = '';
+                isOTPComplete = false;
 
-            return true; // Allow the dialog to be popped
-          },
-          child: AlertDialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20.0),
-            ),
-            backgroundColor: const Color.fromRGBO(223, 225, 229, 1.0),
-            title: const Text(
-              "Please click 'Generate OTP', input your OTP from the sent sms.",
-              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.black),
-            ),
-            actions: <Widget>[
-              TextButton(
-                onPressed: () async {
-                  // User needs to send OTP for verification
-                  await _sendOtpToPhoneNumber();
-                },
-                child: const Text('Generate OTP', style: TextStyle(color: Colors.black)),
-              ),
-              TextButton(
-                onPressed: isOTPComplete
-                    ? () {
-                  verifyOTPCode();
-                  setState(() {
-                    otpCode = '';
-                  });
-                  Navigator.of(context).pop(); // Move this line here
+                // Optionally handle the pop result
+                // You can do additional things based on `didPop` and `result`
+                if (didPop) {
+                  // Allow the pop to proceed
+                  Navigator.of(context).pop();
                 }
-                    : null,
-                child: const Text('Verify OTP', style: TextStyle(color: Colors.black)),
-              ),
-            ],
-            content: Padding(
-              padding: const EdgeInsets.all(6.0),
-              child: AbsorbPointer(
-                absorbing: !isOtpGenerated,
-                child: Form(
-                  key: dialogFormKey,
-                  child: GestureDetector(
-                    onTap: () {
-                      // Show toast message if OTP is not generated
-                      if (!isOtpGenerated) {
-                        Fluttertoast.showToast(
-                          msg: 'Please generate OTP first',
-                          gravity: ToastGravity.BOTTOM,
-                          backgroundColor: Colors.red,
-                          textColor: Colors.white,
-                          fontSize: 16.0,
-                        );
-                      }
+              },
+              canPop: true, // Allow the pop action
+              child: AlertDialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20.0),
+                ),
+                backgroundColor: const Color.fromRGBO(223, 225, 229, 1.0),
+                title: const Text(
+                  "Please click 'Generate OTP', input your OTP from the sent sms.",
+                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.black),
+                ),
+                actions: <Widget>[
+                  TextButton(
+                    onPressed: () async {
+                      // User needs to send OTP for verification
+                      await _sendOtpToPhoneNumber();
                     },
-                    child: PinFieldAutoFill(
-                      autoFocus: true,
-                      currentCode: otpCode,
-                      decoration: BoxLooseDecoration(
-                        gapSpace: 5,
-                        radius: const Radius.circular(8),
-                        strokeColorBuilder: isOtpGenerated
-                            ? const FixedColorBuilder(Color(0xFFE16641))
-                            : const FixedColorBuilder(Colors.grey), // Use grey color if OTP is not generated
+                    child: const Text('Generate OTP', style: TextStyle(color: Colors.black)),
+                  ),
+                  TextButton(
+                    onPressed: isOTPComplete
+                        ? () {
+                            verifyOTPCode();
+                            setState(() {
+                              otpCode = '';
+                            });
+                            Navigator.of(context).pop(); // Move this line here
+                          }
+                        : null,
+                    child: const Text('Verify OTP', style: TextStyle(color: Colors.black)),
+                  ),
+                ],
+                content: Padding(
+                  padding: const EdgeInsets.all(6.0),
+                  child: AbsorbPointer(
+                    absorbing: !isOtpGenerated,
+                    child: Form(
+                      key: dialogFormKey,
+                      child: GestureDetector(
+                        onTap: () {
+                          // Show toast message if OTP is not generated
+                          if (!isOtpGenerated) {
+                            Fluttertoast.showToast(
+                              msg: 'Please generate OTP first',
+                              gravity: ToastGravity.BOTTOM,
+                              backgroundColor: Colors.red,
+                              textColor: Colors.white,
+                              fontSize: 16.0,
+                            );
+                          }
+                        },
+                        child: PinFieldAutoFill(
+                          autoFocus: true,
+                          currentCode: otpCode,
+                          decoration: BoxLooseDecoration(
+                            gapSpace: 5,
+                            radius: const Radius.circular(8),
+                            strokeColorBuilder: isOtpGenerated
+                                ? const FixedColorBuilder(Color(0xFFE16641))
+                                : const FixedColorBuilder(Colors.grey), // Use grey color if OTP is not generated
+                          ),
+                          codeLength: 6,
+                          onCodeChanged: (code) {
+                            if (kDebugMode) {
+                              print("OnCodeChanged : $code");
+                            }
+                            otpCode = code.toString();
+                            isOTPComplete = code!.length == 6;
+                          },
+                          onCodeSubmitted: (val) {
+                            if (kDebugMode) {
+                              print("OnCodeSubmitted : $val");
+                            }
+                            isOTPComplete = val.isEmpty;
+                            otpCode = '';
+                          },
+                        ),
                       ),
-                      codeLength: 6,
-                      onCodeChanged: (code) {
-                        print("OnCodeChanged : $code");
-                        otpCode = code.toString();
-                        isOTPComplete = code!.length == 6;
-                      },
-                      onCodeSubmitted: (val) {
-                        print("OnCodeSubmitted : $val");
-                        isOTPComplete = val.isEmpty;
-                        otpCode = '';
-                      },
                     ),
                   ),
                 ),
               ),
-            ),
-          ),
-        ));
+            ));
   }
 
   Future<bool> isUserVerifiedRecently() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? userProperties = prefs.getString('verificationUserProperties');
     String currentProperties = _name; // Adjust this combination based on what you used for verification
-    print("User properties from SharedPreferences: $userProperties");
+    if (kDebugMode) {
+      print("User properties from SharedPreferences: $userProperties");
+    }
 
     if (userProperties != null && userProperties == currentProperties) {
       // Check if the last verification was within the last 30 minutes
@@ -3382,9 +3418,7 @@ class _CoachesDetailsPage extends State<CoachesDetailsPage> {
         DateTime now = DateTime.now();
         DateTime verificationDateTime = DateTime.fromMillisecondsSinceEpoch(verificationTime);
 
-        return now
-            .difference(verificationDateTime)
-            .inMinutes <= 30;
+        return now.difference(verificationDateTime).inMinutes <= 30;
       }
     }
     return false;
@@ -3525,8 +3559,7 @@ class _CoachesDetailsPage extends State<CoachesDetailsPage> {
                             date = await pickDate();
                             if (date == null) return;
 
-                            final newDateTime =
-                            DateTime(date!.year, date!.month, date!.day, selectedDateA.hour, selectedDateA.minute);
+                            final newDateTime = DateTime(date!.year, date!.month, date!.day, selectedDateA.hour, selectedDateA.minute);
 
                             setState(() {
                               selectedDateA = newDateTime;
@@ -3625,6 +3658,7 @@ class _CoachesDetailsPage extends State<CoachesDetailsPage> {
                 ElevatedButton(
                   onPressed: () async {
                     await _submitForm();
+                    if (!context.mounted) return;
                     Navigator.pop(context); // Close the dialog
                   },
                   child: const Text('Update Autobiography'),
@@ -3709,11 +3743,11 @@ class _CoachesDetailsPage extends State<CoachesDetailsPage> {
                         child: _imageOne != null
                             ? Image.file(_imageOne!, height: 100, width: 100)
                             : CachedNetworkImage(
-                          imageUrl: coachesNotifier.currentCoaches.image!,
-                          fit: BoxFit.cover,
-                          placeholder: (context, url) => const CircularProgressIndicator(),
-                          errorWidget: (context, url, error) => Icon(MdiIcons.alertRhombus),
-                        ),
+                                imageUrl: coachesNotifier.currentCoaches.image!,
+                                fit: BoxFit.cover,
+                                placeholder: (context, url) => const CircularProgressIndicator(),
+                                errorWidget: (context, url, error) => Icon(MdiIcons.alertRhombus),
+                              ),
                       ),
                     ),
                     InkWell(
@@ -3730,11 +3764,11 @@ class _CoachesDetailsPage extends State<CoachesDetailsPage> {
                         child: _imageTwo != null
                             ? Image.file(_imageTwo!, height: 100, width: 100)
                             : CachedNetworkImage(
-                          imageUrl: coachesNotifier.currentCoaches.imageTwo!,
-                          fit: BoxFit.cover,
-                          placeholder: (context, url) => const CircularProgressIndicator(),
-                          errorWidget: (context, url, error) => Icon(MdiIcons.alertRhombus),
-                        ),
+                                imageUrl: coachesNotifier.currentCoaches.imageTwo!,
+                                fit: BoxFit.cover,
+                                placeholder: (context, url) => const CircularProgressIndicator(),
+                                errorWidget: (context, url, error) => Icon(MdiIcons.alertRhombus),
+                              ),
                       ),
                     ),
                   ],
@@ -3780,10 +3814,7 @@ class _CoachesDetailsPage extends State<CoachesDetailsPage> {
                 hintText: 'More goals has been scored this past mon...',
                 hintStyle: TextStyle(color: Colors.white38),
               ),
-              style: const TextStyle(
-                color: Colors.white70,
-                fontSize: 11
-              ),
+              style: const TextStyle(color: Colors.white70, fontSize: 11),
               maxLines: 2, // Allow multiple lines for bug description
             ),
             const SizedBox(height: 20),
@@ -3808,14 +3839,15 @@ class _CoachesDetailsPage extends State<CoachesDetailsPage> {
                     'id': '10',
                   });
 
-                Navigator.pop(context);
-                  // You can add a toast or any other UI feedback for successful bug submission
-                  Fluttertoast.showToast(
-                    msg: 'Thank you, your Comment has been added!',
-                    backgroundColor: shapeDecorationColorTwo,
-                    textColor: Colors.white,
-                    toastLength: Toast.LENGTH_LONG
-                  );
+                  if (context.mounted) {
+                    Navigator.pop(context);
+                    // You can add a toast or any other UI feedback for successful bug submission
+                    Fluttertoast.showToast(
+                        msg: 'Thank you, your Comment has been added!',
+                        backgroundColor: shapeDecorationColorTwo,
+                        textColor: Colors.white,
+                        toastLength: Toast.LENGTH_LONG);
+                  }
                 } else {
                   // Show a toast for empty bug description
                   Fluttertoast.showToast(

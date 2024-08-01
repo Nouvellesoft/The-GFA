@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
@@ -9,7 +10,7 @@ import 'package:image_picker/image_picker.dart';
 import '../../../bloc_navigation_bloc/navigation_bloc.dart';
 
 class MyAddNewOppTeamPage extends StatefulWidget implements NavigationStates {
-  MyAddNewOppTeamPage({super.key});
+  const MyAddNewOppTeamPage({super.key});
 
   @override
   State<MyAddNewOppTeamPage> createState() => MyAddNewOppTeamPageState();
@@ -157,7 +158,9 @@ class MyAddNewOppTeamPageState extends State<MyAddNewOppTeamPage> {
       final String imageUrl = await storageReference.getDownloadURL();
       return imageUrl;
     } catch (e) {
-      print('Error uploading image: $e');
+      if (kDebugMode) {
+        print('Error uploading image: $e');
+      }
       return null;
     }
   }

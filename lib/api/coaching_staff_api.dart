@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../model/coaches.dart';
 import '../notifier/coaching_staff_notifier.dart';
 
-getCoaches(CoachesNotifier coachesNotifier, String clubId) async {
+Future<void> getCoaches(CoachesNotifier coachesNotifier, String clubId) async {
   QuerySnapshot snapshot = await FirebaseFirestore.instance.collection('clubs').doc(clubId).collection('Coaches').orderBy('id').get();
 
   List<Coaches> coachesList = [];

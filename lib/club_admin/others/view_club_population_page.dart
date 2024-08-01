@@ -24,7 +24,7 @@ Color secondRowColorTwo = const Color.fromRGBO(233, 66, 54, 1.0);
 Color thirdRowColor = const Color.fromRGBO(48, 50, 74, 1.0);
 
 class MyViewClubPopulationPage extends StatefulWidget {
-  const MyViewClubPopulationPage({Key? key}) : super(key: key);
+  const MyViewClubPopulationPage({super.key});
 
   @override
   State<MyViewClubPopulationPage> createState() => MyViewClubPopulationPageState();
@@ -339,11 +339,14 @@ class MyViewClubPopulationPageState extends State<MyViewClubPopulationPage> {
       _fetchManagementBodyAndUpdateNotifier(managementBodyNotifier),
     ]).then((_) {
       // Set the data after fetching
-      AllClubMembersNotifier allClubMembersNotifier = Provider.of<AllClubMembersNotifier>(context, listen: false);
-      allClubMembersNotifier.setFirstTeamMembers(firstTeamNotifier.firstTeamClassList);
-      allClubMembersNotifier.setSecondTeamMembers(secondTeamNotifier.secondTeamClassList);
-      allClubMembersNotifier.setCoachesList(coachesNotifier.coachesList);
-      allClubMembersNotifier.setMGMTBodyList(managementBodyNotifier.managementBodyList);
+      if (mounted) {
+        AllClubMembersNotifier allClubMembersNotifier = Provider.of<AllClubMembersNotifier>(context, listen: false);
+
+        allClubMembersNotifier.setFirstTeamMembers(firstTeamNotifier.firstTeamClassList);
+        allClubMembersNotifier.setSecondTeamMembers(secondTeamNotifier.secondTeamClassList);
+        allClubMembersNotifier.setCoachesList(coachesNotifier.coachesList);
+        allClubMembersNotifier.setMGMTBodyList(managementBodyNotifier.managementBodyList);
+      }
     });
   }
 

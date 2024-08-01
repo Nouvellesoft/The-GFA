@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
@@ -11,7 +12,7 @@ Color appBarBackgroundColor = const Color.fromRGBO(48, 50, 74, 1.0);
 Color appBarArrowColor = const Color.fromRGBO(187, 192, 195, 1.0);
 
 class MyAddMonthlyPhotosPage extends StatefulWidget {
-  const MyAddMonthlyPhotosPage({Key? key}) : super(key: key);
+  const MyAddMonthlyPhotosPage({super.key});
 
   @override
   State<MyAddMonthlyPhotosPage> createState() => MyAddMonthlyPhotosPageState();
@@ -80,7 +81,9 @@ class MyAddMonthlyPhotosPageState extends State<MyAddMonthlyPhotosPage> {
         });
       }
     } catch (e) {
-      print('Error uploading images: $e');
+      if (kDebugMode) {
+        print('Error uploading images: $e');
+      }
     }
   }
 
@@ -93,18 +96,16 @@ class MyAddMonthlyPhotosPageState extends State<MyAddMonthlyPhotosPage> {
       final String imageUrl = await storageReference.getDownloadURL();
       return imageUrl;
     } catch (e) {
-      print('Error uploading image: $e');
+      if (kDebugMode) {
+        print('Error uploading image: $e');
+      }
       return null;
     }
   }
 
   _submitForm() async {
     if (_formKey.currentState!.validate() && !_isSubmitting) {
-      bool imagesSelected = _imageOne != null ||
-          _imageTwo != null ||
-          _imageThree != null ||
-          _imageFour != null ||
-          _imageFive != null;
+      bool imagesSelected = _imageOne != null || _imageTwo != null || _imageThree != null || _imageFour != null || _imageFive != null;
 
       if (!imagesSelected) {
         _showErrorToast("Please select one or more images.");
@@ -136,11 +137,13 @@ class MyAddMonthlyPhotosPageState extends State<MyAddMonthlyPhotosPage> {
               await _uploadAndSaveImages(newTrainingsAndGamesReelsRef.id, i);
             }
           } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('Unsupported role: $collectionName'),
-              ),
-            );
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Unsupported role: $collectionName'),
+                ),
+              );
+            }
           }
         }
 
@@ -164,7 +167,6 @@ class MyAddMonthlyPhotosPageState extends State<MyAddMonthlyPhotosPage> {
       }
     }
   }
-
 
   Future<File?> pickImage() async {
     final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
@@ -209,11 +211,7 @@ class MyAddMonthlyPhotosPageState extends State<MyAddMonthlyPhotosPage> {
               const SizedBox(height: 20),
               const Text(
                 "Click to upload images (5 max per time)",
-                style: TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.w600,
-                  color: Colors.white70
-                ),
+                style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600, color: Colors.white70),
               ),
               const SizedBox(height: 30),
               Row(
@@ -239,9 +237,9 @@ class MyAddMonthlyPhotosPageState extends State<MyAddMonthlyPhotosPage> {
                         child: _imageOne != null
                             ? Image.file(_imageOne!, height: 100, width: 100, fit: BoxFit.cover)
                             : const Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [Icon(Icons.person, size: 60), Text('One')],
-                        )),
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [Icon(Icons.person, size: 60), Text('One')],
+                              )),
                   ),
                   InkWell(
                     onTap: () async {
@@ -264,9 +262,9 @@ class MyAddMonthlyPhotosPageState extends State<MyAddMonthlyPhotosPage> {
                         child: _imageTwo != null
                             ? Image.file(_imageTwo!, height: 100, width: 100, fit: BoxFit.cover)
                             : const Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [Icon(Icons.person, size: 60), Text('Two')],
-                        )),
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [Icon(Icons.person, size: 60), Text('Two')],
+                              )),
                   ),
                 ],
               ),
@@ -295,9 +293,9 @@ class MyAddMonthlyPhotosPageState extends State<MyAddMonthlyPhotosPage> {
                         child: _imageThree != null
                             ? Image.file(_imageThree!, height: 100, width: 100, fit: BoxFit.cover)
                             : const Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [Icon(Icons.person, size: 60), Text('Three')],
-                        )),
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [Icon(Icons.person, size: 60), Text('Three')],
+                              )),
                   ),
                   InkWell(
                     onTap: () async {
@@ -320,9 +318,9 @@ class MyAddMonthlyPhotosPageState extends State<MyAddMonthlyPhotosPage> {
                         child: _imageFour != null
                             ? Image.file(_imageFour!, height: 100, width: 100, fit: BoxFit.cover)
                             : const Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [Icon(Icons.person, size: 60), Text('Four')],
-                        )),
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [Icon(Icons.person, size: 60), Text('Four')],
+                              )),
                   ),
                   InkWell(
                     onTap: () async {
@@ -345,9 +343,9 @@ class MyAddMonthlyPhotosPageState extends State<MyAddMonthlyPhotosPage> {
                         child: _imageFive != null
                             ? Image.file(_imageFive!, height: 100, width: 100, fit: BoxFit.cover)
                             : const Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [Icon(Icons.person, size: 60), Text('Five')],
-                        )),
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [Icon(Icons.person, size: 60), Text('Five')],
+                              )),
                   ),
                 ],
               ),
@@ -355,17 +353,14 @@ class MyAddMonthlyPhotosPageState extends State<MyAddMonthlyPhotosPage> {
               ElevatedButton(
                 onPressed: _isSubmitting ? null : _submitForm,
                 style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all<Color>(Colors.black26),
+                  backgroundColor: WidgetStateProperty.all<Color>(Colors.black26),
                 ),
                 child: _isSubmitting
                     ? const CircularProgressIndicator()
                     : const Text(
-                    'Add Training and Match Photos',
-                  style: TextStyle(
-                    color: Colors.white70
-                  ),
-
-                ),
+                        'Add Training and Match Photos',
+                        style: TextStyle(color: Colors.white70),
+                      ),
               ),
             ],
           ),

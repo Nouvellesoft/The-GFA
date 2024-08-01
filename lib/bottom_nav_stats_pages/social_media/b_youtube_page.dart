@@ -1,13 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '/api/b_youtube_api.dart';
 import '/notifier/b_youtube_notifier.dart';
-// import 'package:youtube_player_flutter/youtube_player_flutter.dart';
-
 import '../../bloc_navigation_bloc/navigation_bloc.dart';
 
 Color splashColor = const Color.fromRGBO(98, 98, 213, 1.0);

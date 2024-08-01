@@ -6,7 +6,7 @@ import '/bloc_navigation_bloc/navigation_bloc.dart';
 Color backgroundColor = const Color.fromRGBO(237, 241, 241, 1.0);
 
 class MyAddClubMemberPage extends StatefulWidget implements NavigationStates {
-  MyAddClubMemberPage({super.key});
+  const MyAddClubMemberPage({super.key});
 
   @override
   State<MyAddClubMemberPage> createState() => MyAddClubMemberPageState();
@@ -194,6 +194,7 @@ class MyAddClubMemberPageState extends State<MyAddClubMemberPage> {
           bool nameExists = await doesNameExist(fullName, collectionName);
 
           if (nameExists) {
+            if (!mounted) return;
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text('The name "$fullName" already exists in the $collectionName collection.'),
@@ -203,6 +204,7 @@ class MyAddClubMemberPageState extends State<MyAddClubMemberPage> {
             // Add the new member if the name doesn't exist
             await firestore.collection(collectionName).add(data);
 
+            if (!mounted) return;
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text('New member added to $collectionName collection'),
@@ -223,6 +225,7 @@ class MyAddClubMemberPageState extends State<MyAddClubMemberPage> {
           );
         }
       } catch (e) {
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Error adding member: $e'),
@@ -248,7 +251,7 @@ class MyAddClubMemberPageState extends State<MyAddClubMemberPage> {
             children: [
               TextFormField(
                 controller: _firstNameController,
-                decoration: InputDecoration(labelText: 'First Name'),
+                decoration: const InputDecoration(labelText: 'First Name'),
                 validator: (value) {
                   if (value!.isEmpty) {
                     return 'Please enter a name';
@@ -258,7 +261,7 @@ class MyAddClubMemberPageState extends State<MyAddClubMemberPage> {
               ),
               TextFormField(
                 controller: _lastNameController,
-                decoration: InputDecoration(labelText: 'Second Name'),
+                decoration: const InputDecoration(labelText: 'Second Name'),
                 validator: (value) {
                   if (value!.isEmpty) {
                     return 'Please enter a name';
@@ -279,9 +282,9 @@ class MyAddClubMemberPageState extends State<MyAddClubMemberPage> {
                     child: Text(role),
                   );
                 }).toList(),
-                decoration: InputDecoration(labelText: 'Role'),
+                decoration: const InputDecoration(labelText: 'Role'),
               ),
-              SizedBox(height: 80),
+              const SizedBox(height: 80),
               ElevatedButton(
                 onPressed: _submitForm,
                 style: ElevatedButton.styleFrom(

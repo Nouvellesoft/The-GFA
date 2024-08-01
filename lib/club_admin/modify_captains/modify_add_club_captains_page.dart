@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
@@ -27,7 +28,7 @@ Color backgroundColor = const Color.fromRGBO(20, 36, 62, 1.0);
 PlayersNotifier? playersNotifier;
 
 class MyModifyAddClubCaptainsPage extends StatefulWidget implements NavigationStates {
-  MyModifyAddClubCaptainsPage({Key? key}) : super(key: key);
+  const MyModifyAddClubCaptainsPage({super.key});
 
   @override
   State<MyModifyAddClubCaptainsPage> createState() => MyModifyAddClubCaptainsPageState();
@@ -137,8 +138,8 @@ class MyModifyAddClubCaptainsPageState extends State<MyModifyAddClubCaptainsPage
                       itemBuilder: (context, index) {
                         final player = sortedPlayers[index];
                         final playerName = player.name ?? 'No Name';
-                        final playerImage = player.image ?? 'No Image';
-                        final isCaptain = playerTeams.containsKey(playerName);
+                        // final playerImage = player.image ?? 'No Image';
+                        // final isCaptain = playerTeams.containsKey(playerName);
                         final isSelected = selectedPlayerNames.contains(playerName);
                         final teamForPlayer = playerTeams[playerName];
 
@@ -487,7 +488,9 @@ class MyModifyAddClubCaptainsPageState extends State<MyModifyAddClubCaptainsPage
       // Use the 'then' method to replace the captain after confirmation
       replaceCaptain(playerName).then((_) {
         // Continue processing or add any other logic after replacement
-        print('Captain replaced successfully');
+        if (kDebugMode) {
+          print('Captain replaced successfully');
+        }
       });
     }
   }

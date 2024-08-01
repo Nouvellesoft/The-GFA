@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:confetti/confetti.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -14,9 +15,9 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sms_autofill/sms_autofill.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../notifier/first_team_class_notifier.dart';
 
@@ -151,7 +152,7 @@ dynamic _twitter;
 dynamic _worstMoment;
 
 class SubPage extends StatefulWidget {
-  const SubPage({Key? key, this.title}) : super(key: key);
+  const SubPage({super.key, this.title});
 
   final String? title;
 
@@ -273,7 +274,6 @@ class _SubPageState extends State<SubPage> {
     String fullName2 = _name;
 
     if (_formKey.currentState!.validate()) {
-
       final firestore = FirebaseFirestore.instance;
       final otherPlayPositionName = _myOtherPlayPositionController.text;
       final clubInceptionName = _myClubInceptionController.text;
@@ -363,11 +363,13 @@ class _SubPageState extends State<SubPage> {
           fontSize: 16.0,
         );
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Hmm, strange, Error updating profile'),
-          ),
-        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Hmm, strange, Error updating profile'),
+            ),
+          );
+        }
       }
     }
   }
@@ -428,12 +430,18 @@ class _SubPageState extends State<SubPage> {
           textColor: Colors.white,
           fontSize: 16.0,
         );
-        print('Images uploaded and references stored successfully.');
+        if (kDebugMode) {
+          print('Images uploaded and references stored successfully.');
+        }
       } else {
-        print('User with name $_queryName not found.');
+        if (kDebugMode) {
+          print('User with name $_queryName not found.');
+        }
       }
     } catch (e) {
-      print('Error uploading images and storing references: $e');
+      if (kDebugMode) {
+        print('Error uploading images and storing references: $e');
+      }
       // Show error toast
       Fluttertoast.showToast(
         msg: "Error uploading images and storing references.",
@@ -4643,7 +4651,9 @@ class _SubPageState extends State<SubPage> {
   @override
   void dispose() {
     _confettiController!.dispose();
-    print("Unregistered Listener");
+    if (kDebugMode) {
+      print("Unregistered Listener");
+    }
     super.dispose();
   }
 
@@ -4720,10 +4730,14 @@ class _SubPageState extends State<SubPage> {
           }
         });
       } else {
-        print('Document not found.');
+        if (kDebugMode) {
+          print('Document not found.');
+        }
       }
     } catch (e) {
-      print('Error loading form data: $e');
+      if (kDebugMode) {
+        print('Error loading form data: $e');
+      }
     }
   }
 
@@ -4738,7 +4752,9 @@ class _SubPageState extends State<SubPage> {
         verificationCompleted: (PhoneAuthCredential credential) async {
           // Handle auto verification completed (if needed)
           await auth.signInWithCredential(credential);
-          print('Logged In Successfully');
+          if (kDebugMode) {
+            print('Logged In Successfully');
+          }
 
           Fluttertoast.showToast(
             msg: 'You’re Welcome',
@@ -4750,7 +4766,9 @@ class _SubPageState extends State<SubPage> {
         },
         verificationFailed: (FirebaseAuthException e) {
           // Handle verification failed
-          print("Verification failed: ${e.message}");
+          if (kDebugMode) {
+            print("Verification failed: ${e.message}");
+          }
 
           Fluttertoast.showToast(
             msg: 'Hmm. Check your Internet Connection or maybe too many OTP requests',
@@ -4787,11 +4805,15 @@ class _SubPageState extends State<SubPage> {
         },
         codeAutoRetrievalTimeout: (String verificationId) {
           // Handle timeout (if needed)
-          print('TimeOut');
+          if (kDebugMode) {
+            print('TimeOut');
+          }
         },
       );
     } catch (e) {
-      print('Error sending OTP: $e');
+      if (kDebugMode) {
+        print('Error sending OTP: $e');
+      }
       Fluttertoast.showToast(
         msg: 'Error sending OTP. Please try again.',
         gravity: ToastGravity.BOTTOM,
@@ -4811,7 +4833,9 @@ class _SubPageState extends State<SubPage> {
     );
     try {
       await auth.signInWithCredential(credential).then((value) async {
-        print('User verification is Successful');
+        if (kDebugMode) {
+          print('User verification is Successful');
+        }
 
         // Save the verification timestamp only if it's not already set
         SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -4851,7 +4875,9 @@ class _SubPageState extends State<SubPage> {
         }
       });
     } catch (e) {
-      print('Error verifying OTP: $e');
+      if (kDebugMode) {
+        print('Error verifying OTP: $e');
+      }
       Fluttertoast.showToast(
         msg: 'OTP incorrect. Please retype.',
         gravity: ToastGravity.BOTTOM,
@@ -4894,14 +4920,20 @@ class _SubPageState extends State<SubPage> {
     showDialog<String>(
         // barrierColor: const Color.fromRGBO(66, 67, 69, 1.0),
         context: context,
-        builder: (BuildContext context) => WillPopScope(
-              onWillPop: () async {
-                // Clear the fields or perform any cleanup actions
+        builder: (BuildContext context) => PopScope(
+              onPopInvokedWithResult: (didPop, result) async {
+                // Perform your cleanup actions
                 otpCode = '';
                 isOTPComplete = false;
 
-                return true; // Allow the dialog to be popped
+                // Optionally handle the pop result
+                // You can do additional things based on `didPop` and `result`
+                if (didPop) {
+                  // Allow the pop to proceed
+                  Navigator.of(context).pop();
+                }
               },
+              canPop: true, // Allow the pop action
               child: AlertDialog(
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20.0),
@@ -4963,12 +4995,16 @@ class _SubPageState extends State<SubPage> {
                           ),
                           codeLength: 6,
                           onCodeChanged: (code) {
-                            print("OnCodeChanged : $code");
+                            if (kDebugMode) {
+                              print("OnCodeChanged : $code");
+                            }
                             otpCode = code.toString();
                             isOTPComplete = code!.length == 6;
                           },
                           onCodeSubmitted: (val) {
-                            print("OnCodeSubmitted : $val");
+                            if (kDebugMode) {
+                              print("OnCodeSubmitted : $val");
+                            }
                             isOTPComplete = val.isEmpty;
                             otpCode = '';
                           },
@@ -4985,7 +5021,9 @@ class _SubPageState extends State<SubPage> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? userProperties = prefs.getString('verificationUserProperties');
     String currentProperties = _name; // Adjust this combination based on what you used for verification
-    print("User properties from SharedPreferences: $userProperties");
+    if (kDebugMode) {
+      print("User properties from SharedPreferences: $userProperties");
+    }
 
     if (userProperties != null && userProperties == currentProperties) {
       // Check if the last verification was within the last 30 minutes
@@ -4994,9 +5032,7 @@ class _SubPageState extends State<SubPage> {
         DateTime now = DateTime.now();
         DateTime verificationDateTime = DateTime.fromMillisecondsSinceEpoch(verificationTime);
 
-        return now
-            .difference(verificationDateTime)
-            .inMinutes <= 30;
+        return now.difference(verificationDateTime).inMinutes <= 30;
       }
     }
     return false;
@@ -5386,9 +5422,13 @@ class _SubPageState extends State<SubPage> {
                   onPressed: () async {
                     try {
                       await _submitForm();
+                      if (context.mounted) {
                       Navigator.pop(context); // Close the dialog
+    }
                     } catch (e) {
-                      print("Error submitting form: $e");
+                      if (kDebugMode) {
+                        print("Error submitting form: $e");
+                      }
                       // Handle the error, show a message, or log it as needed
                       Fluttertoast.showToast(msg: "Error Loading up ,...", gravity: ToastGravity.BOTTOM, backgroundColor: backgroundColor);
                     }
@@ -5510,7 +5550,9 @@ class _SubPageState extends State<SubPage> {
                 ElevatedButton(
                   onPressed: () async {
                     await _checkAndUpdatePhoto();
-                    Navigator.pop(context); // Close the dialog
+                    if (context.mounted) {
+                      Navigator.pop(context); // Close the dialog
+                    }
                   },
                   child: const Text('Upload Photos'),
                 ),

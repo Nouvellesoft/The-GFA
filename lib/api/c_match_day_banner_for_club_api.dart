@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../model/c_match_day_banner_for_club.dart';
 import '../notifier/c_match_day_banner_for_club_notifier.dart';
 
-getMatchDayBannerForClub(MatchDayBannerForClubNotifier matchDayBannerForClubNotifier, String clubId) async {
+Future<void> getMatchDayBannerForClub(MatchDayBannerForClubNotifier matchDayBannerForClubNotifier, String clubId) async {
   QuerySnapshot snapshot = await FirebaseFirestore.instance
       .collection('clubs')
       .doc(clubId)

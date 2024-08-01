@@ -2,20 +2,18 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:provider/provider.dart';
 
-import '../home_page/home_page_deux.dart';
 import '/api/club_sponsors_api.dart';
 import '/bloc_navigation_bloc/navigation_bloc.dart';
 import '/notifier/club_sponsors_notifier.dart';
 import '/sidebar/sidebar_layout.dart';
 import '../club_admin/club_admin_page.dart';
 import '../details_pages/club_sponsors_details_page.dart';
-import '../main.dart';
+import '../home_page/home_page_deux.dart';
 import '../model/club_sponsors.dart';
 
 String exitAppStatement = "Exit from App";
@@ -47,7 +45,7 @@ class MyClubSponsorsPage extends StatefulWidget implements NavigationStates {
   final bool fromPage1;
   final String clubId; // Add this line
 
-  const MyClubSponsorsPage({Key? key, required this.fromPage1, required this.clubId, this.title}) : super(key: key);
+  const MyClubSponsorsPage({super.key, required this.fromPage1, required this.clubId, this.title});
   final String? title;
 
   @override
@@ -65,7 +63,7 @@ class _MyClubSponsorsPageState extends State<MyClubSponsorsPage> with SingleTick
   void initState() {
     super.initState();
 
-    ClubSponsorsNotifier clubSponsorsNotifier = Provider.of<ClubSponsorsNotifier>(context, listen: false);
+    clubSponsorsNotifier = Provider.of<ClubSponsorsNotifier>(context, listen: false);
     _fetchClubSponsorsAndUpdateNotifier(clubSponsorsNotifier);
 
     _animationController = AnimationController(
@@ -86,16 +84,8 @@ class _MyClubSponsorsPageState extends State<MyClubSponsorsPage> with SingleTick
   }
 
   Future<void> _fetchClubSponsorsAndUpdateNotifier(ClubSponsorsNotifier notifier) async {
-    // Fetch the collection of club IDs from Firestore
-    QuerySnapshot clubSnapshot = await FirebaseFirestore.instance.collection('clubs').get();
-    List<String> clubIds = clubSnapshot.docs.map((doc) => doc.id).toList();
+    await getClubSponsors(notifier, widget.clubId);
 
-    // Process each club ID
-    for (String clubId in clubIds) {
-      await getClubSponsors(notifier, clubId);
-    }
-
-    // Optionally, notify listeners or update UI after fetching
     setState(() {});
   }
 
@@ -116,47 +106,29 @@ class _MyClubSponsorsPageState extends State<MyClubSponsorsPage> with SingleTick
     });
   }
 
-  @override
-  void didChangeDependencies() {
-    ClubSponsorsNotifier clubSponsorsNotifier = Provider.of<ClubSponsorsNotifier>(context, listen: true);
-    _fetchClubSponsorsAndUpdateNotifier(clubSponsorsNotifier);
-    super.didChangeDependencies();
-  }
+  // @override
+  // void didChangeDependencies() {
+  //   ClubSponsorsNotifier clubSponsorsNotifier = Provider.of<ClubSponsorsNotifier>(context, listen: true);
+  //   _fetchClubSponsorsAndUpdateNotifier(clubSponsorsNotifier);
+  //   super.didChangeDependencies();
+  // }
 
   @override
   void dispose() {
-    print('Dispose method called'); // Add this line
     _timer.cancel(); // Cancel the timer in the dispose method
     _animationController.dispose();
     super.dispose();
   }
 
   Widget _buildSponsorsItem(BuildContext context, int index) {
-    clubSponsorsNotifier = Provider.of<ClubSponsorsNotifier>(context);
-
     final ClubSponsors sponsors = clubSponsorsNotifier.clubSponsorsList[index];
-
-    final List<String?> imageUrls = [];
-    if (sponsors.image != null) {
-      imageUrls.add(sponsors.image);
-    }
-    if (sponsors.imageTwo != null) {
-      imageUrls.add(sponsors.imageTwo);
-    }
-    if (sponsors.imageThree != null) {
-      imageUrls.add(sponsors.imageThree);
-    }
-    if (sponsors.imageFour != null) {
-      imageUrls.add(sponsors.imageFour);
-    }
-    if (sponsors.imageFive != null) {
-      imageUrls.add(sponsors.imageFive);
-    }
+    final List<String?> imageUrls =
+        [sponsors.image, sponsors.imageTwo, sponsors.imageThree, sponsors.imageFour, sponsors.imageFive].where((url) => url != null).toList();
 
     return InkWell(
       splashColor: splashColor,
       onTap: () {
-        clubSponsorsNotifier.currentClubSponsors = clubSponsorsNotifier.clubSponsorsList[index];
+        clubSponsorsNotifier.currentClubSponsors = sponsors;
         navigateToClubSponsorsDetailsPage(context);
       },
       child: SingleChildScrollView(
@@ -180,10 +152,7 @@ class _MyClubSponsorsPageState extends State<MyClubSponsorsPage> with SingleTick
                               AnimatedBuilder(
                                 animation: _animationController,
                                 builder: (context, child) {
-                                  double zoomValue = 1.0;
-                                  if (i == _currentIndex) {
-                                    zoomValue = _zoomAnimation.value;
-                                  }
+                                  double zoomValue = i == _currentIndex ? _zoomAnimation.value : 1.0;
                                   return Transform.scale(
                                     scale: zoomValue,
                                     child: Opacity(
@@ -222,7 +191,7 @@ class _MyClubSponsorsPageState extends State<MyClubSponsorsPage> with SingleTick
                         color: Colors.black.withOpacity(0.65),
                       ),
                       child: Text(
-                        clubSponsorsNotifier.clubSponsorsList[index].name!,
+                        sponsors.name!,
                         style: GoogleFonts.aldrich(
                           color: textColor,
                           fontSize: 17,
@@ -247,8 +216,15 @@ class _MyClubSponsorsPageState extends State<MyClubSponsorsPage> with SingleTick
 
     // bool isClickedFromPage1 = true; // Set this variable based on where the button is clicked
 
-    return WillPopScope(
-      onWillPop: _onWillPop,
+    return PopScope(
+      onPopInvokedWithResult: (didPop, result) async {
+        if (!didPop) {
+          // return false;
+          Navigator.of(context).pop();
+        }
+        await _onWillPop();
+      },
+      canPop: true, // Allow the pop action
       child: Scaffold(
         // appBar: AppBar(
         //   centerTitle: true,
@@ -297,7 +273,7 @@ class _MyClubSponsorsPageState extends State<MyClubSponsorsPage> with SingleTick
                         Navigator.popUntil(context, ModalRoute.withName('/')); // Pop until the root route
 
                         if (widget.fromPage1) {
-                          Navigator.push(context, SlideTransition1(MyClubAdminPage()));
+                          Navigator.push(context, SlideTransition1(const MyClubAdminPage()));
                         } else {
                           Navigator.push(
                               context,

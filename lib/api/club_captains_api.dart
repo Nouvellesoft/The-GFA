@@ -5,7 +5,7 @@ import '../notifier/club_captains_notifier.dart';
 
 //Dependency in version [global use API]
 
-getCaptains(CaptainsNotifier captainsNotifier, String clubId) async {
+Future<void> getCaptains(CaptainsNotifier captainsNotifier, String clubId) async {
   QuerySnapshot snapshot = await FirebaseFirestore.instance.collection('clubs').doc(clubId).collection('Captains').orderBy('name').get();
 
   List<Captains> captainsList = [];

@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../model/club_arial.dart';
 import '../notifier/club_arial_notifier.dart';
 
-getClubArial(ClubArialNotifier clubArialNotifier, String clubId) async {
+Future<void> getClubArial(ClubArialNotifier clubArialNotifier, String clubId) async {
   QuerySnapshot snapshot = await FirebaseFirestore.instance.collection('clubs').doc(clubId).collection('ClubArial').get();
 
   List<ClubArial> clubArialList = [];

@@ -23,7 +23,7 @@ Color? appBarColor = const Color.fromRGBO(136, 121, 176, 1);
 // dynamic totalPlayersPopulation = malePlayersPopulation + femalePlayersPopulation;
 
 class SeasonTimeline extends StatefulWidget {
-  const SeasonTimeline({Key? key}) : super(key: key);
+  const SeasonTimeline({super.key});
 
   @override
   State<SeasonTimeline> createState() => _SeasonTimelineState();
@@ -62,8 +62,7 @@ class _SeasonTimelineState extends State<SeasonTimeline> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: const Text('This Page Is Beta/Dummy 👀🧡',
-            style: TextStyle(color: Color(0xffB1BCE6))),
+        title: const Text('This Page Is Beta/Dummy 👀🧡', style: TextStyle(color: Color(0xffB1BCE6))),
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios, color: appBarIconColor),
           onPressed: () {
@@ -109,18 +108,8 @@ class _SeasonTimelineState extends State<SeasonTimeline> {
                           negativePointColor: Colors.red.withOpacity(0.75),
                           tiePointColor: Colors.black,
                           trackball: const SparkChartTrackball(
-                              color: Colors.indigoAccent,
-                              backgroundColor: Colors.indigoAccent,
-                              activationMode: SparkChartActivationMode.tap),
-                          data: const <double>[
-                            2.1,
-                            3.1,
-                            -2.4,
-                            5.3,
-                            0.0,
-                            4.2,
-                            -1.3
-                          ],
+                              color: Colors.indigoAccent, backgroundColor: Colors.indigoAccent, activationMode: SparkChartActivationMode.tap),
+                          data: const <double>[2.1, 3.1, -2.4, 5.3, 0.0, 4.2, -1.3],
                         ),
                       ],
                     ),
@@ -152,17 +141,15 @@ class _SeasonTimelineState extends State<SeasonTimeline> {
                           plotAreaBorderWidth: 0,
                           tooltipBehavior: _tooltipBehaviorTwo,
                           enableAxisAnimation: true,
-                          legend: Legend(
-                              textStyle: const TextStyle(color: Colors.white),
+                          legend: const Legend(
+                              textStyle: TextStyle(color: Colors.white),
                               isVisible: true,
                               position: LegendPosition.bottom,
                               toggleSeriesVisibility: true),
-                          primaryXAxis: CategoryAxis(
-                              rangePadding: ChartRangePadding.none,
-                              labelStyle: const TextStyle(color: Colors.white)),
-                          primaryYAxis: CategoryAxis(
+                          primaryXAxis: const CategoryAxis(rangePadding: ChartRangePadding.none, labelStyle: TextStyle(color: Colors.white)),
+                          primaryYAxis: const CategoryAxis(
                             rangePadding: ChartRangePadding.none,
-                            labelStyle: const TextStyle(color: Colors.white),
+                            labelStyle: TextStyle(color: Colors.white),
                           ),
                           series: <CartesianSeries>[
                             SplineSeries<TrainingAttendanceChartData, String>(
@@ -207,10 +194,7 @@ class _SeasonTimelineState extends State<SeasonTimeline> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        const Align(
-                            alignment: Alignment.centerLeft,
-                            child: Text(
-                                "Club's Monthly Efficiency | Evaluation Gauge")),
+                        const Align(alignment: Alignment.centerLeft, child: Text("Club's Monthly Efficiency | Evaluation Gauge")),
                         SfRadialGauge(
                           enableLoadingAnimation: true,
                           animationDuration: 7000,
@@ -254,9 +238,7 @@ class _SeasonTimelineState extends State<SeasonTimeline> {
                                     positionFactor: 0.5,
                                     widget: Text(
                                       '87%',
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 20),
+                                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
                                     ))
                               ],
                             )
@@ -264,11 +246,7 @@ class _SeasonTimelineState extends State<SeasonTimeline> {
                         ),
                         const Text(
                           'July 2022   💪🏼',
-                          style: TextStyle(
-                              fontSize: 24,
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold,
-                              fontStyle: FontStyle.italic),
+                          style: TextStyle(fontSize: 24, color: Colors.black, fontWeight: FontWeight.bold, fontStyle: FontStyle.italic),
                         )
                       ],
                     ),
@@ -327,10 +305,7 @@ class _SeasonTimelineState extends State<SeasonTimeline> {
                               position: LinearElementPosition.outside,
                               child: Text(
                                 'Saturday, 2 July | Presentation Night',
-                                style: TextStyle(
-                                    fontSize: 15,
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w500),
+                                style: TextStyle(fontSize: 15, color: Colors.white, fontWeight: FontWeight.w500),
                                 overflow: TextOverflow.ellipsis,
                               ),
                             ),
@@ -355,23 +330,16 @@ class _SeasonTimelineState extends State<SeasonTimeline> {
                                 ))
                           ],
                         ),
-                        Column(
+                        const Column(
                           mainAxisAlignment: MainAxisAlignment.center,
-                          children: const <Widget>[
+                          children: <Widget>[
                             Text(
                               'Days Left',
-                              style: TextStyle(
-                                  color: Colors.white60,
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w500),
+                              style: TextStyle(color: Colors.white60, fontSize: 15, fontWeight: FontWeight.w500),
                             ),
                             Text(
                               '12',
-                              style: TextStyle(
-                                  fontSize: 24,
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontStyle: FontStyle.italic),
+                              style: TextStyle(fontSize: 24, color: Colors.white, fontWeight: FontWeight.bold, fontStyle: FontStyle.italic),
                             )
                           ],
                         )
@@ -400,40 +368,26 @@ class _SeasonTimelineState extends State<SeasonTimeline> {
                               )),
                           SfCircularChart(
                             tooltipBehavior: _tooltipBehavior,
-                            legend: Legend(
+                            legend: const Legend(
                                 alignment: ChartAlignment.center,
                                 overflowMode: LegendItemOverflowMode.wrap,
                                 isResponsive: true,
                                 isVisible: true,
                                 position: LegendPosition.bottom,
-                                textStyle:
-                                    const TextStyle(color: Colors.white)),
-                            palette: [
-                              Colors.teal,
-                              Colors.indigo.shade600,
-                              Colors.blueAccent,
-                              Colors.redAccent
-                            ],
+                                textStyle: TextStyle(color: Colors.white)),
+                            palette: [Colors.teal, Colors.indigo.shade600, Colors.blueAccent, Colors.redAccent],
                             series: <CircularSeries>[
                               PieSeries<PlayersPopulationChartData, String>(
                                 enableTooltip: true,
                                 dataSource: playersPopulationChartData,
-                                xValueMapper:
-                                    (PlayersPopulationChartData data, _) =>
-                                        data.x,
-                                yValueMapper:
-                                    (PlayersPopulationChartData data, _) =>
-                                        data.y,
+                                xValueMapper: (PlayersPopulationChartData data, _) => data.x,
+                                yValueMapper: (PlayersPopulationChartData data, _) => data.y,
                                 dataLabelSettings: const DataLabelSettings(
                                     useSeriesColor: true,
                                     isVisible: true,
-                                    labelPosition:
-                                        ChartDataLabelPosition.outside,
-                                    labelIntersectAction:
-                                        LabelIntersectAction.shift,
-                                    connectorLineSettings:
-                                        ConnectorLineSettings(
-                                            type: ConnectorType.curve)),
+                                    labelPosition: ChartDataLabelPosition.outside,
+                                    labelIntersectAction: LabelIntersectAction.shift,
+                                    connectorLineSettings: ConnectorLineSettings(type: ConnectorType.curve)),
                                 explode: true,
                                 animationDuration: 9000,
                               )
@@ -463,8 +417,7 @@ class _SeasonTimelineState extends State<SeasonTimeline> {
   void initState() {
     _tooltipBehavior = TooltipBehavior(enable: true, color: Colors.teal);
 
-    _tooltipBehaviorTwo =
-        TooltipBehavior(enable: true, color: Colors.lightBlue);
+    _tooltipBehaviorTwo = TooltipBehavior(enable: true, color: Colors.lightBlue);
 
     super.initState();
 

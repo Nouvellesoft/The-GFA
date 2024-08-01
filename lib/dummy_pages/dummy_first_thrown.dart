@@ -37,7 +37,7 @@ Color borderColor = Colors.black;
 
 class MyFirstTeamClassPage extends StatefulWidget implements NavigationStates {
   final String clubId;
-  MyFirstTeamClassPage({Key? key, this.title, required this.clubId}) : super(key: key);
+  const MyFirstTeamClassPage({Key? key, this.title, required this.clubId}) : super(key: key);
 
   final String? title;
 
@@ -218,7 +218,6 @@ class _MyFirstTeamClassPage extends State<MyFirstTeamClassPage> {
   void initState() {
     super.initState();
 
-    FirstTeamClassNotifier firstTeamClassNotifier = Provider.of<FirstTeamClassNotifier>(context, listen: false);
     _fetchFirstTeamClassAndUpdateNotifier(firstTeamClassNotifier);
 
     setState(() {
@@ -227,15 +226,6 @@ class _MyFirstTeamClassPage extends State<MyFirstTeamClassPage> {
   }
 
   Future<void> _fetchFirstTeamClassAndUpdateNotifier(FirstTeamClassNotifier firstTeamNotifier) async {
-    // // Fetch the collection of club IDs from Firestore
-    // QuerySnapshot clubSnapshot = await FirebaseFirestore.instance.collection('clubs').get();
-    // List<String> clubIds = clubSnapshot.docs.map((doc) => doc.id).toList();
-    //
-    // // Process each club ID
-    // for (String clubId in clubIds) {
-    //   await getFirstTeamClass(firstTeamNotifier, clubId);
-    // }
-
     await getFirstTeamClass(firstTeamNotifier, widget.clubId);
     setState(() {}); // Refresh the UI after fetching the data
   }

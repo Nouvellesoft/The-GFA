@@ -14,7 +14,7 @@ Color backgroundColor = const Color.fromRGBO(48, 50, 74, 1.0);
 Color containerBackgroundColor = const Color.fromRGBO(24, 26, 36, 1.0);
 
 class MyMOTMPage extends StatefulWidget implements NavigationStates {
-  MyMOTMPage({Key? key}) : super(key: key);
+  const MyMOTMPage({super.key});
 
   @override
   State<MyMOTMPage> createState() => MyMOTMPageState();

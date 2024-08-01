@@ -27,7 +27,7 @@ Color phoneColor = const Color.fromRGBO(20, 134, 46, 1.0);
 Color backgroundColor = const Color.fromRGBO(147, 165, 193, 1.0);
 
 class TabviewClubMemberPage extends StatefulWidget implements NavigationStates {
-  TabviewClubMemberPage({super.key});
+  const TabviewClubMemberPage({super.key});
 
   @override
   State<TabviewClubMemberPage> createState() => TabviewClubMemberPageState();
@@ -56,7 +56,7 @@ class TabviewClubMemberPageState extends State<TabviewClubMemberPage> with Singl
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // backgrou?ndColor: backgroundColor,
+      // backgroundColor: backgroundColor,
       appBar: AppBar(
         backgroundColor: backgroundColor,
         title: Text(acmTitle, style: GoogleFonts.jura(fontSize: 23, fontWeight: FontWeight.w800, color: Colors.white)),
@@ -79,7 +79,7 @@ class TabviewClubMemberPageState extends State<TabviewClubMemberPage> with Singl
       ),
       body: TabBarView(
         controller: _tabController,
-        children: [
+        children: const [
           MyAddClubMemberPage(),
           MyShowAllClubMemberPage(),
         ],

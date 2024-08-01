@@ -1,12 +1,5 @@
-import 'dart:typed_data';
-import 'dart:ui' as ui;
-import 'dart:ui';
-
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:esys_flutter_share_plus/esys_flutter_share_plus.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_swiper_null_safety/flutter_swiper_null_safety.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -14,10 +7,8 @@ import 'package:material_design_icons_flutter/material_design_icons_flutter.dart
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '/api/club_sponsors_api.dart';
 import '/notifier/a_upcoming_matches_notifier.dart';
 import '/notifier/club_sponsors_notifier.dart';
-import '../api/a_upcoming_matches_api.dart';
 import '../model/club_sponsors.dart';
 
 Color conColor = const Color.fromRGBO(194, 194, 220, 1.0);
@@ -80,27 +71,17 @@ dynamic _snapchat;
 dynamic _aboutUs;
 dynamic _ourServices;
 
-dynamic _homeTeamIcon;
-dynamic _awayTeamIcon;
-dynamic _homeTeam;
-dynamic _awayTeam;
-dynamic _matchDate;
-dynamic _matchDayKickOff;
-dynamic _venue;
-
 late ClubSponsorsNotifier clubSponsorsNotifier;
 late UpcomingMatchesNotifier upcomingMatchesNotifier;
 
 class ClubSponsorsDetailsPage extends StatefulWidget {
-  const ClubSponsorsDetailsPage({Key? key}) : super(key: key);
+  const ClubSponsorsDetailsPage({super.key});
 
   @override
   State<ClubSponsorsDetailsPage> createState() => _ClubSponsorsDetailsPageState();
 }
 
 class _ClubSponsorsDetailsPageState extends State<ClubSponsorsDetailsPage> {
-  GlobalKey _contentKey = GlobalKey();
-
   Future launchURL(String url) async {
     final scaffoldMessenger = ScaffoldMessenger.of(context);
     if (await canLaunchUrl(Uri.parse(url))) {
@@ -117,16 +98,8 @@ class _ClubSponsorsDetailsPageState extends State<ClubSponsorsDetailsPage> {
     clubSponsorsNotifier = Provider.of<ClubSponsorsNotifier>(context, listen: true);
     upcomingMatchesNotifier = Provider.of<UpcomingMatchesNotifier>(context);
 
-    // _homeTeamIcon = upcomingMatchesNotifier.currentUpcomingMatches.homeTeamIcon;
-    // _awayTeamIcon = upcomingMatchesNotifier.currentUpcomingMatches.awayTeamIcon;
-    // _homeTeam = upcomingMatchesNotifier.currentUpcomingMatches.homeTeam;
-    // _awayTeam = upcomingMatchesNotifier.currentUpcomingMatches.awayTeam;
-    // _matchDate = upcomingMatchesNotifier.currentUpcomingMatches.matchDate;
-    // _matchDayKickOff = upcomingMatchesNotifier.currentUpcomingMatches.matchDayKickOff;
-    // _venue = upcomingMatchesNotifier.currentUpcomingMatches.venue;
-
     double width = MediaQuery.of(context).size.width;
-    double height = MediaQuery.of(context).size.height;
+    // double height = MediaQuery.of(context).size.height;
 
     return Scaffold(
       appBar: AppBar(
@@ -733,12 +706,6 @@ class _ClubSponsorsDetailsPageState extends State<ClubSponsorsDetailsPage> {
 
   @override
   void initState() {
-    ClubSponsorsNotifier clubSponsorsNotifier = Provider.of<ClubSponsorsNotifier>(context, listen: false);
-    _fetchClubSponsorsAndUpdateNotifier(clubSponsorsNotifier);
-
-    upcomingMatchesNotifier = Provider.of<UpcomingMatchesNotifier>(context, listen: false);
-    _fetchUpcomingMatchesAndUpdateNotifier(upcomingMatchesNotifier);
-
     _name = clubSponsorsNotifier.currentClubSponsors.name;
     _phone = clubSponsorsNotifier.currentClubSponsors.phone;
     _email = clubSponsorsNotifier.currentClubSponsors.email;
@@ -751,228 +718,7 @@ class _ClubSponsorsDetailsPageState extends State<ClubSponsorsDetailsPage> {
     _aboutUs = clubSponsorsNotifier.currentClubSponsors.aboutUs;
     _ourServices = clubSponsorsNotifier.currentClubSponsors.ourServices;
 
-    _homeTeamIcon = upcomingMatchesNotifier.upcomingMatchesList[1].homeTeamIcon;
-    _awayTeamIcon = upcomingMatchesNotifier.upcomingMatchesList[1].awayTeamIcon;
-    _homeTeam = upcomingMatchesNotifier.upcomingMatchesList[0].homeTeam;
-    _awayTeam = upcomingMatchesNotifier.upcomingMatchesList[0].awayTeam;
-    _matchDate = upcomingMatchesNotifier.upcomingMatchesList[0].matchDate;
-    _matchDayKickOff = upcomingMatchesNotifier.upcomingMatchesList[0].matchDayKickOff;
-    _venue = upcomingMatchesNotifier.upcomingMatchesList[0].venue;
-
     super.initState();
-  }
-
-  Future<void> _fetchClubSponsorsAndUpdateNotifier(ClubSponsorsNotifier notifier) async {
-    // Fetch the collection of club IDs from Firestore
-    QuerySnapshot clubSnapshot = await FirebaseFirestore.instance.collection('clubs').get();
-    List<String> clubIds = clubSnapshot.docs.map((doc) => doc.id).toList();
-
-    // Process each club ID
-    for (String clubId in clubIds) {
-      await getClubSponsors(notifier, clubId);
-    }
-
-    // Optionally, notify listeners or update UI after fetching
-    setState(() {});
-  }
-
-  Future<void> _fetchUpcomingMatchesAndUpdateNotifier(UpcomingMatchesNotifier notifier) async {
-    // Fetch the collection of club IDs from Firestore
-    QuerySnapshot clubSnapshot = await FirebaseFirestore.instance.collection('clubs').get();
-    List<String> clubIds = clubSnapshot.docs.map((doc) => doc.id).toList();
-
-    // Process each club ID
-    for (String clubId in clubIds) {
-      await getUpcomingMatches(notifier, clubId);
-    }
-
-    // Optionally, notify listeners or update UI after fetching
-    setState(() {});
-  }
-
-  void _showUploadDialog() async {
-    // Create a GlobalKey for the RepaintBoundary
-    GlobalKey boundaryKey = GlobalKey();
-
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          // title: Text("Upload Sponsor Information"),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              RepaintBoundary(
-                key: boundaryKey, // Set the key for RepaintBoundary,
-                child: Stack(
-                  key: _contentKey,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(top: 45), // Add top padding of 16 units
-                      child: Image.asset(
-                        'assets/images/cpfc_logo.jpeg',
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                    BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
-                      child: Container(color: Colors.black.withOpacity(0.2)),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 8, right: 8),
-                      child: Text(
-                        "Our Sponsor for today is ${clubSponsorsNotifier.currentClubSponsors.name!}, with their image:",
-                        style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w500, color: Colors.black),
-                      ),
-                    ),
-                    Container(
-                      margin: const EdgeInsets.only(top: 50), // Add a top margin of 16 units
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Container(
-                              width: 50,
-                              height: 50,
-                              decoration: BoxDecoration(
-                                  image: DecorationImage(
-                                      image: CachedNetworkImageProvider(
-                                        _homeTeamIcon!,
-                                      ),
-                                      fit: BoxFit.cover)),
-                            ),
-                          ),
-                          const Text('Matchday', style: TextStyle(fontSize: 25, color: Colors.white)),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Container(
-                              width: 50,
-                              height: 50,
-                              decoration: BoxDecoration(
-                                  image: DecorationImage(
-                                      image: CachedNetworkImageProvider(
-                                        _awayTeamIcon!,
-                                      ),
-                                      fit: BoxFit.cover)),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 120.0),
-                      child: Center(
-                        child: Text(
-                          '${_homeTeam!} vs ${_awayTeam!}',
-                          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 160.0, left: 8),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text('When', style: TextStyle(color: Colors.white)),
-                          Text(
-                            _matchDate!,
-                            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
-                          ),
-                          Text(
-                            '${_matchDayKickOff} kick off',
-                            style: const TextStyle(fontSize: 16, color: Colors.white),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 220.0, left: 8),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text('Where', style: TextStyle(color: Colors.white)),
-                          Text(
-                            _venue!,
-                            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
-                          ),
-                          const Text(
-                            // clubSponsorsNotifier.currentClubSponsors.postcode!,
-                            'CV3 1HW',
-                            style: TextStyle(fontSize: 16, color: Colors.white),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 280.0),
-                      child: Container(
-                        height: 24,
-                        width: MediaQuery.of(context).size.width,
-                        color: Colors.yellow, //
-                        child: Align(
-                          alignment: Alignment.center,
-                          child: Padding(
-                            padding: const EdgeInsets.all(1.0),
-                            child: Text(
-                              'Sponsored by ${clubSponsorsNotifier.currentClubSponsors.name!}',
-                              style: const TextStyle(color: Colors.black),
-                            ),
-                          ),
-                        ), // Yellow rectangular space
-                      ),
-                    ),
-                    const Padding(
-                      padding: EdgeInsets.only(top: 300.0),
-                      child: SizedBox(),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () async {
-                // Capture the screenshot and share the content
-                _shareContent(boundaryKey);
-                Navigator.pop(context);
-              },
-              child: const Text("Share", style: TextStyle(color: Colors.black)),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: const Text("Cancel", style: TextStyle(color: Colors.black)),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void _shareContent(GlobalKey boundaryKey) async {
-    // Get the RenderObject from the RepaintBoundary using its key
-    RenderRepaintBoundary boundary = boundaryKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
-
-    // Increase the pixelRatio for higher resolution
-    double pixelRatio = 3.0; // You can adjust this value based on your needs
-    ui.Image image = await boundary.toImage(pixelRatio: pixelRatio);
-
-    ByteData? byteData = await image.toByteData(format: ui.ImageByteFormat.png);
-    Uint8List? pngBytes = byteData?.buffer.asUint8List();
-
-    String text = "Our Sponsor for today is ${clubSponsorsNotifier.currentClubSponsors.name!}, with their image:";
-
-    // Share the image with caption and text
-    await Share.file(
-      'Sponsor Information',
-      'sponsor_info.png',
-      pngBytes as List<int>,
-      'image/png',
-      text: text,
-    );
   }
 
   void facebookLink() async {

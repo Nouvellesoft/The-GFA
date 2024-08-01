@@ -14,7 +14,7 @@ PlayersNotifier? playersNotifier;
 Color backgroundColor = const Color.fromRGBO(187, 192, 195, 1.0);
 
 class MyModifyClubPlayersPage extends StatefulWidget implements NavigationStates {
-  MyModifyClubPlayersPage({Key? key}) : super(key: key);
+  const MyModifyClubPlayersPage({super.key});
 
   @override
   State<MyModifyClubPlayersPage> createState() => MyModifyClubPlayersPageState();

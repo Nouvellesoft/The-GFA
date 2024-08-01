@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
@@ -11,7 +12,7 @@ Color appBarBackgroundColor = const Color.fromRGBO(48, 50, 74, 1.0);
 Color appBarArrowColor = const Color.fromRGBO(187, 192, 195, 1.0);
 
 class MyChangePagesCoverPhotoPage extends StatefulWidget {
-  const MyChangePagesCoverPhotoPage({Key? key}) : super(key: key);
+  const MyChangePagesCoverPhotoPage({super.key});
 
   @override
   State<MyChangePagesCoverPhotoPage> createState() => MyChangePagesCoverPhotoPageState();
@@ -45,7 +46,9 @@ class MyChangePagesCoverPhotoPageState extends State<MyChangePagesCoverPhotoPage
         });
       }
     } catch (e) {
-      print('Error uploading image: $e');
+      if (kDebugMode) {
+        print('Error uploading image: $e');
+      }
     }
   }
 
@@ -58,7 +61,9 @@ class MyChangePagesCoverPhotoPageState extends State<MyChangePagesCoverPhotoPage
       final String imageUrl = await storageReference.getDownloadURL();
       return imageUrl;
     } catch (e) {
-      print('Error uploading image: $e');
+      if (kDebugMode) {
+        print('Error uploading image: $e');
+      }
       rethrow;
     }
   }
@@ -71,7 +76,6 @@ class MyChangePagesCoverPhotoPageState extends State<MyChangePagesCoverPhotoPage
     'Management Body Page': 6,
     'Home Page': 7,
   };
-
 
   Future<void> _submitForm() async {
     if (!_isSubmitting) {
@@ -93,7 +97,7 @@ class MyChangePagesCoverPhotoPageState extends State<MyChangePagesCoverPhotoPage
 
         if (collectionName.isNotEmpty) {
           QuerySnapshot<Map<String, dynamic>> querySnapshot =
-          await firestore.collection(collectionName).where('slivers_pages', isEqualTo: 'slivers_pages').get();
+              await firestore.collection(collectionName).where('slivers_pages', isEqualTo: 'slivers_pages').get();
 
           if (querySnapshot.docs.isNotEmpty) {
             // Assuming there is only one document with 'document_name' equal to 'slivers_pages'
@@ -112,11 +116,13 @@ class MyChangePagesCoverPhotoPageState extends State<MyChangePagesCoverPhotoPage
               _imageMap.clear();
             });
           } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Document with name "slivers_pages" not found.'),
-              ),
-            );
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Document with name "slivers_pages" not found.'),
+                ),
+              );
+            }
           }
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -245,14 +251,14 @@ class ClosableMenuItem extends StatefulWidget {
   final bool isSubmitting; // Add this line
 
   const ClosableMenuItem({
-    Key? key,
+    super.key,
     required this.image,
     required this.pickImage,
     required this.submitForm,
     required this.gifPath,
     required this.itemName,
     required this.isSubmitting,
-  }) : super(key: key);
+  });
 
   @override
   ClosableMenuItemState createState() => ClosableMenuItemState(); // Remove isSubmitting from here
@@ -338,8 +344,8 @@ class ClosableMenuItemState extends State<ClosableMenuItem> {
                     child: ElevatedButton.icon(
                       onPressed: widget.isSubmitting ? null : () => widget.submitForm(),
                       style: ButtonStyle(
-                        elevation: MaterialStateProperty.all<double>(3.0), // Add this line for elevation
-                        backgroundColor: MaterialStateProperty.all<Color>(Colors.white38),
+                        elevation: WidgetStateProperty.all<double>(3.0), // Add this line for elevation
+                        backgroundColor: WidgetStateProperty.all<Color>(Colors.white38),
                       ),
                       icon: Icon(
                         widget.isSubmitting ? Icons.hourglass_empty : Icons.cloud_upload,

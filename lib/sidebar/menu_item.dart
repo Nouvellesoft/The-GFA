@@ -11,12 +11,12 @@ class MenuItems extends StatelessWidget {
   final Color? textColor; // Add a textColor parameter
 
   const MenuItems({
-    Key? key,
+    super.key,
     this.icon,
     this.title,
     this.onTap,
     this.textColor, // Initialize the textColor parameter
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

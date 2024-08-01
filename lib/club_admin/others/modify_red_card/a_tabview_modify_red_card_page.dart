@@ -28,7 +28,7 @@ String rcTitle = 'All Fined Players';
 Color? selectedTabColor = Colors.indigo[200];
 
 class TabviewRedCardPage extends StatefulWidget implements NavigationStates {
-  TabviewRedCardPage({super.key});
+  const TabviewRedCardPage({super.key});
 
   @override
   State<TabviewRedCardPage> createState() => TabviewRedCardPageState();
@@ -80,7 +80,7 @@ class TabviewRedCardPageState extends State<TabviewRedCardPage> with SingleTicke
       ),
       body: TabBarView(
         controller: _tabController,
-        children: [
+        children: const [
           MyRecordRedCardPage(),
           MyDisplayRedCardHistoryPage(),
         ],

@@ -23,7 +23,7 @@ import '../notifier/second_team_class_notifier.dart';
 //   secondTeamClassNotifier.secondTeamClassList = secondTeamClassList;
 // }
 
-getSecondTeamClass(SecondTeamClassNotifier secondTeamClassNotifier, String clubId) async {
+Future<void> getSecondTeamClass(SecondTeamClassNotifier secondTeamClassNotifier, String clubId) async {
   QuerySnapshot snapshot =
       await FirebaseFirestore.instance.collection('clubs').doc(clubId).collection('SecondTeamClassPlayers').orderBy('name').get();
 

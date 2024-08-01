@@ -3,7 +3,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../model/players_stats_and_info.dart';
 import '../notifier/top_defensive_players_stats_info_notifier.dart';
 
-getTopDefensivePlayersStatsAndInfo(TopDefensivePlayersStatsAndInfoNotifier topDefensivePlayersStatsAndInfoNotifier, String clubId) async {
+Future<void> getTopDefensivePlayersStatsAndInfo(
+    TopDefensivePlayersStatsAndInfoNotifier topDefensivePlayersStatsAndInfoNotifier, String clubId) async {
   QuerySnapshot snapshot =
       await FirebaseFirestore.instance.collection('clubs').doc(clubId).collection('PllayersTable').orderBy('goals_conceded_gk_def').limit(10).get();
 

@@ -4,7 +4,7 @@ import 'package:intl/intl.dart';
 import '../model/coaches_reviews_comment.dart';
 import '../notifier/coaches_reviews_comment_notifier.dart';
 
-getCoachesReviewsComment(CoachesReviewsCommentNotifier coachesReviewsCommentNotifier, String clubId) async {
+Future<void> getCoachesReviewsComment(CoachesReviewsCommentNotifier coachesReviewsCommentNotifier, String clubId) async {
   DateTime currentDateTime = DateTime.now();
   String currentMonth = DateFormat('MM').format(currentDateTime);
   String currentYear = DateFormat('yyyy').format(currentDateTime);

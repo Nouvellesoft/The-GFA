@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../model/club_sponsors.dart';
 import '../notifier/club_sponsors_notifier.dart';
 
-getClubSponsors(ClubSponsorsNotifier clubSponsorsNotifier, String clubId) async {
+Future<void> getClubSponsors(ClubSponsorsNotifier clubSponsorsNotifier, String clubId) async {
   QuerySnapshot snapshot =
       await FirebaseFirestore.instance.collection('clubs').doc(clubId).collection('ClubSponsors').orderBy('id', descending: false).get();
 

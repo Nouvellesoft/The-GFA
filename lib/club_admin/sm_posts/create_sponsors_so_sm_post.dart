@@ -46,7 +46,7 @@ class ImageUrls {
 List<ImageUrls> recentImageUrls = [];
 
 class CreateSponsorsShoutOutSMPost extends StatefulWidget implements NavigationStates {
-  CreateSponsorsShoutOutSMPost({super.key});
+  const CreateSponsorsShoutOutSMPost({super.key});
 
   @override
   State<CreateSponsorsShoutOutSMPost> createState() => _CreateSponsorsShoutOutSMPostState();
@@ -65,8 +65,15 @@ class _CreateSponsorsShoutOutSMPostState extends State<CreateSponsorsShoutOutSMP
   Widget build(BuildContext context) {
     clubSponsorsNotifier = Provider.of<ClubSponsorsNotifier>(context);
 
-    return WillPopScope(
-      onWillPop: _onWillPop,
+    return PopScope(
+      onPopInvokedWithResult: (didPop, result) async {
+        if (!didPop) {
+          // return false;
+          Navigator.of(context).pop();
+        }
+        await _onWillPop();
+      },
+      canPop: true, // Allow the pop action
       child: Scaffold(
         backgroundColor: backgroundColor,
         appBar: AppBar(
@@ -77,7 +84,7 @@ class _CreateSponsorsShoutOutSMPostState extends State<CreateSponsorsShoutOutSMP
             ),
             onPressed: () async {
               bool shouldPop = await _onWillPop();
-              if (shouldPop) {
+              if (shouldPop && context.mounted) {
                 Navigator.pop(context);
               }
             },
@@ -340,7 +347,8 @@ class _CreateSponsorsShoutOutSMPostState extends State<CreateSponsorsShoutOutSMP
                       ? const CircularProgressIndicator(
                           color: Colors.black,
                         ) // Show the progress indicator when sharing
-                      : TextButton(
+                      :
+                  TextButton(
                           onPressed: () async {
                             setState(() {
                               isSharing = true; // Set the state to indicate sharing is in progress
@@ -506,11 +514,13 @@ class _CreateSponsorsShoutOutSMPostState extends State<CreateSponsorsShoutOutSMP
           );
         }
       } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error creating event: $e'),
-          ),
-        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Error creating event: $e'),
+            ),
+          );
+        }
       }
     }
   }
