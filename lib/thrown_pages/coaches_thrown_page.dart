@@ -366,7 +366,7 @@ class _MyCoachesPage extends State<MyCoachesPage> {
                 if (enteredPasscode == storedPasscode && context.mounted) {
                   Navigator.pop(context);
                   _showAdminWelcomeToast();
-                  Navigator.push(context, SlideTransition1(const MyClubAdminPage()));
+                  Navigator.push(context, SlideTransition1(MyClubAdminPage(clubId: widget.clubId)));
                 } else {
                   // Show a toast for incorrect passcode
                   Fluttertoast.showToast(

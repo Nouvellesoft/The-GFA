@@ -10,7 +10,8 @@ import '../../../notifier/c_match_day_banner_for_club_notifier.dart';
 late MatchDayBannerForClubNotifier matchDayBannerForClubNotifier;
 
 class MyRemoveNewHomeTeamPage extends StatefulWidget implements NavigationStates {
-  const MyRemoveNewHomeTeamPage({super.key});
+  final String clubId;
+  const MyRemoveNewHomeTeamPage({super.key, required this.clubId});
 
   @override
   State<MyRemoveNewHomeTeamPage> createState() => MyRemoveNewHomeTeamPageState();
@@ -166,7 +167,13 @@ class MyRemoveNewHomeTeamPageState extends State<MyRemoveNewHomeTeamPage> {
       final homeTeamsName = homeTeams.clubName; // Get the name of the clubCaptains
       if (homeTeamsName != null) {
         // Delete management with matching names
-        await firestore.collection('MatchDayBannerForClub').where('club_name', isEqualTo: homeTeamsName).get().then((querySnapshot) {
+        await firestore
+            .collection('clubs')
+            .doc(widget.clubId)
+            .collection('MatchDayBannerForClub')
+            .where('club_name', isEqualTo: homeTeamsName)
+            .get()
+            .then((querySnapshot) {
           for (var doc in querySnapshot.docs) {
             doc.reference.delete();
           }
@@ -190,16 +197,8 @@ class MyRemoveNewHomeTeamPageState extends State<MyRemoveNewHomeTeamPage> {
   }
 
   Future<void> _fetchMatchDayBannerForClubAndUpdateNotifier(MatchDayBannerForClubNotifier matchDayBannerForClubNotifier) async {
-    // Fetch the collection of club IDs from Firestore
-    QuerySnapshot clubSnapshot = await FirebaseFirestore.instance.collection('clubs').get();
-    List<String> clubIds = clubSnapshot.docs.map((doc) => doc.id).toList();
+    await getMatchDayBannerForClub(matchDayBannerForClubNotifier, widget.clubId);
 
-    // Process each club ID
-    for (String clubId in clubIds) {
-      await getMatchDayBannerForClub(matchDayBannerForClubNotifier, clubId);
-    }
-
-    // Optionally, notify listeners or update UI after fetching
     setState(() {}); // Refresh the UI if needed
   }
 }

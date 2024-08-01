@@ -46,7 +46,8 @@ class ImageUrls {
 List<ImageUrls> recentImageUrls = [];
 
 class CreateSponsorsShoutOutSMPost extends StatefulWidget implements NavigationStates {
-  const CreateSponsorsShoutOutSMPost({super.key});
+  final String clubId;
+  const CreateSponsorsShoutOutSMPost({super.key, required this.clubId});
 
   @override
   State<CreateSponsorsShoutOutSMPost> createState() => _CreateSponsorsShoutOutSMPostState();
@@ -347,8 +348,7 @@ class _CreateSponsorsShoutOutSMPostState extends State<CreateSponsorsShoutOutSMP
                       ? const CircularProgressIndicator(
                           color: Colors.black,
                         ) // Show the progress indicator when sharing
-                      :
-                  TextButton(
+                      : TextButton(
                           onPressed: () async {
                             setState(() {
                               isSharing = true; // Set the state to indicate sharing is in progress
@@ -502,7 +502,7 @@ class _CreateSponsorsShoutOutSMPostState extends State<CreateSponsorsShoutOutSMP
           data['sponsor_name'] = sponsorName;
 
           // Add the new member if the name doesn't exist
-          await firestore.collection(collectionName).add(data);
+          await firestore.collection('clubs').doc(widget.clubId).collection(collectionName).add(data);
 
           // _eventNameController.clear();
           // _eventSummaryController.clear();

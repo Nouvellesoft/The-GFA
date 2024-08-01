@@ -13,7 +13,8 @@ import '/notifier/players_table_notifier.dart';
 Color backgroundColor = const Color.fromRGBO(187, 192, 195, 1.0);
 
 class MyMVPPage extends StatefulWidget implements NavigationStates {
-  const MyMVPPage({super.key});
+  final String clubId;
+  const MyMVPPage({super.key, required this.clubId});
 
   @override
   State<MyMVPPage> createState() => MyMVPPageState();
@@ -132,6 +133,8 @@ class MyMVPPageState extends State<MyMVPPage> {
 
                                   // Find the document with the specific player name and update potm_cum by 1
                                   QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+                                      .collection('clubs')
+                                      .doc(widget.clubId)
                                       .collection('PllayersTable')
                                       .where('player_name', isEqualTo: player.playerName)
                                       .get();
@@ -148,6 +151,8 @@ class MyMVPPageState extends State<MyMVPPage> {
 
                                     // Update 'player_of_the_month' to empty string for other players in the same class
                                     await FirebaseFirestore.instance
+                                        .collection('clubs')
+                                        .doc(widget.clubId)
                                         .collection('PllayersTable')
                                         .where('player_name', isNotEqualTo: player.playerName) // Exclude the selected MVP player
                                         .get()
@@ -200,16 +205,8 @@ class MyMVPPageState extends State<MyMVPPage> {
   }
 
   Future<void> _fetchPlayersTableAndUpdateNotifier(PlayersTableNotifier playersTableNotifier) async {
-    // Fetch the collection of club IDs from Firestore
-    QuerySnapshot clubSnapshot = await FirebaseFirestore.instance.collection('clubs').get();
-    List<String> clubIds = clubSnapshot.docs.map((doc) => doc.id).toList();
+    await getPlayersTable(playersTableNotifier, widget.clubId);
 
-    // Process each club ID
-    for (String clubId in clubIds) {
-      await getPlayersTable(playersTableNotifier, clubId);
-    }
-
-    // Optionally, notify listeners or update UI after fetching
     setState(() {}); // Refresh the UI if needed
   }
 }

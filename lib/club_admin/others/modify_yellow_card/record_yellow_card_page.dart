@@ -12,7 +12,8 @@ import '/notifier/players_table_notifier.dart';
 Color backgroundColor = const Color.fromRGBO(129, 140, 148, 1.0);
 
 class MyRecordYellowCardPage extends StatefulWidget implements NavigationStates {
-  const MyRecordYellowCardPage({super.key});
+  final String clubId;
+  const MyRecordYellowCardPage({super.key, required this.clubId});
 
   @override
   State<MyRecordYellowCardPage> createState() => MyRecordYellowCardPageState();
@@ -125,6 +126,8 @@ class MyRecordYellowCardPageState extends State<MyRecordYellowCardPage> {
 
                                   // Find the document with the specific player name and update potm_cum by 1
                                   QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+                                      .collection('clubs')
+                                      .doc(widget.clubId)
                                       .collection('PllayersTable')
                                       .where('player_name', isEqualTo: player.playerName)
                                       .get();

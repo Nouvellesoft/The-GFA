@@ -24,7 +24,8 @@ Color backgroundColor = const Color.fromRGBO(20, 36, 62, 1.0);
 late CaptainsNotifier clubCaptainsNotifier;
 
 class MyModifyRemoveClubCaptainsPage extends StatefulWidget implements NavigationStates {
-  const MyModifyRemoveClubCaptainsPage({super.key});
+  final String clubId;
+  const MyModifyRemoveClubCaptainsPage({super.key, required this.clubId});
 
   @override
   State<MyModifyRemoveClubCaptainsPage> createState() => MyModifyRemoveClubCaptainsPageState();
@@ -183,7 +184,13 @@ class MyModifyRemoveClubCaptainsPageState extends State<MyModifyRemoveClubCaptai
       final clubCaptainsName = clubCaptains.name; // Get the name of the clubCaptains
       if (clubCaptainsName != null) {
         // Delete management with matching names
-        await firestore.collection('Captains').where('name', isEqualTo: clubCaptainsName).get().then((querySnapshot) {
+        await firestore
+            .collection('clubs')
+            .doc(widget.clubId)
+            .collection('Captains')
+            .where('name', isEqualTo: clubCaptainsName)
+            .get()
+            .then((querySnapshot) {
           for (var doc in querySnapshot.docs) {
             doc.reference.delete();
           }
@@ -207,16 +214,8 @@ class MyModifyRemoveClubCaptainsPageState extends State<MyModifyRemoveClubCaptai
   }
 
   Future<void> _fetchCaptainsAndUpdateNotifier(CaptainsNotifier captainsNotifier) async {
-    // Fetch the collection of club IDs from Firestore
-    QuerySnapshot clubSnapshot = await FirebaseFirestore.instance.collection('clubs').get();
-    List<String> clubIds = clubSnapshot.docs.map((doc) => doc.id).toList();
+    await getCaptains(captainsNotifier, widget.clubId);
 
-    // Process each club ID
-    for (String clubId in clubIds) {
-      await getCaptains(captainsNotifier, clubId);
-    }
-
-    // Optionally, notify listeners or update UI after fetching
     setState(() {}); // Refresh the UI if needed
   }
 }

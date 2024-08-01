@@ -43,7 +43,7 @@ Color backgroundColor = const Color.fromRGBO(147, 165, 193, 1.0);
 
 class MyClubSponsorsPage extends StatefulWidget implements NavigationStates {
   final bool fromPage1;
-  final String clubId; // Add this line
+  final String clubId;
 
   const MyClubSponsorsPage({super.key, required this.fromPage1, required this.clubId, this.title});
   final String? title;
@@ -57,7 +57,7 @@ class _MyClubSponsorsPageState extends State<MyClubSponsorsPage> with SingleTick
   late AnimationController _animationController;
   late Animation<double> _zoomAnimation;
   int _currentIndex = 0;
-  late Timer _timer; // Add a Timer variable
+  late Timer _timer;
 
   @override
   void initState() {
@@ -68,7 +68,7 @@ class _MyClubSponsorsPageState extends State<MyClubSponsorsPage> with SingleTick
 
     _animationController = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 3), // Set the duration for zooming
+      duration: const Duration(seconds: 3),
     );
 
     _animationController.forward();
@@ -79,7 +79,6 @@ class _MyClubSponsorsPageState extends State<MyClubSponsorsPage> with SingleTick
       ),
     );
 
-    // Use TickerProvider to create a periodic animation
     _timer = createPeriodicTimer();
   }
 
@@ -106,16 +105,9 @@ class _MyClubSponsorsPageState extends State<MyClubSponsorsPage> with SingleTick
     });
   }
 
-  // @override
-  // void didChangeDependencies() {
-  //   ClubSponsorsNotifier clubSponsorsNotifier = Provider.of<ClubSponsorsNotifier>(context, listen: true);
-  //   _fetchClubSponsorsAndUpdateNotifier(clubSponsorsNotifier);
-  //   super.didChangeDependencies();
-  // }
-
   @override
   void dispose() {
-    _timer.cancel(); // Cancel the timer in the dispose method
+    _timer.cancel();
     _animationController.dispose();
     super.dispose();
   }
@@ -129,7 +121,7 @@ class _MyClubSponsorsPageState extends State<MyClubSponsorsPage> with SingleTick
       splashColor: splashColor,
       onTap: () {
         clubSponsorsNotifier.currentClubSponsors = sponsors;
-        navigateToClubSponsorsDetailsPage(context);
+        navigateToClubSponsorsDetailsPage(context, widget.clubId);
       },
       child: SingleChildScrollView(
         child: Center(
@@ -214,34 +206,15 @@ class _MyClubSponsorsPageState extends State<MyClubSponsorsPage> with SingleTick
   Widget build(BuildContext context) {
     clubSponsorsNotifier = Provider.of<ClubSponsorsNotifier>(context);
 
-    // bool isClickedFromPage1 = true; // Set this variable based on where the button is clicked
-
     return PopScope(
       onPopInvokedWithResult: (didPop, result) async {
         if (!didPop) {
-          // return false;
           Navigator.of(context).pop();
         }
         await _onWillPop();
       },
-      canPop: true, // Allow the pop action
+      canPop: true,
       child: Scaffold(
-        // appBar: AppBar(
-        //   centerTitle: true,
-        //   shape: const RoundedRectangleBorder(
-        //     borderRadius: BorderRadius.vertical(
-        //       bottom: Radius.circular(30),
-        //     ),
-        //   ),
-        //   elevation: 10,
-        //   backgroundColor: backgroundColor,
-        //   leading: IconButton(
-        //     icon: Icon(Icons.arrow_back_ios, color: whiteColor),
-        //     onPressed: () {
-        //       Navigator.pop(context);
-        //     },
-        //   ),
-        // ),
         backgroundColor: backgroundColor,
         body: SafeArea(
           child: Stack(
@@ -250,7 +223,6 @@ class _MyClubSponsorsPageState extends State<MyClubSponsorsPage> with SingleTick
                 padding: const EdgeInsets.only(top: 60),
                 child: NotificationListener<ScrollNotification>(
                   onNotification: (ScrollNotification scrollInfo) {
-                    // You can add logic here to show/hide the scrollbar based on scroll position
                     return true;
                   },
                   child: Scrollbar(
@@ -270,10 +242,10 @@ class _MyClubSponsorsPageState extends State<MyClubSponsorsPage> with SingleTick
                   children: [
                     GestureDetector(
                       onTap: () {
-                        Navigator.popUntil(context, ModalRoute.withName('/')); // Pop until the root route
+                        Navigator.popUntil(context, ModalRoute.withName('/'));
 
                         if (widget.fromPage1) {
-                          Navigator.push(context, SlideTransition1(const MyClubAdminPage()));
+                          Navigator.push(context, SlideTransition1(MyClubAdminPage(clubId: widget.clubId)));
                         } else {
                           Navigator.push(
                               context,
@@ -295,7 +267,7 @@ class _MyClubSponsorsPageState extends State<MyClubSponsorsPage> with SingleTick
                               Icons.arrow_back,
                               color: Colors.white,
                             ),
-                            const SizedBox(width: 5), // Add some spacing between the Icon and Text
+                            const SizedBox(width: 5),
                             Text(
                               'BACK',
                               style: GoogleFonts.aldrich(
@@ -322,7 +294,6 @@ class _MyClubSponsorsPageState extends State<MyClubSponsorsPage> with SingleTick
                   ],
                 ),
               ),
-              // Positioned for "List of Club Sponsors" text without decoration
             ],
           ),
         ),
@@ -368,6 +339,6 @@ class _MyClubSponsorsPageState extends State<MyClubSponsorsPage> with SingleTick
   }
 }
 
-Future navigateToClubSponsorsDetailsPage(context) async {
+Future navigateToClubSponsorsDetailsPage(BuildContext context, String clubId) async {
   Navigator.push(context, MaterialPageRoute(builder: (context) => const ClubSponsorsDetailsPage()));
 }

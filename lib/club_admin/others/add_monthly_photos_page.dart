@@ -12,7 +12,8 @@ Color appBarBackgroundColor = const Color.fromRGBO(48, 50, 74, 1.0);
 Color appBarArrowColor = const Color.fromRGBO(187, 192, 195, 1.0);
 
 class MyAddMonthlyPhotosPage extends StatefulWidget {
-  const MyAddMonthlyPhotosPage({super.key});
+  final String clubId;
+  const MyAddMonthlyPhotosPage({super.key, required this.clubId});
 
   @override
   State<MyAddMonthlyPhotosPage> createState() => MyAddMonthlyPhotosPageState();
@@ -32,7 +33,8 @@ class MyAddMonthlyPhotosPageState extends State<MyAddMonthlyPhotosPage> {
   }
 
   Future<void> _getHighestId() async {
-    final snapshot = await firestore.collection('TrainingsAndGamesReels').orderBy('id', descending: true).limit(1).get();
+    final snapshot =
+        await firestore.collection('clubs').doc(widget.clubId).collection('TrainingsAndGamesReels').orderBy('id', descending: true).limit(1).get();
     if (snapshot.docs.isNotEmpty) {
       _highestId = snapshot.docs.first['id'] as int;
     }
@@ -75,7 +77,7 @@ class MyAddMonthlyPhotosPageState extends State<MyAddMonthlyPhotosPage> {
       if (image != null) {
         String? imageUrl = await _uploadImageToStorage(image, 'image_${DateTime.now().millisecondsSinceEpoch}.jpg');
 
-        await firestore.collection('TrainingsAndGamesReels').doc(documentId).set({
+        await firestore.collection('clubs').doc(widget.clubId).collection('TrainingsAndGamesReels').doc(documentId).set({
           'id': _getNewId(),
           'image': imageUrl,
         });
@@ -129,7 +131,7 @@ class MyAddMonthlyPhotosPageState extends State<MyAddMonthlyPhotosPage> {
                 (i == 3 && _imageThree != null) ||
                 (i == 4 && _imageFour != null) ||
                 (i == 5 && _imageFive != null)) {
-              DocumentReference newTrainingsAndGamesReelsRef = await firestore.collection(collectionName).add({
+              DocumentReference newTrainingsAndGamesReelsRef = await firestore.collection('clubs').doc(widget.clubId).collection(collectionName).add({
                 'id': _getNewId(),
                 'image': '',
               });

@@ -28,7 +28,8 @@ String rcTitle = 'All Fined Players';
 Color? selectedTabColor = Colors.indigo[200];
 
 class TabviewYellowCardPage extends StatefulWidget implements NavigationStates {
-  const TabviewYellowCardPage({super.key});
+  final String clubId;
+  const TabviewYellowCardPage({super.key, required this.clubId});
 
   @override
   State<TabviewYellowCardPage> createState() => TabviewYellowCardPageState();
@@ -80,9 +81,9 @@ class TabviewYellowCardPageState extends State<TabviewYellowCardPage> with Singl
       ),
       body: TabBarView(
         controller: _tabController,
-        children: const [
-          MyRecordYellowCardPage(),
-          MyDisplayYellowCardHistoryPage(),
+        children: [
+          MyRecordYellowCardPage(clubId: widget.clubId),
+          MyDisplayYellowCardHistoryPage(clubId: widget.clubId),
         ],
       ),
     );

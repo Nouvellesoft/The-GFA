@@ -10,7 +10,8 @@ import 'package:image_picker/image_picker.dart';
 import '../../../bloc_navigation_bloc/navigation_bloc.dart';
 
 class MyAddNewOppTeamPage extends StatefulWidget implements NavigationStates {
-  const MyAddNewOppTeamPage({super.key});
+  final String clubId;
+  const MyAddNewOppTeamPage({super.key, required this.clubId});
 
   @override
   State<MyAddNewOppTeamPage> createState() => MyAddNewOppTeamPageState();
@@ -115,7 +116,7 @@ class MyAddNewOppTeamPageState extends State<MyAddNewOppTeamPage> {
         String? imageUrl = _selectedImage != null ? await _uploadImageToStorage(_selectedImage!, 'away_team_icon.jpg') : null;
 
         // Update Firestore document with data
-        await FirebaseFirestore.instance.collection('MatchDayBannerForClubOpp').add({
+        await FirebaseFirestore.instance.collection('clubs').doc(widget.clubId).collection('MatchDayBannerForClubOpp').add({
           'id': '10',
           'club_name': awayTeamName,
           'club_icon': imageUrl ??

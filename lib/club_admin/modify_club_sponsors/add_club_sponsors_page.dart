@@ -12,7 +12,8 @@ import '../../bloc_navigation_bloc/navigation_bloc.dart';
 Color backgroundColor = const Color.fromRGBO(235, 238, 239, 1.0);
 
 class MyAddClubSponsorPage extends StatefulWidget implements NavigationStates {
-  const MyAddClubSponsorPage({super.key});
+  final String clubId;
+  const MyAddClubSponsorPage({super.key, required this.clubId});
 
   @override
   State<MyAddClubSponsorPage> createState() => MyAddClubSponsorPageState();
@@ -35,7 +36,7 @@ class MyAddClubSponsorPageState extends State<MyAddClubSponsorPage> {
 
   // Function to check if a member with the same name exists
   Future<bool> doesNameExist(String fullName, String collectionName) async {
-    final querySnapshot = await firestore.collection(collectionName).where('name', isEqualTo: fullName).get();
+    final querySnapshot = await firestore.collection('clubs').doc(widget.clubId).collection(collectionName).where('name', isEqualTo: fullName).get();
     return querySnapshot.docs.isNotEmpty;
   }
 
@@ -98,7 +99,7 @@ class MyAddClubSponsorPageState extends State<MyAddClubSponsorPage> {
       try {
         if (collectionName.isNotEmpty) {
           /// Add the new member if the name doesn't exist
-          DocumentReference newSponsorRef = await firestore.collection(collectionName).add(data);
+          DocumentReference newSponsorRef = await firestore.collection('clubs').doc(widget.clubId).collection(collectionName).add(data);
 
           // Check if images are selected before calling _uploadAndSaveImages
           if (_imageOne != null || _imageTwo != null || _imageThree != null || _imageFour != null || _imageFive != null) {
@@ -124,11 +125,13 @@ class MyAddClubSponsorPageState extends State<MyAddClubSponsorPage> {
             _isSubmitting = false; // Stop submitting
           });
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Unsupported role: $collectionName'),
-            ),
-          );
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Unsupported role: $collectionName'),
+              ),
+            );
+          }
           // Update UI to stop submitting
           setState(() {
             _isSubmitting = false;

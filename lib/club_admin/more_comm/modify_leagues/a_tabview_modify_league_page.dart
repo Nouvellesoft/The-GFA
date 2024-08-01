@@ -27,7 +27,8 @@ Color phoneColor = const Color.fromRGBO(20, 134, 46, 1.0);
 Color backgroundColor = const Color.fromRGBO(147, 165, 193, 1.0);
 
 class TabviewLeaguePage extends StatefulWidget implements NavigationStates {
-  const TabviewLeaguePage({super.key});
+  final String clubId;
+  const TabviewLeaguePage({super.key, required this.clubId});
 
   @override
   State<TabviewLeaguePage> createState() => _TabviewLeaguePageState();
@@ -79,9 +80,9 @@ class _TabviewLeaguePageState extends State<TabviewLeaguePage> with SingleTicker
       ),
       body: TabBarView(
         controller: _tabController,
-        children: const [
-          MyAddNewLeaguePage(),
-          MyRemoveNewLeaguePage(),
+        children: [
+          MyAddNewLeaguePage(clubId: widget.clubId),
+          MyRemoveNewLeaguePage(clubId: widget.clubId),
         ],
       ),
     );

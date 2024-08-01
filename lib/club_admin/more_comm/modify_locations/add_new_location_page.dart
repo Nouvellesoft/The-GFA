@@ -5,7 +5,8 @@ import 'package:fluttertoast/fluttertoast.dart';
 import '../../../bloc_navigation_bloc/navigation_bloc.dart';
 
 class MyAddNewLocationPage extends StatefulWidget implements NavigationStates {
-  const MyAddNewLocationPage({super.key});
+  final String clubId;
+  const MyAddNewLocationPage({super.key, required this.clubId});
 
   @override
   State<MyAddNewLocationPage> createState() => MyAddNewLocationPageState();
@@ -85,7 +86,7 @@ class MyAddNewLocationPageState extends State<MyAddNewLocationPage> {
 
       try {
         // Update Firestore document with data
-        await FirebaseFirestore.instance.collection('MatchDayBannerForLocation').add({
+        await FirebaseFirestore.instance.collection('clubs').doc(widget.clubId).collection('MatchDayBannerForLocation').add({
           'id': '10',
           'location': locationName,
           'post_code': postCode,

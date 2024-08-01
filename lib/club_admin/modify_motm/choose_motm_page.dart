@@ -14,7 +14,8 @@ Color backgroundColor = const Color.fromRGBO(48, 50, 74, 1.0);
 Color containerBackgroundColor = const Color.fromRGBO(24, 26, 36, 1.0);
 
 class MyMOTMPage extends StatefulWidget implements NavigationStates {
-  const MyMOTMPage({super.key});
+  final String clubId;
+  const MyMOTMPage({super.key, required this.clubId});
 
   @override
   State<MyMOTMPage> createState() => MyMOTMPageState();
@@ -134,6 +135,8 @@ class MyMOTMPageState extends State<MyMOTMPage> {
 
                                   // Find the document with the specific player name and update motm_cum by 1
                                   QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+                                      .collection('clubs')
+                                      .doc(widget.clubId)
                                       .collection('PllayersTable')
                                       .where('player_name', isEqualTo: player.playerName)
                                       .get();
@@ -205,16 +208,8 @@ class MyMOTMPageState extends State<MyMOTMPage> {
   }
 
   Future<void> _fetchPlayersTableAndUpdateNotifier(PlayersTableNotifier playersTableNotifier) async {
-    // Fetch the collection of club IDs from Firestore
-    QuerySnapshot clubSnapshot = await FirebaseFirestore.instance.collection('clubs').get();
-    List<String> clubIds = clubSnapshot.docs.map((doc) => doc.id).toList();
+    await getPlayersTable(playersTableNotifier, widget.clubId);
 
-    // Process each club ID
-    for (String clubId in clubIds) {
-      await getPlayersTable(playersTableNotifier, clubId);
-    }
-
-    // Optionally, notify listeners or update UI after fetching
     setState(() {}); // Refresh the UI if needed
   }
 }

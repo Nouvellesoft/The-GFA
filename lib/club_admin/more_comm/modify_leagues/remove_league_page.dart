@@ -10,7 +10,8 @@ import '../../../notifier/c_match_day_banner_for_league_notifier.dart';
 late MatchDayBannerForLeagueNotifier matchDayBannerForLeagueNotifier;
 
 class MyRemoveNewLeaguePage extends StatefulWidget implements NavigationStates {
-  const MyRemoveNewLeaguePage({super.key});
+  final String clubId;
+  const MyRemoveNewLeaguePage({super.key, required this.clubId});
 
   @override
   State<MyRemoveNewLeaguePage> createState() => MyRemoveNewLeaguePageState();
@@ -166,7 +167,13 @@ class MyRemoveNewLeaguePageState extends State<MyRemoveNewLeaguePage> {
       final leaguesName = leagues.league; // Get the name of the league
       if (leaguesName != null) {
         // Delete leagues with matching names
-        await firestore.collection('MatchDayBannerForLeague').where('league', isEqualTo: leaguesName).get().then((querySnapshot) {
+        await firestore
+            .collection('clubs')
+            .doc(widget.clubId)
+            .collection('MatchDayBannerForLeague')
+            .where('league', isEqualTo: leaguesName)
+            .get()
+            .then((querySnapshot) {
           for (var doc in querySnapshot.docs) {
             doc.reference.delete();
           }
@@ -190,16 +197,8 @@ class MyRemoveNewLeaguePageState extends State<MyRemoveNewLeaguePage> {
   }
 
   Future<void> _fetchMatchDayBannerForLeagueAndUpdateNotifier(MatchDayBannerForLeagueNotifier matchDayBannerForLeagueNotifier) async {
-    // Fetch the collection of club IDs from Firestore
-    QuerySnapshot clubSnapshot = await FirebaseFirestore.instance.collection('clubs').get();
-    List<String> clubIds = clubSnapshot.docs.map((doc) => doc.id).toList();
+    await getMatchDayBannerForLeague(matchDayBannerForLeagueNotifier, widget.clubId);
 
-    // Process each club ID
-    for (String clubId in clubIds) {
-      await getMatchDayBannerForLeague(matchDayBannerForLeagueNotifier, clubId);
-    }
-
-    // Optionally, notify listeners or update UI after fetching
     setState(() {}); // Refresh the UI if needed
   }
 }

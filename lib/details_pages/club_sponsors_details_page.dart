@@ -7,9 +7,9 @@ import 'package:material_design_icons_flutter/material_design_icons_flutter.dart
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '/notifier/a_upcoming_matches_notifier.dart';
 import '/notifier/club_sponsors_notifier.dart';
 import '../model/club_sponsors.dart';
+
 
 Color conColor = const Color.fromRGBO(194, 194, 220, 1.0);
 Color conColorTwo = const Color.fromRGBO(151, 147, 151, 1.0);
@@ -72,9 +72,9 @@ dynamic _aboutUs;
 dynamic _ourServices;
 
 late ClubSponsorsNotifier clubSponsorsNotifier;
-late UpcomingMatchesNotifier upcomingMatchesNotifier;
 
 class ClubSponsorsDetailsPage extends StatefulWidget {
+
   const ClubSponsorsDetailsPage({super.key});
 
   @override
@@ -96,10 +96,8 @@ class _ClubSponsorsDetailsPageState extends State<ClubSponsorsDetailsPage> {
   @override
   Widget build(BuildContext context) {
     clubSponsorsNotifier = Provider.of<ClubSponsorsNotifier>(context, listen: true);
-    upcomingMatchesNotifier = Provider.of<UpcomingMatchesNotifier>(context);
 
     double width = MediaQuery.of(context).size.width;
-    // double height = MediaQuery.of(context).size.height;
 
     return Scaffold(
       appBar: AppBar(
@@ -121,14 +119,14 @@ class _ClubSponsorsDetailsPageState extends State<ClubSponsorsDetailsPage> {
             Navigator.pop(context);
           },
         ),
-        // actions: [
-        //   IconButton(
-        //     icon: const Icon(Icons.upload),
-        //     onPressed: () {
-        //       _showUploadDialog();
-        //     },
-        //   ),
-        // ],
+// actions: [
+//   IconButton(
+//     icon: const Icon(Icons.upload),
+//     onPressed: () {
+//       _showUploadDialog();
+//     },
+//   ),
+// ],
       ),
       backgroundColor: backgroundColor,
       body: SafeArea(
@@ -140,7 +138,7 @@ class _ClubSponsorsDetailsPageState extends State<ClubSponsorsDetailsPage> {
               children: [
                 Container(
                   width: width,
-                  // height: height/0.8,
+// height: height/0.8,
                   decoration: BoxDecoration(color: conColor.withOpacity(0.3), borderRadius: BorderRadius.circular(20)),
                   child: Column(
                     children: [
@@ -576,7 +574,7 @@ class _ClubSponsorsDetailsPageState extends State<ClubSponsorsDetailsPage> {
                             padding: const EdgeInsets.all(10.0),
                             child: Container(
                               width: width / 1.19,
-                              // height: width/1.6,
+// height: width/1.6,
                               decoration: BoxDecoration(
                                 color: conColor.withOpacity(0.3),
                                 borderRadius: BorderRadius.circular(14),
@@ -642,7 +640,7 @@ class _ClubSponsorsDetailsPageState extends State<ClubSponsorsDetailsPage> {
                                 viewportFraction: 0.8,
                                 scale: 0.9,
                                 itemCount: clubSponsorsNotifier.clubSponsorsList.length,
-                                // Total count of images in all documents
+// Total count of images in all documents
                                 itemBuilder: (context, index) {
                                   int imageIndex = index % 5;
                                   ClubSponsors sponsor = clubSponsorsNotifier.currentClubSponsors;
@@ -706,6 +704,8 @@ class _ClubSponsorsDetailsPageState extends State<ClubSponsorsDetailsPage> {
 
   @override
   void initState() {
+    ClubSponsorsNotifier clubSponsorsNotifier = Provider.of<ClubSponsorsNotifier>(context, listen: false);
+
     _name = clubSponsorsNotifier.currentClubSponsors.name;
     _phone = clubSponsorsNotifier.currentClubSponsors.phone;
     _email = clubSponsorsNotifier.currentClubSponsors.email;
@@ -744,7 +744,7 @@ class _ClubSponsorsDetailsPageState extends State<ClubSponsorsDetailsPage> {
               launchURL(urlFacebook);
               Fluttertoast.showToast(
                 msg: 'Success! Facebook Page Opening',
-                // Show success message (you can replace it with actual banner generation logic)
+// Show success message (you can replace it with actual banner generation logic)
                 gravity: ToastGravity.BOTTOM,
                 backgroundColor: backgroundColor,
                 textColor: Colors.white,

@@ -12,7 +12,8 @@ Color appBarBackgroundColor = const Color.fromRGBO(48, 50, 74, 1.0);
 Color appBarArrowColor = const Color.fromRGBO(187, 192, 195, 1.0);
 
 class MyChangePagesCoverPhotoPage extends StatefulWidget {
-  const MyChangePagesCoverPhotoPage({super.key});
+  final String clubId;
+  const MyChangePagesCoverPhotoPage({super.key, required this.clubId});
 
   @override
   State<MyChangePagesCoverPhotoPage> createState() => MyChangePagesCoverPhotoPageState();
@@ -36,12 +37,12 @@ class MyChangePagesCoverPhotoPageState extends State<MyChangePagesCoverPhotoPage
 
       if (documentId == 'non_slivers_pages' && imageIndex == 5) {
         // Update 'sidebar_page' field in the 'non_slivers_pages' document
-        await firestore.collection('SliversPages').doc(documentId).update({
+        await firestore.collection('clubs').doc(widget.clubId).collection('SliversPages').doc(documentId).update({
           'sidebar_page': imageUrl,
         });
       } else {
         // Update 'slivers_page_$imageIndex' field in other documents
-        await firestore.collection('SliversPages').doc(documentId).update({
+        await firestore.collection('clubs').doc(widget.clubId).collection('SliversPages').doc(documentId).update({
           'slivers_page_$imageIndex': imageUrl,
         });
       }
@@ -96,8 +97,12 @@ class MyChangePagesCoverPhotoPageState extends State<MyChangePagesCoverPhotoPage
         String collectionName = 'SliversPages'; // Use your actual collection name
 
         if (collectionName.isNotEmpty) {
-          QuerySnapshot<Map<String, dynamic>> querySnapshot =
-              await firestore.collection(collectionName).where('slivers_pages', isEqualTo: 'slivers_pages').get();
+          QuerySnapshot<Map<String, dynamic>> querySnapshot = await firestore
+              .collection('clubs')
+              .doc(widget.clubId)
+              .collection(collectionName)
+              .where('slivers_pages', isEqualTo: 'slivers_pages')
+              .get();
 
           if (querySnapshot.docs.isNotEmpty) {
             // Assuming there is only one document with 'document_name' equal to 'slivers_pages'

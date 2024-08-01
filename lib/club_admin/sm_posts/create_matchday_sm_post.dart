@@ -72,7 +72,8 @@ class ImageUrls {
 List<ImageUrls> recentImageUrls = [];
 
 class CreateMatchDaySocialMediaPost extends StatefulWidget implements NavigationStates {
-  const CreateMatchDaySocialMediaPost({super.key});
+  final String clubId;
+  const CreateMatchDaySocialMediaPost({super.key, required this.clubId});
 
   @override
   State<CreateMatchDaySocialMediaPost> createState() => CreateMatchDaySocialMediaPostState();
@@ -840,7 +841,6 @@ class CreateMatchDaySocialMediaPostState extends State<CreateMatchDaySocialMedia
                                                           Navigator.of(context).pop(); // Close the dialog
                                                         }
 
-
                                                         // Update the UI to reflect the deletion
                                                         setState(() {});
                                                       }
@@ -951,7 +951,12 @@ class CreateMatchDaySocialMediaPostState extends State<CreateMatchDaySocialMedia
                           child: InkWell(
                             onTap: () {},
                             child: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-                              stream: FirebaseFirestore.instance.collection('SliversPages').doc('non_slivers_pages').snapshots(),
+                              stream: FirebaseFirestore.instance
+                                  .collection('clubs')
+                                  .doc(widget.clubId)
+                                  .collection('SliversPages')
+                                  .doc('non_slivers_pages')
+                                  .snapshots(),
                               builder: (context, snapshot) {
                                 if (!snapshot.hasData) {
                                   return const CircularProgressIndicator();
@@ -2106,72 +2111,32 @@ ${selectedSponsorNames.isNotEmpty ? 'We are proudly sponsored by ${selectedSpons
   }
 
   Future<void> _fetchMatchDayBannerForClubNotifier(MatchDayBannerForClubNotifier matchDayBannerForClubNotifier) async {
-    // Fetch the collection of club IDs from Firestore
-    QuerySnapshot clubSnapshot = await FirebaseFirestore.instance.collection('clubs').get();
-    List<String> clubIds = clubSnapshot.docs.map((doc) => doc.id).toList();
+    await getMatchDayBannerForClub(matchDayBannerForClubNotifier, widget.clubId);
 
-    // Process each club ID
-    for (String clubId in clubIds) {
-      await getMatchDayBannerForClub(matchDayBannerForClubNotifier, clubId);
-    }
-
-    // Optionally, notify listeners or update UI after fetching
     setState(() {}); // Refresh the UI if needed
   }
 
   Future<void> _fetchMatchDayBannerForClubOppNotifier(MatchDayBannerForClubOppNotifier matchDayBannerForClubOppNotifier) async {
-    // Fetch the collection of club IDs from Firestore
-    QuerySnapshot clubSnapshot = await FirebaseFirestore.instance.collection('clubs').get();
-    List<String> clubIds = clubSnapshot.docs.map((doc) => doc.id).toList();
+    await getMatchDayBannerForClubOpp(matchDayBannerForClubOppNotifier, widget.clubId);
 
-    // Process each club ID
-    for (String clubId in clubIds) {
-      await getMatchDayBannerForClubOpp(matchDayBannerForClubOppNotifier, clubId);
-    }
-
-    // Optionally, notify listeners or update UI after fetching
     setState(() {}); // Refresh the UI if needed
   }
 
   Future<void> _fetchMatchDayBannerForLeagueNotifier(MatchDayBannerForLeagueNotifier matchDayBannerForLeagueNotifier) async {
-    // Fetch the collection of club IDs from Firestore
-    QuerySnapshot clubSnapshot = await FirebaseFirestore.instance.collection('clubs').get();
-    List<String> clubIds = clubSnapshot.docs.map((doc) => doc.id).toList();
+    await getMatchDayBannerForLeague(matchDayBannerForLeagueNotifier, widget.clubId);
 
-    // Process each club ID
-    for (String clubId in clubIds) {
-      await getMatchDayBannerForLeague(matchDayBannerForLeagueNotifier, clubId);
-    }
-
-    // Optionally, notify listeners or update UI after fetching
     setState(() {}); // Refresh the UI if needed
   }
 
   Future<void> _fetchMatchDayBannerForLocationNotifier(MatchDayBannerForLocationNotifier matchDayBannerForLocationNotifier) async {
-    // Fetch the collection of club IDs from Firestore
-    QuerySnapshot clubSnapshot = await FirebaseFirestore.instance.collection('clubs').get();
-    List<String> clubIds = clubSnapshot.docs.map((doc) => doc.id).toList();
+    await getMatchDayBannerForLocation(matchDayBannerForLocationNotifier, widget.clubId);
 
-    // Process each club ID
-    for (String clubId in clubIds) {
-      await getMatchDayBannerForLocation(matchDayBannerForLocationNotifier, clubId);
-    }
-
-    // Optionally, notify listeners or update UI after fetching
     setState(() {}); // Refresh the UI if needed
   }
 
   Future<void> _fetchClubSponsorsNotifier(ClubSponsorsNotifier clubSponsorsNotifier) async {
-    // Fetch the collection of club IDs from Firestore
-    QuerySnapshot clubSnapshot = await FirebaseFirestore.instance.collection('clubs').get();
-    List<String> clubIds = clubSnapshot.docs.map((doc) => doc.id).toList();
+    await getClubSponsors(clubSponsorsNotifier, widget.clubId);
 
-    // Process each club ID
-    for (String clubId in clubIds) {
-      await getClubSponsors(clubSponsorsNotifier, clubId);
-    }
-
-    // Optionally, notify listeners or update UI after fetching
     setState(() {}); // Refresh the UI if needed
   }
 

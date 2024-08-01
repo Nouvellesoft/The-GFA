@@ -5,7 +5,8 @@ import 'package:fluttertoast/fluttertoast.dart';
 import '../../../bloc_navigation_bloc/navigation_bloc.dart';
 
 class MyAddNewHomeTeamPage extends StatefulWidget implements NavigationStates {
-  const MyAddNewHomeTeamPage({super.key});
+  final String clubId;
+  const MyAddNewHomeTeamPage({super.key, required this.clubId});
 
   @override
   State<MyAddNewHomeTeamPage> createState() => MyAddNewHomeTeamPageState();
@@ -69,7 +70,7 @@ class MyAddNewHomeTeamPageState extends State<MyAddNewHomeTeamPage> {
 
       try {
         // Update Firestore document with data
-        await FirebaseFirestore.instance.collection('MatchDayBannerForClub').add({
+        await FirebaseFirestore.instance.collection('clubs').doc(widget.clubId).collection('MatchDayBannerForClub').add({
           'id': '10',
           'club_name': homeTeamName,
           'club_icon':

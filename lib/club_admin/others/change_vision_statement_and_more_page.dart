@@ -7,7 +7,8 @@ Color appBarBackgroundColor = const Color.fromRGBO(48, 50, 74, 1.0);
 Color appBarArrowColor = const Color.fromRGBO(187, 192, 195, 1.0);
 
 class MyChangeVisionStatementAndMorePage extends StatefulWidget implements NavigationStates {
-  const MyChangeVisionStatementAndMorePage({super.key});
+  final String clubId;
+  const MyChangeVisionStatementAndMorePage({super.key, required this.clubId});
 
   @override
   State<MyChangeVisionStatementAndMorePage> createState() => MyChangeVisionStatementAndMorePageState();

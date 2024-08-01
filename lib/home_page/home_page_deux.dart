@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
-import '../club_admin/club_admin_page.dart';
 import '../sidebar/sidebar_layout.dart';
 
 class PandCTransitions extends StatelessWidget {
@@ -171,7 +170,7 @@ class PandCTransitions extends StatelessWidget {
                     Navigator.pop(context);
 
                     _showAdminWelcomeToast();
-                    Navigator.push(context, SlideTransition1(const MyClubAdminPage()));
+                    // Navigator.push(context, SlideTransition1(MyClubAdminPage(clubId: widget.clubId)));
                   }
                 } else {
                   // Show a toast for incorrect passcode

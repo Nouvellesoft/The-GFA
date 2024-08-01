@@ -12,7 +12,8 @@ Color backgroundColor = const Color.fromRGBO(187, 192, 195, 1.0);
 late ManagementBodyNotifier managementBodyNotifier;
 
 class MyModifyManagementBodyPage extends StatefulWidget implements NavigationStates {
-  const MyModifyManagementBodyPage({super.key});
+  final String clubId;
+  const MyModifyManagementBodyPage({super.key, required this.clubId});
 
   @override
   State<MyModifyManagementBodyPage> createState() => MyModifyManagementBodyPageState();
@@ -182,16 +183,8 @@ class MyModifyManagementBodyPageState extends State<MyModifyManagementBodyPage> 
   }
 
   Future<void> _fetchManagementBodyAndUpdateNotifier(ManagementBodyNotifier managementBodyNotifier) async {
-    // Fetch the collection of club IDs from Firestore
-    QuerySnapshot clubSnapshot = await FirebaseFirestore.instance.collection('clubs').get();
-    List<String> clubIds = clubSnapshot.docs.map((doc) => doc.id).toList();
+    await getManagementBody(managementBodyNotifier, widget.clubId);
 
-    // Process each club ID
-    for (String clubId in clubIds) {
-      await getManagementBody(managementBodyNotifier, clubId);
-    }
-
-    // Optionally, notify listeners or update UI after fetching
     setState(() {}); // Refresh the UI if needed
   }
 }

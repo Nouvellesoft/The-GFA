@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -103,7 +102,8 @@ Color deepOrangeColor = Colors.deepOrange;
 Color tealColor = Colors.teal;
 
 class MyClubAdminPage extends StatefulWidget implements NavigationStates {
-  const MyClubAdminPage({super.key});
+  final String clubId;
+  const MyClubAdminPage({super.key, required this.clubId});
 
   @override
   State<MyClubAdminPage> createState() => MyClubAdminPageState();
@@ -182,7 +182,7 @@ class MyClubAdminPageState extends State<MyClubAdminPage> {
                                 ),
                                 onTap: () {
                                   Navigator.pop(context); // Close the dialog
-                                  navigateToCreateSMPost(context); // Navigate to the appropriate page
+                                  fetchAndNavigateToCreateSMPost(context); // Navigate to the appropriate page
                                 },
                               ),
                               ListTile(
@@ -192,7 +192,7 @@ class MyClubAdminPageState extends State<MyClubAdminPage> {
                                 ),
                                 onTap: () {
                                   Navigator.pop(context);
-                                  navigateToCreateUpcomingEventSMPost(context);
+                                  fetchAndNavigateToCreateUpcomingEventSMPost(context);
                                 },
                               ),
                               ListTile(
@@ -202,7 +202,7 @@ class MyClubAdminPageState extends State<MyClubAdminPage> {
                                 ),
                                 onTap: () {
                                   Navigator.pop(context);
-                                  navigateToCreateSponsorsShoutOutSMPost(context);
+                                  fetchAndNavigateToCreateSponsorsShoutOutSMPost(context);
                                 },
                               ),
                               ListTile(
@@ -212,7 +212,7 @@ class MyClubAdminPageState extends State<MyClubAdminPage> {
                                 ),
                                 onTap: () {
                                   Navigator.pop(context);
-                                  navigateToCreateNewSponsorsShoutOutSMPost(context);
+                                  fetchAndNavigateToCreateNewSponsorsShoutOutSMPost(context);
                                 },
                               ),
                               ListTile(
@@ -315,7 +315,7 @@ class MyClubAdminPageState extends State<MyClubAdminPage> {
                                   ),
                                   onTap: () {
                                     Navigator.pop(context);
-                                    navigateToModifyClubSponsors(context);
+                                    fetchAndNavigateToModifyClubSponsors(context);
                                   },
                                 ),
                               ],
@@ -370,7 +370,7 @@ class MyClubAdminPageState extends State<MyClubAdminPage> {
                 child: InkWell(
                   splashColor: splashColorThree,
                   onTap: () {
-                    navigateToModifyClubCaptains(context);
+                    fetchAndNavigateToModifyClubCaptains(context);
                   },
                   child: Align(
                     alignment: Alignment.centerLeft,
@@ -417,7 +417,7 @@ class MyClubAdminPageState extends State<MyClubAdminPage> {
                 child: InkWell(
                   splashColor: splashColorThree,
                   onTap: () {
-                    navigateToAddClubMember(context);
+                    fetchAndNavigateToAddClubMember(context);
                   },
                   child: Align(
                     alignment: Alignment.centerLeft,
@@ -483,7 +483,7 @@ class MyClubAdminPageState extends State<MyClubAdminPage> {
                                 ),
                                 onTap: () {
                                   Navigator.pop(context); // Close the dialog
-                                  navigateToModifyAllClubPlayers(context); // Navigate to the appropriate page
+                                  fetchAndNavigateToModifyAllClubPlayers(context); // Navigate to the appropriate page
                                 },
                               ),
                               ListTile(
@@ -493,7 +493,7 @@ class MyClubAdminPageState extends State<MyClubAdminPage> {
                                 ),
                                 onTap: () {
                                   Navigator.pop(context);
-                                  navigateToModifyCoaches(context);
+                                  fetchAndNavigateToModifyCoaches(context);
                                 },
                               ),
                               ListTile(
@@ -503,7 +503,7 @@ class MyClubAdminPageState extends State<MyClubAdminPage> {
                                 ),
                                 onTap: () {
                                   Navigator.pop(context);
-                                  navigateToModifyManagementBody(context);
+                                  fetchAndNavigateToModifyManagementBody(context);
                                 },
                               ),
                             ],
@@ -557,7 +557,7 @@ class MyClubAdminPageState extends State<MyClubAdminPage> {
                 child: InkWell(
                   splashColor: splashColorThree,
                   onTap: () {
-                    navigateToModifyMVP(context);
+                    fetchAndNavigateToModifyMVP(context);
                   },
                   child: Align(
                     alignment: Alignment.centerLeft,
@@ -604,7 +604,7 @@ class MyClubAdminPageState extends State<MyClubAdminPage> {
                 child: InkWell(
                   splashColor: splashColorThree,
                   onTap: () {
-                    navigateToModifyPOTM(context);
+                    fetchAndNavigateToModifyPOTM(context);
                   },
                   child: Align(
                     alignment: Alignment.centerLeft,
@@ -672,7 +672,7 @@ class MyClubAdminPageState extends State<MyClubAdminPage> {
                                   ),
                                   onTap: () {
                                     Navigator.pop(context); // Close the dialog
-                                    navigateToModifyHomeTeam(context);
+                                    fetchAndNavigateToModifyHomeTeam(context);
                                   },
                                 ),
                                 ListTile(
@@ -683,7 +683,7 @@ class MyClubAdminPageState extends State<MyClubAdminPage> {
                                   ),
                                   onTap: () {
                                     Navigator.pop(context); // Close the dialog
-                                    navigateToModifyOppTeam(context);
+                                    fetchAndNavigateToModifyOppTeam(context);
                                   },
                                 ),
                                 ListTile(
@@ -694,7 +694,7 @@ class MyClubAdminPageState extends State<MyClubAdminPage> {
                                   ),
                                   onTap: () {
                                     Navigator.pop(context); // Close the dialog
-                                    navigateToModifyLeague(context);
+                                    fetchAndNavigateToModifyLeague(context);
                                   },
                                 ),
                                 ListTile(
@@ -705,7 +705,7 @@ class MyClubAdminPageState extends State<MyClubAdminPage> {
                                   ),
                                   onTap: () {
                                     Navigator.pop(context); // Close the dialog
-                                    navigateToModifyLocation(context);
+                                    fetchAndNavigateToModifyLocation(context);
                                   },
                                 ),
                               ],
@@ -794,7 +794,7 @@ class MyClubAdminPageState extends State<MyClubAdminPage> {
                                       ),
                                       onTap: () {
                                         Navigator.pop(context); // Close the dialog
-                                        navigateToViewClubPopulation(context);
+                                        fetchAndNavigateToViewClubPopulation(context);
                                       },
                                     ),
                                     ListTile(
@@ -804,7 +804,7 @@ class MyClubAdminPageState extends State<MyClubAdminPage> {
                                       ),
                                       onTap: () {
                                         Navigator.pop(context); // Close the dialog
-                                        navigateToModifyYellowCard(context);
+                                        fetchAndNavigateToModifyYellowCard(context);
                                       },
                                     ),
                                     ListTile(
@@ -814,7 +814,7 @@ class MyClubAdminPageState extends State<MyClubAdminPage> {
                                       ),
                                       onTap: () {
                                         Navigator.pop(context); // Close the dialog
-                                        navigateToModifyRedCard(context);
+                                        fetchAndNavigateToModifyRedCard(context);
                                       },
                                     ),
                                     ListTile(
@@ -824,7 +824,7 @@ class MyClubAdminPageState extends State<MyClubAdminPage> {
                                       ),
                                       onTap: () {
                                         Navigator.pop(context); // Close the dialog
-                                        navigateToRecordClubAchievement(context);
+                                        fetchAndNavigateToRecordClubAchievement(context);
                                       },
                                     ),
                                     ListTile(
@@ -834,7 +834,7 @@ class MyClubAdminPageState extends State<MyClubAdminPage> {
                                       ),
                                       onTap: () {
                                         Navigator.pop(context); // Close the dialog
-                                        navigateToAddMonthlyPhotos(context);
+                                        fetchAndNavigateToAddMonthlyPhotos(context);
                                       },
                                     ),
                                     ListTile(
@@ -844,7 +844,7 @@ class MyClubAdminPageState extends State<MyClubAdminPage> {
                                       ),
                                       onTap: () {
                                         Navigator.pop(context); // Close the dialog
-                                        navigateToChangePagesCoverPhoto(context);
+                                        fetchAndNavigateToChangePagesCoverPhoto(context);
                                       },
                                     ),
                                     // ListTile(
@@ -994,170 +994,188 @@ class MyClubAdminPageState extends State<MyClubAdminPage> {
   }
 
   Future<void> _fetchMatchDayBannerForClubNotifier(MatchDayBannerForClubNotifier matchDayBannerForClubNotifier) async {
-    // Fetch the collection of club IDs from Firestore
-    QuerySnapshot clubSnapshot = await FirebaseFirestore.instance.collection('clubs').get();
-    List<String> clubIds = clubSnapshot.docs.map((doc) => doc.id).toList();
+    await getMatchDayBannerForClub(matchDayBannerForClubNotifier, widget.clubId);
 
-    // Process each club ID
-    for (String clubId in clubIds) {
-      await getMatchDayBannerForClub(matchDayBannerForClubNotifier, clubId);
-    }
-
-    // Optionally, notify listeners or update UI after fetching
     setState(() {}); // Refresh the UI if needed
   }
 
   Future<void> _fetchMatchDayBannerForClubOppNotifier(MatchDayBannerForClubOppNotifier matchDayBannerForClubOppNotifier) async {
-    // Fetch the collection of club IDs from Firestore
-    QuerySnapshot clubSnapshot = await FirebaseFirestore.instance.collection('clubs').get();
-    List<String> clubIds = clubSnapshot.docs.map((doc) => doc.id).toList();
+    await getMatchDayBannerForClubOpp(matchDayBannerForClubOppNotifier, widget.clubId);
 
-    // Process each club ID
-    for (String clubId in clubIds) {
-      await getMatchDayBannerForClubOpp(matchDayBannerForClubOppNotifier, clubId);
-    }
-
-    // Optionally, notify listeners or update UI after fetching
     setState(() {}); // Refresh the UI if needed
   }
 
   Future<void> _fetchMatchDayBannerForLeagueNotifier(MatchDayBannerForLeagueNotifier matchDayBannerForLeagueNotifier) async {
-    // Fetch the collection of club IDs from Firestore
-    QuerySnapshot clubSnapshot = await FirebaseFirestore.instance.collection('clubs').get();
-    List<String> clubIds = clubSnapshot.docs.map((doc) => doc.id).toList();
+    await getMatchDayBannerForLeague(matchDayBannerForLeagueNotifier, widget.clubId);
 
-    // Process each club ID
-    for (String clubId in clubIds) {
-      await getMatchDayBannerForLeague(matchDayBannerForLeagueNotifier, clubId);
-    }
-
-    // Optionally, notify listeners or update UI after fetching
     setState(() {}); // Refresh the UI if needed
   }
 
   Future<void> _fetchMatchDayBannerForLocationNotifier(MatchDayBannerForLocationNotifier matchDayBannerForLocationNotifier) async {
-    // Fetch the collection of club IDs from Firestore
-    QuerySnapshot clubSnapshot = await FirebaseFirestore.instance.collection('clubs').get();
-    List<String> clubIds = clubSnapshot.docs.map((doc) => doc.id).toList();
+    await getMatchDayBannerForLocation(matchDayBannerForLocationNotifier, widget.clubId);
 
-    // Process each club ID
-    for (String clubId in clubIds) {
-      await getMatchDayBannerForLocation(matchDayBannerForLocationNotifier, clubId);
-    }
-
-    // Optionally, notify listeners or update UI after fetching
     setState(() {}); // Refresh the UI if needed
   }
 
   Future<void> _fetchFirstTeamClassAndUpdateNotifier(FirstTeamClassNotifier firstTeamNotifier) async {
-    // Fetch the collection of club IDs from Firestore
-    QuerySnapshot clubSnapshot = await FirebaseFirestore.instance.collection('clubs').get();
-    List<String> clubIds = clubSnapshot.docs.map((doc) => doc.id).toList();
+    await getFirstTeamClass(firstTeamNotifier, widget.clubId);
 
-    // Process each club ID
-    for (String clubId in clubIds) {
-      await getFirstTeamClass(firstTeamNotifier, clubId);
-    }
-
-    // Optionally, notify listeners or update UI after fetching
     setState(() {}); // Refresh the UI if needed
   }
 
   Future<void> _fetchSecondTeamClassAndUpdateNotifier(SecondTeamClassNotifier secondTeamNotifier) async {
-    // Fetch the collection of club IDs from Firestore
-    QuerySnapshot clubSnapshot = await FirebaseFirestore.instance.collection('clubs').get();
-    List<String> clubIds = clubSnapshot.docs.map((doc) => doc.id).toList();
+    await getSecondTeamClass(secondTeamNotifier, widget.clubId);
 
-    // Process each club ID
-    for (String clubId in clubIds) {
-      await getSecondTeamClass(secondTeamNotifier, clubId);
-    }
-
-    // Optionally, notify listeners or update UI after fetching
     setState(() {}); // Refresh the UI if needed
   }
 
   Future<void> _fetchCaptainsAndUpdateNotifier(CaptainsNotifier captainsNotifier) async {
-    // Fetch the collection of club IDs from Firestore
-    QuerySnapshot clubSnapshot = await FirebaseFirestore.instance.collection('clubs').get();
-    List<String> clubIds = clubSnapshot.docs.map((doc) => doc.id).toList();
+    await getCaptains(captainsNotifier, widget.clubId);
 
-    // Process each club ID
-    for (String clubId in clubIds) {
-      await getCaptains(captainsNotifier, clubId);
-    }
-
-    // Optionally, notify listeners or update UI after fetching
     setState(() {}); // Refresh the UI if needed
   }
 
   Future<void> _fetchCoachesAndUpdateNotifier(CoachesNotifier coachesNotifier) async {
-    // Fetch the collection of club IDs from Firestore
-    QuerySnapshot clubSnapshot = await FirebaseFirestore.instance.collection('clubs').get();
-    List<String> clubIds = clubSnapshot.docs.map((doc) => doc.id).toList();
+    await getCoaches(coachesNotifier, widget.clubId);
 
-    // Process each club ID
-    for (String clubId in clubIds) {
-      await getCoaches(coachesNotifier, clubId);
-    }
-
-    // Optionally, notify listeners or update UI after fetching
     setState(() {}); // Refresh the UI if needed
   }
 
   Future<void> _fetchManagementBodyAndUpdateNotifier(ManagementBodyNotifier managementBodyNotifier) async {
-    // Fetch the collection of club IDs from Firestore
-    QuerySnapshot clubSnapshot = await FirebaseFirestore.instance.collection('clubs').get();
-    List<String> clubIds = clubSnapshot.docs.map((doc) => doc.id).toList();
+    await getManagementBody(managementBodyNotifier, widget.clubId);
 
-    // Process each club ID
-    for (String clubId in clubIds) {
-      await getManagementBody(managementBodyNotifier, clubId);
-    }
-
-    // Optionally, notify listeners or update UI after fetching
     setState(() {}); // Refresh the UI if needed
   }
 
   Future<void> _fetchClubSponsorsAndUpdateNotifier(ClubSponsorsNotifier notifier) async {
-    // Fetch the collection of club IDs from Firestore
-    QuerySnapshot clubSnapshot = await FirebaseFirestore.instance.collection('clubs').get();
-    List<String> clubIds = clubSnapshot.docs.map((doc) => doc.id).toList();
+    await getClubSponsors(notifier, widget.clubId);
 
-    // Process each club ID
-    for (String clubId in clubIds) {
-      await getClubSponsors(notifier, clubId);
-    }
-
-    // Optionally, notify listeners or update UI after fetching
     setState(() {});
   }
 
   Future<void> fetchClubSponsorsAndNavigate(BuildContext context) async {
-    try {
-      // Fetch the clubs from Firestore
-      QuerySnapshot snapshot = await FirebaseFirestore.instance.collection('clubs').get();
+    navigateToClubSponsors(context, widget.clubId);
+    setState(() {});
+  }
 
-      if (snapshot.docs.isNotEmpty) {
-        // Get the first document's ID for this example
-        String clubId = snapshot.docs.first.id;
+  Future<void> fetchAndNavigateToCreateSMPost(BuildContext context) async {
+    navigateToCreateSMPost(context, widget.clubId);
+    setState(() {});
+  }
 
-        // Call the navigate function with the fetched clubId
-        if (context.mounted) {
-          navigateToClubSponsors(context, clubId);
-        }
-      } else {
-        // Handle case where no documents are found
-        if (kDebugMode) {
-          print('No clubs found');
-        }
-      }
-    } catch (e) {
-      // Handle any errors that occur during the fetch
-      if (kDebugMode) {
-        print('Error fetching clubId: $e');
-      }
-    }
+  Future<void> fetchAndNavigateToCreateUpcomingEventSMPost(BuildContext context) async {
+    navigateToCreateUpcomingEventSMPost(context, widget.clubId);
+    setState(() {});
+  }
+
+  Future<void> fetchAndNavigateToCreateAnnouncementSMPost(BuildContext context) async {
+    navigateToCreateAnnouncementSMPost(context, widget.clubId);
+    setState(() {});
+  }
+
+  Future<void> fetchAndNavigateToCreateSponsorsShoutOutSMPost(BuildContext context) async {
+    navigateToCreateSponsorsShoutOutSMPost(context, widget.clubId);
+    setState(() {});
+  }
+
+  Future<void> fetchAndNavigateToCreateNewSponsorsShoutOutSMPost(BuildContext context) async {
+    navigateToCreateNewSponsorsShoutOutSMPost(context, widget.clubId);
+    setState(() {});
+  }
+
+  Future<void> fetchAndNavigateToModifyClubSponsors(BuildContext context) async {
+    navigateToModifyClubSponsors(context, widget.clubId);
+    setState(() {});
+  }
+
+  Future<void> fetchAndNavigateToModifyClubCaptains(BuildContext context) async {
+    navigateToModifyClubCaptains(context, widget.clubId);
+    setState(() {});
+  }
+
+  Future<void> fetchAndNavigateToModifyCoaches(BuildContext context) async {
+    navigateToModifyCoaches(context, widget.clubId);
+    setState(() {});
+  }
+
+  Future<void> fetchAndNavigateToModifyManagementBody(BuildContext context) async {
+    navigateToModifyManagementBody(context, widget.clubId);
+    setState(() {});
+  }
+
+  Future<void> fetchAndNavigateToModifyAllClubPlayers(BuildContext context) async {
+    navigateToModifyAllClubPlayers(context, widget.clubId);
+    setState(() {});
+  }
+
+  Future<void> fetchAndNavigateToAddClubMember(BuildContext context) async {
+    navigateToAddClubMember(context, widget.clubId);
+    setState(() {});
+  }
+
+  Future<void> fetchAndNavigateToModifyHomeTeam(BuildContext context) async {
+    navigateToModifyHomeTeam(context, widget.clubId);
+    setState(() {});
+  }
+
+  Future<void> fetchAndNavigateToModifyOppTeam(BuildContext context) async {
+    navigateToModifyOppTeam(context, widget.clubId);
+    setState(() {});
+  }
+
+  Future<void> fetchAndNavigateToModifyLeague(BuildContext context) async {
+    navigateToModifyLeague(context, widget.clubId);
+    setState(() {});
+  }
+
+  Future<void> fetchAndNavigateToModifyLocation(BuildContext context) async {
+    navigateToModifyLocation(context, widget.clubId);
+    setState(() {});
+  }
+
+  Future<void> fetchAndNavigateToModifyMVP(BuildContext context) async {
+    navigateToModifyMVP(context, widget.clubId);
+    setState(() {});
+  }
+
+  Future<void> fetchAndNavigateToModifyPOTM(BuildContext context) async {
+    navigateToModifyPOTM(context, widget.clubId);
+    setState(() {});
+  }
+
+  Future<void> fetchAndNavigateToModifyYellowCard(BuildContext context) async {
+    navigateToModifyYellowCard(context, widget.clubId);
+    setState(() {});
+  }
+
+  Future<void> fetchAndNavigateToModifyRedCard(BuildContext context) async {
+    navigateToModifyRedCard(context, widget.clubId);
+    setState(() {});
+  }
+
+  Future<void> fetchAndNavigateToAddMonthlyPhotos(BuildContext context) async {
+    navigateToAddMonthlyPhotos(context, widget.clubId);
+    setState(() {});
+  }
+
+  Future<void> fetchAndNavigateToChangePagesCoverPhoto(BuildContext context) async {
+    navigateToChangePagesCoverPhoto(context, widget.clubId);
+    setState(() {});
+  }
+
+  Future<void> fetchAndNavigateToChangeVisionStatementAndMore(BuildContext context) async {
+    navigateToChangeVisionStatementAndMore(context, widget.clubId);
+    setState(() {});
+  }
+
+  Future<void> fetchAndNavigateToRecordClubAchievement(BuildContext context) async {
+    navigateToRecordClubAchievement(context, widget.clubId);
+    setState(() {});
+  }
+
+  Future<void> fetchAndNavigateToViewClubPopulation(BuildContext context) async {
+    navigateToViewClubPopulation(context, widget.clubId);
+    setState(() {});
   }
 }
 
@@ -1210,27 +1228,27 @@ void showConfirmationDialog(BuildContext context) {
   );
 }
 
-Future navigateToCreateSMPost(context) async {
-  Navigator.push(context, MaterialPageRoute(builder: (context) => const CreateMatchDaySocialMediaPost()));
+Future navigateToCreateSMPost(BuildContext context, String clubId) async {
+  Navigator.push(context, MaterialPageRoute(builder: (context) => CreateMatchDaySocialMediaPost(clubId: clubId)));
 }
 
-Future navigateToCreateUpcomingEventSMPost(context) async {
-  Navigator.push(context, MaterialPageRoute(builder: (context) => const CreateUpcomingEventSMPost()));
+Future navigateToCreateUpcomingEventSMPost(BuildContext context, String clubId) async {
+  Navigator.push(context, MaterialPageRoute(builder: (context) => CreateUpcomingEventSMPost(clubId: clubId)));
 }
 
-Future navigateToCreateAnnouncementSMPost(context) async {
-  Navigator.push(context, MaterialPageRoute(builder: (context) => const CreateAnnouncementSMPost()));
+Future navigateToCreateAnnouncementSMPost(BuildContext context, String clubId) async {
+  Navigator.push(context, MaterialPageRoute(builder: (context) => CreateAnnouncementSMPost(clubId: clubId)));
 }
 
-Future navigateToCreateSponsorsShoutOutSMPost(context) async {
-  Navigator.push(context, MaterialPageRoute(builder: (context) => const CreateSponsorsShoutOutSMPost()));
+Future navigateToCreateSponsorsShoutOutSMPost(BuildContext context, String clubId) async {
+  Navigator.push(context, MaterialPageRoute(builder: (context) => CreateSponsorsShoutOutSMPost(clubId: clubId)));
 }
 
-Future navigateToCreateNewSponsorsShoutOutSMPost(context) async {
-  Navigator.push(context, MaterialPageRoute(builder: (context) => const CreateNewSponsorsShoutOutSMPost()));
+Future navigateToCreateNewSponsorsShoutOutSMPost(BuildContext context, String clubId) async {
+  Navigator.push(context, MaterialPageRoute(builder: (context) => CreateNewSponsorsShoutOutSMPost(clubId: clubId)));
 }
 
-Future navigateToClubSponsors(context, String clubId) async {
+Future navigateToClubSponsors(BuildContext context, String clubId) async {
   Navigator.push(
     context,
     MaterialPageRoute(
@@ -1239,80 +1257,80 @@ Future navigateToClubSponsors(context, String clubId) async {
   );
 }
 
-Future navigateToModifyClubSponsors(context) async {
-  Navigator.push(context, MaterialPageRoute(builder: (context) => const TabviewClubSponsorsPage()));
+Future navigateToModifyClubSponsors(BuildContext context, String clubId) async {
+  Navigator.push(context, MaterialPageRoute(builder: (context) => TabviewClubSponsorsPage(clubId: clubId)));
 }
 
-Future navigateToModifyClubCaptains(context) async {
-  Navigator.push(context, MaterialPageRoute(builder: (context) => const TabviewCaptainsPage()));
+Future navigateToModifyClubCaptains(BuildContext context, String clubId) async {
+  Navigator.push(context, MaterialPageRoute(builder: (context) => TabviewCaptainsPage(clubId: clubId)));
 }
 
-Future navigateToModifyCoaches(context) async {
-  Navigator.push(context, MaterialPageRoute(builder: (context) => const MyModifyCoachesPage()));
+Future navigateToModifyCoaches(BuildContext context, String clubId) async {
+  Navigator.push(context, MaterialPageRoute(builder: (context) => MyModifyCoachesPage(clubId: clubId)));
 }
 
-Future navigateToModifyManagementBody(context) async {
-  Navigator.push(context, MaterialPageRoute(builder: (context) => const MyModifyManagementBodyPage()));
+Future navigateToModifyManagementBody(BuildContext context, String clubId) async {
+  Navigator.push(context, MaterialPageRoute(builder: (context) => MyModifyManagementBodyPage(clubId: clubId)));
 }
 
-Future navigateToModifyAllClubPlayers(context) async {
-  Navigator.push(context, MaterialPageRoute(builder: (context) => const MyModifyClubPlayersPage()));
+Future navigateToModifyAllClubPlayers(BuildContext context, String clubId) async {
+  Navigator.push(context, MaterialPageRoute(builder: (context) => MyModifyClubPlayersPage(clubId: clubId)));
 }
 
-Future navigateToAddClubMember(context) async {
-  Navigator.push(context, MaterialPageRoute(builder: (context) => const TabviewClubMemberPage()));
+Future navigateToAddClubMember(BuildContext context, String clubId) async {
+  Navigator.push(context, MaterialPageRoute(builder: (context) => TabviewClubMemberPage(clubId: clubId)));
 }
 
-Future navigateToModifyHomeTeam(context) async {
-  Navigator.push(context, MaterialPageRoute(builder: (context) => const TabviewHomeTeamPage()));
+Future navigateToModifyHomeTeam(BuildContext context, String clubId) async {
+  Navigator.push(context, MaterialPageRoute(builder: (context) => TabviewHomeTeamPage(clubId: clubId)));
 }
 
-Future navigateToModifyOppTeam(context) async {
-  Navigator.push(context, MaterialPageRoute(builder: (context) => const TabviewOppTeamPage()));
+Future navigateToModifyOppTeam(BuildContext context, String clubId) async {
+  Navigator.push(context, MaterialPageRoute(builder: (context) => TabviewOppTeamPage(clubId: clubId)));
 }
 
-Future navigateToModifyLeague(context) async {
-  Navigator.push(context, MaterialPageRoute(builder: (context) => const TabviewLeaguePage()));
+Future navigateToModifyLeague(BuildContext context, String clubId) async {
+  Navigator.push(context, MaterialPageRoute(builder: (context) => TabviewLeaguePage(clubId: clubId)));
 }
 
-Future navigateToModifyLocation(context) async {
-  Navigator.push(context, MaterialPageRoute(builder: (context) => const TabviewLocationPage()));
+Future navigateToModifyLocation(BuildContext context, String clubId) async {
+  Navigator.push(context, MaterialPageRoute(builder: (context) => TabviewLocationPage(clubId: clubId)));
 }
 
-Future navigateToModifyMVP(context) async {
-  Navigator.push(context, MaterialPageRoute(builder: (context) => const TabviewMVPPage()));
+Future navigateToModifyMVP(BuildContext context, String clubId) async {
+  Navigator.push(context, MaterialPageRoute(builder: (context) => TabviewMVPPage(clubId: clubId)));
 }
 
-Future navigateToModifyPOTM(context) async {
-  Navigator.push(context, MaterialPageRoute(builder: (context) => const TabviewMOTMPage()));
+Future navigateToModifyPOTM(BuildContext context, String clubId) async {
+  Navigator.push(context, MaterialPageRoute(builder: (context) => TabviewMOTMPage(clubId: clubId)));
 }
 
-Future navigateToModifyYellowCard(context) async {
-  Navigator.push(context, MaterialPageRoute(builder: (context) => const TabviewYellowCardPage()));
+Future navigateToModifyYellowCard(BuildContext context, String clubId) async {
+  Navigator.push(context, MaterialPageRoute(builder: (context) => TabviewYellowCardPage(clubId: clubId)));
 }
 
-Future navigateToModifyRedCard(context) async {
-  Navigator.push(context, MaterialPageRoute(builder: (context) => const TabviewRedCardPage()));
+Future navigateToModifyRedCard(BuildContext context, String clubId) async {
+  Navigator.push(context, MaterialPageRoute(builder: (context) => TabviewRedCardPage(clubId: clubId)));
 }
 
-Future navigateToAddMonthlyPhotos(context) async {
-  Navigator.push(context, MaterialPageRoute(builder: (context) => const MyAddMonthlyPhotosPage()));
+Future navigateToAddMonthlyPhotos(BuildContext context, String clubId) async {
+  Navigator.push(context, MaterialPageRoute(builder: (context) => MyAddMonthlyPhotosPage(clubId: clubId)));
 }
 
-Future navigateToChangePagesCoverPhoto(context) async {
-  Navigator.push(context, MaterialPageRoute(builder: (context) => const MyChangePagesCoverPhotoPage()));
+Future navigateToChangePagesCoverPhoto(BuildContext context, String clubId) async {
+  Navigator.push(context, MaterialPageRoute(builder: (context) => MyChangePagesCoverPhotoPage(clubId: clubId)));
 }
 
-Future navigateToChangeVisionStatementAndMore(context) async {
-  Navigator.push(context, MaterialPageRoute(builder: (context) => const MyChangeVisionStatementAndMorePage()));
+Future navigateToChangeVisionStatementAndMore(BuildContext context, String clubId) async {
+  Navigator.push(context, MaterialPageRoute(builder: (context) => MyChangeVisionStatementAndMorePage(clubId: clubId)));
 }
 
-Future navigateToRecordClubAchievement(context) async {
-  Navigator.push(context, MaterialPageRoute(builder: (context) => const MyRecordClubAchievementPage()));
+Future navigateToRecordClubAchievement(BuildContext context, String clubId) async {
+  Navigator.push(context, MaterialPageRoute(builder: (context) => MyRecordClubAchievementPage(clubId: clubId)));
 }
 
-Future navigateToViewClubPopulation(context) async {
-  Navigator.push(context, MaterialPageRoute(builder: (context) => const MyViewClubPopulationPage()));
+Future navigateToViewClubPopulation(BuildContext context, String clubId) async {
+  Navigator.push(context, MaterialPageRoute(builder: (context) => MyViewClubPopulationPage(clubId: clubId)));
 }
 
 Future navigateMyApp(context) async {

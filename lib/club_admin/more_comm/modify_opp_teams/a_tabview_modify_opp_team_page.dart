@@ -27,7 +27,8 @@ Color phoneColor = const Color.fromRGBO(20, 134, 46, 1.0);
 Color backgroundColor = const Color.fromRGBO(147, 165, 193, 1.0);
 
 class TabviewOppTeamPage extends StatefulWidget implements NavigationStates {
-  const TabviewOppTeamPage({super.key});
+  final String clubId;
+  const TabviewOppTeamPage({super.key, required this.clubId});
 
   @override
   State<TabviewOppTeamPage> createState() => _TabviewOppTeamPageState();
@@ -79,9 +80,9 @@ class _TabviewOppTeamPageState extends State<TabviewOppTeamPage> with SingleTick
       ),
       body: TabBarView(
         controller: _tabController,
-        children: const [
-          MyAddNewOppTeamPage(),
-          MyRemoveNewOppTeamPage(),
+        children: [
+          MyAddNewOppTeamPage(clubId: widget.clubId),
+          MyRemoveNewOppTeamPage(clubId: widget.clubId),
         ],
       ),
     );

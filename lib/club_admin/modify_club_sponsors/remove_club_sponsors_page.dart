@@ -13,7 +13,8 @@ Color appBackgroundColor = const Color.fromRGBO(147, 165, 193, 1.0);
 late ClubSponsorsNotifier clubSponsorsNotifier;
 
 class MyRemoveClubSponsorPage extends StatefulWidget implements NavigationStates {
-  const MyRemoveClubSponsorPage({super.key});
+  final String clubId;
+  const MyRemoveClubSponsorPage({super.key, required this.clubId});
 
   @override
   State<MyRemoveClubSponsorPage> createState() => MyRemoveClubSponsorPageState();
@@ -159,7 +160,13 @@ class MyRemoveClubSponsorPageState extends State<MyRemoveClubSponsorPage> {
       final clubSponsorsName = clubSponsor.name; // Get the name of the clubSponsor
       if (clubSponsorsName != null) {
         // Delete management with matching names
-        await firestore.collection('ClubSponsors').where('name', isEqualTo: clubSponsorsName).get().then((querySnapshot) {
+        await firestore
+            .collection('clubs')
+            .doc(widget.clubId)
+            .collection('ClubSponsors')
+            .where('name', isEqualTo: clubSponsorsName)
+            .get()
+            .then((querySnapshot) {
           for (var doc in querySnapshot.docs) {
             doc.reference.delete();
           }
@@ -183,16 +190,8 @@ class MyRemoveClubSponsorPageState extends State<MyRemoveClubSponsorPage> {
   }
 
   Future<void> _fetchClubSponsorsAndUpdateNotifier(ClubSponsorsNotifier notifier) async {
-    // Fetch the collection of club IDs from Firestore
-    QuerySnapshot clubSnapshot = await FirebaseFirestore.instance.collection('clubs').get();
-    List<String> clubIds = clubSnapshot.docs.map((doc) => doc.id).toList();
+    await getClubSponsors(notifier, widget.clubId);
 
-    // Process each club ID
-    for (String clubId in clubIds) {
-      await getClubSponsors(notifier, clubId);
-    }
-
-    // Optionally, notify listeners or update UI after fetching
     setState(() {});
   }
 }

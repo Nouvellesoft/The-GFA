@@ -6,7 +6,8 @@ import '/bloc_navigation_bloc/navigation_bloc.dart';
 Color backgroundColor = const Color.fromRGBO(237, 241, 241, 1.0);
 
 class MyAddClubMemberPage extends StatefulWidget implements NavigationStates {
-  const MyAddClubMemberPage({super.key});
+  final String clubId;
+  const MyAddClubMemberPage({super.key, required this.clubId});
 
   @override
   State<MyAddClubMemberPage> createState() => MyAddClubMemberPageState();
@@ -29,7 +30,7 @@ class MyAddClubMemberPageState extends State<MyAddClubMemberPage> {
 
   // Function to check if a member with the same name exists
   Future<bool> doesNameExist(String fullName, String collectionName) async {
-    final querySnapshot = await firestore.collection(collectionName).where('name', isEqualTo: fullName).get();
+    final querySnapshot = await firestore.collection('clubs').doc(widget.clubId).collection(collectionName).where('name', isEqualTo: fullName).get();
     return querySnapshot.docs.isNotEmpty;
   }
 
@@ -202,7 +203,7 @@ class MyAddClubMemberPageState extends State<MyAddClubMemberPage> {
             );
           } else {
             // Add the new member if the name doesn't exist
-            await firestore.collection(collectionName).add(data);
+            await firestore.collection('clubs').doc(widget.clubId).collection(collectionName).add(data);
 
             if (!mounted) return;
             ScaffoldMessenger.of(context).showSnackBar(
@@ -236,7 +237,7 @@ class MyAddClubMemberPageState extends State<MyAddClubMemberPage> {
   }
 
   Future<void> addDataToCollection(FirebaseFirestore firestore, String collectionName, Map<String, dynamic> data) async {
-    await firestore.collection(collectionName).add(data);
+    await firestore.collection('clubs').doc(widget.clubId).collection(collectionName).add(data);
   }
 
   @override

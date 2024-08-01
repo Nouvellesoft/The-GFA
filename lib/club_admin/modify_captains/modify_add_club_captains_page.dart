@@ -28,7 +28,8 @@ Color backgroundColor = const Color.fromRGBO(20, 36, 62, 1.0);
 PlayersNotifier? playersNotifier;
 
 class MyModifyAddClubCaptainsPage extends StatefulWidget implements NavigationStates {
-  const MyModifyAddClubCaptainsPage({super.key});
+  final String clubId;
+  const MyModifyAddClubCaptainsPage({super.key, required this.clubId});
 
   @override
   State<MyModifyAddClubCaptainsPage> createState() => MyModifyAddClubCaptainsPageState();
@@ -103,7 +104,7 @@ class MyModifyAddClubCaptainsPageState extends State<MyModifyAddClubCaptainsPage
             await refreshData();
           },
           child: StreamBuilder<QuerySnapshot>(
-            stream: FirebaseFirestore.instance.collection('Captains').snapshots(),
+            stream: FirebaseFirestore.instance.collection('clubs').doc(widget.clubId).collection('Captains').snapshots(),
             builder: (context, snapshot) {
               if (!snapshot.hasData) {
                 return const Center(
@@ -373,30 +374,16 @@ class MyModifyAddClubCaptainsPageState extends State<MyModifyAddClubCaptainsPage
   }
 
   Future<void> _fetchFirstTeamClassAndUpdateNotifier(FirstTeamClassNotifier firstTeamNotifier) async {
-    // Fetch the collection of club IDs from Firestore
-    QuerySnapshot clubSnapshot = await FirebaseFirestore.instance.collection('clubs').get();
-    List<String> clubIds = clubSnapshot.docs.map((doc) => doc.id).toList();
 
-    // Process each club ID
-    for (String clubId in clubIds) {
-      await getFirstTeamClass(firstTeamNotifier, clubId);
-    }
+      await getFirstTeamClass(firstTeamNotifier, widget.clubId);
 
-    // Optionally, notify listeners or update UI after fetching
     setState(() {}); // Refresh the UI if needed
   }
 
   Future<void> _fetchSecondTeamClassAndUpdateNotifier(SecondTeamClassNotifier secondTeamNotifier) async {
-    // Fetch the collection of club IDs from Firestore
-    QuerySnapshot clubSnapshot = await FirebaseFirestore.instance.collection('clubs').get();
-    List<String> clubIds = clubSnapshot.docs.map((doc) => doc.id).toList();
 
-    // Process each club ID
-    for (String clubId in clubIds) {
-      await getSecondTeamClass(secondTeamNotifier, clubId);
-    }
+      await getSecondTeamClass(secondTeamNotifier, widget.clubId);
 
-    // Optionally, notify listeners or update UI after fetching
     setState(() {}); // Refresh the UI if needed
   }
 
@@ -407,7 +394,7 @@ class MyModifyAddClubCaptainsPageState extends State<MyModifyAddClubCaptainsPage
     Map<String, String> existingCaptains = {};
 
     // Fetch existing captains data from Firestore
-    final captainsCollection = await firestore.collection('Captains').get();
+    final captainsCollection = await firestore.collection('clubs').doc(widget.clubId).collection('Captains').get();
     for (final doc in captainsCollection.docs) {
       final playerName = doc['name'] as String?;
       final teamCaptaining = doc['team_captaining'] as String?;
@@ -509,7 +496,7 @@ class MyModifyAddClubCaptainsPageState extends State<MyModifyAddClubCaptainsPage
       final imageTwoUrl = player.imageTwo ?? ''; // Get the imageTwo URL
 
       // Add player as captain to the 'Captains' collection with the image URLs
-      await firestore.collection('Captains').add({
+      await firestore.collection('clubs').doc(widget.clubId).collection('Captains').add({
         'name': playerName,
         'team_captaining': selectedTeam.isNotEmpty ? selectedTeam : 'YourTeamHere',
         'image': imageUrl, // Use the retrieved image URL
@@ -527,7 +514,7 @@ class MyModifyAddClubCaptainsPageState extends State<MyModifyAddClubCaptainsPage
 
     // Fetch the existing captain document ID
     final querySnapshot =
-        await firestore.collection('Captains').where('team_captaining', isEqualTo: selectedTeam.isNotEmpty ? selectedTeam : 'YourTeamHere').get();
+        await firestore.collection('clubs').doc(widget.clubId).collection('Captains').where('team_captaining', isEqualTo: selectedTeam.isNotEmpty ? selectedTeam : 'YourTeamHere').get();
 
     for (final doc in querySnapshot.docs) {
       // Delete the existing captain document

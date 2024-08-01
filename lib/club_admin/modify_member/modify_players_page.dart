@@ -14,7 +14,8 @@ PlayersNotifier? playersNotifier;
 Color backgroundColor = const Color.fromRGBO(187, 192, 195, 1.0);
 
 class MyModifyClubPlayersPage extends StatefulWidget implements NavigationStates {
-  const MyModifyClubPlayersPage({super.key});
+  final String clubId;
+  const MyModifyClubPlayersPage({super.key, required this.clubId});
 
   @override
   State<MyModifyClubPlayersPage> createState() => MyModifyClubPlayersPageState();
@@ -175,30 +176,14 @@ class MyModifyClubPlayersPageState extends State<MyModifyClubPlayersPage> {
   }
 
   Future<void> _fetchFirstTeamClassAndUpdateNotifier(FirstTeamClassNotifier firstTeamNotifier) async {
-    // Fetch the collection of club IDs from Firestore
-    QuerySnapshot clubSnapshot = await FirebaseFirestore.instance.collection('clubs').get();
-    List<String> clubIds = clubSnapshot.docs.map((doc) => doc.id).toList();
+    await getFirstTeamClass(firstTeamNotifier, widget.clubId);
 
-    // Process each club ID
-    for (String clubId in clubIds) {
-      await getFirstTeamClass(firstTeamNotifier, clubId);
-    }
-
-    // Optionally, notify listeners or update UI after fetching
     setState(() {}); // Refresh the UI if needed
   }
 
   Future<void> _fetchSecondTeamClassAndUpdateNotifier(SecondTeamClassNotifier secondTeamNotifier) async {
-    // Fetch the collection of club IDs from Firestore
-    QuerySnapshot clubSnapshot = await FirebaseFirestore.instance.collection('clubs').get();
-    List<String> clubIds = clubSnapshot.docs.map((doc) => doc.id).toList();
+    await getSecondTeamClass(secondTeamNotifier, widget.clubId);
 
-    // Process each club ID
-    for (String clubId in clubIds) {
-      await getSecondTeamClass(secondTeamNotifier, clubId);
-    }
-
-    // Optionally, notify listeners or update UI after fetching
     setState(() {}); // Refresh the UI if needed
   }
 
@@ -223,7 +208,7 @@ class MyModifyClubPlayersPageState extends State<MyModifyClubPlayersPage> {
   }
 
   Future<void> deletePlayerByName(FirebaseFirestore firestore, String collection, String name) async {
-    final querySnapshot = await firestore.collection(collection).where('name', isEqualTo: name).get();
+    final querySnapshot = await firestore.collection('clubs').doc(widget.clubId).collection(collection).where('name', isEqualTo: name).get();
 
     for (final document in querySnapshot.docs) {
       await document.reference.delete();

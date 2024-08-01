@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import '../../bloc_navigation_bloc/navigation_bloc.dart';
 
 class CreateAnnouncementSMPost extends StatefulWidget implements NavigationStates {
-  const CreateAnnouncementSMPost({super.key});
+  final String clubId;
+  const CreateAnnouncementSMPost({super.key, required this.clubId});
 
   @override
   State<CreateAnnouncementSMPost> createState() => _CreateAnnouncementSMPostState();

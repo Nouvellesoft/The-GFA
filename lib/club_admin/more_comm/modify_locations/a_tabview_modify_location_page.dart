@@ -27,7 +27,8 @@ Color phoneColor = const Color.fromRGBO(20, 134, 46, 1.0);
 Color backgroundColor = const Color.fromRGBO(147, 165, 193, 1.0);
 
 class TabviewLocationPage extends StatefulWidget implements NavigationStates {
-  const TabviewLocationPage({super.key});
+  final String clubId;
+  const TabviewLocationPage({super.key, required this.clubId});
 
   @override
   State<TabviewLocationPage> createState() => _TabviewLocationPageState();
@@ -79,9 +80,9 @@ class _TabviewLocationPageState extends State<TabviewLocationPage> with SingleTi
       ),
       body: TabBarView(
         controller: _tabController,
-        children: const [
-          MyAddNewLocationPage(),
-          MyRemoveNewLocationPage(),
+        children: [
+          MyAddNewLocationPage(clubId: widget.clubId),
+          MyRemoveNewLocationPage(clubId: widget.clubId),
         ],
       ),
     );

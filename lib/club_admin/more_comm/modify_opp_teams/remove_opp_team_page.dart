@@ -10,7 +10,8 @@ import '../../../model/c_match_day_banner_for_club_opp.dart';
 late MatchDayBannerForClubOppNotifier matchDayBannerForClubOppNotifier;
 
 class MyRemoveNewOppTeamPage extends StatefulWidget implements NavigationStates {
-  const MyRemoveNewOppTeamPage({super.key});
+  final String clubId;
+  const MyRemoveNewOppTeamPage({super.key, required this.clubId});
 
   @override
   State<MyRemoveNewOppTeamPage> createState() => MyRemoveNewOppTeamPageState();
@@ -167,7 +168,13 @@ class MyRemoveNewOppTeamPageState extends State<MyRemoveNewOppTeamPage> {
       final awayTeamsName = awayTeams.clubName; // Get the name of the clubCaptains
       if (awayTeamsName != null) {
         // Delete management with matching names
-        await firestore.collection('MatchDayBannerForClubOpp').where('club_name', isEqualTo: awayTeamsName).get().then((querySnapshot) {
+        await firestore
+            .collection('clubs')
+            .doc(widget.clubId)
+            .collection('MatchDayBannerForClubOpp')
+            .where('club_name', isEqualTo: awayTeamsName)
+            .get()
+            .then((querySnapshot) {
           for (var doc in querySnapshot.docs) {
             doc.reference.delete();
           }
@@ -191,16 +198,8 @@ class MyRemoveNewOppTeamPageState extends State<MyRemoveNewOppTeamPage> {
   }
 
   Future<void> _fetchMatchDayBannerForClubOppNotifier(MatchDayBannerForClubOppNotifier matchDayBannerForClubOppNotifier) async {
-    // Fetch the collection of club IDs from Firestore
-    QuerySnapshot clubSnapshot = await FirebaseFirestore.instance.collection('clubs').get();
-    List<String> clubIds = clubSnapshot.docs.map((doc) => doc.id).toList();
+    await getMatchDayBannerForClubOpp(matchDayBannerForClubOppNotifier, widget.clubId);
 
-    // Process each club ID
-    for (String clubId in clubIds) {
-      await getMatchDayBannerForClubOpp(matchDayBannerForClubOppNotifier, clubId);
-    }
-
-    // Optionally, notify listeners or update UI after fetching
     setState(() {}); // Refresh the UI if needed
   }
 }

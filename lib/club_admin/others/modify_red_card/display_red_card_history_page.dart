@@ -10,7 +10,8 @@ Color backgroundColor = const Color.fromRGBO(129, 140, 148, 1.0);
 PlayersTableNotifier? playersTableNotifier;
 
 class MyDisplayRedCardHistoryPage extends StatefulWidget implements NavigationStates {
-  const MyDisplayRedCardHistoryPage({super.key});
+  final String clubId;
+  const MyDisplayRedCardHistoryPage({super.key, required this.clubId});
 
   @override
   State<MyDisplayRedCardHistoryPage> createState() => MyDisplayRedCardHistoryPageState();

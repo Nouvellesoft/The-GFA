@@ -12,7 +12,8 @@ Color backgroundColor = const Color.fromRGBO(187, 192, 195, 1.0);
 late CoachesNotifier coachesNotifier;
 
 class MyModifyCoachesPage extends StatefulWidget implements NavigationStates {
-  const MyModifyCoachesPage({super.key});
+  final String clubId;
+  const MyModifyCoachesPage({super.key, required this.clubId});
 
   @override
   State<MyModifyCoachesPage> createState() => MyModifyCoachesPageState();
@@ -158,7 +159,7 @@ class MyModifyCoachesPageState extends State<MyModifyCoachesPage> {
       final coachName = coach.name; // Get the name of the coach
       if (coachName != null) {
         // Delete coaches with matching names
-        await firestore.collection('Coaches').where('name', isEqualTo: coachName).get().then((querySnapshot) {
+        await firestore.collection('clubs').doc(widget.clubId).collection('Coaches').where('name', isEqualTo: coachName).get().then((querySnapshot) {
           for (var doc in querySnapshot.docs) {
             doc.reference.delete();
           }
@@ -182,16 +183,8 @@ class MyModifyCoachesPageState extends State<MyModifyCoachesPage> {
   }
 
   Future<void> _fetchCoachesAndUpdateNotifier(CoachesNotifier coachesNotifier) async {
-    // Fetch the collection of club IDs from Firestore
-    QuerySnapshot clubSnapshot = await FirebaseFirestore.instance.collection('clubs').get();
-    List<String> clubIds = clubSnapshot.docs.map((doc) => doc.id).toList();
+    await getCoaches(coachesNotifier, widget.clubId);
 
-    // Process each club ID
-    for (String clubId in clubIds) {
-      await getCoaches(coachesNotifier, clubId);
-    }
-
-    // Optionally, notify listeners or update UI after fetching
     setState(() {}); // Refresh the UI if needed
   }
 }

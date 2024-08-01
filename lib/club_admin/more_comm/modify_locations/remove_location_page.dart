@@ -10,7 +10,8 @@ import '../../../notifier/c_match_day_banner_for_location_notifier.dart';
 late MatchDayBannerForLocationNotifier matchDayBannerForLocationNotifier;
 
 class MyRemoveNewLocationPage extends StatefulWidget implements NavigationStates {
-  const MyRemoveNewLocationPage({super.key});
+  final String clubId;
+  const MyRemoveNewLocationPage({super.key, required this.clubId});
 
   @override
   State<MyRemoveNewLocationPage> createState() => MyRemoveNewLocationPageState();
@@ -166,7 +167,13 @@ class MyRemoveNewLocationPageState extends State<MyRemoveNewLocationPage> {
       final locationsName = locations.location; // Get the name of the location
       if (locationsName != null) {
         // Delete locations with matching names
-        await firestore.collection('MatchDayBannerForLocation').where('location', isEqualTo: locationsName).get().then((querySnapshot) {
+        await firestore
+            .collection('clubs')
+            .doc(widget.clubId)
+            .collection('MatchDayBannerForLocation')
+            .where('location', isEqualTo: locationsName)
+            .get()
+            .then((querySnapshot) {
           for (var doc in querySnapshot.docs) {
             doc.reference.delete();
           }
@@ -190,16 +197,8 @@ class MyRemoveNewLocationPageState extends State<MyRemoveNewLocationPage> {
   }
 
   Future<void> _fetchMatchDayBannerForLocationNotifier(MatchDayBannerForLocationNotifier matchDayBannerForLocationNotifier) async {
-    // Fetch the collection of club IDs from Firestore
-    QuerySnapshot clubSnapshot = await FirebaseFirestore.instance.collection('clubs').get();
-    List<String> clubIds = clubSnapshot.docs.map((doc) => doc.id).toList();
+    await getMatchDayBannerForLocation(matchDayBannerForLocationNotifier, widget.clubId);
 
-    // Process each club ID
-    for (String clubId in clubIds) {
-      await getMatchDayBannerForLocation(matchDayBannerForLocationNotifier, clubId);
-    }
-
-    // Optionally, notify listeners or update UI after fetching
     setState(() {}); // Refresh the UI if needed
   }
 }

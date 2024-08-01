@@ -51,7 +51,8 @@ class ImageUrls {
 List<ImageUrls> recentImageUrls = [];
 
 class CreateUpcomingEventSMPost extends StatefulWidget implements NavigationStates {
-  const CreateUpcomingEventSMPost({super.key});
+  final String clubId;
+  const CreateUpcomingEventSMPost({super.key, required this.clubId});
 
   @override
   State<CreateUpcomingEventSMPost> createState() => _CreateUpcomingEventSMPostState();
@@ -169,7 +170,7 @@ class _CreateUpcomingEventSMPostState extends State<CreateUpcomingEventSMPost> {
   }
 
   Future<void> addDataToCollection(FirebaseFirestore firestore, String collectionName, Map<String, dynamic> data) async {
-    await firestore.collection(collectionName).add(data);
+    await firestore.collection('clubs').doc(widget.clubId).collection(collectionName).add(data);
   }
 
   @override
@@ -1083,16 +1084,8 @@ class _CreateUpcomingEventSMPostState extends State<CreateUpcomingEventSMPost> {
   }
 
   Future<void> _fetchMatchDayBannerForLocationNotifier(MatchDayBannerForLocationNotifier matchDayBannerForLocationNotifier) async {
-    // Fetch the collection of club IDs from Firestore
-    QuerySnapshot clubSnapshot = await FirebaseFirestore.instance.collection('clubs').get();
-    List<String> clubIds = clubSnapshot.docs.map((doc) => doc.id).toList();
+    await getMatchDayBannerForLocation(matchDayBannerForLocationNotifier, widget.clubId);
 
-    // Process each club ID
-    for (String clubId in clubIds) {
-      await getMatchDayBannerForLocation(matchDayBannerForLocationNotifier, clubId);
-    }
-
-    // Optionally, notify listeners or update UI after fetching
     setState(() {}); // Refresh the UI if needed
   }
 

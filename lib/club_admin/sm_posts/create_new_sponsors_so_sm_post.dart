@@ -46,7 +46,8 @@ class ImageUrls {
 List<ImageUrls> recentImageUrls = [];
 
 class CreateNewSponsorsShoutOutSMPost extends StatefulWidget implements NavigationStates {
-  const CreateNewSponsorsShoutOutSMPost({super.key});
+  final String clubId;
+  const CreateNewSponsorsShoutOutSMPost({super.key, required this.clubId});
 
   @override
   State<CreateNewSponsorsShoutOutSMPost> createState() => _CreateNewSponsorsShoutOutSMPostState();
@@ -521,7 +522,7 @@ class _CreateNewSponsorsShoutOutSMPostState extends State<CreateNewSponsorsShout
           data['new_sponsor_name'] = newSponsorName;
 
           // Add the new member if the name doesn't exist
-          await firestore.collection(collectionName).add(data);
+          await firestore.collection('clubs').doc(widget.clubId).collection(collectionName).add(data);
 
           // _eventNameController.clear();
           // _eventSummaryController.clear();
@@ -557,16 +558,8 @@ class _CreateNewSponsorsShoutOutSMPostState extends State<CreateNewSponsorsShout
   }
 
   Future<void> _fetchClubSponsorsNotifier(ClubSponsorsNotifier clubSponsorsNotifier) async {
-    // Fetch the collection of club IDs from Firestore
-    QuerySnapshot clubSnapshot = await FirebaseFirestore.instance.collection('clubs').get();
-    List<String> clubIds = clubSnapshot.docs.map((doc) => doc.id).toList();
+    await getClubSponsors(clubSponsorsNotifier, widget.clubId);
 
-    // Process each club ID
-    for (String clubId in clubIds) {
-      await getClubSponsors(clubSponsorsNotifier, clubId);
-    }
-
-    // Optionally, notify listeners or update UI after fetching
     setState(() {}); // Refresh the UI if needed
   }
 
