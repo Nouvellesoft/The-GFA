@@ -1310,53 +1310,56 @@ class CreateMatchDaySocialMediaPostState extends State<CreateMatchDaySocialMedia
               "Select Sponsor(s) [4 Max]",
               style: TextStyle(fontSize: 14, color: Colors.white70, fontWeight: FontWeight.w500),
             ),
-            content: SizedBox(
-              height: MediaQuery.of(context).size.height * 0.45,
-              child: Column(
-                children: <Widget>[
-                  SizedBox(
-                    width: double.maxFinite,
-                    height: MediaQuery.of(context).size.height * 0.35,
-                    child: ListView.builder(
-                      shrinkWrap: true,
-                      itemCount: clubSponsorsNotifier!.clubSponsorsList.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        return CheckboxListTile(
-                          activeColor: iconColor,
-                          title: Text(
-                            clubSponsorsNotifier!.clubSponsorsList[index].name!,
-                            style: const TextStyle(fontSize: 14, color: Colors.white, fontWeight: FontWeight.w400),
-                          ),
-                          value: selectedSponsors[index],
-                          onChanged: (bool? value) {
-                            if (selectedSponsors.where((element) => element).length < 4 || value == false) {
-                              setState(() {
-                                selectedSponsors[index] = value!;
-                              });
-                            }
-                          },
-                          secondary: Container(
-                            width: 30,
-                            height: 30,
-                            decoration: BoxDecoration(
-                                image: DecorationImage(
-                                    image: CachedNetworkImageProvider(
-                                      clubSponsorsNotifier!.clubSponsorsList[index].sponsorIcon!,
-                                    ),
-                                    fit: BoxFit.cover)),
-                          ),
-                        );
-                      },
+            content: StatefulBuilder(builder: (context, setState) {
+              return SizedBox(
+                height: MediaQuery.of(context).size.height * 0.45,
+                child: Column(
+                  children: <Widget>[
+                    SizedBox(
+                      width: double.maxFinite,
+                      height: MediaQuery.of(context).size.height * 0.35,
+                      child: ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: clubSponsorsNotifier!.clubSponsorsList.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          return CheckboxListTile(
+                            activeColor: iconColor,
+                            title: Text(
+                              clubSponsorsNotifier!.clubSponsorsList[index].name!,
+                              style: const TextStyle(fontSize: 14, color: Colors.white, fontWeight: FontWeight.w400),
+                            ),
+                            value: selectedSponsors[index],
+                            onChanged: (bool? value) {
+                              if (selectedSponsors.where((element) => element).length < 4 || value == false) {
+                                setState(() {
+                                  // selectedSponsors[index] = value!;
+                                  _onSponsorSelected(value!, index);
+                                });
+                              }
+                            },
+                            secondary: Container(
+                              width: 30,
+                              height: 30,
+                              decoration: BoxDecoration(
+                                  image: DecorationImage(
+                                      image: CachedNetworkImageProvider(
+                                        clubSponsorsNotifier!.clubSponsorsList[index].sponsorIcon!,
+                                      ),
+                                      fit: BoxFit.cover)),
+                            ),
+                          );
+                        },
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 30),
-                  Text(
-                    '${selectedSponsors.where((element) => element).length}/${clubSponsorsNotifier!.clubSponsorsList.length} sponsors chosen',
-                    style: const TextStyle(fontSize: 16, color: Colors.white70, fontWeight: FontWeight.w600),
-                  ),
-                ],
-              ),
-            ),
+                    const SizedBox(height: 30),
+                    Text(
+                      '${selectedSponsors.where((element) => element).length}/${clubSponsorsNotifier!.clubSponsorsList.length} sponsors chosen',
+                      style: const TextStyle(fontSize: 16, color: Colors.white70, fontWeight: FontWeight.w600),
+                    ),
+                  ],
+                ),
+              );
+            }),
             actions: <Widget>[
               TextButton(
                 onPressed: () {
@@ -1395,6 +1398,13 @@ class CreateMatchDaySocialMediaPostState extends State<CreateMatchDaySocialMedia
           });
         }
       }
+    });
+  }
+
+  void _onSponsorSelected(bool selected, int index) {
+    setState(() {
+      selectedSponsors[index] = !selectedSponsors[index];
+      // print("Sponsor ${clubSponsorsNotifier.clubSponsorsList[index]['name']} selected: ${selectedSponsors[index]}"); // Debugging line
     });
   }
 
@@ -2088,7 +2098,8 @@ ${selectedSponsorNames.isNotEmpty ? 'We are proudly sponsored by ${selectedSpons
     ClubSponsorsNotifier clubSponsorsNotifier = Provider.of<ClubSponsorsNotifier>(context, listen: false);
 
     // Initialize the selectedSponsors list with all false values
-    selectedSponsors = List<bool>.generate(clubSponsorsNotifier.clubSponsorsList.length, (index) => false);
+    // selectedSponsors = List<bool>.generate(clubSponsorsNotifier.clubSponsorsList.length, (index) => false);
+    selectedSponsors = List<bool>.filled(clubSponsorsNotifier.clubSponsorsList.length, false);
 
     _fetchMatchDayBannerForClubNotifier(matchDayBannerForClubNotifier);
     _fetchMatchDayBannerForClubOppNotifier(matchDayBannerForClubOppNotifier);

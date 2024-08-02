@@ -1229,6 +1229,7 @@ void showConfirmationDialog(BuildContext context) {
 }
 
 Future navigateToCreateSMPost(BuildContext context, String clubId) async {
+  // Navigator.push(context, MaterialPageRoute(builder: (context) => CreateMatchDaySocialMediaPost()));
   Navigator.push(context, MaterialPageRoute(builder: (context) => CreateMatchDaySocialMediaPost(clubId: clubId)));
 }
 

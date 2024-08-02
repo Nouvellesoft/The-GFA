@@ -76,26 +76,28 @@ class MyModifyClubPlayersPageState extends State<MyModifyClubPlayersPage> {
                   itemCount: sortedPlayers.length,
                   itemBuilder: (context, index) {
                     final player = sortedPlayers[index];
-                    return ListTile(
-                      title: Text(player.name ?? 'No Name'),
-                      trailing: isEditing
-                          ? Checkbox(
-                              activeColor: Colors.white,
-                              checkColor: Colors.black,
-                              value: selectedPlayers.contains(player),
-                              onChanged: (value) {
-                                setState(() {
-                                  if (value != null && value) {
-                                    selectedPlayers.add(player);
-                                  } else {
-                                    selectedPlayers.remove(player);
-                                  }
-                                });
-                              },
-                            )
-                          : null, // Show checkbox only in "Edit" mode
-                      // Add other player information you want to display
-                    );
+                    return StatefulBuilder(builder: (BuildContext context, StateSetter setState) {
+                      return ListTile(
+                        title: Text(player.name ?? 'No Name'),
+                        trailing: isEditing
+                            ? Checkbox(
+                                activeColor: Colors.white,
+                                checkColor: Colors.black,
+                                value: selectedPlayers.contains(player),
+                                onChanged: (value) {
+                                  setState(() {
+                                    if (value != null && value) {
+                                      selectedPlayers.add(player);
+                                    } else {
+                                      selectedPlayers.remove(player);
+                                    }
+                                  });
+                                },
+                              )
+                            : null, // Show checkbox only in "Edit" mode
+                        // Add other player information you want to display
+                      );
+                    });
                   },
                 ),
               ),
@@ -104,55 +106,58 @@ class MyModifyClubPlayersPageState extends State<MyModifyClubPlayersPage> {
         ),
       ),
       bottomSheet: isEditing
-          ? SingleChildScrollView(
-              scrollDirection: Axis.vertical,
-              child: Container(
-                constraints: BoxConstraints(
-                  maxHeight: MediaQuery.of(context).size.height * 0.27,
-                ),
-                padding: const EdgeInsets.all(16.0),
-                child: Row(
-                  children: [
-                    // const Text('Selected\nPlayers:'),
-                    const SizedBox(width: 8.0),
-                    Expanded(
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.horizontal, // Set the scroll direction to horizontal
-                        child: Wrap(
-                          children: selectedPlayers.map((player) {
-                            return Chip(
-                              label: Text(
-                                player.name ?? '',
-                                style: const TextStyle(fontSize: 12),
-                              ),
-                              onDeleted: () {
-                                setState(() {
-                                  selectedPlayers.remove(player);
-                                });
-                              },
-                            );
-                          }).toList(),
+          ? StatefulBuilder(builder: (BuildContext context, StateSetter setState) {
+              return SingleChildScrollView(
+                scrollDirection: Axis.vertical,
+                child: Container(
+                  color: Colors.black54,
+                  constraints: BoxConstraints(
+                    maxHeight: MediaQuery.of(context).size.height * 0.27,
+                  ),
+                  padding: const EdgeInsets.all(16.0),
+                  child: Row(
+                    children: [
+                      // const Text('Selected\nPlayers:'),
+                      const SizedBox(width: 8.0),
+                      Expanded(
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal, // Set the scroll direction to horizontal
+                          child: Wrap(
+                            children: selectedPlayers.map((player) {
+                              return Chip(
+                                label: Text(
+                                  player.name ?? '',
+                                  style: const TextStyle(fontSize: 12),
+                                ),
+                                onDeleted: () {
+                                  setState(() {
+                                    selectedPlayers.remove(player);
+                                  });
+                                },
+                              );
+                            }).toList(),
+                          ),
                         ),
                       ),
-                    ),
-                    const SizedBox(width: 8.0),
-                    ElevatedButton(
-                      onPressed: () async {
-                        await deleteSelectedPlayers(selectedPlayers);
-                        // Clear selected players list after deletion
-                        setState(() {
-                          selectedPlayers.clear();
-                        });
-                      },
-                      child: const Text(
-                        'Delete Selected',
-                        style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.w600),
+                      const SizedBox(width: 8.0),
+                      ElevatedButton(
+                        onPressed: () async {
+                          await deleteSelectedPlayers(selectedPlayers);
+                          // Clear selected players list after deletion
+                          setState(() {
+                            selectedPlayers.clear();
+                          });
+                        },
+                        child: const Text(
+                          'Delete Selected',
+                          style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.w600),
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-            )
+              );
+            })
           : null, // Show selected players at the bottom only in "Edit" mode
     );
   }

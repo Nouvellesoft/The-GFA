@@ -157,14 +157,14 @@ class MyMOTMPageState extends State<MyMOTMPage> {
                                         .where('player_name', isNotEqualTo: player.playerName) // Exclude the selected MOTM player
                                         .get()
                                         .then((querySnapshot) {
-                                      querySnapshot.docs.forEach((doc) {
+                                      for (var doc in querySnapshot.docs) {
                                         if (doc['man_of_the_match']?.toLowerCase() == 'yes') {
                                           // Set 'man_of_the_match' to empty string for other players
                                           doc.reference.update({
                                             'man_of_the_match': '',
                                           });
                                         }
-                                      });
+                                      }
                                     });
 
                                     // Show a toast notification

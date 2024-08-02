@@ -157,14 +157,14 @@ class MyMVPPageState extends State<MyMVPPage> {
                                         .where('player_name', isNotEqualTo: player.playerName) // Exclude the selected MVP player
                                         .get()
                                         .then((querySnapshot) {
-                                      querySnapshot.docs.forEach((doc) {
+                                      for (var doc in querySnapshot.docs) {
                                         if (doc['player_of_the_month']?.toLowerCase() == 'yes') {
                                           // Set 'player_of_the_month' to empty string for other players
                                           doc.reference.update({
                                             'player_of_the_month': '',
                                           });
                                         }
-                                      });
+                                      }
                                     });
 
                                     // Show a toast notification

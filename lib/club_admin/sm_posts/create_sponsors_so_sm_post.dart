@@ -538,16 +538,8 @@ class _CreateSponsorsShoutOutSMPostState extends State<CreateSponsorsShoutOutSMP
   }
 
   Future<void> _fetchClubSponsorsAndUpdateNotifier(ClubSponsorsNotifier notifier) async {
-    // Fetch the collection of club IDs from Firestore
-    QuerySnapshot clubSnapshot = await FirebaseFirestore.instance.collection('clubs').get();
-    List<String> clubIds = clubSnapshot.docs.map((doc) => doc.id).toList();
+    await getClubSponsors(notifier, widget.clubId);
 
-    // Process each club ID
-    for (String clubId in clubIds) {
-      await getClubSponsors(notifier, clubId);
-    }
-
-    // Optionally, notify listeners or update UI after fetching
     setState(() {});
   }
 

@@ -159,7 +159,13 @@ class MyModifyManagementBodyPageState extends State<MyModifyManagementBodyPage> 
       final managementBodyName = managementBody.name; // Get the name of the managementBody
       if (managementBodyName != null) {
         // Delete management with matching names
-        await firestore.collection('ManagementBody').where('name', isEqualTo: managementBodyName).get().then((querySnapshot) {
+        await firestore
+            .collection('clubs')
+            .doc(widget.clubId)
+            .collection('ManagementBody')
+            .where('name', isEqualTo: managementBodyName)
+            .get()
+            .then((querySnapshot) {
           for (var doc in querySnapshot.docs) {
             doc.reference.delete();
           }
