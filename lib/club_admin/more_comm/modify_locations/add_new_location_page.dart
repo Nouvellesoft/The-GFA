@@ -50,7 +50,7 @@ class MyAddNewLocationPageState extends State<MyAddNewLocationPage> {
                 ),
                 validator: (value) {
                   if (value!.isEmpty) {
-                    return 'Please enter a name';
+                    return 'Please enter a post code';
                   }
                   return null;
                 },
@@ -85,6 +85,16 @@ class MyAddNewLocationPageState extends State<MyAddNewLocationPage> {
       final postCode = _postCodeController.text;
 
       try {
+        // Check if the location name or post code already exists
+        bool locationExists = await doesLocationExist(locationName, postCode);
+        if (locationExists) {
+          _showErrorToast('Location name or post code already exists.');
+          setState(() {
+            _isSubmitting = false;
+          });
+          return;
+        }
+
         // Update Firestore document with data
         await FirebaseFirestore.instance.collection('clubs').doc(widget.clubId).collection('MatchDayBannerForLocation').add({
           'id': '10',
@@ -112,6 +122,17 @@ class MyAddNewLocationPageState extends State<MyAddNewLocationPage> {
         });
       }
     }
+  }
+
+  Future<bool> doesLocationExist(String locationName, String postCode) async {
+    final querySnapshot = await FirebaseFirestore.instance
+        .collection('clubs')
+        .doc(widget.clubId)
+        .collection('MatchDayBannerForLocation')
+        .where('location', isEqualTo: locationName)
+        .get();
+
+    return querySnapshot.docs.isNotEmpty;
   }
 
   void _showSuccessToast() {

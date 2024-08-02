@@ -166,7 +166,7 @@ class MyAddClubSponsorPageState extends State<MyAddClubSponsorPage> {
       String? imageUrlFive = _imageFive != null ? await _uploadImageToStorage(_imageFive!, 'image_five.jpg') : null;
 
       // Update Firestore document with image URLs
-      await firestore.collection('ClubSponsors').doc(documentId).update({
+      await firestore.collection('clubs').doc(widget.clubId).collection('ClubSponsors').doc(documentId).update({
         'image': imageUrlOne ?? data['image'],
         'image_two': imageUrlTwo ?? data['image_two'],
         'image_three': imageUrlThree ?? data['image_three'],
@@ -182,7 +182,8 @@ class MyAddClubSponsorPageState extends State<MyAddClubSponsorPage> {
 
   Future<String?> _uploadImageToStorage(File imageFile, String imageName) async {
     try {
-      final Reference storageReference = FirebaseStorage.instance.ref().child('club_sponsor_images').child(sponsorName!).child(imageName);
+      final Reference storageReference =
+          FirebaseStorage.instance.ref().child('${widget.clubId}/club_sponsor_images').child(sponsorName!).child(imageName);
       final UploadTask uploadTask = storageReference.putFile(imageFile);
 
       await uploadTask.whenComplete(() {});
@@ -222,7 +223,7 @@ class MyAddClubSponsorPageState extends State<MyAddClubSponsorPage> {
                 ),
                 validator: (value) {
                   if (value!.isEmpty) {
-                    return 'Please enter a name';
+                    return 'Please enter sponsor name';
                   }
                   return null;
                 },
@@ -230,13 +231,13 @@ class MyAddClubSponsorPageState extends State<MyAddClubSponsorPage> {
               TextFormField(
                 controller: _clubSponsoringSummaryController,
                 decoration: const InputDecoration(
-                  labelText: "Sponsor's Role",
+                  labelText: "Summary of Sponsorship",
                   hintText: "We sponsor the Over 35's road trips all over The UK, during their matchday to and fro.",
                   hintStyle: TextStyle(color: Colors.black54, fontSize: 13),
                 ),
                 validator: (value) {
                   if (value!.isEmpty) {
-                    return 'Please enter a role';
+                    return 'Please enter summary of sponsorship';
                   }
                   return null;
                 },
@@ -391,7 +392,7 @@ class MyAddClubSponsorPageState extends State<MyAddClubSponsorPage> {
                 ),
                 child: _isSubmitting
                     ? const CircularProgressIndicator() // Show circular progress indicator
-                    : const Text('Add Club Sponsor'),
+                    : const Text('Submit'),
               ),
             ],
           ),

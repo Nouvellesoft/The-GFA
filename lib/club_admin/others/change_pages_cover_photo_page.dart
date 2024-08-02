@@ -55,7 +55,7 @@ class MyChangePagesCoverPhotoPageState extends State<MyChangePagesCoverPhotoPage
 
   Future<String> _uploadImageToStorage(File imageFile, String imageName) async {
     try {
-      final Reference storageReference = FirebaseStorage.instance.ref().child('sliver_image').child(imageName);
+      final Reference storageReference = FirebaseStorage.instance.ref().child('${widget.clubId}/sliver_image').child(imageName);
       final UploadTask uploadTask = storageReference.putFile(imageFile);
 
       await uploadTask.whenComplete(() {});

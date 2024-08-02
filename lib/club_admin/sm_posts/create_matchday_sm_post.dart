@@ -1905,8 +1905,8 @@ class CreateMatchDaySocialMediaPostState extends State<CreateMatchDaySocialMedia
     );
 
     // Reference to the Firebase Storage paths with dynamic file names
-    var storageRefLowRes = FirebaseStorage.instance.ref().child('matchday_banners/low_resolution/$fileNameLowRes');
-    var storageRefHighRes = FirebaseStorage.instance.ref().child('matchday_banners/high_resolution/$fileNameHighRes');
+    var storageRefLowRes = FirebaseStorage.instance.ref().child('${widget.clubId}/matchday_banners/low_resolution/$fileNameLowRes');
+    var storageRefHighRes = FirebaseStorage.instance.ref().child('${widget.clubId}/matchday_banners/high_resolution/$fileNameHighRes');
 
     // Compress the image for low-resolution version
     img_lib.Image compressedImage = img_lib.decodeImage(Uint8List.fromList(pngBytes))!;

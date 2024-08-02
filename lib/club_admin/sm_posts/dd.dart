@@ -1,244 +1,321 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:image_picker/image_picker.dart';
 
-import '/bloc_navigation_bloc/navigation_bloc.dart';
-import '../../api/first_team_class_api.dart';
-import '../../api/second_team_class_api.dart';
-import '../../notifier/first_team_class_notifier.dart';
-import '../../notifier/players_notifier.dart';
-import '../../notifier/second_team_class_notifier.dart';
+import '../../bloc_navigation_bloc/navigation_bloc.dart';
 
-PlayersNotifier? playersNotifier;
+Color backgroundColor = const Color.fromRGBO(235, 238, 239, 1.0);
 
-Color backgroundColor = const Color.fromRGBO(187, 192, 195, 1.0);
-
-class MyModifyClubPlayersPage extends StatefulWidget implements NavigationStates {
+class MyAddClubSponsorPage extends StatefulWidget implements NavigationStates {
   final String clubId;
-  const MyModifyClubPlayersPage({super.key, required this.clubId});
+  const MyAddClubSponsorPage({super.key, required this.clubId});
 
   @override
-  State<MyModifyClubPlayersPage> createState() => MyModifyClubPlayersPageState();
+  State<MyAddClubSponsorPage> createState() => MyAddClubSponsorPageState();
 }
 
-class MyModifyClubPlayersPageState extends State<MyModifyClubPlayersPage> {
-  bool isEditing = false; // Flag to determine if the user is in "Edit" mode
-  List<dynamic> selectedPlayers = []; // List to store selected players
+class MyAddClubSponsorPageState extends State<MyAddClubSponsorPage> {
+  // Define variables to store form input
+  final TextEditingController _sponsorNameController = TextEditingController();
+  final TextEditingController _clubSponsoringSummaryController = TextEditingController();
+
+  String? sponsorName;
+
+  bool _isSubmitting = false;
+
+  // Create a GlobalKey for the form
+  final _formKey = GlobalKey<FormState>();
+
+  // Firebase Firestore instance
+  final firestore = FirebaseFirestore.instance;
+
+  // Function to check if a member with the same name exists
+  Future<bool> doesNameExist(String fullName, String collectionName) async {
+    final querySnapshot = await firestore.collection('clubs').doc(widget.clubId).collection(collectionName).where('name', isEqualTo: fullName).get();
+    return querySnapshot.docs.isNotEmpty;
+  }
+
+  Map<String, dynamic> data = {
+    'id': '10',
+    'about_us': '',
+    'address': '',
+    'category': '',
+    'email': '',
+    'facebook': '',
+    'image':
+        'https://firebasestorage.googleapis.com/v0/b/cov-phoenix-fc.appspot.com/o/ClubSponsors%2Fclub_sponsor_default.jpeg?alt=media&token=20a8e9c6-b2dd-413a-9bbc-cc189d7bfe9f',
+    'image_two':
+        'https://firebasestorage.googleapis.com/v0/b/cov-phoenix-fc.appspot.com/o/ClubSponsors%2Fclub_sponsor_default.jpeg?alt=media&token=20a8e9c6-b2dd-413a-9bbc-cc189d7bfe9f',
+    'image_three':
+        'https://firebasestorage.googleapis.com/v0/b/cov-phoenix-fc.appspot.com/o/ClubSponsors%2Fclub_sponsor_default.jpeg?alt=media&token=20a8e9c6-b2dd-413a-9bbc-cc189d7bfe9f',
+    'image_four':
+        'https://firebasestorage.googleapis.com/v0/b/cov-phoenix-fc.appspot.com/o/ClubSponsors%2Fclub_sponsor_default.jpeg?alt=media&token=20a8e9c6-b2dd-413a-9bbc-cc189d7bfe9f',
+    'image_five':
+        'https://firebasestorage.googleapis.com/v0/b/cov-phoenix-fc.appspot.com/o/ClubSponsors%2Fclub_sponsor_default.jpeg?alt=media&token=20a8e9c6-b2dd-413a-9bbc-cc189d7bfe9f',
+    'instagram': '',
+    'name': '',
+    'our_services': '',
+    'phone': '',
+    'snapchat': '',
+    'sponsor_icon': '',
+    'twitter': '',
+    'website': '',
+    'youtube': '',
+  };
+
+  // Implement a function to handle form submission
+  _submitForm() async {
+    if (_formKey.currentState!.validate() && !_isSubmitting) {
+      setState(() {
+        _isSubmitting = true; // Start submitting
+      });
+      final firestore = FirebaseFirestore.instance;
+      sponsorName = _sponsorNameController.text;
+      final clubSponsorSummary = _clubSponsoringSummaryController.text;
+
+      String collectionName = 'ClubSponsors';
+
+      // Check if the name already exists
+      bool nameExists = await doesNameExist(sponsorName!, collectionName);
+
+      if (nameExists) {
+        // Show error toast
+        _showErrorToast('Sponsor name already exists.');
+        setState(() {
+          _isSubmitting = false; // Stop submitting
+        });
+        return;
+      }
+
+      // Update the data values
+      data['name'] = sponsorName;
+      data['about_us'] = clubSponsorSummary;
+
+      try {
+        if (collectionName.isNotEmpty) {
+          /// Add the new member if the name doesn't exist
+          DocumentReference newSponsorRef = await firestore.collection('clubs').doc(widget.clubId).collection(collectionName).add(data);
+
+          // Check if images are selected before calling _uploadAndSaveImages
+          if (_imageOne != null || _imageTwo != null || _imageThree != null || _imageFour != null || _imageFive != null) {
+            // Upload and update images
+            await _uploadAndSaveImages(newSponsorRef.id);
+          }
+
+          // Show success toast
+          _showSuccessToast();
+
+          // Update UI to reflect changes
+          setState(() {
+            _sponsorNameController.clear();
+            _clubSponsoringSummaryController.clear();
+
+            // Reset images to null
+            _imageOne = null;
+            _imageTwo = null;
+            _imageThree = null;
+            _imageFour = null;
+            _imageFive = null;
+
+            _isSubmitting = false; // Stop submitting
+          });
+        } else {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Unsupported role: $collectionName'),
+              ),
+            );
+          }
+          // Update UI to stop submitting
+          setState(() {
+            _isSubmitting = false;
+          });
+        }
+      } catch (e) {
+        // Show error toast
+        _showErrorToast(e.toString());
+        // Update UI to stop submitting
+        setState(() {
+          _isSubmitting = false;
+        });
+      }
+    }
+  }
+
+  ////
+
+  final ImagePicker _picker = ImagePicker();
+  File? _imageOne;
+  File? _imageTwo;
+  File? _imageThree;
+  File? _imageFour;
+  File? _imageFive;
+
+  Future<void> _uploadAndSaveImages(String documentId) async {
+    try {
+      String? imageUrlOne = _imageOne != null ? await _uploadImageToStorage(_imageOne!, 'image_one.jpg') : null;
+      String? imageUrlTwo = _imageTwo != null ? await _uploadImageToStorage(_imageTwo!, 'image_two.jpg') : null;
+      String? imageUrlThree = _imageThree != null ? await _uploadImageToStorage(_imageThree!, 'image_three.jpg') : null;
+      String? imageUrlFour = _imageFour != null ? await _uploadImageToStorage(_imageFour!, 'image_four.jpg') : null;
+      String? imageUrlFive = _imageFive != null ? await _uploadImageToStorage(_imageFive!, 'image_five.jpg') : null;
+
+      // Update Firestore document with image URLs
+      await firestore.collection('clubs').doc(widget.clubId).collection('ClubSponsors').doc(documentId).update({
+        'image': imageUrlOne ?? data['image'],
+        'image_two': imageUrlTwo ?? data['image_two'],
+        'image_three': imageUrlThree ?? data['image_three'],
+        'image_four': imageUrlFour ?? data['image_four'],
+        'image_five': imageUrlFive ?? data['image_five'],
+      });
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error uploading images: $e');
+      }
+    }
+  }
+
+  Future<String?> _uploadImageToStorage(File imageFile, String imageName) async {
+    try {
+      final Reference storageReference =
+          FirebaseStorage.instance.ref().child('${widget.clubId}/club_sponsor_images').child(sponsorName!).child(imageName);
+      final UploadTask uploadTask = storageReference.putFile(imageFile);
+
+      await uploadTask.whenComplete(() {});
+      final String imageUrl = await storageReference.getDownloadURL();
+      return imageUrl;
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error uploading image: $e');
+      }
+      return null;
+    }
+  }
+
+  Future<File?> pickImage() async {
+    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+    if (image == null) return null;
+
+    return File(image.path);
+  }
 
   @override
   Widget build(BuildContext context) {
-    // Use the PlayersNotifier to access the combined list of players
-    playersNotifier = Provider.of<PlayersNotifier>(context);
-
-    // Create a copy of the allClubMembersList and sort it alphabetically by name
-    List<dynamic> sortedPlayers = List.from(playersNotifier!.playersList);
-    sortedPlayers.sort((a, b) => (a.name ?? 'No Name').toLowerCase().compareTo((b.name ?? 'No Name').toLowerCase()));
-
     return Scaffold(
       backgroundColor: backgroundColor,
-      appBar: AppBar(
-        backgroundColor: backgroundColor,
-        title: const Text('All Players'),
-        actions: [
-          // Add a button to toggle "Edit" mode
-          IconButton(
-            icon: Icon(isEditing ? Icons.done : Icons.edit),
-            onPressed: () {
-              // Toggle "Edit" mode and clear selected players list
-              setState(() {
-                isEditing = !isEditing;
-                selectedPlayers.clear();
-              });
-            },
-          ),
-        ],
-      ),
-      body: GestureDetector(
-        behavior: HitTestBehavior.translucent,
-        onTap: () {
-          // Hide the keyboard when tapping outside the text field
-          FocusManager.instance.primaryFocus?.unfocus();
-        },
-        child: RefreshIndicator(
-          onRefresh: () async {
-            // Refresh the data when the user pulls down the list
-            await refreshData();
-          },
-          child: Padding(
-            padding: EdgeInsets.only(bottom: MediaQuery.of(context).size.width * 0.25),
-            child: NotificationListener<ScrollNotification>(
-              onNotification: (ScrollNotification scrollInfo) {
-                // You can add logic here to show/hide the scrollbar based on scroll position
-                return true;
-              },
-              child: Scrollbar(
-                child: ListView.builder(
-                  itemCount: sortedPlayers.length,
-                  itemBuilder: (context, index) {
-                    final player = sortedPlayers[index];
-                    return StatefulBuilder(builder: (BuildContext context, StateSetter setState) {
-                      return ListTile(
-                        title: Text(player.name ?? 'No Name'),
-                        trailing: isEditing
-                            ? Checkbox(
-                                activeColor: Colors.white,
-                                checkColor: Colors.black,
-                                value: selectedPlayers.contains(player),
-                                onChanged: (value) {
-                                  setState(() {
-                                    if (value != null && value) {
-                                      selectedPlayers.add(player);
-                                    } else {
-                                      selectedPlayers.remove(player);
-                                    }
-                                  });
-                                },
-                              )
-                            : null, // Show checkbox only in "Edit" mode
-                        // Add other player information you want to display
-                      );
-                    });
-                  },
-                ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Form(
+          key: _formKey,
+          child: ListView(
+            children: [
+              TextFormField(
+                controller: _sponsorNameController,
+                decoration: const InputDecoration(labelText: 'Sponsor Name'),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter sponsor name';
+                  }
+                  return null;
+                },
               ),
-            ),
+              const SizedBox(height: 10),
+              TextFormField(
+                controller: _clubSponsoringSummaryController,
+                decoration: const InputDecoration(labelText: 'Summary of Sponsorship'),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter summary of sponsorship';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 10),
+              _buildImagePickerButton('Image 1', _imageOne, (pickedImage) {
+                setState(() {
+                  _imageOne = pickedImage;
+                });
+              }),
+              _buildImagePickerButton('Image 2', _imageTwo, (pickedImage) {
+                setState(() {
+                  _imageTwo = pickedImage;
+                });
+              }),
+              _buildImagePickerButton('Image 3', _imageThree, (pickedImage) {
+                setState(() {
+                  _imageThree = pickedImage;
+                });
+              }),
+              _buildImagePickerButton('Image 4', _imageFour, (pickedImage) {
+                setState(() {
+                  _imageFour = pickedImage;
+                });
+              }),
+              _buildImagePickerButton('Image 5', _imageFive, (pickedImage) {
+                setState(() {
+                  _imageFive = pickedImage;
+                });
+              }),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: _isSubmitting ? null : _submitForm,
+                child: _isSubmitting ? const CircularProgressIndicator() : const Text('Submit'),
+              ),
+            ],
           ),
         ),
       ),
-      bottomSheet: isEditing
-          ? StatefulBuilder(builder: (BuildContext context, StateSetter setState) {
-              return SingleChildScrollView(
-                scrollDirection: Axis.vertical,
-                child: Container(
-                  color: Colors.black54,
-                  constraints: BoxConstraints(
-                    maxHeight: MediaQuery.of(context).size.height * 0.27,
-                  ),
-                  padding: const EdgeInsets.all(16.0),
-                  child: Row(
-                    children: [
-                      // const Text('Selected\nPlayers:'),
-                      const SizedBox(width: 8.0),
-                      Expanded(
-                        child: SingleChildScrollView(
-                          scrollDirection: Axis.horizontal, // Set the scroll direction to horizontal
-                          child: Wrap(
-                            children: selectedPlayers.map((player) {
-                              return Chip(
-                                label: Text(
-                                  player.name ?? '',
-                                  style: const TextStyle(fontSize: 12),
-                                ),
-                                onDeleted: () {
-                                  setState(() {
-                                    selectedPlayers.remove(player);
-                                  });
-                                },
-                              );
-                            }).toList(),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 8.0),
-                      ElevatedButton(
-                        onPressed: () async {
-                          await deleteSelectedPlayers(selectedPlayers);
-                          // Clear selected players list after deletion
-                          setState(() {
-                            selectedPlayers.clear();
-                          });
-                        },
-                        child: const Text(
-                          'Delete Selected',
-                          style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.w600),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            })
-          : null, // Show selected players at the bottom only in "Edit" mode
     );
   }
 
-  @override
-  void initState() {
-    super.initState();
-
-    // Fetch data for the first and second teams using their notifiers
-    FirstTeamClassNotifier firstTeamClassNotifier = Provider.of<FirstTeamClassNotifier>(context, listen: false);
-    _fetchFirstTeamClassAndUpdateNotifier(firstTeamClassNotifier);
-
-    SecondTeamClassNotifier secondTeamClassNotifier = Provider.of<SecondTeamClassNotifier>(context, listen: false);
-    _fetchSecondTeamClassAndUpdateNotifier(secondTeamClassNotifier);
-
-    // Populate the PlayersNotifier with data from both teams
-    PlayersNotifier playersNotifier = Provider.of<PlayersNotifier>(context, listen: false);
-
-    playersNotifier.setFirstTeamPlayers(firstTeamClassNotifier.firstTeamClassList);
-    playersNotifier.setSecondTeamPlayers(secondTeamClassNotifier.secondTeamClassList);
-  }
-
-  Future<void> _fetchFirstTeamClassAndUpdateNotifier(FirstTeamClassNotifier firstTeamNotifier) async {
-    await getFirstTeamClass(firstTeamNotifier, widget.clubId);
-
-    setState(() {}); // Refresh the UI if needed
-  }
-
-  Future<void> _fetchSecondTeamClassAndUpdateNotifier(SecondTeamClassNotifier secondTeamNotifier) async {
-    await getSecondTeamClass(secondTeamNotifier, widget.clubId);
-
-    setState(() {}); // Refresh the UI if needed
-  }
-
-  Future<void> deleteSelectedPlayers(List<dynamic> selectedPlayers) async {
-    final firestore = FirebaseFirestore.instance;
-
-    // Iterate through the selected players and delete them
-    for (final player in selectedPlayers) {
-      // Assuming 'name' is a unique identifier
-      final name = player.name;
-
-      // Delete from both collections
-      await deletePlayerByName(firestore, 'FirstTeamClassPlayers', name);
-      await deletePlayerByName(firestore, 'SecondTeamClassPlayers', name);
-    }
-
-    // Show a Snackbar message indicating the players that have been removed
-    showSnackbar(selectedPlayers);
-
-    // Refresh the data to trigger a UI update
-    await refreshData();
-  }
-
-  Future<void> deletePlayerByName(FirebaseFirestore firestore, String collection, String name) async {
-    final querySnapshot = await firestore.collection('clubs').doc(widget.clubId).collection(collection).where('name', isEqualTo: name).get();
-
-    for (final document in querySnapshot.docs) {
-      await document.reference.delete();
-    }
-  }
-
-  Future<void> refreshData() async {
-    FirstTeamClassNotifier firstTeamClassNotifier = Provider.of<FirstTeamClassNotifier>(context, listen: false);
-    await _fetchFirstTeamClassAndUpdateNotifier(firstTeamClassNotifier);
-
-    SecondTeamClassNotifier secondTeamClassNotifier = Provider.of<SecondTeamClassNotifier>(context, listen: false);
-    await _fetchSecondTeamClassAndUpdateNotifier(secondTeamClassNotifier);
-
-    PlayersNotifier playersNotifier = Provider.of<PlayersNotifier>(context, listen: false);
-    playersNotifier.setFirstTeamPlayers(firstTeamClassNotifier.firstTeamClassList);
-    playersNotifier.setSecondTeamPlayers(secondTeamClassNotifier.secondTeamClassList);
-
-    // Call setState to ensure the UI is updated with the latest data
-    setState(() {});
-  }
-
-  void showSnackbar(List<dynamic> players) {
-    final snackBar = SnackBar(
-      content: Text('${players.length} players have been removed: ${players.map((player) => player.name).join(", ")}'),
+  Widget _buildImagePickerButton(String label, File? imageFile, Function(File?) onImagePicked) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label),
+        const SizedBox(height: 10),
+        Row(
+          children: [
+            ElevatedButton(
+              onPressed: () async {
+                final pickedImage = await pickImage();
+                onImagePicked(pickedImage);
+              },
+              child: const Text('Pick Image'),
+            ),
+            const SizedBox(width: 10),
+            imageFile != null ? Image.file(imageFile, width: 100, height: 100) : const Text('No image selected'),
+          ],
+        ),
+        const SizedBox(height: 20),
+      ],
     );
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
+  void _showSuccessToast() {
+    Fluttertoast.showToast(
+      msg: "Sponsor added successfully!",
+      toastLength: Toast.LENGTH_LONG,
+      gravity: ToastGravity.CENTER,
+      backgroundColor: Colors.green,
+      textColor: Colors.white,
+      fontSize: 16.0,
+    );
+  }
+
+  void _showErrorToast(String message) {
+    Fluttertoast.showToast(
+      msg: "Error: $message",
+      toastLength: Toast.LENGTH_LONG,
+      gravity: ToastGravity.CENTER,
+      backgroundColor: Colors.red,
+      textColor: Colors.white,
+      fontSize: 16.0,
+    );
   }
 }

@@ -112,7 +112,17 @@ class MyAddNewOppTeamPageState extends State<MyAddNewOppTeamPage> {
       final awayTeamName = _awayTeamNameController.text;
 
       try {
-        // Upload image
+        // Check if the away team name already exists
+        bool teamExists = await doesOppTeamExist(awayTeamName);
+        if (teamExists) {
+          _showErrorToast('Opposition team name already exists.');
+          setState(() {
+            _isSubmitting = false;
+          });
+          return;
+        }
+
+        // Upload image if selected
         String? imageUrl = _selectedImage != null ? await _uploadImageToStorage(_selectedImage!, 'away_team_icon.jpg') : null;
 
         // Update Firestore document with data
@@ -146,13 +156,24 @@ class MyAddNewOppTeamPageState extends State<MyAddNewOppTeamPage> {
     }
   }
 
+  Future<bool> doesOppTeamExist(String awayTeamName) async {
+    final querySnapshot = await FirebaseFirestore.instance
+        .collection('clubs')
+        .doc(widget.clubId)
+        .collection('MatchDayBannerForClubOpp')
+        .where('club_name', isEqualTo: awayTeamName)
+        .get();
+
+    return querySnapshot.docs.isNotEmpty;
+  }
+
   Future<String?> _uploadImageToStorage(File imageFile, String imageName) async {
     try {
       // Generate a unique filename using the current date and time
       String timestamp = DateTime.now().millisecondsSinceEpoch.toString();
       String uniqueImageName = 'away_team_icon_$timestamp.jpg';
 
-      final Reference storageReference = FirebaseStorage.instance.ref().child('away_team_icons').child(uniqueImageName);
+      final Reference storageReference = FirebaseStorage.instance.ref().child('${widget.clubId}/away_team_icons').child(uniqueImageName);
       final UploadTask uploadTask = storageReference.putFile(imageFile);
 
       await uploadTask.whenComplete(() {});

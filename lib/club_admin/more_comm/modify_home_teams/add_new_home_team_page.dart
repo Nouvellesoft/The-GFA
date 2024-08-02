@@ -69,6 +69,16 @@ class MyAddNewHomeTeamPageState extends State<MyAddNewHomeTeamPage> {
       final homeTeamName = _homeTeamNameController.text;
 
       try {
+        // Check if the home team name already exists
+        bool teamExists = await doesHomeTeamExist(homeTeamName);
+        if (teamExists) {
+          _showErrorToast('Home team name already exists.');
+          setState(() {
+            _isSubmitting = false;
+          });
+          return;
+        }
+
         // Update Firestore document with data
         await FirebaseFirestore.instance.collection('clubs').doc(widget.clubId).collection('MatchDayBannerForClub').add({
           'id': '10',
@@ -97,6 +107,17 @@ class MyAddNewHomeTeamPageState extends State<MyAddNewHomeTeamPage> {
         });
       }
     }
+  }
+
+  Future<bool> doesHomeTeamExist(String homeTeamName) async {
+    final querySnapshot = await FirebaseFirestore.instance
+        .collection('clubs')
+        .doc(widget.clubId)
+        .collection('MatchDayBannerForClub')
+        .where('club_name', isEqualTo: homeTeamName)
+        .get();
+
+    return querySnapshot.docs.isNotEmpty;
   }
 
   void _showSuccessToast() {

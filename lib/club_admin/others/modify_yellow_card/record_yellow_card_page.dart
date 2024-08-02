@@ -179,16 +179,8 @@ class MyRecordYellowCardPageState extends State<MyRecordYellowCardPage> {
   }
 
   Future<void> _fetchPlayersTableAndUpdateNotifier(PlayersTableNotifier playersTableNotifier) async {
-    // Fetch the collection of club IDs from Firestore
-    QuerySnapshot clubSnapshot = await FirebaseFirestore.instance.collection('clubs').get();
-    List<String> clubIds = clubSnapshot.docs.map((doc) => doc.id).toList();
+    await getPlayersTable(playersTableNotifier, widget.clubId);
 
-    // Process each club ID
-    for (String clubId in clubIds) {
-      await getPlayersTable(playersTableNotifier, clubId);
-    }
-
-    // Optionally, notify listeners or update UI after fetching
     setState(() {}); // Refresh the UI if needed
   }
 }

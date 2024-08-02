@@ -91,7 +91,7 @@ class MyAddMonthlyPhotosPageState extends State<MyAddMonthlyPhotosPage> {
 
   Future<String?> _uploadImageToStorage(File imageFile, String imageName) async {
     try {
-      final Reference storageReference = FirebaseStorage.instance.ref().child('club_training_match_images').child(imageName);
+      final Reference storageReference = FirebaseStorage.instance.ref().child('${widget.clubId}/club_training_match_images').child(imageName);
       final UploadTask uploadTask = storageReference.putFile(imageFile);
 
       await uploadTask.whenComplete(() {});

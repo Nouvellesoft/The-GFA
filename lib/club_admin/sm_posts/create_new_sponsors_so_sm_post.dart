@@ -435,8 +435,8 @@ class _CreateNewSponsorsShoutOutSMPostState extends State<CreateNewSponsorsShout
     );
 
     // Reference to the Firebase Storage paths with dynamic file names
-    var storageRefLowRes = FirebaseStorage.instance.ref().child('new_sponsor_event_banners/low_resolution/$fileNameLowRes');
-    var storageRefHighRes = FirebaseStorage.instance.ref().child('new_sponsor_event_banners/high_resolution/$fileNameHighRes');
+    var storageRefLowRes = FirebaseStorage.instance.ref().child('${widget.clubId}/new_sponsor_event_banners/low_resolution/$fileNameLowRes');
+    var storageRefHighRes = FirebaseStorage.instance.ref().child('${widget.clubId}/new_sponsor_event_banners/high_resolution/$fileNameHighRes');
 
     // Compress the image for low-resolution version
     img.Image compressedImage = img.decodeImage(Uint8List.fromList(pngBytes!))!;

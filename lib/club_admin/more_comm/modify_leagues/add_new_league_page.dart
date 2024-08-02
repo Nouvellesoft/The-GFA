@@ -69,6 +69,16 @@ class MyAddNewLeaguePageState extends State<MyAddNewLeaguePage> {
       final leagueName = _leagueNameController.text;
 
       try {
+        // Check if the league name already exists
+        bool leagueExists = await doesLeagueExist(leagueName);
+        if (leagueExists) {
+          _showErrorToast('League name already exists.');
+          setState(() {
+            _isSubmitting = false;
+          });
+          return;
+        }
+
         // Update Firestore document with data
         await FirebaseFirestore.instance.collection('clubs').doc(widget.clubId).collection('MatchDayBannerForLeague').add({
           'id': '10',
@@ -94,6 +104,17 @@ class MyAddNewLeaguePageState extends State<MyAddNewLeaguePage> {
         });
       }
     }
+  }
+
+  Future<bool> doesLeagueExist(String leagueName) async {
+    final querySnapshot = await FirebaseFirestore.instance
+        .collection('clubs')
+        .doc(widget.clubId)
+        .collection('MatchDayBannerForLeague')
+        .where('league', isEqualTo: leagueName)
+        .get();
+
+    return querySnapshot.docs.isNotEmpty;
   }
 
   void _showSuccessToast() {
