@@ -152,7 +152,8 @@ dynamic _twitter;
 dynamic _worstMoment;
 
 class SubPage extends StatefulWidget {
-  const SubPage({super.key, this.title});
+  final String clubId;
+  const SubPage({super.key, this.title, required this.clubId});
 
   final String? title;
 
@@ -293,7 +294,8 @@ class _SubPageState extends State<SubPage> {
       String collectionName = 'FirstTeamClassPlayers';
 
       // Find the corresponding document in the firestore by querying for the full name
-      QuerySnapshot querySnapshot = await firestore.collection(collectionName).where('name', isEqualTo: fullName).get();
+      QuerySnapshot querySnapshot =
+          await firestore.collection('clubs').doc(widget.clubId).collection(collectionName).where('name', isEqualTo: fullName).get();
 
       if (querySnapshot.docs.isNotEmpty) {
         // Get the first document from the query results
@@ -385,15 +387,15 @@ class _SubPageState extends State<SubPage> {
   Future<void> uploadImagesToStorageAndFirestore(List<File> imageFiles) async {
     try {
       // Find the document ID for the user with the specified name (_name)
-      String _queryName = _name.toLowerCase().replaceAll(" ", "");
+      String queryName = _name.toLowerCase().replaceAll(" ", "");
 
-      QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('FirstTeamClassPlayers').get();
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('clubs').doc(widget.clubId).collection('FirstTeamClassPlayers').get();
 
       String? documentId;
 
       for (QueryDocumentSnapshot document in querySnapshot.docs) {
         String documentName = document['name'].toLowerCase().replaceAll(" ", "");
-        if (documentName == _queryName) {
+        if (documentName == queryName) {
           // Found the document with the matching name
           documentId = document.id;
           break; // Exit the loop since we found the document
@@ -402,10 +404,11 @@ class _SubPageState extends State<SubPage> {
 
       if (documentId != null) {
         for (int i = 0; i < imageFiles.length; i++) {
-          String imageName = '$_queryName${i + 1}.jpg';
+          String imageName = '$queryName${i + 1}.jpg';
 
           // Upload each image to Firebase Storage
-          final Reference storageReference = FirebaseStorage.instance.ref().child('players_images').child(_queryName).child(imageName);
+          final Reference storageReference =
+              FirebaseStorage.instance.ref().child('${widget.clubId}/players_images').child(queryName).child(imageName);
           final UploadTask uploadTask = storageReference.putFile(imageFiles[i]);
           await uploadTask.whenComplete(() {});
 
@@ -416,7 +419,7 @@ class _SubPageState extends State<SubPage> {
           String imageField = i == 0 ? 'image' : 'image_two'; // Set the field name based on the image index
 
           // Update the existing document for the specified user (_queryName)
-          await FirebaseFirestore.instance.collection('FirstTeamClassPlayers').doc(documentId).update({
+          await FirebaseFirestore.instance.collection('clubs').doc(widget.clubId).collection('FirstTeamClassPlayers').doc(documentId).update({
             imageField: imageUrl,
           });
         }
@@ -435,7 +438,7 @@ class _SubPageState extends State<SubPage> {
         }
       } else {
         if (kDebugMode) {
-          print('User with name $_queryName not found.');
+          print('User with name $queryName not found.');
         }
       }
     } catch (e) {
@@ -4662,7 +4665,8 @@ class _SubPageState extends State<SubPage> {
 
     try {
       // Query the Firestore collection
-      QuerySnapshot querySnapshot = await firestore.collection(collectionName).where('name', isEqualTo: _name).limit(1).get();
+      QuerySnapshot querySnapshot =
+          await firestore.collection('clubs').doc(widget.clubId).collection(collectionName).where('name', isEqualTo: _name).limit(1).get();
 
       if (querySnapshot.docs.isNotEmpty) {
         // Get the first document from the query results
@@ -5423,8 +5427,8 @@ class _SubPageState extends State<SubPage> {
                     try {
                       await _submitForm();
                       if (context.mounted) {
-                      Navigator.pop(context); // Close the dialog
-    }
+                        Navigator.pop(context); // Close the dialog
+                      }
                     } catch (e) {
                       if (kDebugMode) {
                         print("Error submitting form: $e");

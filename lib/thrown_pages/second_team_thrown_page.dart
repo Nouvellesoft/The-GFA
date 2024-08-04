@@ -208,7 +208,7 @@ class _MySecondTeamClassPage extends State<MySecondTeamClassPage> {
   }
 
   Future navigateToSecondTeamClassDetailsPage(context) async {
-    Navigator.push(context, MaterialPageRoute(builder: (context) => const SecondTeamClassDetailsPage()));
+    Navigator.push(context, MaterialPageRoute(builder: (context) => SecondTeamClassDetailsPage(clubId: widget.clubId)));
   }
 
   Future navigateTablesAndStatsDetails(BuildContext context) async {
@@ -604,7 +604,7 @@ class _MySecondTeamClassPage extends State<MySecondTeamClassPage> {
                       onPressed: () {
                         showSearch(
                           context: context,
-                          delegate: MySecondTeamClassSearch(all: secondTeamClassNotifier.secondTeamClassList),
+                          delegate: MySecondTeamClassSearch(all: secondTeamClassNotifier.secondTeamClassList, clubId: widget.clubId),
                         );
                       },
                       tooltip: "Search",

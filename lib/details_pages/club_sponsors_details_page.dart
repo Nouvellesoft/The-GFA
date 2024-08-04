@@ -10,7 +10,6 @@ import 'package:url_launcher/url_launcher.dart';
 import '/notifier/club_sponsors_notifier.dart';
 import '../model/club_sponsors.dart';
 
-
 Color conColor = const Color.fromRGBO(194, 194, 220, 1.0);
 Color conColorTwo = const Color.fromRGBO(151, 147, 151, 1.0);
 Color textColor = const Color.fromRGBO(222, 214, 214, 1.0);
@@ -74,8 +73,9 @@ dynamic _ourServices;
 late ClubSponsorsNotifier clubSponsorsNotifier;
 
 class ClubSponsorsDetailsPage extends StatefulWidget {
+  final String clubId;
 
-  const ClubSponsorsDetailsPage({super.key});
+  const ClubSponsorsDetailsPage({super.key, required this.clubId});
 
   @override
   State<ClubSponsorsDetailsPage> createState() => _ClubSponsorsDetailsPageState();

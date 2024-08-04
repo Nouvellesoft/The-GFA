@@ -128,7 +128,8 @@ dynamic _twitter;
 dynamic _linkedIn;
 
 class CoachesDetailsPage extends StatefulWidget {
-  const CoachesDetailsPage({super.key, this.title});
+  final String clubId;
+  const CoachesDetailsPage({super.key, this.title, required this.clubId});
 
   final String? title;
 
@@ -248,7 +249,8 @@ class _CoachesDetailsPage extends State<CoachesDetailsPage> {
       String collectionName = 'Coaches';
 
       // Find the corresponding document in the firestore by querying for the full name
-      QuerySnapshot querySnapshot = await firestore.collection(collectionName).where('name', isEqualTo: fullName).get();
+      QuerySnapshot querySnapshot =
+          await firestore.collection('clubs').doc(widget.clubId).collection(collectionName).where('name', isEqualTo: fullName).get();
 
       if (querySnapshot.docs.isNotEmpty) {
         // Get the first document from the query results
@@ -313,7 +315,7 @@ class _CoachesDetailsPage extends State<CoachesDetailsPage> {
       // Find the document ID for the user with the specified name (_name)
       String queryName = _name.toLowerCase().replaceAll(" ", "");
 
-      QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('Coaches').get();
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('clubs').doc(widget.clubId).collection('Coaches').get();
 
       String? documentId;
 
@@ -331,7 +333,7 @@ class _CoachesDetailsPage extends State<CoachesDetailsPage> {
           String imageName = '$queryName${i + 1}.jpg';
 
           // Upload each image to Firebase Storage
-          final Reference storageReference = FirebaseStorage.instance.ref().child('coaches').child(queryName).child(imageName);
+          final Reference storageReference = FirebaseStorage.instance.ref().child('${widget.clubId}/coaches').child(queryName).child(imageName);
           final UploadTask uploadTask = storageReference.putFile(imageFiles[i]);
           await uploadTask.whenComplete(() {});
 
@@ -342,7 +344,7 @@ class _CoachesDetailsPage extends State<CoachesDetailsPage> {
           String imageField = i == 0 ? 'image' : 'image_two'; // Set the field name based on the image index
 
           // Update the existing document for the specified user (_queryName)
-          await FirebaseFirestore.instance.collection('Coaches').doc(documentId).update({
+          await FirebaseFirestore.instance.collection('clubs').doc(widget.clubId).collection('Coaches').doc(documentId).update({
             imageField: imageUrl,
           });
         }
@@ -3086,7 +3088,8 @@ class _CoachesDetailsPage extends State<CoachesDetailsPage> {
 
     try {
       // Query the Firestore collection
-      QuerySnapshot querySnapshot = await firestore.collection(collectionName).where('name', isEqualTo: _name).limit(1).get();
+      QuerySnapshot querySnapshot =
+          await firestore.collection('clubs').doc(widget.clubId).collection(collectionName).where('name', isEqualTo: _name).limit(1).get();
 
       if (querySnapshot.docs.isNotEmpty) {
         // Get the first document from the query results
@@ -3829,7 +3832,7 @@ class _CoachesDetailsPage extends State<CoachesDetailsPage> {
                   String formattedTimestamp = DateFormat('MMMM yyyy').format(currentDateTime);
 
                   // Store bug report in Firestore
-                  await FirebaseFirestore.instance.collection('CoachesMonthlyComments').add({
+                  await FirebaseFirestore.instance.collection('clubs').doc(widget.clubId).collection('CoachesMonthlyComments').add({
                     'name': coachesNotifier.currentCoaches.name,
                     'image': coachesNotifier.currentCoaches.image,
                     'comment': commentDescription,

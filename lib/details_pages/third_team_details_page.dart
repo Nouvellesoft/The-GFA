@@ -63,15 +63,13 @@ String philosophyTitle = "My Philosophy about Life\n";
 String droplineTitle = "My Dropline to my fellow $clubName footballers\n";
 
 String facebookProfileSharedPreferencesTitle = "Manual Website Search";
-String facebookProfileSharedPreferencesContentOne =
-    "Apparently, you'd need to search manually for ";
+String facebookProfileSharedPreferencesContentOne = "Apparently, you'd need to search manually for ";
 String facebookProfileSharedPreferencesContentTwo = ", on Facebook.com";
 String facebookProfileSharedPreferencesButton = "Go to Facebook";
 String facebookProfileSharedPreferencesButtonTwo = "Lol, No";
 
 String linkedInProfileSharedPreferencesTitle = "Manual Website Search";
-String linkedInProfileSharedPreferencesContentOne =
-    "Apparently, you'd need to search manually for ";
+String linkedInProfileSharedPreferencesContentOne = "Apparently, you'd need to search manually for ";
 String linkedInProfileSharedPreferencesContentTwo = ", on LinkedIn.com";
 String linkedInProfileSharedPreferencesButton = "Go to LinkedIn";
 String linkedInProfileSharedPreferencesButtonTwo = "Lol, No";
@@ -142,13 +140,13 @@ dynamic _twitter;
 dynamic _worstMoment;
 
 class ThirdTeamClassDetailsPage extends StatefulWidget {
-  const ThirdTeamClassDetailsPage({super.key, this.title});
+  final String clubId;
+  const ThirdTeamClassDetailsPage({super.key, this.title, required this.clubId});
 
   final String? title;
 
   @override
-  State<ThirdTeamClassDetailsPage> createState() =>
-      _ThirdTeamClassDetailsPage();
+  State<ThirdTeamClassDetailsPage> createState() => _ThirdTeamClassDetailsPage();
 }
 
 class _ThirdTeamClassDetailsPage extends State<ThirdTeamClassDetailsPage> {
@@ -167,15 +165,13 @@ class _ThirdTeamClassDetailsPage extends State<ThirdTeamClassDetailsPage> {
     if (await canLaunchUrl(url as Uri)) {
       await launchUrl(url as Uri);
     } else {
-      scaffoldMessenger.showSnackBar(
-          const SnackBar(content: Text("The required App not installed")));
+      scaffoldMessenger.showSnackBar(const SnackBar(content: Text("The required App not installed")));
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    thirdTeamClassNotifier =
-        Provider.of<ThirdTeamClassNotifier>(context, listen: true);
+    thirdTeamClassNotifier = Provider.of<ThirdTeamClassNotifier>(context, listen: true);
 
     return ConfettiWidget(
       confettiController: _confettiController!,
@@ -201,10 +197,7 @@ class _ThirdTeamClassDetailsPage extends State<ThirdTeamClassDetailsPage> {
           centerTitle: true,
           title: Text(
             thirdTeamClassNotifier.currentThirdTeamClass.nickname!,
-            style: GoogleFonts.sanchez(
-                color: appBarTextColor,
-                fontSize: 25,
-                fontWeight: FontWeight.w400),
+            style: GoogleFonts.sanchez(color: appBarTextColor, fontSize: 25, fontWeight: FontWeight.w400),
           ),
           shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.vertical(
@@ -227,17 +220,12 @@ class _ThirdTeamClassDetailsPage extends State<ThirdTeamClassDetailsPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[
-              if (thirdTeamClassNotifier.currentThirdTeamClass.imageTwo
-                  .toString()
-                  .isEmpty) ...[
+              if (thirdTeamClassNotifier.currentThirdTeamClass.imageTwo.toString().isEmpty) ...[
                 Tooltip(
                     message: thirdTeamClassNotifier.currentThirdTeamClass.name,
                     child: GestureDetector(
                       onTap: () => setState(() {
-                        crossFadeView =
-                            crossFadeView == CrossFadeState.showFirst
-                                ? CrossFadeState.showSecond
-                                : CrossFadeState.showFirst;
+                        crossFadeView = crossFadeView == CrossFadeState.showFirst ? CrossFadeState.showSecond : CrossFadeState.showFirst;
                       }),
                       child: SizedBox(
                         height: MediaQuery.of(context).size.height * .64,
@@ -251,28 +239,19 @@ class _ThirdTeamClassDetailsPage extends State<ThirdTeamClassDetailsPage> {
                             borderRadius: BorderRadius.circular(10.0),
                           ),
                           child: AnimatedCrossFade(
-                            crossFadeState:
-                                crossFadeView == CrossFadeState.showFirst
-                                    ? CrossFadeState.showSecond
-                                    : CrossFadeState.showFirst,
+                            crossFadeState: crossFadeView == CrossFadeState.showFirst ? CrossFadeState.showSecond : CrossFadeState.showFirst,
                             duration: const Duration(milliseconds: 1000),
                             firstChild: CachedNetworkImage(
-                              imageUrl: thirdTeamClassNotifier
-                                  .currentThirdTeamClass.image!,
+                              imageUrl: thirdTeamClassNotifier.currentThirdTeamClass.image!,
                               fit: BoxFit.cover,
-                              placeholder: (context, url) =>
-                                  const CircularProgressIndicator(),
-                              errorWidget: (context, url, error) =>
-                                  Icon(MdiIcons.alertRhombus),
+                              placeholder: (context, url) => const CircularProgressIndicator(),
+                              errorWidget: (context, url, error) => Icon(MdiIcons.alertRhombus),
                             ),
                             secondChild: CachedNetworkImage(
-                              imageUrl: thirdTeamClassNotifier
-                                  .currentThirdTeamClass.image!,
+                              imageUrl: thirdTeamClassNotifier.currentThirdTeamClass.image!,
                               fit: BoxFit.cover,
-                              placeholder: (context, url) =>
-                                  const CircularProgressIndicator(),
-                              errorWidget: (context, url, error) =>
-                                  Icon(MdiIcons.alertRhombus),
+                              placeholder: (context, url) => const CircularProgressIndicator(),
+                              errorWidget: (context, url, error) => Icon(MdiIcons.alertRhombus),
                             ),
                           ),
                         ),
@@ -283,10 +262,7 @@ class _ThirdTeamClassDetailsPage extends State<ThirdTeamClassDetailsPage> {
                     message: thirdTeamClassNotifier.currentThirdTeamClass.name,
                     child: GestureDetector(
                       onTap: () => setState(() {
-                        crossFadeView =
-                            crossFadeView == CrossFadeState.showFirst
-                                ? CrossFadeState.showSecond
-                                : CrossFadeState.showFirst;
+                        crossFadeView = crossFadeView == CrossFadeState.showFirst ? CrossFadeState.showSecond : CrossFadeState.showFirst;
                       }),
                       child: SizedBox(
                         width: MediaQuery.of(context).size.width,
@@ -299,28 +275,19 @@ class _ThirdTeamClassDetailsPage extends State<ThirdTeamClassDetailsPage> {
                             borderRadius: BorderRadius.circular(10.0),
                           ),
                           child: AnimatedCrossFade(
-                            crossFadeState:
-                                crossFadeView == CrossFadeState.showFirst
-                                    ? CrossFadeState.showSecond
-                                    : CrossFadeState.showFirst,
+                            crossFadeState: crossFadeView == CrossFadeState.showFirst ? CrossFadeState.showSecond : CrossFadeState.showFirst,
                             duration: const Duration(milliseconds: 1000),
                             firstChild: CachedNetworkImage(
-                              imageUrl: thirdTeamClassNotifier
-                                  .currentThirdTeamClass.image!,
+                              imageUrl: thirdTeamClassNotifier.currentThirdTeamClass.image!,
                               fit: BoxFit.cover,
-                              placeholder: (context, url) =>
-                                  const CircularProgressIndicator(),
-                              errorWidget: (context, url, error) =>
-                                  Icon(MdiIcons.alertRhombus),
+                              placeholder: (context, url) => const CircularProgressIndicator(),
+                              errorWidget: (context, url, error) => Icon(MdiIcons.alertRhombus),
                             ),
                             secondChild: CachedNetworkImage(
-                              imageUrl: thirdTeamClassNotifier
-                                  .currentThirdTeamClass.imageTwo!,
+                              imageUrl: thirdTeamClassNotifier.currentThirdTeamClass.imageTwo!,
                               fit: BoxFit.cover,
-                              placeholder: (context, url) =>
-                                  const CircularProgressIndicator(),
-                              errorWidget: (context, url, error) =>
-                                  Icon(MdiIcons.alertRhombus),
+                              placeholder: (context, url) => const CircularProgressIndicator(),
+                              errorWidget: (context, url, error) => Icon(MdiIcons.alertRhombus),
                             ),
                           ),
                         ),
@@ -335,32 +302,22 @@ class _ThirdTeamClassDetailsPage extends State<ThirdTeamClassDetailsPage> {
                   child: Card(
                     elevation: 4,
                     shape: OutlineInputBorder(
-                      borderSide: BorderSide(
-                          color: shapeDecorationColor.withOpacity(0.70),
-                          width: 4.0,
-                          style: BorderStyle.solid),
+                      borderSide: BorderSide(color: shapeDecorationColor.withOpacity(0.70), width: 4.0, style: BorderStyle.solid),
                     ),
                     margin: const EdgeInsets.fromLTRB(16, 16, 16, 16),
                     child: Padding(
-                      padding: const EdgeInsets.only(
-                          left: 16.0, top: 16.0, right: 16.0, bottom: 16.0),
+                      padding: const EdgeInsets.only(left: 16.0, top: 16.0, right: 16.0, bottom: 16.0),
                       child: SingleChildScrollView(
                         scrollDirection: Axis.horizontal,
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: <Widget>[
                             Text(
-                              thirdTeamClassNotifier.currentThirdTeamClass.name!
-                                  .toUpperCase(),
-                              style: GoogleFonts.blinker(
-                                  color: shapeDecorationTextColor,
-                                  fontSize: 30,
-                                  fontWeight: FontWeight.w500),
+                              thirdTeamClassNotifier.currentThirdTeamClass.name!.toUpperCase(),
+                              style: GoogleFonts.blinker(color: shapeDecorationTextColor, fontSize: 30, fontWeight: FontWeight.w500),
                             ),
                             (() {
-                              if (thirdTeamClassNotifier
-                                      .currentThirdTeamClass.captain ==
-                                  "Yes") {
+                              if (thirdTeamClassNotifier.currentThirdTeamClass.captain == "Yes") {
                                 return Row(
                                   children: <Widget>[
                                     const SizedBox(width: 10),
@@ -397,8 +354,7 @@ class _ThirdTeamClassDetailsPage extends State<ThirdTeamClassDetailsPage> {
                   borderRadius: BorderRadius.circular(10.0),
                 ),
                 child: Padding(
-                  padding: const EdgeInsets.only(
-                      top: 20, bottom: 20, left: 8.0, right: 8.0),
+                  padding: const EdgeInsets.only(top: 20, bottom: 20, left: 8.0, right: 8.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: <Widget>[
@@ -412,10 +368,7 @@ class _ThirdTeamClassDetailsPage extends State<ThirdTeamClassDetailsPage> {
                             0: Text(
                               reachDetails,
                               style: GoogleFonts.sacramento(
-                                  color: shapeDecorationTextColorTwo,
-                                  fontSize: 25,
-                                  fontStyle: FontStyle.normal,
-                                  fontWeight: FontWeight.w400),
+                                  color: shapeDecorationTextColorTwo, fontSize: 25, fontStyle: FontStyle.normal, fontWeight: FontWeight.w400),
                             ),
                             1: Text(
                               autoBioDetails,
@@ -455,19 +408,16 @@ class _ThirdTeamClassDetailsPage extends State<ThirdTeamClassDetailsPage> {
       DeviceOrientation.portraitDown,
     ]);
 
-    _confettiController =
-        ConfettiController(duration: const Duration(seconds: 77));
+    _confettiController = ConfettiController(duration: const Duration(seconds: 77));
     _confettiController!.play();
 
-    ThirdTeamClassNotifier thirdTeamClassNotifier =
-        Provider.of<ThirdTeamClassNotifier>(context, listen: false);
+    ThirdTeamClassNotifier thirdTeamClassNotifier = Provider.of<ThirdTeamClassNotifier>(context, listen: false);
 
     _autoBio = thirdTeamClassNotifier.currentThirdTeamClass.autoBio;
     _bestMoment = thirdTeamClassNotifier.currentThirdTeamClass.bestMoment;
     _dob = thirdTeamClassNotifier.currentThirdTeamClass.dob;
     _dreamFC = thirdTeamClassNotifier.currentThirdTeamClass.dreamFC;
-    _positionPlaying =
-        thirdTeamClassNotifier.currentThirdTeamClass.positionPlaying;
+    _positionPlaying = thirdTeamClassNotifier.currentThirdTeamClass.positionPlaying;
     _email = thirdTeamClassNotifier.currentThirdTeamClass.email;
     _facebook = thirdTeamClassNotifier.currentThirdTeamClass.facebook;
     _linkedIn = thirdTeamClassNotifier.currentThirdTeamClass.linkedIn;
@@ -485,17 +435,12 @@ class _ThirdTeamClassDetailsPage extends State<ThirdTeamClassDetailsPage> {
     _twitter = thirdTeamClassNotifier.currentThirdTeamClass.twitter;
     _snapchat = thirdTeamClassNotifier.currentThirdTeamClass.snapchat;
     _tikTok = thirdTeamClassNotifier.currentThirdTeamClass.tikTok;
-    _otherPositionsOfPlay =
-        thirdTeamClassNotifier.currentThirdTeamClass.otherPositionsOfPlay;
-    _favFootballLegend =
-        thirdTeamClassNotifier.currentThirdTeamClass.favFootballLegend;
-    _yearOfInception =
-        thirdTeamClassNotifier.currentThirdTeamClass.yearOfInception;
-    _leftOrRightFooted =
-        thirdTeamClassNotifier.currentThirdTeamClass.leftOrRightFooted;
+    _otherPositionsOfPlay = thirdTeamClassNotifier.currentThirdTeamClass.otherPositionsOfPlay;
+    _favFootballLegend = thirdTeamClassNotifier.currentThirdTeamClass.favFootballLegend;
+    _yearOfInception = thirdTeamClassNotifier.currentThirdTeamClass.yearOfInception;
+    _leftOrRightFooted = thirdTeamClassNotifier.currentThirdTeamClass.leftOrRightFooted;
     _adidasOrNike = thirdTeamClassNotifier.currentThirdTeamClass.adidasOrNike;
-    _ronaldoOrMessi =
-        thirdTeamClassNotifier.currentThirdTeamClass.ronaldoOrMessi;
+    _ronaldoOrMessi = thirdTeamClassNotifier.currentThirdTeamClass.ronaldoOrMessi;
     _worstMoment = thirdTeamClassNotifier.currentThirdTeamClass.worstMoment;
 
     userBIO = <int, Widget>{
@@ -513,18 +458,13 @@ class _ThirdTeamClassDetailsPage extends State<ThirdTeamClassDetailsPage> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: buttonColor,
                       elevation: 2,
-                      shape: BeveledRectangleBorder(
-                          borderRadius: BorderRadius.circular(10)),
+                      shape: BeveledRectangleBorder(borderRadius: BorderRadius.circular(10)),
                     ),
                     icon: Icon(
                       MdiIcons.dialpad,
                       color: iconTextColor,
                     ),
-                    label: Text(callButton,
-                        style: GoogleFonts.abel(
-                            color: iconTextColor,
-                            fontSize: 18,
-                            fontWeight: FontWeight.w300)),
+                    label: Text(callButton, style: GoogleFonts.abel(color: iconTextColor, fontSize: 18, fontWeight: FontWeight.w300)),
                     onPressed: () {
                       if (_phone.toString().startsWith('0')) {
                         var most = _phone.toString().substring(1);
@@ -547,18 +487,13 @@ class _ThirdTeamClassDetailsPage extends State<ThirdTeamClassDetailsPage> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: buttonColor,
                         elevation: 2,
-                        shape: BeveledRectangleBorder(
-                            borderRadius: BorderRadius.circular(10)),
+                        shape: BeveledRectangleBorder(borderRadius: BorderRadius.circular(10)),
                       ),
                       icon: Icon(
                         MdiIcons.dialpad,
                         color: iconTextColor,
                       ),
-                      label: Text(callButton,
-                          style: GoogleFonts.abel(
-                              color: iconTextColor,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w300)),
+                      label: Text(callButton, style: GoogleFonts.abel(color: iconTextColor, fontSize: 18, fontWeight: FontWeight.w300)),
                       onPressed: () {
                         launchURL(callFIRST + _phone);
                       },
@@ -578,18 +513,13 @@ class _ThirdTeamClassDetailsPage extends State<ThirdTeamClassDetailsPage> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: buttonColor,
                       elevation: 2,
-                      shape: BeveledRectangleBorder(
-                          borderRadius: BorderRadius.circular(10)),
+                      shape: BeveledRectangleBorder(borderRadius: BorderRadius.circular(10)),
                     ),
                     icon: Icon(
                       MdiIcons.message,
                       color: iconTextColor,
                     ),
-                    label: Text(messageButton,
-                        style: GoogleFonts.abel(
-                            color: iconTextColor,
-                            fontSize: 18,
-                            fontWeight: FontWeight.w300)),
+                    label: Text(messageButton, style: GoogleFonts.abel(color: iconTextColor, fontSize: 18, fontWeight: FontWeight.w300)),
                     onPressed: () {
                       if (_phone.toString().startsWith('0')) {
                         var most = _phone.toString().substring(1);
@@ -612,18 +542,13 @@ class _ThirdTeamClassDetailsPage extends State<ThirdTeamClassDetailsPage> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: buttonColor,
                         elevation: 2,
-                        shape: BeveledRectangleBorder(
-                            borderRadius: BorderRadius.circular(10)),
+                        shape: BeveledRectangleBorder(borderRadius: BorderRadius.circular(10)),
                       ),
                       icon: Icon(
                         MdiIcons.message,
                         color: iconTextColor,
                       ),
-                      label: Text(messageButton,
-                          style: GoogleFonts.abel(
-                              color: iconTextColor,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w300)),
+                      label: Text(messageButton, style: GoogleFonts.abel(color: iconTextColor, fontSize: 18, fontWeight: FontWeight.w300)),
                       onPressed: () {
                         launchURL(smsFIRST + _phone);
                       },
@@ -643,38 +568,21 @@ class _ThirdTeamClassDetailsPage extends State<ThirdTeamClassDetailsPage> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: buttonColor,
                       elevation: 2,
-                      shape: BeveledRectangleBorder(
-                          borderRadius: BorderRadius.circular(10)),
+                      shape: BeveledRectangleBorder(borderRadius: BorderRadius.circular(10)),
                     ),
                     icon: Icon(
                       MdiIcons.whatsapp,
                       color: iconTextColor,
                     ),
-                    label: Text(whatsAppButton,
-                        style: GoogleFonts.abel(
-                            color: iconTextColor,
-                            fontSize: 18,
-                            fontWeight: FontWeight.w300)),
+                    label: Text(whatsAppButton, style: GoogleFonts.abel(color: iconTextColor, fontSize: 18, fontWeight: FontWeight.w300)),
                     onPressed: () {
                       if (_phone.toString().startsWith('0')) {
                         var most = _phone.toString().substring(1);
-                        var firstName = _name
-                            .toString()
-                            .substring(0, _name.toString().indexOf(" "));
-                        launchURL(whatsAppFIRST +
-                            most +
-                            whatsAppSECOND +
-                            firstName +
-                            whatsAppTHIRD);
+                        var firstName = _name.toString().substring(0, _name.toString().indexOf(" "));
+                        launchURL(whatsAppFIRST + most + whatsAppSECOND + firstName + whatsAppTHIRD);
                       } else {
-                        var firstName = _name
-                            .toString()
-                            .substring(0, _name.toString().indexOf(" "));
-                        launchURL(whatsAppFIRST +
-                            _phone +
-                            whatsAppSECOND +
-                            firstName +
-                            whatsAppTHIRD);
+                        var firstName = _name.toString().substring(0, _name.toString().indexOf(" "));
+                        launchURL(whatsAppFIRST + _phone + whatsAppSECOND + firstName + whatsAppTHIRD);
                       }
                     },
                   ),
@@ -691,18 +599,13 @@ class _ThirdTeamClassDetailsPage extends State<ThirdTeamClassDetailsPage> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: buttonColor,
                         elevation: 2,
-                        shape: BeveledRectangleBorder(
-                            borderRadius: BorderRadius.circular(10)),
+                        shape: BeveledRectangleBorder(borderRadius: BorderRadius.circular(10)),
                       ),
                       icon: Icon(
                         MdiIcons.message,
                         color: iconTextColor,
                       ),
-                      label: Text(whatsAppButton,
-                          style: GoogleFonts.abel(
-                              color: iconTextColor,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w300)),
+                      label: Text(whatsAppButton, style: GoogleFonts.abel(color: iconTextColor, fontSize: 18, fontWeight: FontWeight.w300)),
                       onPressed: () {
                         launchURL(smsFIRST + _phone);
                       },
@@ -722,18 +625,13 @@ class _ThirdTeamClassDetailsPage extends State<ThirdTeamClassDetailsPage> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: buttonColor,
                       elevation: 2,
-                      shape: BeveledRectangleBorder(
-                          borderRadius: BorderRadius.circular(10)),
+                      shape: BeveledRectangleBorder(borderRadius: BorderRadius.circular(10)),
                     ),
                     icon: Icon(
                       MdiIcons.gmail,
                       color: iconTextColor,
                     ),
-                    label: Text(emailButton,
-                        style: GoogleFonts.abel(
-                            color: iconTextColor,
-                            fontSize: 18,
-                            fontWeight: FontWeight.w300)),
+                    label: Text(emailButton, style: GoogleFonts.abel(color: iconTextColor, fontSize: 18, fontWeight: FontWeight.w300)),
                     onPressed: () {
                       launchURL(mailFIRST + _email + mailSECOND + _name);
                     },
@@ -751,18 +649,13 @@ class _ThirdTeamClassDetailsPage extends State<ThirdTeamClassDetailsPage> {
                         style: ElevatedButton.styleFrom(
                           backgroundColor: buttonColor,
                           elevation: 2,
-                          shape: BeveledRectangleBorder(
-                              borderRadius: BorderRadius.circular(10)),
+                          shape: BeveledRectangleBorder(borderRadius: BorderRadius.circular(10)),
                         ),
                         icon: Icon(
                           MdiIcons.gmail,
                           color: iconTextColor,
                         ),
-                        label: Text(emailButton,
-                            style: GoogleFonts.abel(
-                                color: iconTextColor,
-                                fontSize: 18,
-                                fontWeight: FontWeight.w300)),
+                        label: Text(emailButton, style: GoogleFonts.abel(color: iconTextColor, fontSize: 18, fontWeight: FontWeight.w300)),
                         onPressed: () {
                           launchURL(mailFIRST + _email + mailSECOND + _name);
                         },
@@ -781,15 +674,10 @@ class _ThirdTeamClassDetailsPage extends State<ThirdTeamClassDetailsPage> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: buttonColor,
                       elevation: 2,
-                      shape: BeveledRectangleBorder(
-                          borderRadius: BorderRadius.circular(10)),
+                      shape: BeveledRectangleBorder(borderRadius: BorderRadius.circular(10)),
                     ),
                     icon: Icon(MdiIcons.twitter, color: iconTextColor),
-                    label: Text(twitterButton,
-                        style: GoogleFonts.abel(
-                            color: iconTextColor,
-                            fontSize: 18,
-                            fontWeight: FontWeight.w300)),
+                    label: Text(twitterButton, style: GoogleFonts.abel(color: iconTextColor, fontSize: 18, fontWeight: FontWeight.w300)),
                     onPressed: () {
                       if (_twitter.toString().startsWith('@')) {
                         var most = _twitter.toString().substring(1);
@@ -812,15 +700,10 @@ class _ThirdTeamClassDetailsPage extends State<ThirdTeamClassDetailsPage> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: buttonColor,
                         elevation: 2,
-                        shape: BeveledRectangleBorder(
-                            borderRadius: BorderRadius.circular(10)),
+                        shape: BeveledRectangleBorder(borderRadius: BorderRadius.circular(10)),
                       ),
                       icon: Icon(MdiIcons.twitter, color: iconTextColor),
-                      label: Text(twitterButton,
-                          style: GoogleFonts.abel(
-                              color: iconTextColor,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w300)),
+                      label: Text(twitterButton, style: GoogleFonts.abel(color: iconTextColor, fontSize: 18, fontWeight: FontWeight.w300)),
                       onPressed: () {
                         launchURL(urlTwitter + _twitter);
                       },
@@ -840,18 +723,13 @@ class _ThirdTeamClassDetailsPage extends State<ThirdTeamClassDetailsPage> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: buttonColor,
                       elevation: 2,
-                      shape: BeveledRectangleBorder(
-                          borderRadius: BorderRadius.circular(10)),
+                      shape: BeveledRectangleBorder(borderRadius: BorderRadius.circular(10)),
                     ),
                     icon: Icon(
                       MdiIcons.instagram,
                       color: iconTextColor,
                     ),
-                    label: Text(instagramButton,
-                        style: GoogleFonts.abel(
-                            color: iconTextColor,
-                            fontSize: 18,
-                            fontWeight: FontWeight.w300)),
+                    label: Text(instagramButton, style: GoogleFonts.abel(color: iconTextColor, fontSize: 18, fontWeight: FontWeight.w300)),
                     onPressed: () {
                       if (_instagram.toString().startsWith('@')) {
                         var most = _instagram.toString().substring(1);
@@ -874,18 +752,13 @@ class _ThirdTeamClassDetailsPage extends State<ThirdTeamClassDetailsPage> {
                         style: ElevatedButton.styleFrom(
                           backgroundColor: buttonColor,
                           elevation: 2,
-                          shape: BeveledRectangleBorder(
-                              borderRadius: BorderRadius.circular(10)),
+                          shape: BeveledRectangleBorder(borderRadius: BorderRadius.circular(10)),
                         ),
                         icon: Icon(
                           MdiIcons.instagram,
                           color: iconTextColor,
                         ),
-                        label: Text(instagramButton,
-                            style: GoogleFonts.abel(
-                                color: iconTextColor,
-                                fontSize: 18,
-                                fontWeight: FontWeight.w300)),
+                        label: Text(instagramButton, style: GoogleFonts.abel(color: iconTextColor, fontSize: 18, fontWeight: FontWeight.w300)),
                         onPressed: () {
                           launchURL(urlInstagram + _instagram);
                         },
@@ -904,18 +777,13 @@ class _ThirdTeamClassDetailsPage extends State<ThirdTeamClassDetailsPage> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: buttonColor,
                       elevation: 2,
-                      shape: BeveledRectangleBorder(
-                          borderRadius: BorderRadius.circular(10)),
+                      shape: BeveledRectangleBorder(borderRadius: BorderRadius.circular(10)),
                     ),
                     icon: Icon(
                       MdiIcons.snapchat,
                       color: iconTextColor,
                     ),
-                    label: Text(snapchatButton,
-                        style: GoogleFonts.abel(
-                            color: iconTextColor,
-                            fontSize: 18,
-                            fontWeight: FontWeight.w300)),
+                    label: Text(snapchatButton, style: GoogleFonts.abel(color: iconTextColor, fontSize: 18, fontWeight: FontWeight.w300)),
                     onPressed: () {
                       if (_snapchat.toString().startsWith('@')) {
                         var most = _instagram.toString().substring(1);
@@ -938,18 +806,13 @@ class _ThirdTeamClassDetailsPage extends State<ThirdTeamClassDetailsPage> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: buttonColor,
                         elevation: 2,
-                        shape: BeveledRectangleBorder(
-                            borderRadius: BorderRadius.circular(10)),
+                        shape: BeveledRectangleBorder(borderRadius: BorderRadius.circular(10)),
                       ),
                       icon: Icon(
                         MdiIcons.snapchat,
                         color: iconTextColorTwo,
                       ),
-                      label: Text(snapchatButton,
-                          style: GoogleFonts.abel(
-                              color: iconTextColorTwo,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w300)),
+                      label: Text(snapchatButton, style: GoogleFonts.abel(color: iconTextColorTwo, fontSize: 18, fontWeight: FontWeight.w300)),
                       onPressed: () {
                         launchURL(urlSnapchat + _snapchat);
                       },
@@ -969,18 +832,13 @@ class _ThirdTeamClassDetailsPage extends State<ThirdTeamClassDetailsPage> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: buttonColor,
                       elevation: 2,
-                      shape: BeveledRectangleBorder(
-                          borderRadius: BorderRadius.circular(10)),
+                      shape: BeveledRectangleBorder(borderRadius: BorderRadius.circular(10)),
                     ),
                     icon: FaIcon(
                       FontAwesomeIcons.tiktok,
                       color: iconTextColor,
                     ),
-                    label: Text(tikTokButton,
-                        style: GoogleFonts.abel(
-                            color: iconTextColor,
-                            fontSize: 18,
-                            fontWeight: FontWeight.w300)),
+                    label: Text(tikTokButton, style: GoogleFonts.abel(color: iconTextColor, fontSize: 18, fontWeight: FontWeight.w300)),
                     onPressed: () {
                       if (_tikTok.toString().startsWith('@')) {
                         var most = _tikTok.toString().substring(1);
@@ -1003,18 +861,13 @@ class _ThirdTeamClassDetailsPage extends State<ThirdTeamClassDetailsPage> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: buttonColor,
                         elevation: 2,
-                        shape: BeveledRectangleBorder(
-                            borderRadius: BorderRadius.circular(10)),
+                        shape: BeveledRectangleBorder(borderRadius: BorderRadius.circular(10)),
                       ),
                       icon: FaIcon(
                         FontAwesomeIcons.tiktok,
                         color: iconTextColorTwo,
                       ),
-                      label: Text(tikTokButton,
-                          style: GoogleFonts.abel(
-                              color: iconTextColorTwo,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w300)),
+                      label: Text(tikTokButton, style: GoogleFonts.abel(color: iconTextColorTwo, fontSize: 18, fontWeight: FontWeight.w300)),
                       onPressed: () {
                         launchURL(urlTikTok + _tikTok);
                       },
@@ -1034,8 +887,7 @@ class _ThirdTeamClassDetailsPage extends State<ThirdTeamClassDetailsPage> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: buttonColor,
                       elevation: 2,
-                      shape: BeveledRectangleBorder(
-                          borderRadius: BorderRadius.circular(10)),
+                      shape: BeveledRectangleBorder(borderRadius: BorderRadius.circular(10)),
                     ),
                     icon: Icon(
                       MdiIcons.facebook,
@@ -1067,8 +919,7 @@ class _ThirdTeamClassDetailsPage extends State<ThirdTeamClassDetailsPage> {
                         style: ElevatedButton.styleFrom(
                           backgroundColor: buttonColor,
                           elevation: 2,
-                          shape: BeveledRectangleBorder(
-                              borderRadius: BorderRadius.circular(10)),
+                          shape: BeveledRectangleBorder(borderRadius: BorderRadius.circular(10)),
                         ),
                         icon: Icon(
                           MdiIcons.facebook,
@@ -1076,10 +927,7 @@ class _ThirdTeamClassDetailsPage extends State<ThirdTeamClassDetailsPage> {
                         ),
                         label: Text(
                           facebookButton,
-                          style: GoogleFonts.abel(
-                              color: iconTextColor,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w300),
+                          style: GoogleFonts.abel(color: iconTextColor, fontSize: 18, fontWeight: FontWeight.w300),
                         ),
                         onPressed: () {
                           launchURL(urlFacebook + _facebook);
@@ -1099,8 +947,7 @@ class _ThirdTeamClassDetailsPage extends State<ThirdTeamClassDetailsPage> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: buttonColor,
                       elevation: 2,
-                      shape: BeveledRectangleBorder(
-                          borderRadius: BorderRadius.circular(10)),
+                      shape: BeveledRectangleBorder(borderRadius: BorderRadius.circular(10)),
                     ),
                     icon: Icon(
                       MdiIcons.linkedin,
@@ -1132,8 +979,7 @@ class _ThirdTeamClassDetailsPage extends State<ThirdTeamClassDetailsPage> {
                         style: ElevatedButton.styleFrom(
                           backgroundColor: buttonColor,
                           elevation: 2,
-                          shape: BeveledRectangleBorder(
-                              borderRadius: BorderRadius.circular(10)),
+                          shape: BeveledRectangleBorder(borderRadius: BorderRadius.circular(10)),
                         ),
                         icon: Icon(
                           MdiIcons.facebook,
@@ -1141,10 +987,7 @@ class _ThirdTeamClassDetailsPage extends State<ThirdTeamClassDetailsPage> {
                         ),
                         label: Text(
                           facebookButton,
-                          style: GoogleFonts.abel(
-                              color: iconTextColor,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w300),
+                          style: GoogleFonts.abel(color: iconTextColor, fontSize: 18, fontWeight: FontWeight.w300),
                         ),
                         onPressed: () {
                           launchURL(urlFacebook + _facebook);
@@ -1166,17 +1009,14 @@ class _ThirdTeamClassDetailsPage extends State<ThirdTeamClassDetailsPage> {
               return Padding(
                 padding: const EdgeInsets.only(top: 20.0),
                 child: Container(
-                  decoration: BoxDecoration(
-                      color: textColor.withAlpha(50),
-                      borderRadius: BorderRadius.circular(10)),
+                  decoration: BoxDecoration(color: textColor.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                   child: Material(
                     color: materialBackgroundColor,
                     child: InkWell(
                       splashColor: splashColorTwo,
                       onTap: () {},
                       child: Padding(
-                        padding: const EdgeInsets.only(
-                            bottom: 15, top: 15, left: 25),
+                        padding: const EdgeInsets.only(bottom: 15, top: 15, left: 25),
                         child: Text.rich(
                           TextSpan(
                             children: <TextSpan>[
@@ -1208,9 +1048,7 @@ class _ThirdTeamClassDetailsPage extends State<ThirdTeamClassDetailsPage> {
                   child: Padding(
                     padding: const EdgeInsets.only(top: 20.0),
                     child: Container(
-                      decoration: BoxDecoration(
-                          color: textColor.withAlpha(50),
-                          borderRadius: BorderRadius.circular(10)),
+                      decoration: BoxDecoration(color: textColor.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                       child: Material(
                         color: materialBackgroundColor,
                         // child: InkWell(
@@ -1252,17 +1090,14 @@ class _ThirdTeamClassDetailsPage extends State<ThirdTeamClassDetailsPage> {
               return Padding(
                 padding: const EdgeInsets.only(top: 20.0),
                 child: Container(
-                  decoration: BoxDecoration(
-                      color: textColor.withAlpha(50),
-                      borderRadius: BorderRadius.circular(10)),
+                  decoration: BoxDecoration(color: textColor.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                   child: Material(
                     color: materialBackgroundColor,
                     child: InkWell(
                       splashColor: splashColorTwo,
                       onTap: () {},
                       child: Padding(
-                        padding: const EdgeInsets.only(
-                            bottom: 15, top: 15, left: 25),
+                        padding: const EdgeInsets.only(bottom: 15, top: 15, left: 25),
                         child: Text.rich(
                           TextSpan(
                             children: <TextSpan>[
@@ -1294,9 +1129,7 @@ class _ThirdTeamClassDetailsPage extends State<ThirdTeamClassDetailsPage> {
                   child: Padding(
                     padding: const EdgeInsets.only(top: 20.0),
                     child: Container(
-                      decoration: BoxDecoration(
-                          color: textColor.withAlpha(50),
-                          borderRadius: BorderRadius.circular(10)),
+                      decoration: BoxDecoration(color: textColor.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                       child: Material(
                         color: materialBackgroundColor,
                         // child: InkWell(
@@ -1338,17 +1171,14 @@ class _ThirdTeamClassDetailsPage extends State<ThirdTeamClassDetailsPage> {
               return Padding(
                 padding: const EdgeInsets.only(top: 20.0),
                 child: Container(
-                  decoration: BoxDecoration(
-                      color: textColor.withAlpha(50),
-                      borderRadius: BorderRadius.circular(10)),
+                  decoration: BoxDecoration(color: textColor.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                   child: Material(
                     color: materialBackgroundColor,
                     child: InkWell(
                       splashColor: splashColorTwo,
                       onTap: () {},
                       child: Padding(
-                        padding: const EdgeInsets.only(
-                            bottom: 15, top: 15, left: 25),
+                        padding: const EdgeInsets.only(bottom: 15, top: 15, left: 25),
                         child: Text.rich(
                           TextSpan(
                             children: <TextSpan>[
@@ -1380,9 +1210,7 @@ class _ThirdTeamClassDetailsPage extends State<ThirdTeamClassDetailsPage> {
                   child: Padding(
                     padding: const EdgeInsets.only(top: 20.0),
                     child: Container(
-                      decoration: BoxDecoration(
-                          color: textColor.withAlpha(50),
-                          borderRadius: BorderRadius.circular(10)),
+                      decoration: BoxDecoration(color: textColor.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                       child: Material(
                         color: materialBackgroundColor,
                         // child: InkWell(
@@ -1424,17 +1252,14 @@ class _ThirdTeamClassDetailsPage extends State<ThirdTeamClassDetailsPage> {
               return Padding(
                 padding: const EdgeInsets.only(top: 20.0),
                 child: Container(
-                  decoration: BoxDecoration(
-                      color: textColor.withAlpha(50),
-                      borderRadius: BorderRadius.circular(10)),
+                  decoration: BoxDecoration(color: textColor.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                   child: Material(
                     color: materialBackgroundColor,
                     child: InkWell(
                       splashColor: splashColorTwo,
                       onTap: () {},
                       child: Padding(
-                        padding: const EdgeInsets.only(
-                            bottom: 15, top: 15, left: 25),
+                        padding: const EdgeInsets.only(bottom: 15, top: 15, left: 25),
                         child: Text.rich(
                           TextSpan(
                             children: <TextSpan>[
@@ -1466,9 +1291,7 @@ class _ThirdTeamClassDetailsPage extends State<ThirdTeamClassDetailsPage> {
                   child: Padding(
                     padding: const EdgeInsets.only(top: 20.0),
                     child: Container(
-                      decoration: BoxDecoration(
-                          color: textColor.withAlpha(50),
-                          borderRadius: BorderRadius.circular(10)),
+                      decoration: BoxDecoration(color: textColor.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                       child: Material(
                         color: materialBackgroundColor,
                         // child: InkWell(
@@ -1510,17 +1333,14 @@ class _ThirdTeamClassDetailsPage extends State<ThirdTeamClassDetailsPage> {
               return Padding(
                 padding: const EdgeInsets.only(top: 20.0),
                 child: Container(
-                  decoration: BoxDecoration(
-                      color: textColor.withAlpha(50),
-                      borderRadius: BorderRadius.circular(10)),
+                  decoration: BoxDecoration(color: textColor.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                   child: Material(
                     color: materialBackgroundColor,
                     child: InkWell(
                       splashColor: splashColorTwo,
                       onTap: () {},
                       child: Padding(
-                        padding: const EdgeInsets.only(
-                            bottom: 15, top: 15, left: 25),
+                        padding: const EdgeInsets.only(bottom: 15, top: 15, left: 25),
                         child: Text.rich(
                           TextSpan(
                             children: <TextSpan>[
@@ -1552,9 +1372,7 @@ class _ThirdTeamClassDetailsPage extends State<ThirdTeamClassDetailsPage> {
                   child: Padding(
                     padding: const EdgeInsets.only(top: 20.0),
                     child: Container(
-                      decoration: BoxDecoration(
-                          color: textColor.withAlpha(50),
-                          borderRadius: BorderRadius.circular(10)),
+                      decoration: BoxDecoration(color: textColor.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                       child: Material(
                         color: materialBackgroundColor,
                         // child: InkWell(
@@ -1596,17 +1414,14 @@ class _ThirdTeamClassDetailsPage extends State<ThirdTeamClassDetailsPage> {
               return Padding(
                 padding: const EdgeInsets.only(top: 20.0),
                 child: Container(
-                  decoration: BoxDecoration(
-                      color: textColor.withAlpha(50),
-                      borderRadius: BorderRadius.circular(10)),
+                  decoration: BoxDecoration(color: textColor.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                   child: Material(
                     color: materialBackgroundColor,
                     child: InkWell(
                       splashColor: splashColorTwo,
                       onTap: () {},
                       child: Padding(
-                        padding: const EdgeInsets.only(
-                            bottom: 15, top: 15, left: 25),
+                        padding: const EdgeInsets.only(bottom: 15, top: 15, left: 25),
                         child: Text.rich(
                           TextSpan(
                             children: <TextSpan>[
@@ -1638,9 +1453,7 @@ class _ThirdTeamClassDetailsPage extends State<ThirdTeamClassDetailsPage> {
                   child: Padding(
                     padding: const EdgeInsets.only(top: 20.0),
                     child: Container(
-                      decoration: BoxDecoration(
-                          color: textColor.withAlpha(50),
-                          borderRadius: BorderRadius.circular(10)),
+                      decoration: BoxDecoration(color: textColor.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                       child: Material(
                         color: materialBackgroundColor,
                         // child: InkWell(
@@ -1682,17 +1495,14 @@ class _ThirdTeamClassDetailsPage extends State<ThirdTeamClassDetailsPage> {
               return Padding(
                 padding: const EdgeInsets.only(top: 20.0),
                 child: Container(
-                  decoration: BoxDecoration(
-                      color: textColor.withAlpha(50),
-                      borderRadius: BorderRadius.circular(10)),
+                  decoration: BoxDecoration(color: textColor.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                   child: Material(
                     color: materialBackgroundColor,
                     child: InkWell(
                       splashColor: splashColorTwo,
                       onTap: () {},
                       child: Padding(
-                        padding: const EdgeInsets.only(
-                            bottom: 15, top: 15, left: 25),
+                        padding: const EdgeInsets.only(bottom: 15, top: 15, left: 25),
                         child: Text.rich(
                           TextSpan(
                             children: <TextSpan>[
@@ -1724,9 +1534,7 @@ class _ThirdTeamClassDetailsPage extends State<ThirdTeamClassDetailsPage> {
                   child: Padding(
                     padding: const EdgeInsets.only(top: 20.0),
                     child: Container(
-                      decoration: BoxDecoration(
-                          color: textColor.withAlpha(50),
-                          borderRadius: BorderRadius.circular(10)),
+                      decoration: BoxDecoration(color: textColor.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                       child: Material(
                         color: materialBackgroundColor,
                         // child: InkWell(
@@ -1768,17 +1576,14 @@ class _ThirdTeamClassDetailsPage extends State<ThirdTeamClassDetailsPage> {
               return Padding(
                 padding: const EdgeInsets.only(top: 20.0),
                 child: Container(
-                  decoration: BoxDecoration(
-                      color: textColor.withAlpha(50),
-                      borderRadius: BorderRadius.circular(10)),
+                  decoration: BoxDecoration(color: textColor.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                   child: Material(
                     color: materialBackgroundColor,
                     child: InkWell(
                       splashColor: splashColorTwo,
                       onTap: () {},
                       child: Padding(
-                        padding: const EdgeInsets.only(
-                            bottom: 15, top: 15, left: 25),
+                        padding: const EdgeInsets.only(bottom: 15, top: 15, left: 25),
                         child: Text.rich(
                           TextSpan(
                             children: <TextSpan>[
@@ -1810,9 +1615,7 @@ class _ThirdTeamClassDetailsPage extends State<ThirdTeamClassDetailsPage> {
                   child: Padding(
                     padding: const EdgeInsets.only(top: 20.0),
                     child: Container(
-                      decoration: BoxDecoration(
-                          color: textColor.withAlpha(50),
-                          borderRadius: BorderRadius.circular(10)),
+                      decoration: BoxDecoration(color: textColor.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                       child: Material(
                         color: materialBackgroundColor,
                         // child: InkWell(
@@ -1854,17 +1657,14 @@ class _ThirdTeamClassDetailsPage extends State<ThirdTeamClassDetailsPage> {
               return Padding(
                 padding: const EdgeInsets.only(top: 20.0),
                 child: Container(
-                  decoration: BoxDecoration(
-                      color: textColor.withAlpha(50),
-                      borderRadius: BorderRadius.circular(10)),
+                  decoration: BoxDecoration(color: textColor.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                   child: Material(
                     color: materialBackgroundColor,
                     child: InkWell(
                       splashColor: splashColorTwo,
                       onTap: () {},
                       child: Padding(
-                        padding: const EdgeInsets.only(
-                            bottom: 15, top: 15, left: 25),
+                        padding: const EdgeInsets.only(bottom: 15, top: 15, left: 25),
                         child: Text.rich(
                           TextSpan(
                             children: <TextSpan>[
@@ -1896,17 +1696,14 @@ class _ThirdTeamClassDetailsPage extends State<ThirdTeamClassDetailsPage> {
                   child: Padding(
                     padding: const EdgeInsets.only(top: 20.0),
                     child: Container(
-                      decoration: BoxDecoration(
-                          color: textColor.withAlpha(50),
-                          borderRadius: BorderRadius.circular(10)),
+                      decoration: BoxDecoration(color: textColor.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                       child: Material(
                         color: materialBackgroundColor,
                         child: InkWell(
                           splashColor: splashColorTwo,
                           onTap: () {},
                           child: Padding(
-                            padding: const EdgeInsets.only(
-                                bottom: 15, top: 15, left: 25),
+                            padding: const EdgeInsets.only(bottom: 15, top: 15, left: 25),
                             child: Text.rich(
                               TextSpan(
                                 children: <TextSpan>[
@@ -1940,17 +1737,14 @@ class _ThirdTeamClassDetailsPage extends State<ThirdTeamClassDetailsPage> {
               return Padding(
                 padding: const EdgeInsets.only(top: 20.0),
                 child: Container(
-                  decoration: BoxDecoration(
-                      color: textColor.withAlpha(50),
-                      borderRadius: BorderRadius.circular(10)),
+                  decoration: BoxDecoration(color: textColor.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                   child: Material(
                     color: materialBackgroundColor,
                     child: InkWell(
                       splashColor: splashColorTwo,
                       onTap: () {},
                       child: Padding(
-                        padding: const EdgeInsets.only(
-                            bottom: 15, top: 15, left: 25),
+                        padding: const EdgeInsets.only(bottom: 15, top: 15, left: 25),
                         child: Text.rich(
                           TextSpan(
                             children: <TextSpan>[
@@ -1982,17 +1776,14 @@ class _ThirdTeamClassDetailsPage extends State<ThirdTeamClassDetailsPage> {
                   child: Padding(
                     padding: const EdgeInsets.only(top: 20.0),
                     child: Container(
-                      decoration: BoxDecoration(
-                          color: textColor.withAlpha(50),
-                          borderRadius: BorderRadius.circular(10)),
+                      decoration: BoxDecoration(color: textColor.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                       child: Material(
                         color: materialBackgroundColor,
                         child: InkWell(
                           splashColor: splashColorTwo,
                           onTap: () {},
                           child: Padding(
-                            padding: const EdgeInsets.only(
-                                bottom: 15, top: 15, left: 25),
+                            padding: const EdgeInsets.only(bottom: 15, top: 15, left: 25),
                             child: Text.rich(
                               TextSpan(
                                 children: <TextSpan>[
@@ -2026,17 +1817,14 @@ class _ThirdTeamClassDetailsPage extends State<ThirdTeamClassDetailsPage> {
               return Padding(
                 padding: const EdgeInsets.only(top: 20.0),
                 child: Container(
-                  decoration: BoxDecoration(
-                      color: textColor.withAlpha(50),
-                      borderRadius: BorderRadius.circular(10)),
+                  decoration: BoxDecoration(color: textColor.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                   child: Material(
                     color: materialBackgroundColor,
                     child: InkWell(
                       splashColor: splashColorTwo,
                       onTap: () {},
                       child: Padding(
-                        padding: const EdgeInsets.only(
-                            bottom: 15, top: 15, left: 25),
+                        padding: const EdgeInsets.only(bottom: 15, top: 15, left: 25),
                         child: Text.rich(
                           TextSpan(
                             children: <TextSpan>[
@@ -2068,17 +1856,14 @@ class _ThirdTeamClassDetailsPage extends State<ThirdTeamClassDetailsPage> {
                   child: Padding(
                     padding: const EdgeInsets.only(top: 20.0),
                     child: Container(
-                      decoration: BoxDecoration(
-                          color: textColor.withAlpha(50),
-                          borderRadius: BorderRadius.circular(10)),
+                      decoration: BoxDecoration(color: textColor.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                       child: Material(
                         color: materialBackgroundColor,
                         child: InkWell(
                           splashColor: splashColorTwo,
                           onTap: () {},
                           child: Padding(
-                            padding: const EdgeInsets.only(
-                                bottom: 15, top: 15, left: 25),
+                            padding: const EdgeInsets.only(bottom: 15, top: 15, left: 25),
                             child: Text.rich(
                               TextSpan(
                                 children: <TextSpan>[
@@ -2112,17 +1897,14 @@ class _ThirdTeamClassDetailsPage extends State<ThirdTeamClassDetailsPage> {
               return Padding(
                 padding: const EdgeInsets.only(top: 20.0),
                 child: Container(
-                  decoration: BoxDecoration(
-                      color: textColor.withAlpha(50),
-                      borderRadius: BorderRadius.circular(10)),
+                  decoration: BoxDecoration(color: textColor.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                   child: Material(
                     color: materialBackgroundColor,
                     child: InkWell(
                       splashColor: splashColorTwo,
                       onTap: () {},
                       child: Padding(
-                        padding: const EdgeInsets.only(
-                            bottom: 15, top: 15, left: 25),
+                        padding: const EdgeInsets.only(bottom: 15, top: 15, left: 25),
                         child: Text.rich(
                           TextSpan(
                             children: <TextSpan>[
@@ -2154,17 +1936,14 @@ class _ThirdTeamClassDetailsPage extends State<ThirdTeamClassDetailsPage> {
                   child: Padding(
                     padding: const EdgeInsets.only(top: 20.0),
                     child: Container(
-                      decoration: BoxDecoration(
-                          color: textColor.withAlpha(50),
-                          borderRadius: BorderRadius.circular(10)),
+                      decoration: BoxDecoration(color: textColor.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                       child: Material(
                         color: materialBackgroundColor,
                         child: InkWell(
                           splashColor: splashColorTwo,
                           onTap: () {},
                           child: Padding(
-                            padding: const EdgeInsets.only(
-                                bottom: 15, top: 15, left: 25),
+                            padding: const EdgeInsets.only(bottom: 15, top: 15, left: 25),
                             child: Text.rich(
                               TextSpan(
                                 children: <TextSpan>[
@@ -2198,17 +1977,14 @@ class _ThirdTeamClassDetailsPage extends State<ThirdTeamClassDetailsPage> {
               return Padding(
                 padding: const EdgeInsets.only(top: 20.0),
                 child: Container(
-                  decoration: BoxDecoration(
-                      color: textColor.withAlpha(50),
-                      borderRadius: BorderRadius.circular(10)),
+                  decoration: BoxDecoration(color: textColor.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                   child: Material(
                     color: materialBackgroundColor,
                     child: InkWell(
                       splashColor: splashColorTwo,
                       onTap: () {},
                       child: Padding(
-                        padding: const EdgeInsets.only(
-                            bottom: 15, top: 15, left: 25),
+                        padding: const EdgeInsets.only(bottom: 15, top: 15, left: 25),
                         child: Text.rich(
                           TextSpan(
                             children: <TextSpan>[
@@ -2240,17 +2016,14 @@ class _ThirdTeamClassDetailsPage extends State<ThirdTeamClassDetailsPage> {
                   child: Padding(
                     padding: const EdgeInsets.only(top: 20.0),
                     child: Container(
-                      decoration: BoxDecoration(
-                          color: textColor.withAlpha(50),
-                          borderRadius: BorderRadius.circular(10)),
+                      decoration: BoxDecoration(color: textColor.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                       child: Material(
                         color: materialBackgroundColor,
                         child: InkWell(
                           splashColor: splashColorTwo,
                           onTap: () {},
                           child: Padding(
-                            padding: const EdgeInsets.only(
-                                bottom: 15, top: 15, left: 25),
+                            padding: const EdgeInsets.only(bottom: 15, top: 15, left: 25),
                             child: Text.rich(
                               TextSpan(
                                 children: <TextSpan>[
@@ -2284,17 +2057,14 @@ class _ThirdTeamClassDetailsPage extends State<ThirdTeamClassDetailsPage> {
               return Padding(
                 padding: const EdgeInsets.only(top: 20.0),
                 child: Container(
-                  decoration: BoxDecoration(
-                      color: textColor.withAlpha(50),
-                      borderRadius: BorderRadius.circular(10)),
+                  decoration: BoxDecoration(color: textColor.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                   child: Material(
                     color: materialBackgroundColor,
                     child: InkWell(
                       splashColor: splashColorTwo,
                       onTap: () {},
                       child: Padding(
-                        padding: const EdgeInsets.only(
-                            bottom: 15, top: 15, left: 25),
+                        padding: const EdgeInsets.only(bottom: 15, top: 15, left: 25),
                         child: Text.rich(
                           TextSpan(
                             children: <TextSpan>[
@@ -2326,17 +2096,14 @@ class _ThirdTeamClassDetailsPage extends State<ThirdTeamClassDetailsPage> {
                   child: Padding(
                     padding: const EdgeInsets.only(top: 20.0),
                     child: Container(
-                      decoration: BoxDecoration(
-                          color: textColor.withAlpha(50),
-                          borderRadius: BorderRadius.circular(10)),
+                      decoration: BoxDecoration(color: textColor.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                       child: Material(
                         color: materialBackgroundColor,
                         child: InkWell(
                           splashColor: splashColorTwo,
                           onTap: () {},
                           child: Padding(
-                            padding: const EdgeInsets.only(
-                                bottom: 15, top: 15, left: 25),
+                            padding: const EdgeInsets.only(bottom: 15, top: 15, left: 25),
                             child: Text.rich(
                               TextSpan(
                                 children: <TextSpan>[
@@ -2370,17 +2137,14 @@ class _ThirdTeamClassDetailsPage extends State<ThirdTeamClassDetailsPage> {
               return Padding(
                 padding: const EdgeInsets.only(top: 20.0),
                 child: Container(
-                  decoration: BoxDecoration(
-                      color: textColor.withAlpha(50),
-                      borderRadius: BorderRadius.circular(10)),
+                  decoration: BoxDecoration(color: textColor.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                   child: Material(
                     color: materialBackgroundColor,
                     child: InkWell(
                       splashColor: splashColorTwo,
                       onTap: () {},
                       child: Padding(
-                        padding: const EdgeInsets.only(
-                            bottom: 15, top: 15, left: 25),
+                        padding: const EdgeInsets.only(bottom: 15, top: 15, left: 25),
                         child: Text.rich(
                           TextSpan(
                             children: <TextSpan>[
@@ -2412,17 +2176,14 @@ class _ThirdTeamClassDetailsPage extends State<ThirdTeamClassDetailsPage> {
                   child: Padding(
                     padding: const EdgeInsets.only(top: 20.0),
                     child: Container(
-                      decoration: BoxDecoration(
-                          color: textColor.withAlpha(50),
-                          borderRadius: BorderRadius.circular(10)),
+                      decoration: BoxDecoration(color: textColor.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                       child: Material(
                         color: materialBackgroundColor,
                         child: InkWell(
                           splashColor: splashColorTwo,
                           onTap: () {},
                           child: Padding(
-                            padding: const EdgeInsets.only(
-                                bottom: 15, top: 15, left: 25),
+                            padding: const EdgeInsets.only(bottom: 15, top: 15, left: 25),
                             child: Text.rich(
                               TextSpan(
                                 children: <TextSpan>[
@@ -2456,17 +2217,14 @@ class _ThirdTeamClassDetailsPage extends State<ThirdTeamClassDetailsPage> {
               return Padding(
                 padding: const EdgeInsets.only(top: 20),
                 child: Container(
-                  decoration: BoxDecoration(
-                      color: textColor.withAlpha(50),
-                      borderRadius: BorderRadius.circular(10)),
+                  decoration: BoxDecoration(color: textColor.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                   child: Material(
                     color: materialBackgroundColor,
                     child: InkWell(
                       splashColor: splashColorTwo,
                       onTap: () {},
                       child: Padding(
-                        padding: const EdgeInsets.only(
-                            bottom: 15, top: 15, left: 25),
+                        padding: const EdgeInsets.only(bottom: 15, top: 15, left: 25),
                         child: Text.rich(
                           TextSpan(
                             children: <TextSpan>[
@@ -2496,17 +2254,14 @@ class _ThirdTeamClassDetailsPage extends State<ThirdTeamClassDetailsPage> {
               return Visibility(
                   visible: !_isVisible,
                   child: Container(
-                    decoration: BoxDecoration(
-                        color: textColor.withAlpha(50),
-                        borderRadius: BorderRadius.circular(10)),
+                    decoration: BoxDecoration(color: textColor.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                     child: Material(
                       color: materialBackgroundColor,
                       child: InkWell(
                         splashColor: splashColorTwo,
                         onTap: () {},
                         child: Padding(
-                          padding: const EdgeInsets.only(
-                              bottom: 15, top: 15, left: 25),
+                          padding: const EdgeInsets.only(bottom: 15, top: 15, left: 25),
                           child: Text.rich(
                             TextSpan(
                               children: <TextSpan>[
@@ -2539,17 +2294,14 @@ class _ThirdTeamClassDetailsPage extends State<ThirdTeamClassDetailsPage> {
               return Padding(
                 padding: const EdgeInsets.only(top: 20.0),
                 child: Container(
-                  decoration: BoxDecoration(
-                      color: textColor.withAlpha(50),
-                      borderRadius: BorderRadius.circular(10)),
+                  decoration: BoxDecoration(color: textColor.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                   child: Material(
                     color: materialBackgroundColor,
                     child: InkWell(
                       splashColor: splashColorTwo,
                       onTap: () {},
                       child: Padding(
-                        padding: const EdgeInsets.only(
-                            bottom: 15, top: 15, left: 25),
+                        padding: const EdgeInsets.only(bottom: 15, top: 15, left: 25),
                         child: Text.rich(
                           TextSpan(
                             children: <TextSpan>[
@@ -2581,17 +2333,14 @@ class _ThirdTeamClassDetailsPage extends State<ThirdTeamClassDetailsPage> {
                   child: Padding(
                     padding: const EdgeInsets.only(top: 20.0),
                     child: Container(
-                      decoration: BoxDecoration(
-                          color: textColor.withAlpha(50),
-                          borderRadius: BorderRadius.circular(10)),
+                      decoration: BoxDecoration(color: textColor.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                       child: Material(
                         color: materialBackgroundColor,
                         child: InkWell(
                           splashColor: splashColorTwo,
                           onTap: () {},
                           child: Padding(
-                            padding: const EdgeInsets.only(
-                                bottom: 15, top: 15, left: 25),
+                            padding: const EdgeInsets.only(bottom: 15, top: 15, left: 25),
                             child: Text.rich(
                               TextSpan(
                                 children: <TextSpan>[
@@ -2625,17 +2374,14 @@ class _ThirdTeamClassDetailsPage extends State<ThirdTeamClassDetailsPage> {
               return Padding(
                 padding: const EdgeInsets.only(top: 20.0),
                 child: Container(
-                  decoration: BoxDecoration(
-                      color: textColor.withAlpha(50),
-                      borderRadius: BorderRadius.circular(10)),
+                  decoration: BoxDecoration(color: textColor.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                   child: Material(
                     color: materialBackgroundColor,
                     child: InkWell(
                       splashColor: splashColorTwo,
                       onTap: () {},
                       child: Padding(
-                        padding: const EdgeInsets.only(
-                            bottom: 15, top: 15, left: 25),
+                        padding: const EdgeInsets.only(bottom: 15, top: 15, left: 25),
                         child: Text.rich(
                           TextSpan(
                             children: <TextSpan>[
@@ -2667,17 +2413,14 @@ class _ThirdTeamClassDetailsPage extends State<ThirdTeamClassDetailsPage> {
                   child: Padding(
                     padding: const EdgeInsets.only(top: 20.0),
                     child: Container(
-                      decoration: BoxDecoration(
-                          color: textColor.withAlpha(50),
-                          borderRadius: BorderRadius.circular(10)),
+                      decoration: BoxDecoration(color: textColor.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                       child: Material(
                         color: materialBackgroundColor,
                         child: InkWell(
                           splashColor: splashColorTwo,
                           onTap: () {},
                           child: Padding(
-                            padding: const EdgeInsets.only(
-                                bottom: 15, top: 15, left: 25),
+                            padding: const EdgeInsets.only(bottom: 15, top: 15, left: 25),
                             child: Text.rich(
                               TextSpan(
                                 children: <TextSpan>[
@@ -2813,9 +2556,7 @@ class _ThirdTeamClassDetailsPage extends State<ThirdTeamClassDetailsPage> {
           style: TextStyle(color: cardBackgroundColor),
         ),
         content: Text(
-          facebookProfileSharedPreferencesContentOne +
-              _facebook +
-              facebookProfileSharedPreferencesContentTwo,
+          facebookProfileSharedPreferencesContentOne + _facebook + facebookProfileSharedPreferencesContentTwo,
           textAlign: TextAlign.justify,
           style: TextStyle(color: cardBackgroundColor),
         ),
@@ -2861,9 +2602,7 @@ class _ThirdTeamClassDetailsPage extends State<ThirdTeamClassDetailsPage> {
           style: TextStyle(color: cardBackgroundColor),
         ),
         content: Text(
-          linkedInProfileSharedPreferencesContentOne +
-              _linkedIn +
-              linkedInProfileSharedPreferencesContentTwo,
+          linkedInProfileSharedPreferencesContentOne + _linkedIn + linkedInProfileSharedPreferencesContentTwo,
           textAlign: TextAlign.justify,
           style: TextStyle(color: cardBackgroundColor),
         ),

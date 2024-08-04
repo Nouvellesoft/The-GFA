@@ -26,10 +26,11 @@ dynamic queryTech;
 
 class MyThirdTeamClassSearch extends SearchDelegate {
   final List? all;
+  final String clubId;
 
   final bool _isVisible = true;
 
-  MyThirdTeamClassSearch({@required this.all});
+  MyThirdTeamClassSearch({required this.clubId, required this.all});
 
   @override
   ThemeData appBarTheme(BuildContext context) {
@@ -38,21 +39,16 @@ class MyThirdTeamClassSearch extends SearchDelegate {
         primarySwatch: Colors.deepOrange,
         appBarTheme: AppBarTheme(backgroundColor: cardBackgroundColor),
         primaryIconTheme: IconThemeData(color: appBarIconColor),
-        textTheme: TextTheme(
-            titleMedium: TextStyle(color: appBarTextColor, fontSize: 25)),
+        textTheme: TextTheme(titleMedium: TextStyle(color: appBarTextColor, fontSize: 25)),
         inputDecorationTheme: InputDecorationTheme(
           hintStyle: TextStyle(color: appBarTextColor.withAlpha(60)),
         ),
-        textSelectionTheme:
-            TextSelectionThemeData(cursorColor: appBarTextColor));
+        textSelectionTheme: TextSelectionThemeData(cursorColor: appBarTextColor));
     return theme;
   }
 
   Future navigateToThirdTeamClassDetailsPage(context) async {
-    Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => const ThirdTeamClassDetailsPage()));
+    Navigator.push(context, MaterialPageRoute(builder: (context) => ThirdTeamClassDetailsPage(clubId: clubId)));
   }
 
   @override
@@ -62,8 +58,7 @@ class MyThirdTeamClassSearch extends SearchDelegate {
         Visibility(
           visible: true,
           child: IconButton(
-            icon: Visibility(
-                visible: true, child: Icon(MdiIcons.closeCircleOutline)),
+            icon: Visibility(visible: true, child: Icon(MdiIcons.closeCircleOutline)),
             onPressed: () {
               query = '';
             },
@@ -75,8 +70,7 @@ class MyThirdTeamClassSearch extends SearchDelegate {
         Visibility(
           visible: false,
           child: IconButton(
-            icon: Visibility(
-                visible: false, child: Icon(MdiIcons.closeCircleOutline)),
+            icon: Visibility(visible: false, child: Icon(MdiIcons.closeCircleOutline)),
             onPressed: () {
               query = '';
             },
@@ -105,13 +99,9 @@ class MyThirdTeamClassSearch extends SearchDelegate {
       query2 = query1[0].toUpperCase() + query1.substring(1);
     }
 
-    var search = all
-        ?.where((thirdTeamClass) => thirdTeamClass.name.contains(query2))
-        .toList();
+    var search = all?.where((thirdTeamClass) => thirdTeamClass.name.contains(query2)).toList();
 
-    return search == null
-        ? _buildProgressIndicator()
-        : _buildSearchList(search);
+    return search == null ? _buildProgressIndicator() : _buildSearchList(search);
   }
 
   @override
@@ -126,16 +116,12 @@ class MyThirdTeamClassSearch extends SearchDelegate {
     List? search;
 
     if (queryTech.isNotEmpty) {
-      search = all
-          ?.where((thirdTeamClass) => thirdTeamClass.name.contains(queryTech))
-          .toList();
+      search = all?.where((thirdTeamClass) => thirdTeamClass.name.contains(queryTech)).toList();
     } else {
       search = all;
     }
 
-    return search == null
-        ? _buildProgressIndicator()
-        : _buildSearchList(search);
+    return search == null ? _buildProgressIndicator() : _buildSearchList(search);
   }
 
   _buildSearchList(List search) {
@@ -149,8 +135,7 @@ class MyThirdTeamClassSearch extends SearchDelegate {
               shrinkWrap: true,
               itemCount: search.length,
               itemBuilder: (BuildContext context, int position) {
-                ThirdTeamClassNotifier thirdTeamClassNotifier =
-                    Provider.of<ThirdTeamClassNotifier>(context);
+                ThirdTeamClassNotifier thirdTeamClassNotifier = Provider.of<ThirdTeamClassNotifier>(context);
                 return Padding(
                   padding: const EdgeInsets.only(bottom: 8.0),
                   child: Container(
@@ -163,8 +148,7 @@ class MyThirdTeamClassSearch extends SearchDelegate {
                       child: InkWell(
                         splashColor: splashColor,
                         onTap: () {
-                          thirdTeamClassNotifier.currentThirdTeamClass =
-                              search[position];
+                          thirdTeamClassNotifier.currentThirdTeamClass = search[position];
                           navigateToThirdTeamClassDetailsPage(context);
                         },
                         child: SingleChildScrollView(
@@ -176,13 +160,10 @@ class MyThirdTeamClassSearch extends SearchDelegate {
                                 width: 100,
                                 height: 100,
                                 decoration: BoxDecoration(
-                                    borderRadius: const BorderRadius.only(
-                                        topLeft: Radius.circular(10),
-                                        bottomLeft: Radius.circular(10)),
+                                    borderRadius: const BorderRadius.only(topLeft: Radius.circular(10), bottomLeft: Radius.circular(10)),
                                     image: DecorationImage(
                                         alignment: const Alignment(0, -1),
-                                        image: CachedNetworkImageProvider(
-                                            search[position].image),
+                                        image: CachedNetworkImageProvider(search[position].image),
                                         fit: BoxFit.cover)),
                               ),
                               Padding(
@@ -196,29 +177,16 @@ class MyThirdTeamClassSearch extends SearchDelegate {
                                         children: <Widget>[
                                           RichText(
                                             text: TextSpan(
-                                                text: search[position]
-                                                    .name
-                                                    .substring(
-                                                        0, queryTech.length),
-                                                style: GoogleFonts.tenorSans(
-                                                    color: textColor,
-                                                    fontSize: 13.5,
-                                                    fontWeight:
-                                                        FontWeight.w600),
+                                                text: search[position].name.substring(0, queryTech.length),
+                                                style: GoogleFonts.tenorSans(color: textColor, fontSize: 13.5, fontWeight: FontWeight.w600),
                                                 children: [
                                                   TextSpan(
-                                                      text: search[position]
-                                                          .name
-                                                          .substring(
-                                                              queryTech.length),
-                                                      style:
-                                                          GoogleFonts.tenorSans(
-                                                              color: textColor))
+                                                      text: search[position].name.substring(queryTech.length),
+                                                      style: GoogleFonts.tenorSans(color: textColor))
                                                 ]),
                                           ),
                                           (() {
-                                            if (search[position].captain ==
-                                                "Yes") {
+                                            if (search[position].captain == "Yes") {
                                               return Row(
                                                 children: <Widget>[
                                                   const SizedBox(width: 10),
@@ -243,11 +211,8 @@ class MyThirdTeamClassSearch extends SearchDelegate {
                                     ),
                                     Padding(
                                       padding: const EdgeInsets.only(top: 10),
-                                      child: Text(
-                                          search[position].positionPlaying,
-                                          style: GoogleFonts.varela(
-                                              color: textColorTwo,
-                                              fontStyle: FontStyle.italic)),
+                                      child: Text(search[position].positionPlaying,
+                                          style: GoogleFonts.varela(color: textColorTwo, fontStyle: FontStyle.italic)),
                                     ),
                                   ],
                                 ),

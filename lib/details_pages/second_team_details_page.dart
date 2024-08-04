@@ -151,7 +151,8 @@ dynamic _twitter;
 dynamic _worstMoment;
 
 class SecondTeamClassDetailsPage extends StatefulWidget {
-  const SecondTeamClassDetailsPage({super.key, this.title});
+  final String clubId;
+  const SecondTeamClassDetailsPage({super.key, this.title, required this.clubId});
 
   final String? title;
 
@@ -291,7 +292,8 @@ class _SecondTeamClassDetailsPage extends State<SecondTeamClassDetailsPage> {
       String collectionName = 'SecondTeamClassPlayers';
 
       // Find the corresponding document in the firestore by querying for the full name
-      QuerySnapshot querySnapshot = await firestore.collection(collectionName).where('name', isEqualTo: fullName).get();
+      QuerySnapshot querySnapshot =
+          await firestore.collection('clubs').doc(widget.clubId).collection(collectionName).where('name', isEqualTo: fullName).get();
 
       if (querySnapshot.docs.isNotEmpty) {
         // Get the first document from the query results
@@ -385,7 +387,8 @@ class _SecondTeamClassDetailsPage extends State<SecondTeamClassDetailsPage> {
       // Find the document ID for the user with the specified name (_name)
       String queryName = _name.toLowerCase().replaceAll(" ", "");
 
-      QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('SecondTeamClassPlayers').get();
+      QuerySnapshot querySnapshot =
+          await FirebaseFirestore.instance.collection('clubs').doc(widget.clubId).collection('SecondTeamClassPlayers').get();
 
       String? documentId;
 
@@ -403,7 +406,8 @@ class _SecondTeamClassDetailsPage extends State<SecondTeamClassDetailsPage> {
           String imageName = '$queryName${i + 1}.jpg';
 
           // Upload each image to Firebase Storage
-          final Reference storageReference = FirebaseStorage.instance.ref().child('players_images').child(queryName).child(imageName);
+          final Reference storageReference =
+              FirebaseStorage.instance.ref().child('${widget.clubId}/players_images').child(queryName).child(imageName);
           final UploadTask uploadTask = storageReference.putFile(imageFiles[i]);
           await uploadTask.whenComplete(() {});
 
@@ -414,7 +418,7 @@ class _SecondTeamClassDetailsPage extends State<SecondTeamClassDetailsPage> {
           String imageField = i == 0 ? 'image' : 'image_two'; // Set the field name based on the image index
 
           // Update the existing document for the specified user (_queryName)
-          await FirebaseFirestore.instance.collection('SecondTeamClassPlayers').doc(documentId).update({
+          await FirebaseFirestore.instance.collection('clubs').doc(widget.clubId).collection('SecondTeamClassPlayers').doc(documentId).update({
             imageField: imageUrl,
           });
         }
@@ -607,7 +611,6 @@ class _SecondTeamClassDetailsPage extends State<SecondTeamClassDetailsPage> {
                   });
 
                   modifyProfile(); // Use modifyProfile function instead of _showAutobiographyModificationDialog or _showImageModificationDialog
-
                 }),
           ],
         ),
@@ -4649,7 +4652,8 @@ class _SecondTeamClassDetailsPage extends State<SecondTeamClassDetailsPage> {
 
     try {
       // Query the Firestore collection
-      QuerySnapshot querySnapshot = await firestore.collection(collectionName).where('name', isEqualTo: _name).limit(1).get();
+      QuerySnapshot querySnapshot =
+          await firestore.collection('clubs').doc(widget.clubId).collection(collectionName).where('name', isEqualTo: _name).limit(1).get();
 
       if (querySnapshot.docs.isNotEmpty) {
         // Get the first document from the query results
@@ -4905,103 +4909,103 @@ class _SecondTeamClassDetailsPage extends State<SecondTeamClassDetailsPage> {
     final GlobalKey<FormState> dialogFormKey = GlobalKey<FormState>();
 
     showDialog<String>(
-      // barrierColor: const Color.fromRGBO(66, 67, 69, 1.0),
+        // barrierColor: const Color.fromRGBO(66, 67, 69, 1.0),
         context: context,
         builder: (BuildContext context) => PopScope(
-          onPopInvokedWithResult: (didPop, result) async {
-            // Perform your cleanup actions
-            otpCode = '';
-            isOTPComplete = false;
+              onPopInvokedWithResult: (didPop, result) async {
+                // Perform your cleanup actions
+                otpCode = '';
+                isOTPComplete = false;
 
-            // Optionally handle the pop result
-            // You can do additional things based on `didPop` and `result`
-            if (didPop) {
-              // Allow the pop to proceed
-              Navigator.of(context).pop();
-            }
-          },
-          canPop: true, // Allow the pop action
-          child: AlertDialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20.0),
-            ),
-            backgroundColor: const Color.fromRGBO(223, 225, 229, 1.0),
-            title: const Text(
-              "Please click 'Generate OTP', input your OTP from the sent sms.",
-              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.black),
-            ),
-            actions: <Widget>[
-              TextButton(
-                onPressed: () async {
-                  // User needs to send OTP for verification
-                  await _sendOtpToPhoneNumber();
-                },
-                child: const Text('Generate OTP', style: TextStyle(color: Colors.black)),
-              ),
-              TextButton(
-                onPressed: isOTPComplete
-                    ? () {
-                  verifyOTPCode();
-                  setState(() {
-                    otpCode = '';
-                  });
-                  Navigator.of(context).pop(); // Move this line here
+                // Optionally handle the pop result
+                // You can do additional things based on `didPop` and `result`
+                if (didPop) {
+                  // Allow the pop to proceed
+                  Navigator.of(context).pop();
                 }
-                    : null,
-                child: const Text('Verify OTP', style: TextStyle(color: Colors.black)),
-              ),
-            ],
-            content: Padding(
-              padding: const EdgeInsets.all(6.0),
-              child: AbsorbPointer(
-                absorbing: !isOtpGenerated,
-                child: Form(
-                  key: dialogFormKey,
-                  child: GestureDetector(
-                    onTap: () {
-                      // Show toast message if OTP is not generated
-                      if (!isOtpGenerated) {
-                        Fluttertoast.showToast(
-                          msg: 'Please generate OTP first',
-                          gravity: ToastGravity.BOTTOM,
-                          backgroundColor: Colors.red,
-                          textColor: Colors.white,
-                          fontSize: 16.0,
-                        );
-                      }
+              },
+              canPop: true, // Allow the pop action
+              child: AlertDialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20.0),
+                ),
+                backgroundColor: const Color.fromRGBO(223, 225, 229, 1.0),
+                title: const Text(
+                  "Please click 'Generate OTP', input your OTP from the sent sms.",
+                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.black),
+                ),
+                actions: <Widget>[
+                  TextButton(
+                    onPressed: () async {
+                      // User needs to send OTP for verification
+                      await _sendOtpToPhoneNumber();
                     },
-                    child: PinFieldAutoFill(
-                      autoFocus: true,
-                      currentCode: otpCode,
-                      decoration: BoxLooseDecoration(
-                        gapSpace: 5,
-                        radius: const Radius.circular(8),
-                        strokeColorBuilder: isOtpGenerated
-                            ? const FixedColorBuilder(Color(0xFFE16641))
-                            : const FixedColorBuilder(Colors.grey), // Use grey color if OTP is not generated
+                    child: const Text('Generate OTP', style: TextStyle(color: Colors.black)),
+                  ),
+                  TextButton(
+                    onPressed: isOTPComplete
+                        ? () {
+                            verifyOTPCode();
+                            setState(() {
+                              otpCode = '';
+                            });
+                            Navigator.of(context).pop(); // Move this line here
+                          }
+                        : null,
+                    child: const Text('Verify OTP', style: TextStyle(color: Colors.black)),
+                  ),
+                ],
+                content: Padding(
+                  padding: const EdgeInsets.all(6.0),
+                  child: AbsorbPointer(
+                    absorbing: !isOtpGenerated,
+                    child: Form(
+                      key: dialogFormKey,
+                      child: GestureDetector(
+                        onTap: () {
+                          // Show toast message if OTP is not generated
+                          if (!isOtpGenerated) {
+                            Fluttertoast.showToast(
+                              msg: 'Please generate OTP first',
+                              gravity: ToastGravity.BOTTOM,
+                              backgroundColor: Colors.red,
+                              textColor: Colors.white,
+                              fontSize: 16.0,
+                            );
+                          }
+                        },
+                        child: PinFieldAutoFill(
+                          autoFocus: true,
+                          currentCode: otpCode,
+                          decoration: BoxLooseDecoration(
+                            gapSpace: 5,
+                            radius: const Radius.circular(8),
+                            strokeColorBuilder: isOtpGenerated
+                                ? const FixedColorBuilder(Color(0xFFE16641))
+                                : const FixedColorBuilder(Colors.grey), // Use grey color if OTP is not generated
+                          ),
+                          codeLength: 6,
+                          onCodeChanged: (code) {
+                            if (kDebugMode) {
+                              print("OnCodeChanged : $code");
+                            }
+                            otpCode = code.toString();
+                            isOTPComplete = code!.length == 6;
+                          },
+                          onCodeSubmitted: (val) {
+                            if (kDebugMode) {
+                              print("OnCodeSubmitted : $val");
+                            }
+                            isOTPComplete = val.isEmpty;
+                            otpCode = '';
+                          },
+                        ),
                       ),
-                      codeLength: 6,
-                      onCodeChanged: (code) {
-                        if (kDebugMode) {
-                          print("OnCodeChanged : $code");
-                        }
-                        otpCode = code.toString();
-                        isOTPComplete = code!.length == 6;
-                      },
-                      onCodeSubmitted: (val) {
-                        if (kDebugMode) {
-                          print("OnCodeSubmitted : $val");
-                        }
-                        isOTPComplete = val.isEmpty;
-                        otpCode = '';
-                      },
                     ),
                   ),
                 ),
               ),
-            ),
-          ),
-        ));
+            ));
   }
 
   Future<bool> isUserVerifiedRecently() async {
@@ -5019,9 +5023,7 @@ class _SecondTeamClassDetailsPage extends State<SecondTeamClassDetailsPage> {
         DateTime now = DateTime.now();
         DateTime verificationDateTime = DateTime.fromMillisecondsSinceEpoch(verificationTime);
 
-        return now
-            .difference(verificationDateTime)
-            .inMinutes <= 30;
+        return now.difference(verificationDateTime).inMinutes <= 30;
       }
     }
     return false;
@@ -5496,11 +5498,11 @@ class _SecondTeamClassDetailsPage extends State<SecondTeamClassDetailsPage> {
                         child: _imageOne != null
                             ? Image.file(_imageOne!, height: 100, width: 100, fit: BoxFit.cover)
                             : CachedNetworkImage(
-                          imageUrl: secondTeamClassNotifier.currentSecondTeamClass.image!,
-                          fit: BoxFit.cover,
-                          placeholder: (context, url) => const CircularProgressIndicator(),
-                          errorWidget: (context, url, error) => Icon(MdiIcons.alertRhombus),
-                        ),
+                                imageUrl: secondTeamClassNotifier.currentSecondTeamClass.image!,
+                                fit: BoxFit.cover,
+                                placeholder: (context, url) => const CircularProgressIndicator(),
+                                errorWidget: (context, url, error) => Icon(MdiIcons.alertRhombus),
+                              ),
                       ),
                     ),
                     InkWell(
@@ -5517,11 +5519,11 @@ class _SecondTeamClassDetailsPage extends State<SecondTeamClassDetailsPage> {
                         child: _imageTwo != null
                             ? Image.file(_imageTwo!, height: 100, width: 100, fit: BoxFit.cover)
                             : CachedNetworkImage(
-                          imageUrl: secondTeamClassNotifier.currentSecondTeamClass.imageTwo!,
-                          fit: BoxFit.cover,
-                          placeholder: (context, url) => const CircularProgressIndicator(),
-                          errorWidget: (context, url, error) => Icon(MdiIcons.alertRhombus),
-                        ),
+                                imageUrl: secondTeamClassNotifier.currentSecondTeamClass.imageTwo!,
+                                fit: BoxFit.cover,
+                                placeholder: (context, url) => const CircularProgressIndicator(),
+                                errorWidget: (context, url, error) => Icon(MdiIcons.alertRhombus),
+                              ),
                       ),
                     ),
                   ],

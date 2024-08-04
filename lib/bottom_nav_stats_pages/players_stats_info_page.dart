@@ -35,18 +35,6 @@ import '../notifier/top_defensive_players_stats_info_notifier.dart';
 import '../notifier/top_gk_players_stats_info_notifier.dart';
 import '../notifier/top_goals_players_stats_info_notifier.dart';
 
-late TopGoalsPlayersStatsAndInfoNotifier? topGoalsPlayersStatsAndInfoNotifier;
-late MostAssistsPlayersStatsAndInfoNotifier mostAssistsPlayersStatsAndInfoNotifier;
-late MostFouledYCPlayersStatsAndInfoNotifier mostFouledYCPlayersStatsAndInfoNotifier;
-late MostFouledRCPlayersStatsAndInfoNotifier mostFouledRCPlayersStatsAndInfoNotifier;
-late PlayerOfTheMonthStatsAndInfoNotifier playerOfTheMonthStatsAndInfoNotifier;
-late TopGKPlayersStatsAndInfoNotifier topGKPlayersStatsAndInfoNotifier;
-late TopDefensivePlayersStatsAndInfoNotifier topDefensivePlayersStatsAndInfoNotifier;
-late MOTMPlayersStatsAndInfoNotifier motmPlayersStatsAndInfoNotifier;
-late CumMOTMPlayersStatsAndInfoNotifier cumMOTMPlayersStatsAndInfoNotifier;
-late CoachesReviewsCommentNotifier coachesReviewsCommentNotifier;
-late FoundersReviewsCommentNotifier foundersReviewsCommentNotifier;
-
 Color? backgroundColor = const Color.fromRGBO(247, 246, 242, 1);
 Color parallaxRainColor = const Color.fromRGBO(221, 212, 212, 1.0);
 Color? iconColor = const Color.fromRGBO(196, 174, 137, 1.0);

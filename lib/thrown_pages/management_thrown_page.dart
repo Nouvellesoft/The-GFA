@@ -180,7 +180,7 @@ class _MyManagementBodyPage extends State<MyManagementBodyPage> {
   }
 
   Future navigateToManagementBodyDetailsPage(context) async {
-    Navigator.push(context, MaterialPageRoute(builder: (context) => const ManagementBodyDetailsPage()));
+    Navigator.push(context, MaterialPageRoute(builder: (context) => ManagementBodyDetailsPage(clubId: widget.clubId)));
   }
 
   Future navigateTablesAndStatsDetails(BuildContext context) async {
@@ -572,7 +572,7 @@ class _MyManagementBodyPage extends State<MyManagementBodyPage> {
                       onPressed: () {
                         showSearch(
                           context: context,
-                          delegate: MyManagementBodySearch(all: managementBodyNotifier.managementBodyList),
+                          delegate: MyManagementBodySearch(all: managementBodyNotifier.managementBodyList, clubId: widget.clubId),
                         );
                       },
                       tooltip: "Search",

@@ -109,7 +109,7 @@ class PlayersTablePageState extends State<PlayersTablePage> {
                     redCard: data['red_card'],
                     nationality: data['nationality']));
               }
-              playersTableDataSource = PlayersTableDataSource(playersTableList);
+              playersTableDataSource = PlayersTableDataSource(playersTableList, widget.clubId);
             }
 
             return SizedBox(
@@ -138,12 +138,12 @@ class PlayersTablePageState extends State<PlayersTablePage> {
 
                         if (firstTeamPlayer != null) {
                           firstTeamClassNotifier?.currentFirstTeamClass = firstTeamPlayer;
-                          navigateToSubPage(context);
+                          navigateToSubPage(context, widget.clubId);
 
                           Toast.show("Loading up $playerName", duration: Toast.lengthLong, gravity: Toast.bottom, backgroundRadius: 10);
                         } else if (secondTeamPlayer != null) {
                           secondTeamClassNotifier?.currentSecondTeamClass = secondTeamPlayer;
-                          navigateToSecondTeamClassDetailsPage(context);
+                          navigateToSecondTeamClassDetailsPage(context, widget.clubId);
 
                           Toast.show("Loading up $playerName", duration: Toast.lengthLong, gravity: Toast.bottom, backgroundRadius: 10);
                         } else {
@@ -311,7 +311,7 @@ class PlayersTablePageState extends State<PlayersTablePage> {
   void initState() {
     // getDataFromFirestore();
     // if (playersTableList.isEmpty) {
-    playersTableDataSource = PlayersTableDataSource(playersTableList);
+    playersTableDataSource = PlayersTableDataSource(playersTableList, widget.clubId);
     playersTableDataSource.sortedColumns.add(const SortColumnDetails(name: 'goals_scored', sortDirection: DataGridSortDirection.descending));
     // }
 
@@ -838,11 +838,12 @@ class PlayersTablePageState extends State<PlayersTablePage> {
 }
 
 class PlayersTableDataSource extends DataGridSource {
-  PlayersTableDataSource(this.playersTableList) {
+  PlayersTableDataSource(this.playersTableList, this.clubId) {
     sort();
     _buildDataRow();
   }
 
+  final String clubId; // Add this line
   List<PlayersTable> playersTableList = [];
 
   List<DataGridRow> dataGridRows = <DataGridRow>[];
@@ -916,12 +917,12 @@ class PlayersTableDataSource extends DataGridSource {
 
                       if (firstTeamPlayer != null) {
                         firstTeamClassNotifier.currentFirstTeamClass = firstTeamPlayer;
-                        navigateToSubPage(context);
+                        navigateToSubPage(context, clubId);
 
                         Toast.show("Loading up $playerName", duration: Toast.lengthLong, gravity: Toast.bottom, backgroundRadius: 10);
                       } else if (secondTeamPlayer != null) {
                         secondTeamClassNotifier.currentSecondTeamClass = secondTeamPlayer;
-                        navigateToSecondTeamClassDetailsPage(context);
+                        navigateToSecondTeamClassDetailsPage(context, clubId);
 
                         Toast.show("Loading up $playerName", duration: Toast.lengthLong, gravity: Toast.bottom, backgroundRadius: 10);
                       } else {
@@ -1004,10 +1005,10 @@ class PlayersTable {
       this.nationality});
 }
 
-Future navigateToSubPage(context) async {
-  Navigator.push(context, MaterialPageRoute(builder: (context) => const SubPage()));
+Future navigateToSubPage(context, String clubId) async {
+  Navigator.push(context, MaterialPageRoute(builder: (context) => SubPage(clubId: clubId)));
 }
 
-Future navigateToSecondTeamClassDetailsPage(context) async {
-  Navigator.push(context, MaterialPageRoute(builder: (context) => const SecondTeamClassDetailsPage()));
+Future navigateToSecondTeamClassDetailsPage(context, String clubId) async {
+  Navigator.push(context, MaterialPageRoute(builder: (context) => SecondTeamClassDetailsPage(clubId: clubId)));
 }

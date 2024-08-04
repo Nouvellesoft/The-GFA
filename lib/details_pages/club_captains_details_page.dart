@@ -38,7 +38,8 @@ late CaptainsNotifier captainsNotifier;
 var crossFadeView = CrossFadeState.showFirst;
 
 class CaptainsDetailsPage extends StatefulWidget {
-  const CaptainsDetailsPage({super.key, this.title});
+  final String clubId;
+  const CaptainsDetailsPage({super.key, this.title, required this.clubId});
 
   final String? title;
 

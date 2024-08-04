@@ -308,7 +308,7 @@ class _MyFirstTeamClassPage extends State<MyFirstTeamClassPage> {
                       onPressed: () {
                         showSearch(
                           context: context,
-                          delegate: MyFirstTeamClassSearch(all: firstTeamClassNotifier.firstTeamClassList),
+                          delegate: MyFirstTeamClassSearch(all: firstTeamClassNotifier.firstTeamClassList, clubId: widget.clubId),
                         );
                       },
                       tooltip: "Search",
@@ -502,7 +502,7 @@ class _MyFirstTeamClassPage extends State<MyFirstTeamClassPage> {
   }
 
   Future navigateToSubPage(context) async {
-    Navigator.push(context, MaterialPageRoute(builder: (context) => const SubPage()));
+    Navigator.push(context, MaterialPageRoute(builder: (context) => SubPage(clubId: widget.clubId)));
   }
 
   Future navigateTablesAndStatsDetails(BuildContext context) async {

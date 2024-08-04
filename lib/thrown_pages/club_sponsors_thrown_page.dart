@@ -340,5 +340,5 @@ class _MyClubSponsorsPageState extends State<MyClubSponsorsPage> with SingleTick
 }
 
 Future navigateToClubSponsorsDetailsPage(BuildContext context, String clubId) async {
-  Navigator.push(context, MaterialPageRoute(builder: (context) => const ClubSponsorsDetailsPage()));
+  Navigator.push(context, MaterialPageRoute(builder: (context) => ClubSponsorsDetailsPage(clubId: clubId)));
 }

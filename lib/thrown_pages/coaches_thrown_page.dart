@@ -188,7 +188,7 @@ class _MyCoachesPage extends State<MyCoachesPage> {
   }
 
   Future navigateToCoachesDetailsPage(context) async {
-    Navigator.push(context, MaterialPageRoute(builder: (context) => const CoachesDetailsPage()));
+    Navigator.push(context, MaterialPageRoute(builder: (context) => CoachesDetailsPage(clubId: widget.clubId)));
   }
 
   Future navigateTablesAndStatsDetails(BuildContext context) async {
@@ -582,7 +582,7 @@ class _MyCoachesPage extends State<MyCoachesPage> {
                       onPressed: () {
                         showSearch(
                           context: context,
-                          delegate: MyCoachesSearch(all: coachesNotifier.coachesList),
+                          delegate: MyCoachesSearch(all: coachesNotifier.coachesList, clubId: widget.clubId),
                         );
                       },
                       tooltip: "Search",

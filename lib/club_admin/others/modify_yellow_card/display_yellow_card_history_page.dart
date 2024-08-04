@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '/api/players_table_api.dart';
 import '/model/players_table.dart';
 import '../../../bloc_navigation_bloc/navigation_bloc.dart';
 import '../../../notifier/players_table_notifier.dart';
 
 Color backgroundColor = const Color.fromRGBO(129, 140, 148, 1.0);
-
-PlayersTableNotifier? playersTableNotifier;
 
 class MyDisplayYellowCardHistoryPage extends StatefulWidget implements NavigationStates {
   final String clubId;
@@ -18,9 +17,40 @@ class MyDisplayYellowCardHistoryPage extends StatefulWidget implements Navigatio
 }
 
 class MyDisplayYellowCardHistoryPageState extends State<MyDisplayYellowCardHistoryPage> {
+  bool _isLoading = true;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _fetchPlayersTableAndUpdateNotifier();
+  }
+
+  Future<void> _fetchPlayersTableAndUpdateNotifier() async {
+    PlayersTableNotifier playersTableNotifier = Provider.of<PlayersTableNotifier>(context, listen: false);
+    await getPlayersTable(playersTableNotifier, widget.clubId);
+
+    if (mounted) {
+      setState(() {
+        _isLoading = false; // Stop loading after fetching data
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    playersTableNotifier = Provider.of<PlayersTableNotifier>(context);
+    PlayersTableNotifier playersTableNotifier = Provider.of<PlayersTableNotifier>(context);
+
+    if (_isLoading) {
+      return Scaffold(
+        backgroundColor: backgroundColor,
+        body: const Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    List<PlayersTable> filteredPlayers = playersTableNotifier.playersTableList.where((player) => player.yellowCard! > 0).toList();
+
+    // Sort the list based on yellowCard in descending order
+    filteredPlayers.sort((a, b) => b.yellowCard!.compareTo(a.yellowCard!));
 
     return Scaffold(
       backgroundColor: backgroundColor,
@@ -33,13 +63,8 @@ class MyDisplayYellowCardHistoryPageState extends State<MyDisplayYellowCardHisto
           },
           child: Scrollbar(
             child: ListView.builder(
-              itemCount: playersTableNotifier!.playersTableList.where((player) => player.yellowCard! > 0).length,
+              itemCount: filteredPlayers.length,
               itemBuilder: (context, index) {
-                final List<PlayersTable> filteredPlayers = playersTableNotifier!.playersTableList.where((player) => player.yellowCard! > 0).toList();
-
-                // Sort the list based on playerOfTheMonthCum in descending order
-                filteredPlayers.sort((a, b) => b.yellowCard!.compareTo(a.yellowCard!));
-
                 final player = filteredPlayers[index];
 
                 return InkWell(
