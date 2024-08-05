@@ -34,6 +34,14 @@
                 <string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
             </array>
         </dict>
+        <dict>
+            <key>CFBundleTypeRole</key>
+            <string></string>
+            <key>CFBundleURLSchemes</key>
+            <array>
+                <string>app-1-24652197499-ios-2e7409bb80b9dea311fcde</string>
+            </array>
+        </dict>
     </array>
     <key>CFBundleVersion</key>
     <string>1</string>

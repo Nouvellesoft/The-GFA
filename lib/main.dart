@@ -172,11 +172,15 @@ void main() async {
     ], child: const MyApp()));
 
     // Handle initial message
-    FirebaseMessaging.instance.getInitialMessage().then((initialMessage) {
-      if (initialMessage != null) {
-        // Handle the initial message
-      }
-    });
+    // FirebaseMessaging.instance.getInitialMessage().then((initialMessage) {
+    //   if (initialMessage != null) {
+    //     // Handle the initial message
+    //   }
+    // });
+    RemoteMessage? initialMessage = await FirebaseMessaging.instance.getInitialMessage();
+    if (initialMessage != null) {
+      // App received a notification when it was killed
+    }
   }, FirebaseCrashlytics.instance.recordError);
 }
 

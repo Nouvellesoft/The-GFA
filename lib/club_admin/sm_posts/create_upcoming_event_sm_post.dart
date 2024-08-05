@@ -146,7 +146,7 @@ class _CreateUpcomingEventSMPostState extends State<CreateUpcomingEventSMPost> {
           data['post_code'] = postCode;
 
           // Add the new member if the name doesn't exist
-          await firestore.collection(collectionName).add(data);
+          await firestore.collection('clubs').doc(widget.clubId).collection(collectionName).add(data);
 
           // _eventNameController.clear();
           // _eventSummaryController.clear();

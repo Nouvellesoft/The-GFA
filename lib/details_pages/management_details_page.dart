@@ -144,10 +144,10 @@ class _ManagementBodyDetailsPage extends State<ManagementBodyDetailsPage> {
   bool isLoaded = false;
   final FirebaseAuth auth = FirebaseAuth.instance;
   String _receivedId = ""; // Add this line
-  bool isOTPComplete = false;
+  bool isOTPComplete = true;
   bool isOtpVerified = false; // Add this variable
   // Declare a boolean variable to track OTP generation
-  bool isOtpGenerated = false;
+  bool isOtpGenerated = true;
 
   bool isModifyingAutobiography = true; // Assuming modifying autobiography by default
 
@@ -3246,7 +3246,7 @@ class _ManagementBodyDetailsPage extends State<ManagementBodyDetailsPage> {
         );
 
         // Close the OTP verification dialog upon success
-        // Navigator.pop(context);
+        Navigator.pop(context);
 
         // Check if modifying autobiography or image and show the appropriate dialog
         if (isModifyingAutobiography) {
@@ -3333,15 +3333,12 @@ class _ManagementBodyDetailsPage extends State<ManagementBodyDetailsPage> {
                     child: const Text('Generate OTP', style: TextStyle(color: Colors.black)),
                   ),
                   TextButton(
-                    onPressed: isOTPComplete
-                        ? () {
+                    onPressed: () {
                             verifyOTPCode();
                             setState(() {
                               otpCode = '';
                             });
-                            Navigator.of(context).pop(); // Move this line here
-                          }
-                        : null,
+                          },
                     child: const Text('Verify OTP', style: TextStyle(color: Colors.black)),
                   ),
                 ],

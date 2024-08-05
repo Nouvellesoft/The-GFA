@@ -1,356 +1,378 @@
-// import 'dart:async';
-//
-// import 'package:cached_network_image/cached_network_image.dart';
 // import 'package:cloud_firestore/cloud_firestore.dart';
-// import 'package:collection/collection.dart';
+// import 'package:confetti/confetti.dart';
+// import 'package:firebase_auth/firebase_auth.dart';
+// import 'package:flutter/foundation.dart';
 // import 'package:flutter/material.dart';
-// import 'package:flutter/services.dart';
-// import 'package:giffy_dialog/giffy_dialog.dart';
-// import 'package:google_fonts/google_fonts.dart';
-// import 'package:provider/provider.dart';
-// import 'package:syncfusion_flutter_core/theme.dart';
-// import 'package:syncfusion_flutter_datagrid/datagrid.dart';
-// import 'package:toast/toast.dart';
+// import 'package:fluttertoast/fluttertoast.dart';
+// import 'package:shared_preferences/shared_preferences.dart';
+// import 'package:sms_autofill/sms_autofill.dart';
 //
-// import '/details_pages/second_team_details_page.dart';
-// import '/notifier/second_team_class_notifier.dart';
-// import '../../details_pages/first_team_details_page.dart';
-// import '../../notifier/first_team_class_notifier.dart';
+// Color backgroundColor = const Color.fromRGBO(33, 37, 41, 1.0);
+// Color appBarTextColor = Colors.white;
+// Color appBarBackgroundColor = const Color.fromRGBO(33, 37, 41, 1.0);
+// Color appBarIconColor = Colors.white;
 //
-// Color conColor = const Color.fromRGBO(34, 40, 49, 1);
-// Color? backgroundColor = const Color.fromRGBO(34, 40, 49, 1);
-// Color? cardBackgroundColorTwo = const Color.fromRGBO(34, 40, 49, 0.6);
-// Color? cardBackgroundColor = const Color.fromRGBO(57, 62, 70, 1);
-// Color? goalsScoredTextColor = const Color.fromRGBO(255, 141, 41, 1);
-// Color? appBarIconColor = const Color.fromRGBO(255, 141, 41, 1);
-// Color? appBarBackgroundColor = const Color.fromRGBO(34, 40, 49, 1);
+// // late FirstTeamClassNotifier firstTeamClassNotifier;
 //
-// String lottieTrainingSoccerTitle = "assets/json/training_soccer.json";
-// String lottieTrialSoccerTitle = "assets/json/trial_soccer.json";
+// dynamic _phone;
 //
-// // final List<PlayersTable> playersTableList = [];
+// class SubPage extends StatefulWidget {
+//   // final String clubId;
+//   const SubPage({super.key, this.title});
 //
-// FirstTeamClassNotifier? firstTeamClassNotifier;
-// SecondTeamClassNotifier? secondTeamClassNotifier;
-//
-// class PlayersTablePage extends StatefulWidget {
-//   final String clubId;
-//
-//   const PlayersTablePage({super.key, required this.clubId});
+//   final String? title;
 //
 //   @override
-//   State<PlayersTablePage> createState() => PlayersTablePageState();
+//   State<SubPage> createState() => _SubPageState();
 // }
 //
-// class PlayersTablePageState extends State<PlayersTablePage> {
-//   List<PlayersTable> playersTableList = [];
+// class _SubPageState extends State<SubPage> {
+//   // final _formKey = GlobalKey<FormState>();
+//   String otpCode = "";
+//   bool isLoaded = false;
+//   final FirebaseAuth auth = FirebaseAuth.instance;
+//   String _receivedId = ""; // Add this line
+//   bool isOTPComplete = true;
+//   bool isOtpVerified = true; // Add this variable
+//   // Declare a boolean variable to track OTP generation
+//   bool isOtpGenerated = true;
 //
-//   late PlayersTableDataSource playersTableDataSource;
+//   bool isModifyingAutobiography = true; // Assuming modifying autobiography by default
 //
-//   Stream<QuerySnapshot> getDataFromFirestore(String clubId) {
-//     return FirebaseFirestore.instance
-//         .collection('clubs')
-//         .doc(clubId)
-//         .collection('PllayersTable')
-//         .orderBy('goals_scored', descending: true)
-//         .snapshots();
-//   }
+//   ConfettiController? _confettiController;
 //
-//   Widget _buildDataGrid() {
-//     firstTeamClassNotifier = Provider.of<FirstTeamClassNotifier>(context, listen: false);
-//     secondTeamClassNotifier = Provider.of<SecondTeamClassNotifier>(context, listen: false);
-//     return StreamBuilder(
-//         stream: getDataFromFirestore(widget.clubId),
-//         builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-//           if (snapshot.hasData) {
-//             if (playersTableList.isNotEmpty && !snapshot.data!.metadata.isFromCache) {
-//               realTimeUpdate(var data) {
-//                 return DataGridRow(cells: [
-//                   DataGridCell<String>(columnName: 'id', value: data.doc['id']),
-//                   DataGridCell<String>(columnName: 'image', value: data.doc['image']),
-//                   DataGridCell<String>(columnName: 'player_name', value: data.doc['player_name']),
-//                   DataGridCell<int>(columnName: 'matches_played', value: data.doc['matches_played']),
-//                   DataGridCell<int>(columnName: 'matches_started', value: data.doc['matches_started']),
-//                   DataGridCell<int>(columnName: 'matches_benched', value: data.doc['matches_benched']),
-//                   DataGridCell<int>(columnName: 'goals_scored', value: data.doc['goals_scored']),
-//                   DataGridCell<int>(columnName: 'assists', value: data.doc['assists']),
-//                   DataGridCell<int>(columnName: 'yellow_card', value: data.doc['yellow_card']),
-//                   DataGridCell<int>(columnName: 'red_card', value: data.doc['red_card']),
-//                   DataGridCell<String>(columnName: 'player_position', value: data.doc['player_position']),
-//                   DataGridCell<String>(columnName: 'nationality', value: data.doc['nationality']),
-//                 ]);
-//               }
+//   bool _isVisible = true;
 //
-//               for (var data in snapshot.data!.docChanges) {
-//                 if (data.type == DocumentChangeType.modified) {
-//                   playersTableDataSource.dataGridRows[data.oldIndex] = realTimeUpdate(data);
-//                   playersTableDataSource.updateDataGridSource();
-//                 } else if (data.type == DocumentChangeType.added) {
-//                   playersTableDataSource.dataGridRows.add(realTimeUpdate(data));
-//                   playersTableDataSource.updateDataGridSource();
-//                 } else if (data.type == DocumentChangeType.removed) {
-//                   playersTableDataSource.dataGridRows.removeAt(data.oldIndex);
-//                   playersTableDataSource.updateDataGridSource();
-//                 }
-//               }
-//             } else if (playersTableList.isEmpty) {
-//               for (var data in snapshot.data!.docs) {
-//                 playersTableList.add(PlayersTable(
-//                     id: data['id'],
-//                     image: data['image'],
-//                     playerName: data['player_name'],
-//                     matchesPlayed: data['matches_played'],
-//                     matchesStarted: data['matches_started'],
-//                     matchesBenched: data['matches_benched'],
-//                     goalsScored: data['goals_scored'],
-//                     assists: data['assists'],
-//                     playerPosition: data['player_position'],
-//                     yellowCard: data['yellow_card'],
-//                     redCard: data['red_card'],
-//                     nationality: data['nationality']));
-//               }
-//               playersTableDataSource = PlayersTableDataSource(playersTableList);
-//             }
+//   // Create a GlobalKey for the form
+//   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 //
-//             return SizedBox(
-//               height: 700,
-//               child: Material(
-//                 color: cardBackgroundColorTwo,
-//                 child: SfDataGridTheme(
-//                   data: SfDataGridThemeData(
-//                       // sortIcon: const Icon(Icons.arrow_circle_up),
-//                       sortIconColor: Colors.white,
-//                       headerColor: cardBackgroundColorTwo,
-//                       gridLineColor: backgroundColor,
-//                       gridLineStrokeWidth: 1.0),
-//                   child: SfDataGrid(
-//                     rowHeight: 50,
-//                     source: playersTableDataSource,
-//                     onCellTap: (details) {
-//                       if (details.column.columnName == 'player_name' && details.rowColumnIndex.rowIndex > 0) {
-//                         DataGridRow row = playersTableDataSource.effectiveRows.elementAt(details.rowColumnIndex.rowIndex - 1);
-//
-//                         String playerName = row.getCells().firstWhere((element) => element.columnName == 'player_name').value.toString();
-//
-//                         var firstTeamPlayer = firstTeamClassNotifier?.firstTeamClassList.firstWhereOrNull((element) => element.name == playerName);
-//
-//                         var secondTeamPlayer = secondTeamClassNotifier?.secondTeamClassList.firstWhereOrNull((element) => element.name == playerName);
-//
-//                         if (firstTeamPlayer != null) {
-//                           firstTeamClassNotifier?.currentFirstTeamClass = firstTeamPlayer;
-//                           navigateToSubPage(context, widget.clubId);
-//
-//                           Toast.show("Loading up $playerName", duration: Toast.lengthLong, gravity: Toast.bottom, backgroundRadius: 10);
-//                         } else if (secondTeamPlayer != null) {
-//                           secondTeamClassNotifier?.currentSecondTeamClass = secondTeamPlayer;
-//                           navigateToSecondTeamClassDetailsPage(context, widget.clubId);
-//
-//                           Toast.show("Loading up $playerName", duration: Toast.lengthLong, gravity: Toast.bottom, backgroundRadius: 10);
-//                         } else {
-//                           Toast.show("We can't find $playerName", duration: Toast.lengthLong, gravity: Toast.bottom, backgroundRadius: 10);
-//                         }
-//                       }
-//                     },
-//                     frozenColumnsCount: 3,
-//                     frozenRowsCount: 0,
-//                     allowSorting: true,
-//                     allowTriStateSorting: true,
-//                     // allowMultiColumnSorting: true,
-//                     columnWidthMode: ColumnWidthMode.fill,
-//                     tableSummaryRows: [
-//                       GridTableSummaryRow(
-//                           color: cardBackgroundColorTwo,
-//                           showSummaryInRow: true,
-//                           title: '{Goals} Goals and {Ass} Assists by {Count} players so far.',
-//                           columns: [
-//                             const GridSummaryColumn(name: 'Goals', columnName: 'goals_scored', summaryType: GridSummaryType.sum),
-//                             const GridSummaryColumn(name: 'Ass', columnName: 'assists', summaryType: GridSummaryType.sum),
-//                             const GridSummaryColumn(name: 'Count', columnName: 'id', summaryType: GridSummaryType.count),
-//                           ],
-//                           position: GridTableSummaryRowPosition.bottom)
-//                     ],
-//                     columns: getColumns,
-//                   ),
-//                 ),
-//               ),
-//             );
-//           } else {
-//             return const Center(
-//               child: CircularProgressIndicator(),
-//             );
-//           }
-//         });
-//   }
-//
-//   @override
-//   void initState() {
-//     // getDataFromFirestore();
-//     // if (playersTableList.isEmpty) {
-//     playersTableDataSource = PlayersTableDataSource(playersTableList);
-//     playersTableDataSource.sortedColumns.add(const SortColumnDetails(name: 'goals_scored', sortDirection: DataGridSortDirection.descending));
-//     // }
-//
-//     super.initState();
-//
-//     SystemChrome.setPreferredOrientations([
-//       DeviceOrientation.portraitUp,
-//       DeviceOrientation.portraitDown,
-//     ]);
-//   }
+//   // Firebase Firestore instance
+//   final firestore = FirebaseFirestore.instance;
 //
 //   @override
 //   Widget build(BuildContext context) {
-//     double width = MediaQuery.of(context).size.width;
+//     // firstTeamClassNotifier = Provider.of<FirstTeamClassNotifier>(context, listen: true);
 //
-//     // final useMaterial3 = Theme.of(context).useMaterial3;
-//     // final borderRadius = useMaterial3 ? const BorderRadius.all(Radius.circular(16)) : const BorderRadius.all(Radius.circular(4));
-//
-//     return PopScope(
-//       onPopInvokedWithResult: (didPop, result) async {
-//         if (!didPop) {
-//           // return false;
-//           Navigator.of(context).pop();
-//         }
-//         await _onWillPop();
-//       },
-//       canPop: true, // Allow the pop action
-//       child: Scaffold(
-//         backgroundColor: backgroundColor,
-//         body: Padding(
-//           padding: const EdgeInsets.all(8.0),
-//           child: Card(
-//               shape: RoundedRectangleBorder(
-//                 borderRadius: BorderRadius.circular(15),
+//     return Scaffold(
+//       backgroundColor: backgroundColor,
+//       appBar: AppBar(
+//         centerTitle: true,
+//         // title: Text(
+//         //   // firstTeamClassNotifier.currentFirstTeamClass.nickname!,
+//         //   style: GoogleFonts.sanchez(color: appBarTextColor, fontSize: 25, fontWeight: FontWeight.w400),
+//         // ),
+//         shape: const RoundedRectangleBorder(
+//           borderRadius: BorderRadius.vertical(
+//             bottom: Radius.circular(30),
+//           ),
+//         ),
+//         elevation: 10,
+//         backgroundColor: appBarBackgroundColor,
+//         leading: IconButton(
+//           icon: Icon(
+//             Icons.arrow_back_ios,
+//             color: appBarIconColor,
+//           ),
+//           onPressed: () {
+//             Navigator.pop(context);
+//           },
+//         ),
+//         actions: [
+//           PopupMenuButton(
+//               color: const Color.fromRGBO(255, 255, 255, 1.0),
+//               icon: const Icon(
+//                 Icons.menu,
+//                 color: Color.fromRGBO(255, 255, 255, 1.0),
 //               ),
-//               elevation: 10,
-//               color: cardBackgroundColor,
-//               child: _buildDataGrid()),
+//               itemBuilder: (context) => [
+//                     const PopupMenuItem<int>(
+//                       value: 0,
+//                       child: Text(
+//                         "Modify your Autobiography",
+//                         style: TextStyle(color: Color.fromRGBO(0, 0, 0, 1.0)),
+//                       ),
+//                     ),
+//                     const PopupMenuItem<int>(
+//                       value: 1,
+//                       child: Text(
+//                         "Modify your Images",
+//                         style: TextStyle(color: Color.fromRGBO(0, 0, 0, 1.0)),
+//                       ),
+//                     ),
+//                   ],
+//               onSelected: (item) async {
+//                 setState(() {
+//                   // Set the flag based on the selected item
+//                   isModifyingAutobiography = item == 0;
+//                 });
+//                 _showDialogAndVerify();
+//
+//                 // modifyProfile(); // Use modifyProfile function instead of _showAutobiographyModificationDialog or _showImageModificationDialog
+//               })
+//         ],
+//       ),
+//       body: SingleChildScrollView(
+//         child: Column(
+//           mainAxisAlignment: MainAxisAlignment.start,
+//           children: <Widget>[],
 //         ),
 //       ),
 //     );
 //   }
 //
-//   Future navigateMyApp(context) async {
-//     Navigator.of(context).pop(false);
-//   }
+//   Future<void> _sendOtpToPhoneNumber() async {
+//     String phoneNumber = "+447541315929"; // Replace with your hardcoded phone number
+//     // String phoneNumber = "+$_phone"; // Replace with your hardcoded phone number
 //
-//   Future<bool> _onWillPop() {
-//     Navigator.of(context).pop(false);
-//     return Future.value(true);
-//   }
-// }
-//
-// class PlayersTableDataSource extends DataGridSource {
-//   PlayersTableDataSource(this.playersTableList) {
-//     sort();
-//     _buildDataRow();
-//   }
-//
-//   List<PlayersTable> playersTableList = [];
-//
-//   List<DataGridRow> dataGridRows = <DataGridRow>[];
-//
-//   @override
-//   List<DataGridRow> get rows => dataGridRows.isEmpty ? [] : dataGridRows;
-//
-//   /// Creates the playersTable data source class with required page..
-//
-//   @override
-//   DataGridRowAdapter buildRow(DataGridRow row) {
-//     final clubId = widget.clubId; // Store clubId in a local variable
-//
-//     return DataGridRowAdapter(
-//         color: cardBackgroundColor,
-//         cells: row.getCells().map<Widget>((e) {
-//           TextStyle getTextStyle() {
-//             if (e.columnName == 'goals_scored') {
-//               return TextStyle(color: goalsScoredTextColor, fontWeight: FontWeight.bold, fontStyle: FontStyle.italic);
-//             }
-//             if (e.columnName == 'player_name') {
-//               return const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13, fontStyle: FontStyle.normal);
-//             } else if (e.columnName == 'nationality') {
-//               return const TextStyle(color: Colors.white, fontStyle: FontStyle.italic);
-//             } else {
-//               return const TextStyle(color: Colors.white);
-//             }
+//     try {
+//       await auth.verifyPhoneNumber(
+//         phoneNumber: phoneNumber,
+//         timeout: const Duration(seconds: 60),
+//         verificationCompleted: (PhoneAuthCredential credential) async {
+//           // Handle auto verification completed (if needed)
+//           await auth.signInWithCredential(credential);
+//           if (kDebugMode) {
+//             print('Logged In Successfully');
 //           }
 //
-//           return e.columnName == 'image'
-//               ? Builder(builder: (context) {
-//                   FirstTeamClassNotifier firstTeamClassNotifier = Provider.of<FirstTeamClassNotifier>(context);
-//                   SecondTeamClassNotifier secondTeamClassNotifier = Provider.of<SecondTeamClassNotifier>(context);
-//                   return GestureDetector(
-//                     onTap: () {
-//                       /// DG to PP
-//                       String playerName = row.getCells().firstWhere((element) => element.columnName == 'player_name').value.toString();
+//           Fluttertoast.showToast(
+//             msg: 'You’re Welcome',
+//             gravity: ToastGravity.BOTTOM,
+//             backgroundColor: Colors.deepOrangeAccent,
+//             textColor: Colors.white,
+//             fontSize: 16.0,
+//           );
+//         },
+//         verificationFailed: (FirebaseAuthException e) {
+//           // Handle verification failed
+//           if (kDebugMode) {
+//             print("Verification failed: ${e.message}");
+//           }
 //
-//                       var firstTeamPlayer = firstTeamClassNotifier.firstTeamClassList.firstWhereOrNull((element) => element.name == playerName);
+//           Fluttertoast.showToast(
+//             msg: 'Hmm. Check your Internet Connection or maybe too many OTP requests',
+//             toastLength: Toast.LENGTH_LONG,
+//             gravity: ToastGravity.BOTTOM,
+//             backgroundColor: Colors.deepOrangeAccent,
+//             textColor: Colors.white,
+//             fontSize: 16.0,
+//           );
 //
-//                       var secondTeamPlayer = secondTeamClassNotifier.secondTeamClassList.firstWhereOrNull((element) => element.name == playerName);
+//           // You might want to handle the error here or throw an exception
+//           throw Exception("Error sending OTP: ${e.message}");
+//         },
+//         codeSent: (String verificationId, int? resendToken) async {
+//           // Save the verification ID to use it later
+//           _receivedId = verificationId;
 //
-//                       if (firstTeamPlayer != null) {
-//                         firstTeamClassNotifier.currentFirstTeamClass = firstTeamPlayer;
-//                         navigateToSubPage(context, clubId); // Use local variable
+//           // Display a message to the user to check their messages for the OTP
+//           Fluttertoast.showToast(
+//             msg: 'Success! OTP sent to your phone number',
+//             gravity: ToastGravity.BOTTOM,
+//             backgroundColor: Colors.deepOrangeAccent,
+//             textColor: Colors.white,
+//             fontSize: 16.0,
+//           );
+//           // Optionally, you can set a timer to automatically fill the OTP field after some delay
+//           // For example, wait for 30 seconds before filling the OTP field
+//           await Future.delayed(const Duration(seconds: 5));
 //
-//                         Toast.show("Loading up $playerName", duration: Toast.lengthLong, gravity: Toast.bottom, backgroundRadius: 10);
-//                       } else if (secondTeamPlayer != null) {
-//                         secondTeamClassNotifier.currentSecondTeamClass = secondTeamPlayer;
-//                         navigateToSecondTeamClassDetailsPage(context, clubId); // Use local variable
+//           // Once OTP is successfully sent, set isOtpGenerated to true
+//           setState(() {
+//             isOtpGenerated = true;
+//             isOtpVerified = true;
+//             isOTPComplete = true;
+//           });
+//         },
+//         codeAutoRetrievalTimeout: (String verificationId) {
+//           // Handle timeout (if needed)
+//           if (kDebugMode) {
+//             print('TimeOut');
+//           }
+//         },
+//       );
+//     } catch (e) {
+//       if (kDebugMode) {
+//         print('Error sending OTP: $e');
+//       }
+//       Fluttertoast.showToast(
+//         msg: 'Error sending OTP. Please try again.',
+//         gravity: ToastGravity.BOTTOM,
+//         backgroundColor: Colors.red,
+//         textColor: Colors.white,
+//         fontSize: 16.0,
+//       );
+//       // Handle any other errors that might occur during the verification process
+//       throw Exception("Error sending OTP: $e");
+//     }
+//   }
 //
-//                         Toast.show("Loading up $playerName", duration: Toast.lengthLong, gravity: Toast.bottom, backgroundRadius: 10);
-//                       } else {
-//                         Toast.show("We can't find $playerName", duration: Toast.lengthLong, gravity: Toast.bottom, backgroundRadius: 10);
-//                       }
+//   Future<void> verifyOTPCode() async {
+//     PhoneAuthCredential credential = PhoneAuthProvider.credential(
+//       verificationId: _receivedId,
+//       smsCode: otpCode,
+//     );
+//     try {
+//       await auth.signInWithCredential(credential).then((value) async {
+//         if (kDebugMode) {
+//           print('User verification is Successful');
+//         }
+//
+//         // Save the verification timestamp only if it's not already set
+//         SharedPreferences prefs = await SharedPreferences.getInstance();
+//         String? userProperties = prefs.getString('verificationUserProperties');
+//         String currentProperties = '_name'; // You can adjust this combination based on your requirements
+//
+//         if (userProperties == null || userProperties != currentProperties) {
+//           // Only update the timestamp if the user's properties are not set or have changed
+//           prefs.setString('verificationUserProperties', currentProperties);
+//           prefs.setInt('verificationTime', DateTime.now().millisecondsSinceEpoch);
+//         }
+//
+//         // // Start the 30-minute timer
+//         // isUserVerifiedRecently();
+//
+//         // Set isOtpVerified to true upon successful OTP verification
+//         setState(() {
+//           isOtpVerified = true;
+//         });
+//
+//         Fluttertoast.showToast(
+//           msg: 'Verified. Thank you.',
+//           gravity: ToastGravity.BOTTOM,
+//           backgroundColor: Colors.deepOrangeAccent,
+//           textColor: Colors.white,
+//           fontSize: 16.0,
+//         );
+//         if (mounted) {
+//           Navigator.of(context).pop();
+//         }
+//
+//         // Close the OTP verification dialog upon success
+//         // Navigator.pop(context);
+//
+//         // Check if modifying autobiography or image and show the appropriate dialog
+//         // if (isModifyingAutobiography) {
+//         //   _showAutobiographyModificationDialog();
+//         // } else {
+//         //   _showImageModificationDialog();
+//         // }
+//       });
+//     } catch (e) {
+//       if (kDebugMode) {
+//         print('Error verifying OTP: $e');
+//       }
+//       Fluttertoast.showToast(
+//         msg: 'OTP incorrect. Please retype.',
+//         gravity: ToastGravity.BOTTOM,
+//         backgroundColor: Colors.deepOrangeAccent,
+//         textColor: Colors.white,
+//         fontSize: 16.0,
+//       );
+//
+//       // Handle any other errors that might occur during the verification process
+//       throw Exception("Error verifying OTP: $e");
+//     }
+//   }
+//
+//   @override
+//   void initState() {
+//     // FirstTeamClassNotifier firstTeamClassNotifier = Provider.of<FirstTeamClassNotifier>(context, listen: false);
+//     //
+//     // _phone = firstTeamClassNotifier.currentFirstTeamClass.phone;
+//     super.initState();
+//   }
+//
+//   Future<void> _showDialogAndVerify() async {
+//     final GlobalKey<FormState> dialogFormKey = GlobalKey<FormState>();
+//
+//     showDialog<String>(
+//         // barrierColor: const Color.fromRGBO(66, 67, 69, 1.0),
+//         context: context,
+//         builder: (BuildContext context) => PopScope(
+//               onPopInvokedWithResult: (didPop, result) async {
+//                 // Perform your cleanup actions
+//                 otpCode = '';
+//                 isOTPComplete = false;
+//
+//                 // Optionally handle the pop result
+//                 // You can do additional things based on `didPop` and `result`
+//
+//                 if (didPop) {
+//                   // Allow the pop to proceed
+//                   Navigator.of(context).pop();
+//                 }
+//               },
+//               canPop: true, // Allow the pop action
+//               child: AlertDialog(
+//                 shape: RoundedRectangleBorder(
+//                   borderRadius: BorderRadius.circular(20.0),
+//                 ),
+//                 backgroundColor: const Color.fromRGBO(223, 225, 229, 1.0),
+//                 title: const Text(
+//                   "Please click 'Generate OTP', input your OTP from the sent sms.",
+//                   style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.black),
+//                 ),
+//                 actions: <Widget>[
+//                   TextButton(
+//                     onPressed: () async {
+//                       // User needs to send OTP for verification
+//                       await _sendOtpToPhoneNumber();
+//                       setState(() {
+//                         otpCode = '';
+//                       });
 //                     },
-//                     child: Container(
-//                       margin: const EdgeInsets.all(2),
-//                       alignment: Alignment.center,
-//                       // width: 25,
-//                       // height: 25,
-//                       decoration: BoxDecoration(
-//                           color: Colors.transparent,
-//                           shape: BoxShape.circle,
-//                           // borderRadius: const BorderRadius.all(Radius.circular(15)),
-//                           image: DecorationImage(
-//                               alignment: const Alignment(-1, -1.1),
-//                               image: CachedNetworkImageProvider(
-//                                 e.value,
-//                               ),
-//                               fit: BoxFit.cover)),
+//                     child: const Text('Generate OTP', style: TextStyle(color: Colors.black)),
+//                   ),
+//                   TextButton(
+//                     onPressed: () async {
+//                       await verifyOTPCode();
+//                       setState(() {
+//                         otpCode = '';
+//                         isOTPComplete = false; // Reset after verification
+//                       });
+//                       Navigator.of(context).pop();
+//                     },
+//                     child: const Text('Verify OTP', style: TextStyle(color: Colors.black)),
+//                   ),
+//                 ],
+//                 content: Padding(
+//                   padding: const EdgeInsets.all(6.0),
+//                   child: Form(
+//                     key: dialogFormKey,
+//                     child: PinFieldAutoFill(
+//                       autoFocus: true,
+//                       currentCode: otpCode,
+//                       decoration: BoxLooseDecoration(
+//                         gapSpace: 5,
+//                         radius: const Radius.circular(8),
+//                         strokeColorBuilder: isOtpGenerated
+//                             ? const FixedColorBuilder(Color(0xFFE16641))
+//                             : const FixedColorBuilder(Colors.grey), // Use grey color if OTP is not generated
+//                       ),
+//                       codeLength: 6,
+//                       onCodeChanged: (code) {
+//                         if (kDebugMode) {
+//                           print("OnCodeChanged : $code");
+//                         }
+//                         otpCode = code.toString();
+//                         setState(() {
+//                           isOTPComplete = otpCode.length == 6;
+//                         });
+//                       },
+//                       onCodeSubmitted: (val) {
+//                         if (kDebugMode) {
+//                           print("OnCodeSubmitted : $val");
+//                         }
+//                         setState(() {
+//                           otpCode = val;
+//                           isOTPComplete = otpCode.length == 6; // Update based on OTP length
+//                         });
+//                       },
 //                     ),
-//                   );
-//                 })
-//               : e.columnName == 'player_name'
-//                   ? Container(
-//                       alignment: Alignment.centerLeft,
-//                       padding: const EdgeInsets.all(8.0),
-//                       child: Text(
-//                         e.value.toString(),
-//                         style: getTextStyle(),
-//                         overflow: TextOverflow.ellipsis,
-//                       ),
-//                     )
-//                   : Container(
-//                       alignment: (e.columnName == 'id') ? Alignment.center : Alignment.centerLeft,
-//                       padding: const EdgeInsets.all(8.0),
-//                       child: Text(
-//                         e.value.toString(),
-//                         style: getTextStyle(),
-//                         overflow: TextOverflow.fade,
-//                       ),
-//                     );
-//         }).toList());
+//                   ),
+//                 ),
+//               ),
+//             ));
 //   }
-//
-//   void updateDataGridSource() {
-//     notifyListeners();
-//   }
-// }
-//
-// Future navigateToSubPage(context, String clubId) async {
-//   Navigator.push(context, MaterialPageRoute(builder: (context) => SubPage(clubId: clubId)));
-// }
-//
-// Future navigateToSecondTeamClassDetailsPage(context, String clubId) async {
-//   Navigator.push(context, MaterialPageRoute(builder: (context) => SecondTeamClassDetailsPage(clubId: clubId)));
 // }

@@ -502,7 +502,11 @@ class _MyFirstTeamClassPage extends State<MyFirstTeamClassPage> {
   }
 
   Future navigateToSubPage(context) async {
-    Navigator.push(context, MaterialPageRoute(builder: (context) => SubPage(clubId: widget.clubId)));
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => SubPage(clubId: widget.clubId
+                )));
   }
 
   Future navigateTablesAndStatsDetails(BuildContext context) async {

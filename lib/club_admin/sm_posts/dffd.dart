@@ -167,9 +167,9 @@ class _SubPageState extends State<SubPage> {
   bool isLoaded = false;
   final FirebaseAuth auth = FirebaseAuth.instance;
   String _receivedId = "";
-  bool isOTPComplete = true;
+  bool isOTPComplete = false;
   bool isOtpVerified = false;
-  bool isOtpGenerated = true;
+  bool isOtpGenerated = false;
 
   bool isModifyingAutobiography = true; // Assuming modifying autobiography by default
 
@@ -4755,7 +4755,9 @@ class _SubPageState extends State<SubPage> {
         verificationCompleted: (PhoneAuthCredential credential) async {
           // Handle auto verification completed (if needed)
           await auth.signInWithCredential(credential);
-          print('Logged In Successfully');
+          if (kDebugMode) {
+            print('Logged In Successfully');
+          }
 
           Fluttertoast.showToast(
             msg: 'You’re Welcome',
@@ -4767,7 +4769,9 @@ class _SubPageState extends State<SubPage> {
         },
         verificationFailed: (FirebaseAuthException e) {
           // Handle verification failed
-          print("Verification failed: ${e.message}");
+          if (kDebugMode) {
+            print("Verification failed: ${e.message}");
+          }
 
           Fluttertoast.showToast(
             msg: 'Hmm. Check your Internet Connection or maybe too many OTP requests',
@@ -4804,11 +4808,15 @@ class _SubPageState extends State<SubPage> {
         },
         codeAutoRetrievalTimeout: (String verificationId) {
           // Handle timeout (if needed)
-          print('TimeOut');
+          if (kDebugMode) {
+            print('TimeOut');
+          }
         },
       );
     } catch (e) {
-      print('Error sending OTP: $e');
+      if (kDebugMode) {
+        print('Error sending OTP: $e');
+      }
       Fluttertoast.showToast(
         msg: 'Error sending OTP. Please try again.',
         gravity: ToastGravity.BOTTOM,
@@ -4828,7 +4836,9 @@ class _SubPageState extends State<SubPage> {
     );
     try {
       await auth.signInWithCredential(credential).then((value) async {
-        print('User verification is Successful');
+        if (kDebugMode) {
+          print('User verification is Successful');
+        }
 
         // Save the verification timestamp only if it's not already set
         SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -4856,9 +4866,9 @@ class _SubPageState extends State<SubPage> {
           textColor: Colors.white,
           fontSize: 16.0,
         );
-
-        // Close the OTP verification dialog upon success
-        Navigator.pop(context);
+        if (mounted) {
+          Navigator.of(context).pop();
+        }
 
         // Check if modifying autobiography or image and show the appropriate dialog
         if (isModifyingAutobiography) {
@@ -4868,7 +4878,9 @@ class _SubPageState extends State<SubPage> {
         }
       });
     } catch (e) {
-      print('Error verifying OTP: $e');
+      if (kDebugMode) {
+        print('Error verifying OTP: $e');
+      }
       Fluttertoast.showToast(
         msg: 'OTP incorrect. Please retype.',
         gravity: ToastGravity.BOTTOM,
@@ -4911,84 +4923,74 @@ class _SubPageState extends State<SubPage> {
     showDialog<String>(
         // barrierColor: const Color.fromRGBO(66, 67, 69, 1.0),
         context: context,
-        builder: (BuildContext context) => WillPopScope(
-              onWillPop: () async {
-                // Clear the fields or perform any cleanup actions
-                otpCode = '';
-                isOTPComplete = false;
-
-                return true; // Allow the dialog to be popped
-              },
-              child: AlertDialog(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20.0),
+        builder: (BuildContext context) => AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20.0),
+              ),
+              backgroundColor: const Color.fromRGBO(223, 225, 229, 1.0),
+              title: const Text(
+                "Please click 'Generate OTP', input your OTP from the sent sms.",
+                style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.black),
+              ),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () async {
+                    // User needs to send OTP for verification
+                    await _sendOtpToPhoneNumber();
+                    setState(() {
+                      otpCode = '';
+                    });
+                  },
+                  child: const Text('Generate OTP', style: TextStyle(color: Colors.black)),
                 ),
-                backgroundColor: const Color.fromRGBO(223, 225, 229, 1.0),
-                title: const Text(
-                  "Please click 'Generate OTP', input your OTP from the sent sms.",
-                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.black),
-                ),
-                actions: <Widget>[
-                  TextButton(
-                    onPressed: () async {
-                      // User needs to send OTP for verification
-                      await _sendOtpToPhoneNumber();
-                    },
-                    child: const Text('Generate OTP', style: TextStyle(color: Colors.black)),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                            verifyOTPCode();
-                            setState(() {
-                              otpCode = '';
-                            });
-                          },
-                    child: const Text('Verify OTP', style: TextStyle(color: Colors.black)),
-                  ),
-                ],
-                content: Padding(
-                  padding: const EdgeInsets.all(6.0),
-                  child: AbsorbPointer(
-                    absorbing: !isOtpGenerated,
-                    child: Form(
-                      key: dialogFormKey,
-                      child: GestureDetector(
-                        onTap: () {
-                          // Show toast message if OTP is not generated
-                          if (!isOtpGenerated) {
-                            Fluttertoast.showToast(
-                              msg: 'Please generate OTP first',
-                              gravity: ToastGravity.BOTTOM,
-                              backgroundColor: Colors.red,
-                              textColor: Colors.white,
-                              fontSize: 16.0,
-                            );
-                          }
-                        },
-                        child: PinFieldAutoFill(
-                          autoFocus: true,
-                          currentCode: otpCode,
-                          decoration: BoxLooseDecoration(
-                            gapSpace: 5,
-                            radius: const Radius.circular(8),
-                            strokeColorBuilder: isOtpGenerated
-                                ? const FixedColorBuilder(Color(0xFFE16641))
-                                : const FixedColorBuilder(Colors.grey), // Use grey color if OTP is not generated
-                          ),
-                          codeLength: 6,
-                          onCodeChanged: (code) {
-                            print("OnCodeChanged : $code");
-                            otpCode = code.toString();
-                            isOTPComplete = code!.length == 6;
-                          },
-                          onCodeSubmitted: (val) {
-                            print("OnCodeSubmitted : $val");
-                            isOTPComplete = val.isEmpty;
+                TextButton(
+                  onPressed: isOTPComplete
+                      ? () async {
+                          await verifyOTPCode();
+                          setState(() {
                             otpCode = '';
-                          },
-                        ),
-                      ),
+                            isOTPComplete = false; // Reset after verification
+                          });
+                          // Navigator.of(context).pop(); // Move this line here
+                        }
+                      : null,
+                  child: const Text('Verify OTP', style: TextStyle(color: Colors.black)),
+                ),
+              ],
+              content: Padding(
+                padding: const EdgeInsets.all(6.0),
+                child: Form(
+                  key: dialogFormKey,
+                  child: PinFieldAutoFill(
+                    autoFocus: true,
+                    currentCode: otpCode,
+                    decoration: BoxLooseDecoration(
+                      gapSpace: 5,
+                      radius: const Radius.circular(8),
+                      strokeColorBuilder: isOtpGenerated
+                          ? const FixedColorBuilder(Color(0xFFE16641))
+                          : const FixedColorBuilder(Colors.grey), // Use grey color if OTP is not generated
                     ),
+                    codeLength: 6,
+                    onCodeChanged: (code) {
+                      if (kDebugMode) {
+                        print("OnCodeChanged : $code");
+                      }
+
+                      setState(() {
+                        otpCode = code.toString();
+                        isOTPComplete = otpCode.length == 6; // Update based on OTP length
+                      });
+                    },
+                    onCodeSubmitted: (val) {
+                      if (kDebugMode) {
+                        print("OnCodeSubmitted : $val");
+                      }
+                      setState(() {
+                        otpCode = val;
+                        isOTPComplete = otpCode.length == 6; // Update based on OTP length
+                      });
+                    },
                   ),
                 ),
               ),
@@ -4999,7 +5001,9 @@ class _SubPageState extends State<SubPage> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? userProperties = prefs.getString('verificationUserProperties');
     String currentProperties = _name; // Adjust this combination based on what you used for verification
-    print("User properties from SharedPreferences: $userProperties");
+    if (kDebugMode) {
+      print("User properties from SharedPreferences: $userProperties");
+    }
 
     if (userProperties != null && userProperties == currentProperties) {
       // Check if the last verification was within the last 30 minutes

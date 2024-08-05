@@ -165,10 +165,10 @@ class _SecondTeamClassDetailsPage extends State<SecondTeamClassDetailsPage> {
   bool isLoaded = false;
   final FirebaseAuth auth = FirebaseAuth.instance;
   String _receivedId = ""; // Add this line
-  bool isOTPComplete = false;
+  bool isOTPComplete = true;
   bool isOtpVerified = false; // Add this variable
   // Declare a boolean variable to track OTP generation
-  bool isOtpGenerated = false;
+  bool isOtpGenerated = true;
 
   bool isModifyingAutobiography = true; // Assuming modifying autobiography by default
 
@@ -4741,7 +4741,6 @@ class _SecondTeamClassDetailsPage extends State<SecondTeamClassDetailsPage> {
         phoneNumber: phoneNumber,
         timeout: const Duration(seconds: 60),
         verificationCompleted: (PhoneAuthCredential credential) async {
-          // Handle auto verification completed (if needed)
           await auth.signInWithCredential(credential);
           if (kDebugMode) {
             print('Logged In Successfully');
@@ -4756,7 +4755,6 @@ class _SecondTeamClassDetailsPage extends State<SecondTeamClassDetailsPage> {
           );
         },
         verificationFailed: (FirebaseAuthException e) {
-          // Handle verification failed
           if (kDebugMode) {
             print("Verification failed: ${e.message}");
           }
@@ -4770,14 +4768,11 @@ class _SecondTeamClassDetailsPage extends State<SecondTeamClassDetailsPage> {
             fontSize: 16.0,
           );
 
-          // You might want to handle the error here or throw an exception
           throw Exception("Error sending OTP: ${e.message}");
         },
         codeSent: (String verificationId, int? resendToken) async {
-          // Save the verification ID to use it later
           _receivedId = verificationId;
 
-          // Display a message to the user to check their messages for the OTP
           Fluttertoast.showToast(
             msg: 'Success! OTP sent to your phone number',
             gravity: ToastGravity.BOTTOM,
@@ -4785,17 +4780,14 @@ class _SecondTeamClassDetailsPage extends State<SecondTeamClassDetailsPage> {
             textColor: Colors.white,
             fontSize: 16.0,
           );
-          // Optionally, you can set a timer to automatically fill the OTP field after some delay
-          // For example, wait for 30 seconds before filling the OTP field
+
           await Future.delayed(const Duration(seconds: 5));
 
-          // Once OTP is successfully sent, set isOtpGenerated to true
           setState(() {
             isOtpGenerated = true;
           });
         },
         codeAutoRetrievalTimeout: (String verificationId) {
-          // Handle timeout (if needed)
           if (kDebugMode) {
             print('TimeOut');
           }
@@ -4812,7 +4804,6 @@ class _SecondTeamClassDetailsPage extends State<SecondTeamClassDetailsPage> {
         textColor: Colors.white,
         fontSize: 16.0,
       );
-      // Handle any other errors that might occur during the verification process
       throw Exception("Error sending OTP: $e");
     }
   }
@@ -4828,21 +4819,15 @@ class _SecondTeamClassDetailsPage extends State<SecondTeamClassDetailsPage> {
           print('User verification is Successful');
         }
 
-        // Save the verification timestamp only if it's not already set
         SharedPreferences prefs = await SharedPreferences.getInstance();
         String? userProperties = prefs.getString('verificationUserProperties');
-        String currentProperties = _name; // You can adjust this combination based on your requirements
+        String currentProperties = _name;
 
         if (userProperties == null || userProperties != currentProperties) {
-          // Only update the timestamp if the user's properties are not set or have changed
           prefs.setString('verificationUserProperties', currentProperties);
           prefs.setInt('verificationTime', DateTime.now().millisecondsSinceEpoch);
         }
 
-        // // Start the 30-minute timer
-        // isUserVerifiedRecently();
-
-        // Set isOtpVerified to true upon successful OTP verification
         setState(() {
           isOtpVerified = true;
         });
@@ -4855,10 +4840,8 @@ class _SecondTeamClassDetailsPage extends State<SecondTeamClassDetailsPage> {
           fontSize: 16.0,
         );
 
-        // Close the OTP verification dialog upon success
-        // Navigator.pop(context);
+        Navigator.pop(context);
 
-        // Check if modifying autobiography or image and show the appropriate dialog
         if (isModifyingAutobiography) {
           _showAutobiographyModificationDialog();
         } else {
@@ -4877,23 +4860,19 @@ class _SecondTeamClassDetailsPage extends State<SecondTeamClassDetailsPage> {
         fontSize: 16.0,
       );
 
-      // Handle any other errors that might occur during the verification process
       throw Exception("Error verifying OTP: $e");
     }
   }
 
   void modifyProfile() async {
     if (await isUserVerifiedRecently()) {
-      // User has been verified in the last 30 minutes
-      // Modify profile without asking for OTP
       if (isModifyingAutobiography) {
         _showAutobiographyModificationDialog();
       } else {
         _showImageModificationDialog();
       }
     } else {
-      // User needs to send OTP for verification
-      await _showDialogAndVerify(); // Pass the context to the function
+      await _showDialogAndVerify();
       Fluttertoast.showToast(
         msg: "Click 'Generate OTP' first",
         gravity: ToastGravity.BOTTOM,
@@ -4909,115 +4888,105 @@ class _SecondTeamClassDetailsPage extends State<SecondTeamClassDetailsPage> {
     final GlobalKey<FormState> dialogFormKey = GlobalKey<FormState>();
 
     showDialog<String>(
-        // barrierColor: const Color.fromRGBO(66, 67, 69, 1.0),
-        context: context,
-        builder: (BuildContext context) => PopScope(
-              onPopInvokedWithResult: (didPop, result) async {
-                // Perform your cleanup actions
-                otpCode = '';
-                isOTPComplete = false;
+      context: context,
+      builder: (BuildContext context) => PopScope(
+        onPopInvokedWithResult: (didPop, result) async {
+          otpCode = '';
+          isOTPComplete = false;
 
-                // Optionally handle the pop result
-                // You can do additional things based on `didPop` and `result`
-                if (didPop) {
-                  // Allow the pop to proceed
-                  Navigator.of(context).pop();
-                }
+          if (didPop) {
+            Navigator.of(context).pop();
+          }
+        },
+        canPop: true,
+        child: AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20.0),
+          ),
+          backgroundColor: const Color.fromRGBO(223, 225, 229, 1.0),
+          title: const Text(
+            "Please click 'Generate OTP', input your OTP from the sent sms.",
+            style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.black),
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () async {
+                await _sendOtpToPhoneNumber();
               },
-              canPop: true, // Allow the pop action
-              child: AlertDialog(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20.0),
-                ),
-                backgroundColor: const Color.fromRGBO(223, 225, 229, 1.0),
-                title: const Text(
-                  "Please click 'Generate OTP', input your OTP from the sent sms.",
-                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.black),
-                ),
-                actions: <Widget>[
-                  TextButton(
-                    onPressed: () async {
-                      // User needs to send OTP for verification
-                      await _sendOtpToPhoneNumber();
-                    },
-                    child: const Text('Generate OTP', style: TextStyle(color: Colors.black)),
-                  ),
-                  TextButton(
-                    onPressed: isOTPComplete
-                        ? () {
-                            verifyOTPCode();
-                            setState(() {
-                              otpCode = '';
-                            });
-                            Navigator.of(context).pop(); // Move this line here
-                          }
-                        : null,
-                    child: const Text('Verify OTP', style: TextStyle(color: Colors.black)),
-                  ),
-                ],
-                content: Padding(
-                  padding: const EdgeInsets.all(6.0),
-                  child: AbsorbPointer(
-                    absorbing: !isOtpGenerated,
-                    child: Form(
-                      key: dialogFormKey,
-                      child: GestureDetector(
-                        onTap: () {
-                          // Show toast message if OTP is not generated
-                          if (!isOtpGenerated) {
-                            Fluttertoast.showToast(
-                              msg: 'Please generate OTP first',
-                              gravity: ToastGravity.BOTTOM,
-                              backgroundColor: Colors.red,
-                              textColor: Colors.white,
-                              fontSize: 16.0,
-                            );
-                          }
-                        },
-                        child: PinFieldAutoFill(
-                          autoFocus: true,
-                          currentCode: otpCode,
-                          decoration: BoxLooseDecoration(
-                            gapSpace: 5,
-                            radius: const Radius.circular(8),
-                            strokeColorBuilder: isOtpGenerated
-                                ? const FixedColorBuilder(Color(0xFFE16641))
-                                : const FixedColorBuilder(Colors.grey), // Use grey color if OTP is not generated
-                          ),
-                          codeLength: 6,
-                          onCodeChanged: (code) {
-                            if (kDebugMode) {
-                              print("OnCodeChanged : $code");
-                            }
-                            otpCode = code.toString();
-                            isOTPComplete = code!.length == 6;
-                          },
-                          onCodeSubmitted: (val) {
-                            if (kDebugMode) {
-                              print("OnCodeSubmitted : $val");
-                            }
-                            isOTPComplete = val.isEmpty;
-                            otpCode = '';
-                          },
-                        ),
-                      ),
+              child: const Text('Generate OTP', style: TextStyle(color: Colors.black)),
+            ),
+            TextButton(
+              onPressed: () {
+                verifyOTPCode();
+                setState(() {
+                  otpCode = '';
+                });
+              },
+              child: const Text('Verify OTP', style: TextStyle(color: Colors.black)),
+            ),
+          ],
+          content: Padding(
+            padding: const EdgeInsets.all(6.0),
+            child: AbsorbPointer(
+              absorbing: !isOtpGenerated,
+              child: Form(
+                key: dialogFormKey,
+                child: GestureDetector(
+                  onTap: () {
+                    if (!isOtpGenerated) {
+                      Fluttertoast.showToast(
+                        msg: 'Please generate OTP first',
+                        gravity: ToastGravity.BOTTOM,
+                        backgroundColor: Colors.red,
+                        textColor: Colors.white,
+                        fontSize: 16.0,
+                      );
+                    }
+                  },
+                  child: PinFieldAutoFill(
+                    autoFocus: true,
+                    currentCode: otpCode,
+                    decoration: BoxLooseDecoration(
+                      gapSpace: 5,
+                      radius: const Radius.circular(8),
+                      strokeColorBuilder: isOtpGenerated
+                          ? const FixedColorBuilder(Color(0xFFE16641))
+                          : const FixedColorBuilder(Colors.grey),
                     ),
+                    codeLength: 6,
+                    onCodeChanged: (code) {
+                      if (kDebugMode) {
+                        print("OnCodeChanged : $code");
+                      }
+                      otpCode = code.toString();
+                      isOTPComplete = code!.length == 6;
+                    },
+                    onCodeSubmitted: (val) {
+                      if (kDebugMode) {
+                        print("OnCodeSubmitted : $val");
+                      }
+                      isOTPComplete = val.isEmpty;
+                      otpCode = '';
+                    },
                   ),
                 ),
               ),
-            ));
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   Future<bool> isUserVerifiedRecently() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? userProperties = prefs.getString('verificationUserProperties');
-    String currentProperties = _name; // Adjust this combination based on what you used for verification
+    String currentProperties = _name;
     if (kDebugMode) {
       print("User properties from SharedPreferences: $userProperties");
     }
 
     if (userProperties != null && userProperties == currentProperties) {
-      // Check if the last verification was within the last 30 minutes
       int? verificationTime = prefs.getInt('verificationTime');
       if (verificationTime != null) {
         DateTime now = DateTime.now();
@@ -5035,7 +5004,7 @@ class _SecondTeamClassDetailsPage extends State<SecondTeamClassDetailsPage> {
     prefs.remove('verificationTime');
   }
 
-  void _showAutobiographyModificationDialog() {
+    void _showAutobiographyModificationDialog() {
     // final GlobalKey<FormState> dialogFormKey = GlobalKey<FormState>();
 
     showDialog<String>(
