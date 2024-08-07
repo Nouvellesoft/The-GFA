@@ -3,11 +3,19 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '/bloc_navigation_bloc/navigation_bloc.dart';
+import '../../api/fifth_team_class_api.dart';
 import '../../api/first_team_class_api.dart';
+import '../../api/fourth_team_class_api.dart';
 import '../../api/second_team_class_api.dart';
+import '../../api/sixth_team_class_api.dart';
+import '../../api/third_team_class_api.dart';
+import '../../notifier/fifth_team_class_notifier.dart';
 import '../../notifier/first_team_class_notifier.dart';
+import '../../notifier/fourth_team_class_notifier.dart';
 import '../../notifier/players_notifier.dart';
 import '../../notifier/second_team_class_notifier.dart';
+import '../../notifier/sixth_team_class_notifier.dart';
+import '../../notifier/third_team_class_notifier.dart';
 
 PlayersNotifier? playersNotifier;
 
@@ -168,11 +176,27 @@ class MyModifyClubPlayersPageState extends State<MyModifyClubPlayersPage> {
     SecondTeamClassNotifier secondTeamClassNotifier = Provider.of<SecondTeamClassNotifier>(context, listen: false);
     _fetchSecondTeamClassAndUpdateNotifier(secondTeamClassNotifier);
 
+    ThirdTeamClassNotifier thirdTeamClassNotifier = Provider.of<ThirdTeamClassNotifier>(context, listen: false);
+    _fetchThirdTeamClassAndUpdateNotifier(thirdTeamClassNotifier);
+
+    FourthTeamClassNotifier fourthTeamClassNotifier = Provider.of<FourthTeamClassNotifier>(context, listen: false);
+    _fetchFourthTeamClassAndUpdateNotifier(fourthTeamClassNotifier);
+
+    FifthTeamClassNotifier fifthTeamClassNotifier = Provider.of<FifthTeamClassNotifier>(context, listen: false);
+    _fetchFifthTeamClassAndUpdateNotifier(fifthTeamClassNotifier);
+
+    SixthTeamClassNotifier sixthTeamClassNotifier = Provider.of<SixthTeamClassNotifier>(context, listen: false);
+    _fetchSixthTeamClassAndUpdateNotifier(sixthTeamClassNotifier);
+
     // Populate the PlayersNotifier with data from both teams
     PlayersNotifier playersNotifier = Provider.of<PlayersNotifier>(context, listen: false);
 
     playersNotifier.setFirstTeamPlayers(firstTeamClassNotifier.firstTeamClassList);
     playersNotifier.setSecondTeamPlayers(secondTeamClassNotifier.secondTeamClassList);
+    playersNotifier.setThirdTeamPlayers(thirdTeamClassNotifier.thirdTeamClassList);
+    playersNotifier.setFourthTeamPlayers(fourthTeamClassNotifier.fourthTeamClassList);
+    playersNotifier.setFifthTeamPlayers(fifthTeamClassNotifier.fifthTeamClassList);
+    playersNotifier.setSixthTeamPlayers(sixthTeamClassNotifier.sixthTeamClassList);
   }
 
   Future<void> _fetchFirstTeamClassAndUpdateNotifier(FirstTeamClassNotifier firstTeamNotifier) async {
@@ -183,6 +207,30 @@ class MyModifyClubPlayersPageState extends State<MyModifyClubPlayersPage> {
 
   Future<void> _fetchSecondTeamClassAndUpdateNotifier(SecondTeamClassNotifier secondTeamNotifier) async {
     await getSecondTeamClass(secondTeamNotifier, widget.clubId);
+
+    setState(() {}); // Refresh the UI if needed
+  }
+
+  Future<void> _fetchThirdTeamClassAndUpdateNotifier(ThirdTeamClassNotifier thirdTeamClassNotifier) async {
+    await getThirdTeamClass(thirdTeamClassNotifier, widget.clubId);
+
+    setState(() {}); // Refresh the UI if needed
+  }
+
+  Future<void> _fetchFourthTeamClassAndUpdateNotifier(FourthTeamClassNotifier fourthTeamClassNotifier) async {
+    await getFourthTeamClass(fourthTeamClassNotifier, widget.clubId);
+
+    setState(() {}); // Refresh the UI if needed
+  }
+
+  Future<void> _fetchFifthTeamClassAndUpdateNotifier(FifthTeamClassNotifier fifthTeamClassNotifier) async {
+    await getFifthTeamClass(fifthTeamClassNotifier, widget.clubId);
+
+    setState(() {}); // Refresh the UI if needed
+  }
+
+  Future<void> _fetchSixthTeamClassAndUpdateNotifier(SixthTeamClassNotifier sixthTeamClassNotifier) async {
+    await getSixthTeamClass(sixthTeamClassNotifier, widget.clubId);
 
     setState(() {}); // Refresh the UI if needed
   }
@@ -198,6 +246,10 @@ class MyModifyClubPlayersPageState extends State<MyModifyClubPlayersPage> {
       // Delete from both collections
       await deletePlayerByName(firestore, 'FirstTeamClassPlayers', name);
       await deletePlayerByName(firestore, 'SecondTeamClassPlayers', name);
+      await deletePlayerByName(firestore, 'ThirdTeamClassPlayers', name);
+      await deletePlayerByName(firestore, 'FourthTeamClassPlayers', name);
+      await deletePlayerByName(firestore, 'FifthTeamClassPlayers', name);
+      await deletePlayerByName(firestore, 'SixthTeamClassPlayers', name);
     }
 
     // Show a Snackbar message indicating the players that have been removed
@@ -222,9 +274,25 @@ class MyModifyClubPlayersPageState extends State<MyModifyClubPlayersPage> {
     SecondTeamClassNotifier secondTeamClassNotifier = Provider.of<SecondTeamClassNotifier>(context, listen: false);
     await _fetchSecondTeamClassAndUpdateNotifier(secondTeamClassNotifier);
 
+    ThirdTeamClassNotifier thirdTeamClassNotifier = Provider.of<ThirdTeamClassNotifier>(context, listen: false);
+    _fetchThirdTeamClassAndUpdateNotifier(thirdTeamClassNotifier);
+
+    FourthTeamClassNotifier fourthTeamClassNotifier = Provider.of<FourthTeamClassNotifier>(context, listen: false);
+    _fetchFourthTeamClassAndUpdateNotifier(fourthTeamClassNotifier);
+
+    FifthTeamClassNotifier fifthTeamClassNotifier = Provider.of<FifthTeamClassNotifier>(context, listen: false);
+    _fetchFifthTeamClassAndUpdateNotifier(fifthTeamClassNotifier);
+
+    SixthTeamClassNotifier sixthTeamClassNotifier = Provider.of<SixthTeamClassNotifier>(context, listen: false);
+    _fetchSixthTeamClassAndUpdateNotifier(sixthTeamClassNotifier);
+
     PlayersNotifier playersNotifier = Provider.of<PlayersNotifier>(context, listen: false);
     playersNotifier.setFirstTeamPlayers(firstTeamClassNotifier.firstTeamClassList);
     playersNotifier.setSecondTeamPlayers(secondTeamClassNotifier.secondTeamClassList);
+    playersNotifier.setThirdTeamPlayers(thirdTeamClassNotifier.thirdTeamClassList);
+    playersNotifier.setFourthTeamPlayers(fourthTeamClassNotifier.fourthTeamClassList);
+    playersNotifier.setFifthTeamPlayers(fifthTeamClassNotifier.fifthTeamClassList);
+    playersNotifier.setSixthTeamPlayers(sixthTeamClassNotifier.sixthTeamClassList);
 
     // Call setState to ensure the UI is updated with the latest data
     setState(() {});

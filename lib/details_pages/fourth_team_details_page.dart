@@ -19,7 +19,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sms_autofill/sms_autofill.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../../notifier/first_team_class_notifier.dart';
+import '../notifier/fourth_team_class_notifier.dart';
 
 String clubName = "Coventry Phoenix FC";
 
@@ -57,7 +57,7 @@ String bestMomentTitle = "My best moment so far in $clubName\n";
 String worstMomentTitle = "My worst moment so far in $clubName\n";
 String dreamFCTitle = "My Dream Football Club\n";
 String positionPlayingTitle = "My Play Position\n";
-String dobTitle = "My Birthday\n";
+String dobTitle = "My Age\n";
 // String prefectPositionTitle = "Position held as a Prefect\n";
 String regionOfOriginTitle = "My Region of Origin\n";
 String countryTitle = "My Nationality\n";
@@ -83,24 +83,23 @@ String linkedInProfileSharedPreferencesContentTwo = ", on LinkedIn.com";
 String linkedInProfileSharedPreferencesButton = "Go to LinkedIn";
 String linkedInProfileSharedPreferencesButtonTwo = "Lol, No";
 
-Color backgroundColor = const Color.fromRGBO(33, 37, 41, 1.0);
+Color backgroundColor = const Color.fromRGBO(186, 90, 49, 1);
 Color appBarTextColor = Colors.white;
-Color appBarBackgroundColor = const Color.fromRGBO(33, 37, 41, 1.0);
+Color appBarBackgroundColor = const Color.fromRGBO(186, 90, 49, 1);
 Color appBarIconColor = Colors.white;
 Color materialBackgroundColor = Colors.transparent;
-Color shapeDecorationColor = const Color.fromRGBO(33, 37, 41, 1.0);
-Color shapeDecorationColorTwo = Colors.white;
-Color shapeDecorationColorThree = const Color.fromRGBO(33, 37, 41, 1.0);
-Color shapeDecorationTextColor = const Color.fromRGBO(255, 107, 53, 1.0);
-Color shapeDecorationIconColor = const Color.fromRGBO(255, 107, 53, 1.0);
+Color shapeDecorationColor = const Color.fromRGBO(186, 90, 49, 1);
+Color shapeDecorationColorTwo = const Color.fromRGBO(186, 90, 49, 1);
+Color shapeDecorationTextColor = const Color.fromRGBO(186, 90, 49, 1);
+Color shapeDecorationIconColor = const Color.fromRGBO(186, 90, 49, 1);
 Color cardBackgroundColor = Colors.white;
-Color splashColor = const Color.fromRGBO(33, 37, 41, 1.0);
+Color splashColor = Colors.white;
 Color splashColorTwo = Colors.white;
-Color splashColorThree = const Color.fromRGBO(33, 37, 41, 1.0);
+Color splashColorThree = Colors.white;
 Color iconTextColor = Colors.white;
-Color iconTextColorTwo = const Color.fromRGBO(33, 37, 41, 1.0);
-Color buttonColor = const Color.fromRGBO(33, 37, 41, 1.0);
-Color textColor = const Color.fromRGBO(33, 37, 41, 1.0);
+Color iconTextColorTwo = const Color.fromRGBO(186, 90, 49, 1);
+Color buttonColor = const Color.fromRGBO(186, 90, 49, 1);
+Color textColor = const Color.fromRGBO(186, 90, 49, 1);
 
 Color confettiColorOne = Colors.green;
 Color confettiColorTwo = Colors.blue;
@@ -115,7 +114,7 @@ Color confettiColorTen = Colors.teal;
 Color confettiColorEleven = Colors.indigoAccent;
 Color confettiColorTwelve = Colors.cyan;
 
-late FirstTeamClassNotifier firstTeamClassNotifier;
+late FourthTeamClassNotifier fourthTeamClassNotifier;
 
 Map<int, Widget>? userBIO;
 
@@ -151,24 +150,24 @@ dynamic _ronaldoOrMessi;
 dynamic _twitter;
 dynamic _worstMoment;
 
-class SubPage extends StatefulWidget {
+class FourthTeamClassDetailsPage extends StatefulWidget {
   final String clubId;
-  const SubPage({super.key, this.title, required this.clubId});
+  const FourthTeamClassDetailsPage({super.key, this.title, required this.clubId});
 
   final String? title;
 
   @override
-  State<SubPage> createState() => _SubPageState();
+  State<FourthTeamClassDetailsPage> createState() => _FourthTeamClassDetailsPage();
 }
 
-class _SubPageState extends State<SubPage> {
-  // final _formKey = GlobalKey<FormState>();
+class _FourthTeamClassDetailsPage extends State<FourthTeamClassDetailsPage> {
   String otpCode = "";
   bool isLoaded = false;
   final FirebaseAuth auth = FirebaseAuth.instance;
-  String _receivedId = "";
+  String _receivedId = ""; // Add this line
   bool isOTPComplete = true;
-  bool isOtpVerified = false;
+  bool isOtpVerified = false; // Add this variable
+  // Declare a boolean variable to track OTP generation
   bool isOtpGenerated = true;
 
   bool isModifyingAutobiography = true; // Assuming modifying autobiography by default
@@ -290,7 +289,7 @@ class _SubPageState extends State<SubPage> {
       final droplineName = _myDroplineController.text;
       final fullName = fullName2;
 
-      String collectionName = 'FirstTeamClassPlayers';
+      String collectionName = 'FourthTeamClassPlayers';
 
       // Find the corresponding document in the firestore by querying for the full name
       QuerySnapshot querySnapshot =
@@ -388,7 +387,8 @@ class _SubPageState extends State<SubPage> {
       // Find the document ID for the user with the specified name (_name)
       String queryName = _name.toLowerCase().replaceAll(" ", "");
 
-      QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('clubs').doc(widget.clubId).collection('FirstTeamClassPlayers').get();
+      QuerySnapshot querySnapshot =
+          await FirebaseFirestore.instance.collection('clubs').doc(widget.clubId).collection('FourthTeamClassPlayers').get();
 
       String? documentId;
 
@@ -418,7 +418,7 @@ class _SubPageState extends State<SubPage> {
           String imageField = i == 0 ? 'image' : 'image_two'; // Set the field name based on the image index
 
           // Update the existing document for the specified user (_queryName)
-          await FirebaseFirestore.instance.collection('clubs').doc(widget.clubId).collection('FirstTeamClassPlayers').doc(documentId).update({
+          await FirebaseFirestore.instance.collection('clubs').doc(widget.clubId).collection('FourthTeamClassPlayers').doc(documentId).update({
             imageField: imageUrl,
           });
         }
@@ -537,7 +537,7 @@ class _SubPageState extends State<SubPage> {
 
   @override
   Widget build(BuildContext context) {
-    firstTeamClassNotifier = Provider.of<FirstTeamClassNotifier>(context, listen: true);
+    fourthTeamClassNotifier = Provider.of<FourthTeamClassNotifier>(context, listen: true);
 
     return ConfettiWidget(
       confettiController: _confettiController!,
@@ -562,7 +562,7 @@ class _SubPageState extends State<SubPage> {
         appBar: AppBar(
           centerTitle: true,
           title: Text(
-            firstTeamClassNotifier.currentFirstTeamClass.nickname!,
+            fourthTeamClassNotifier.currentFourthTeamClass.nickname!,
             style: GoogleFonts.sanchez(color: appBarTextColor, fontSize: 25, fontWeight: FontWeight.w400),
           ),
           shape: const RoundedRectangleBorder(
@@ -611,16 +611,16 @@ class _SubPageState extends State<SubPage> {
                   });
 
                   modifyProfile(); // Use modifyProfile function instead of _showAutobiographyModificationDialog or _showImageModificationDialog
-                })
+                }),
           ],
         ),
         body: SingleChildScrollView(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[
-              if (firstTeamClassNotifier.currentFirstTeamClass.imageTwo.toString().isEmpty) ...[
+              if (fourthTeamClassNotifier.currentFourthTeamClass.imageTwo.toString().isEmpty) ...[
                 Tooltip(
-                    message: firstTeamClassNotifier.currentFirstTeamClass.name,
+                    message: fourthTeamClassNotifier.currentFourthTeamClass.name,
                     child: GestureDetector(
                       onTap: () => setState(() {
                         crossFadeView = crossFadeView == CrossFadeState.showFirst ? CrossFadeState.showSecond : CrossFadeState.showFirst;
@@ -640,13 +640,13 @@ class _SubPageState extends State<SubPage> {
                             crossFadeState: crossFadeView == CrossFadeState.showFirst ? CrossFadeState.showSecond : CrossFadeState.showFirst,
                             duration: const Duration(milliseconds: 1000),
                             firstChild: CachedNetworkImage(
-                              imageUrl: firstTeamClassNotifier.currentFirstTeamClass.image!,
+                              imageUrl: fourthTeamClassNotifier.currentFourthTeamClass.image!,
                               fit: BoxFit.cover,
                               placeholder: (context, url) => const CircularProgressIndicator(),
                               errorWidget: (context, url, error) => Icon(MdiIcons.alertRhombus),
                             ),
                             secondChild: CachedNetworkImage(
-                              imageUrl: firstTeamClassNotifier.currentFirstTeamClass.image!,
+                              imageUrl: fourthTeamClassNotifier.currentFourthTeamClass.image!,
                               fit: BoxFit.cover,
                               placeholder: (context, url) => const CircularProgressIndicator(),
                               errorWidget: (context, url, error) => Icon(MdiIcons.alertRhombus),
@@ -657,7 +657,7 @@ class _SubPageState extends State<SubPage> {
                     )),
               ] else ...[
                 Tooltip(
-                    message: firstTeamClassNotifier.currentFirstTeamClass.name,
+                    message: fourthTeamClassNotifier.currentFourthTeamClass.name,
                     child: GestureDetector(
                       onTap: () => setState(() {
                         crossFadeView = crossFadeView == CrossFadeState.showFirst ? CrossFadeState.showSecond : CrossFadeState.showFirst;
@@ -676,13 +676,13 @@ class _SubPageState extends State<SubPage> {
                             crossFadeState: crossFadeView == CrossFadeState.showFirst ? CrossFadeState.showSecond : CrossFadeState.showFirst,
                             duration: const Duration(milliseconds: 1000),
                             firstChild: CachedNetworkImage(
-                              imageUrl: firstTeamClassNotifier.currentFirstTeamClass.image!,
+                              imageUrl: fourthTeamClassNotifier.currentFourthTeamClass.image!,
                               fit: BoxFit.cover,
                               placeholder: (context, url) => const CircularProgressIndicator(),
                               errorWidget: (context, url, error) => Icon(MdiIcons.alertRhombus),
                             ),
                             secondChild: CachedNetworkImage(
-                              imageUrl: firstTeamClassNotifier.currentFirstTeamClass.imageTwo!,
+                              imageUrl: fourthTeamClassNotifier.currentFourthTeamClass.imageTwo!,
                               fit: BoxFit.cover,
                               placeholder: (context, url) => const CircularProgressIndicator(),
                               errorWidget: (context, url, error) => Icon(MdiIcons.alertRhombus),
@@ -695,12 +695,13 @@ class _SubPageState extends State<SubPage> {
               Material(
                 color: materialBackgroundColor,
                 child: InkWell(
-                  splashColor: splashColor.withOpacity(0.20),
+                  splashColor: splashColor,
                   onTap: () {},
                   child: Card(
                     elevation: 4,
+                    color: cardBackgroundColor,
                     shape: OutlineInputBorder(
-                      borderSide: BorderSide(color: shapeDecorationColor.withOpacity(0.20), width: 4.0, style: BorderStyle.solid),
+                      borderSide: BorderSide(color: cardBackgroundColor.withOpacity(0.70), width: 4.0, style: BorderStyle.solid),
                     ),
                     margin: const EdgeInsets.fromLTRB(16, 16, 16, 16),
                     child: Padding(
@@ -711,11 +712,11 @@ class _SubPageState extends State<SubPage> {
                           mainAxisSize: MainAxisSize.min,
                           children: <Widget>[
                             Text(
-                              firstTeamClassNotifier.currentFirstTeamClass.name!.toUpperCase(),
+                              fourthTeamClassNotifier.currentFourthTeamClass.name!.toUpperCase(),
                               style: GoogleFonts.blinker(color: shapeDecorationTextColor, fontSize: 30, fontWeight: FontWeight.w500),
                             ),
                             (() {
-                              if (firstTeamClassNotifier.currentFirstTeamClass.captain == "Yes") {
+                              if (fourthTeamClassNotifier.currentFourthTeamClass.captain == "Yes") {
                                 return Row(
                                   children: <Widget>[
                                     const SizedBox(width: 10),
@@ -761,13 +762,14 @@ class _SubPageState extends State<SubPage> {
                       //   padding: const EdgeInsets.only(bottom: 35),
                       //   child: CupertinoSlidingSegmentedControl<int>(
                       //     padding: const EdgeInsets.fromLTRB(5, 10, 5, 10),
-                      //     thumbColor: shapeDecorationColorTwo,
-                      //     backgroundColor: shapeDecorationColorThree.withAlpha(50),
+                      //     thumbColor: cardBackgroundColor,
+                      //     backgroundColor:
+                      //     shapeDecorationColorTwo.withAlpha(50),
                       //     children: {
                       //       0: Text(
                       //         reachDetails,
                       //         style: GoogleFonts.sacramento(
-                      //             color: shapeDecorationColorThree,
+                      //             color: shapeDecorationColorTwo,
                       //             fontSize: 25,
                       //             fontStyle: FontStyle.normal,
                       //             fontWeight: FontWeight.w400),
@@ -775,7 +777,7 @@ class _SubPageState extends State<SubPage> {
                       //       1: Text(
                       //         autoBioDetails,
                       //         style: GoogleFonts.sacramento(
-                      //           color: shapeDecorationColorThree,
+                      //           color: shapeDecorationColorTwo,
                       //           fontSize: 25,
                       //           fontStyle: FontStyle.normal,
                       //           fontWeight: FontWeight.w400,
@@ -791,6 +793,8 @@ class _SubPageState extends State<SubPage> {
                       //   ),
                       // ),
 
+                      // userBIO![sharedValue]!,
+
                       Column(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         mainAxisSize: MainAxisSize.max,
@@ -799,12 +803,14 @@ class _SubPageState extends State<SubPage> {
                           Padding(
                             padding: const EdgeInsets.only(top: 20.0, bottom: 20),
                             child: Container(
-                              decoration: BoxDecoration(color: shapeDecorationColorThree.withAlpha(50)),
-                              // borderRadius: BorderRadius.circular(10)),
+                              decoration: BoxDecoration(
+                                color: splashColorThree.withAlpha(50),
+                                // borderRadius: BorderRadius.circular(10)
+                              ),
                               child: Material(
-                                color: materialBackgroundColor.withAlpha(110),
+                                color: shapeDecorationColorTwo.withAlpha(160),
                                 child: InkWell(
-                                  splashColor: shapeDecorationColorThree.withOpacity(0.1),
+                                  splashColor: splashColorThree.withOpacity(0.1),
                                   onTap: () {},
                                   child: Padding(
                                     padding: const EdgeInsets.only(bottom: 8, top: 8, left: 14, right: 14),
@@ -857,8 +863,7 @@ class _SubPageState extends State<SubPage> {
                                 child: Padding(
                                   padding: const EdgeInsets.only(top: 20),
                                   child: Container(
-                                    decoration:
-                                        BoxDecoration(color: shapeDecorationColorThree.withAlpha(50), borderRadius: BorderRadius.circular(10)),
+                                    decoration: BoxDecoration(color: shapeDecorationColorTwo.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                                     child: Material(
                                       color: materialBackgroundColor,
                                       child: InkWell(
@@ -899,7 +904,7 @@ class _SubPageState extends State<SubPage> {
                                     padding: const EdgeInsets.only(top: 20.0),
                                     child: Container(
                                       decoration:
-                                          BoxDecoration(color: shapeDecorationColorThree.withAlpha(50), borderRadius: BorderRadius.circular(10)),
+                                          BoxDecoration(color: shapeDecorationColorTwo.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                                       child: Material(
                                         color: materialBackgroundColor,
                                         child: InkWell(
@@ -940,7 +945,7 @@ class _SubPageState extends State<SubPage> {
                               return Padding(
                                 padding: const EdgeInsets.only(top: 20.0),
                                 child: Container(
-                                  decoration: BoxDecoration(color: shapeDecorationColorThree.withAlpha(50), borderRadius: BorderRadius.circular(10)),
+                                  decoration: BoxDecoration(color: shapeDecorationColorTwo.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                                   child: Material(
                                     color: materialBackgroundColor,
                                     child: InkWell(
@@ -980,7 +985,7 @@ class _SubPageState extends State<SubPage> {
                                     padding: const EdgeInsets.only(top: 20.0),
                                     child: Container(
                                       decoration:
-                                          BoxDecoration(color: shapeDecorationColorThree.withAlpha(50), borderRadius: BorderRadius.circular(10)),
+                                          BoxDecoration(color: shapeDecorationColorTwo.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                                       child: Material(
                                         color: materialBackgroundColor,
                                         // child: InkWell(
@@ -1022,7 +1027,7 @@ class _SubPageState extends State<SubPage> {
                               return Padding(
                                 padding: const EdgeInsets.only(top: 20.0),
                                 child: Container(
-                                  decoration: BoxDecoration(color: shapeDecorationColorThree.withAlpha(50), borderRadius: BorderRadius.circular(10)),
+                                  decoration: BoxDecoration(color: shapeDecorationColorTwo.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                                   child: Material(
                                     color: materialBackgroundColor,
                                     child: InkWell(
@@ -1062,7 +1067,7 @@ class _SubPageState extends State<SubPage> {
                                     padding: const EdgeInsets.only(top: 20.0),
                                     child: Container(
                                       decoration:
-                                          BoxDecoration(color: shapeDecorationColorThree.withAlpha(50), borderRadius: BorderRadius.circular(10)),
+                                          BoxDecoration(color: shapeDecorationColorTwo.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                                       child: Material(
                                         color: materialBackgroundColor,
                                         // child: InkWell(
@@ -1104,7 +1109,7 @@ class _SubPageState extends State<SubPage> {
                               return Padding(
                                 padding: const EdgeInsets.only(top: 20.0),
                                 child: Container(
-                                  decoration: BoxDecoration(color: shapeDecorationColorThree.withAlpha(50), borderRadius: BorderRadius.circular(10)),
+                                  decoration: BoxDecoration(color: shapeDecorationColorTwo.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                                   child: Material(
                                     color: materialBackgroundColor,
                                     child: InkWell(
@@ -1144,7 +1149,7 @@ class _SubPageState extends State<SubPage> {
                                     padding: const EdgeInsets.only(top: 20.0),
                                     child: Container(
                                       decoration:
-                                          BoxDecoration(color: shapeDecorationColorThree.withAlpha(50), borderRadius: BorderRadius.circular(10)),
+                                          BoxDecoration(color: shapeDecorationColorTwo.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                                       child: Material(
                                         color: materialBackgroundColor,
                                         // child: InkWell(
@@ -1186,7 +1191,7 @@ class _SubPageState extends State<SubPage> {
                               return Padding(
                                 padding: const EdgeInsets.only(top: 20.0),
                                 child: Container(
-                                  decoration: BoxDecoration(color: shapeDecorationColorThree.withAlpha(50), borderRadius: BorderRadius.circular(10)),
+                                  decoration: BoxDecoration(color: shapeDecorationColorTwo.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                                   child: Material(
                                     color: materialBackgroundColor,
                                     child: InkWell(
@@ -1226,7 +1231,7 @@ class _SubPageState extends State<SubPage> {
                                     padding: const EdgeInsets.only(top: 20.0),
                                     child: Container(
                                       decoration:
-                                          BoxDecoration(color: shapeDecorationColorThree.withAlpha(50), borderRadius: BorderRadius.circular(10)),
+                                          BoxDecoration(color: shapeDecorationColorTwo.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                                       child: Material(
                                         color: materialBackgroundColor,
                                         // child: InkWell(
@@ -1268,7 +1273,7 @@ class _SubPageState extends State<SubPage> {
                               return Padding(
                                 padding: const EdgeInsets.only(top: 20.0),
                                 child: Container(
-                                  decoration: BoxDecoration(color: shapeDecorationColorThree.withAlpha(50), borderRadius: BorderRadius.circular(10)),
+                                  decoration: BoxDecoration(color: shapeDecorationColorTwo.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                                   child: Material(
                                     color: materialBackgroundColor,
                                     child: InkWell(
@@ -1308,7 +1313,7 @@ class _SubPageState extends State<SubPage> {
                                     padding: const EdgeInsets.only(top: 20.0),
                                     child: Container(
                                       decoration:
-                                          BoxDecoration(color: shapeDecorationColorThree.withAlpha(50), borderRadius: BorderRadius.circular(10)),
+                                          BoxDecoration(color: shapeDecorationColorTwo.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                                       child: Material(
                                         color: materialBackgroundColor,
                                         // child: InkWell(
@@ -1350,7 +1355,7 @@ class _SubPageState extends State<SubPage> {
                               return Padding(
                                 padding: const EdgeInsets.only(top: 20.0),
                                 child: Container(
-                                  decoration: BoxDecoration(color: shapeDecorationColorThree.withAlpha(50), borderRadius: BorderRadius.circular(10)),
+                                  decoration: BoxDecoration(color: shapeDecorationColorTwo.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                                   child: Material(
                                     color: materialBackgroundColor,
                                     child: InkWell(
@@ -1390,7 +1395,7 @@ class _SubPageState extends State<SubPage> {
                                     padding: const EdgeInsets.only(top: 20.0),
                                     child: Container(
                                       decoration:
-                                          BoxDecoration(color: shapeDecorationColorThree.withAlpha(50), borderRadius: BorderRadius.circular(10)),
+                                          BoxDecoration(color: shapeDecorationColorTwo.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                                       child: Material(
                                         color: materialBackgroundColor,
                                         // child: InkWell(
@@ -1432,7 +1437,7 @@ class _SubPageState extends State<SubPage> {
                               return Padding(
                                 padding: const EdgeInsets.only(top: 20.0),
                                 child: Container(
-                                  decoration: BoxDecoration(color: shapeDecorationColorThree.withAlpha(50), borderRadius: BorderRadius.circular(10)),
+                                  decoration: BoxDecoration(color: shapeDecorationColorTwo.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                                   child: Material(
                                     color: materialBackgroundColor,
                                     child: InkWell(
@@ -1472,7 +1477,7 @@ class _SubPageState extends State<SubPage> {
                                     padding: const EdgeInsets.only(top: 20.0),
                                     child: Container(
                                       decoration:
-                                          BoxDecoration(color: shapeDecorationColorThree.withAlpha(50), borderRadius: BorderRadius.circular(10)),
+                                          BoxDecoration(color: shapeDecorationColorTwo.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                                       child: Material(
                                         color: materialBackgroundColor,
                                         // child: InkWell(
@@ -1514,7 +1519,7 @@ class _SubPageState extends State<SubPage> {
                               return Padding(
                                 padding: const EdgeInsets.only(top: 20.0),
                                 child: Container(
-                                  decoration: BoxDecoration(color: shapeDecorationColorThree.withAlpha(50), borderRadius: BorderRadius.circular(10)),
+                                  decoration: BoxDecoration(color: shapeDecorationColorTwo.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                                   child: Material(
                                     color: materialBackgroundColor,
                                     child: InkWell(
@@ -1554,7 +1559,7 @@ class _SubPageState extends State<SubPage> {
                                     padding: const EdgeInsets.only(top: 20.0),
                                     child: Container(
                                       decoration:
-                                          BoxDecoration(color: shapeDecorationColorThree.withAlpha(50), borderRadius: BorderRadius.circular(10)),
+                                          BoxDecoration(color: shapeDecorationColorTwo.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                                       child: Material(
                                         color: materialBackgroundColor,
                                         // child: InkWell(
@@ -1596,7 +1601,7 @@ class _SubPageState extends State<SubPage> {
                               return Padding(
                                 padding: const EdgeInsets.only(top: 20.0),
                                 child: Container(
-                                  decoration: BoxDecoration(color: shapeDecorationColorThree.withAlpha(50), borderRadius: BorderRadius.circular(10)),
+                                  decoration: BoxDecoration(color: shapeDecorationColorTwo.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                                   child: Material(
                                     color: materialBackgroundColor,
                                     child: InkWell(
@@ -1636,7 +1641,7 @@ class _SubPageState extends State<SubPage> {
                                     padding: const EdgeInsets.only(top: 20.0),
                                     child: Container(
                                       decoration:
-                                          BoxDecoration(color: shapeDecorationColorThree.withAlpha(50), borderRadius: BorderRadius.circular(10)),
+                                          BoxDecoration(color: shapeDecorationColorTwo.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                                       child: Material(
                                         color: materialBackgroundColor,
                                         child: InkWell(
@@ -1677,7 +1682,7 @@ class _SubPageState extends State<SubPage> {
                               return Padding(
                                 padding: const EdgeInsets.only(top: 20.0),
                                 child: Container(
-                                  decoration: BoxDecoration(color: shapeDecorationColorThree.withAlpha(50), borderRadius: BorderRadius.circular(10)),
+                                  decoration: BoxDecoration(color: shapeDecorationColorTwo.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                                   child: Material(
                                     color: materialBackgroundColor,
                                     child: InkWell(
@@ -1717,7 +1722,7 @@ class _SubPageState extends State<SubPage> {
                                     padding: const EdgeInsets.only(top: 20.0),
                                     child: Container(
                                       decoration:
-                                          BoxDecoration(color: shapeDecorationColorThree.withAlpha(50), borderRadius: BorderRadius.circular(10)),
+                                          BoxDecoration(color: shapeDecorationColorTwo.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                                       child: Material(
                                         color: materialBackgroundColor,
                                         child: InkWell(
@@ -1758,7 +1763,7 @@ class _SubPageState extends State<SubPage> {
                               return Padding(
                                 padding: const EdgeInsets.only(top: 20.0),
                                 child: Container(
-                                  decoration: BoxDecoration(color: shapeDecorationColorThree.withAlpha(50), borderRadius: BorderRadius.circular(10)),
+                                  decoration: BoxDecoration(color: shapeDecorationColorTwo.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                                   child: Material(
                                     color: materialBackgroundColor,
                                     child: InkWell(
@@ -1798,7 +1803,7 @@ class _SubPageState extends State<SubPage> {
                                     padding: const EdgeInsets.only(top: 20.0),
                                     child: Container(
                                       decoration:
-                                          BoxDecoration(color: shapeDecorationColorThree.withAlpha(50), borderRadius: BorderRadius.circular(10)),
+                                          BoxDecoration(color: shapeDecorationColorTwo.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                                       child: Material(
                                         color: materialBackgroundColor,
                                         child: InkWell(
@@ -1839,7 +1844,7 @@ class _SubPageState extends State<SubPage> {
                               return Padding(
                                 padding: const EdgeInsets.only(top: 20.0),
                                 child: Container(
-                                  decoration: BoxDecoration(color: shapeDecorationColorThree.withAlpha(50), borderRadius: BorderRadius.circular(10)),
+                                  decoration: BoxDecoration(color: shapeDecorationColorTwo.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                                   child: Material(
                                     color: materialBackgroundColor,
                                     child: InkWell(
@@ -1879,7 +1884,7 @@ class _SubPageState extends State<SubPage> {
                                     padding: const EdgeInsets.only(top: 20.0),
                                     child: Container(
                                       decoration:
-                                          BoxDecoration(color: shapeDecorationColorThree.withAlpha(50), borderRadius: BorderRadius.circular(10)),
+                                          BoxDecoration(color: shapeDecorationColorTwo.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                                       child: Material(
                                         color: materialBackgroundColor,
                                         child: InkWell(
@@ -1920,7 +1925,7 @@ class _SubPageState extends State<SubPage> {
                               return Padding(
                                 padding: const EdgeInsets.only(top: 20.0),
                                 child: Container(
-                                  decoration: BoxDecoration(color: shapeDecorationColorThree.withAlpha(50), borderRadius: BorderRadius.circular(10)),
+                                  decoration: BoxDecoration(color: shapeDecorationColorTwo.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                                   child: Material(
                                     color: materialBackgroundColor,
                                     child: InkWell(
@@ -1960,7 +1965,7 @@ class _SubPageState extends State<SubPage> {
                                     padding: const EdgeInsets.only(top: 20.0),
                                     child: Container(
                                       decoration:
-                                          BoxDecoration(color: shapeDecorationColorThree.withAlpha(50), borderRadius: BorderRadius.circular(10)),
+                                          BoxDecoration(color: shapeDecorationColorTwo.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                                       child: Material(
                                         color: materialBackgroundColor,
                                         child: InkWell(
@@ -2001,7 +2006,7 @@ class _SubPageState extends State<SubPage> {
                               return Padding(
                                 padding: const EdgeInsets.only(top: 20.0),
                                 child: Container(
-                                  decoration: BoxDecoration(color: shapeDecorationColorThree.withAlpha(50), borderRadius: BorderRadius.circular(10)),
+                                  decoration: BoxDecoration(color: shapeDecorationColorTwo.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                                   child: Material(
                                     color: materialBackgroundColor,
                                     child: InkWell(
@@ -2041,7 +2046,7 @@ class _SubPageState extends State<SubPage> {
                                     padding: const EdgeInsets.only(top: 20.0),
                                     child: Container(
                                       decoration:
-                                          BoxDecoration(color: shapeDecorationColorThree.withAlpha(50), borderRadius: BorderRadius.circular(10)),
+                                          BoxDecoration(color: shapeDecorationColorTwo.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                                       child: Material(
                                         color: materialBackgroundColor,
                                         child: InkWell(
@@ -2082,7 +2087,7 @@ class _SubPageState extends State<SubPage> {
                               return Padding(
                                 padding: const EdgeInsets.only(top: 20.0),
                                 child: Container(
-                                  decoration: BoxDecoration(color: shapeDecorationColorThree.withAlpha(50), borderRadius: BorderRadius.circular(10)),
+                                  decoration: BoxDecoration(color: shapeDecorationColorTwo.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                                   child: Material(
                                     color: materialBackgroundColor,
                                     child: InkWell(
@@ -2122,7 +2127,7 @@ class _SubPageState extends State<SubPage> {
                                     padding: const EdgeInsets.only(top: 20.0),
                                     child: Container(
                                       decoration:
-                                          BoxDecoration(color: shapeDecorationColorThree.withAlpha(50), borderRadius: BorderRadius.circular(10)),
+                                          BoxDecoration(color: shapeDecorationColorTwo.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                                       child: Material(
                                         color: materialBackgroundColor,
                                         child: InkWell(
@@ -2163,7 +2168,7 @@ class _SubPageState extends State<SubPage> {
                               return Padding(
                                 padding: const EdgeInsets.only(top: 20),
                                 child: Container(
-                                  decoration: BoxDecoration(color: shapeDecorationColorThree.withAlpha(50), borderRadius: BorderRadius.circular(10)),
+                                  decoration: BoxDecoration(color: shapeDecorationColorTwo.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                                   child: Material(
                                     color: materialBackgroundColor,
                                     child: InkWell(
@@ -2182,7 +2187,7 @@ class _SubPageState extends State<SubPage> {
                                                     fontWeight: FontWeight.bold,
                                                   )),
                                               TextSpan(
-                                                  text: _autoBio,
+                                                  text: ' $_autoBio',
                                                   style: GoogleFonts.trykker(
                                                     color: textColor,
                                                     fontSize: 19,
@@ -2199,37 +2204,33 @@ class _SubPageState extends State<SubPage> {
                             } else {
                               return Visibility(
                                   visible: !_isVisible,
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(top: 20),
-                                    child: Container(
-                                      decoration:
-                                          BoxDecoration(color: shapeDecorationColorThree.withAlpha(50), borderRadius: BorderRadius.circular(10)),
-                                      child: Material(
-                                        color: materialBackgroundColor,
-                                        child: InkWell(
-                                          splashColor: splashColorThree,
-                                          onTap: () {},
-                                          child: Padding(
-                                            padding: const EdgeInsets.only(bottom: 15, top: 15, left: 25),
-                                            child: Text.rich(
-                                              TextSpan(
-                                                children: <TextSpan>[
-                                                  TextSpan(
-                                                      text: autobiographyTitle,
-                                                      style: GoogleFonts.aBeeZee(
-                                                        color: textColor,
-                                                        fontSize: 19,
-                                                        fontWeight: FontWeight.bold,
-                                                      )),
-                                                  TextSpan(
-                                                      text: _autoBio,
-                                                      style: GoogleFonts.trykker(
-                                                        color: textColor,
-                                                        fontSize: 19,
-                                                        fontWeight: FontWeight.w300,
-                                                      )),
-                                                ],
-                                              ),
+                                  child: Container(
+                                    decoration: BoxDecoration(color: shapeDecorationColorTwo.withAlpha(50), borderRadius: BorderRadius.circular(10)),
+                                    child: Material(
+                                      color: materialBackgroundColor,
+                                      child: InkWell(
+                                        splashColor: splashColorThree,
+                                        onTap: () {},
+                                        child: Padding(
+                                          padding: const EdgeInsets.only(bottom: 15, top: 15, left: 25),
+                                          child: Text.rich(
+                                            TextSpan(
+                                              children: <TextSpan>[
+                                                TextSpan(
+                                                    text: autobiographyTitle,
+                                                    style: GoogleFonts.aBeeZee(
+                                                      color: textColor,
+                                                      fontSize: 19,
+                                                      fontWeight: FontWeight.bold,
+                                                    )),
+                                                TextSpan(
+                                                    text: " ${_name.substring(0, _name.indexOf(' '))} hasn't filled his data",
+                                                    style: GoogleFonts.trykker(
+                                                      color: textColor,
+                                                      fontSize: 19,
+                                                      fontWeight: FontWeight.w300,
+                                                    )),
+                                              ],
                                             ),
                                           ),
                                         ),
@@ -2244,7 +2245,7 @@ class _SubPageState extends State<SubPage> {
                               return Padding(
                                 padding: const EdgeInsets.only(top: 20.0),
                                 child: Container(
-                                  decoration: BoxDecoration(color: shapeDecorationColorThree.withAlpha(50), borderRadius: BorderRadius.circular(10)),
+                                  decoration: BoxDecoration(color: shapeDecorationColorTwo.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                                   child: Material(
                                     color: materialBackgroundColor,
                                     child: InkWell(
@@ -2284,7 +2285,7 @@ class _SubPageState extends State<SubPage> {
                                     padding: const EdgeInsets.only(top: 20.0),
                                     child: Container(
                                       decoration:
-                                          BoxDecoration(color: shapeDecorationColorThree.withAlpha(50), borderRadius: BorderRadius.circular(10)),
+                                          BoxDecoration(color: shapeDecorationColorTwo.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                                       child: Material(
                                         color: materialBackgroundColor,
                                         child: InkWell(
@@ -2325,7 +2326,7 @@ class _SubPageState extends State<SubPage> {
                               return Padding(
                                 padding: const EdgeInsets.only(top: 20.0),
                                 child: Container(
-                                  decoration: BoxDecoration(color: shapeDecorationColorThree.withAlpha(50), borderRadius: BorderRadius.circular(10)),
+                                  decoration: BoxDecoration(color: shapeDecorationColorTwo.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                                   child: Material(
                                     color: materialBackgroundColor,
                                     child: InkWell(
@@ -2365,7 +2366,7 @@ class _SubPageState extends State<SubPage> {
                                     padding: const EdgeInsets.only(top: 20.0),
                                     child: Container(
                                       decoration:
-                                          BoxDecoration(color: shapeDecorationColorThree.withAlpha(50), borderRadius: BorderRadius.circular(10)),
+                                          BoxDecoration(color: shapeDecorationColorTwo.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                                       child: Material(
                                         color: materialBackgroundColor,
                                         child: InkWell(
@@ -2438,7 +2439,7 @@ class _SubPageState extends State<SubPage> {
                           //           ),
                           //         ),
                           //         decoration: BoxDecoration(
-                          //             color: shapeDecorationColorThree.withAlpha(50),
+                          //             color: shapeDecorationColorTwo.withAlpha(50),
                           //             borderRadius: new BorderRadius.circular(10)),
                           //       ),
                           //     );
@@ -2480,7 +2481,7 @@ class _SubPageState extends State<SubPage> {
                           //               ),
                           //             ),
                           //             decoration: BoxDecoration(
-                          //                 color: shapeDecorationColorThree.withAlpha(50),
+                          //                 color: shapeDecorationColorTwo.withAlpha(50),
                           //                 borderRadius: new BorderRadius.circular(10)),
                           //           ),
                           //         )
@@ -2489,7 +2490,6 @@ class _SubPageState extends State<SubPage> {
                           // }()),
                         ],
                       ),
-                      // userBIO![sharedValue]!,
                     ],
                   ),
                 ),
@@ -2512,47 +2512,44 @@ class _SubPageState extends State<SubPage> {
       DeviceOrientation.portraitDown,
     ]);
 
-    _confettiController = ConfettiController(duration: const Duration(seconds: 7));
+    _confettiController = ConfettiController(duration: const Duration(seconds: 777));
     _confettiController!.play();
 
-    FirstTeamClassNotifier firstTeamClassNotifier = Provider.of<FirstTeamClassNotifier>(context, listen: false);
+    FourthTeamClassNotifier fourthTeamClassNotifier = Provider.of<FourthTeamClassNotifier>(context, listen: false);
 
-    _autoBio = firstTeamClassNotifier.currentFirstTeamClass.autoBio;
-    _bestMoment = firstTeamClassNotifier.currentFirstTeamClass.bestMoment;
-    _dob = firstTeamClassNotifier.currentFirstTeamClass.dob;
-    _dreamFC = firstTeamClassNotifier.currentFirstTeamClass.dreamFC;
-    _positionPlaying = firstTeamClassNotifier.currentFirstTeamClass.positionPlaying;
-    _email = firstTeamClassNotifier.currentFirstTeamClass.email;
-    _facebook = firstTeamClassNotifier.currentFirstTeamClass.facebook;
-    _linkedIn = firstTeamClassNotifier.currentFirstTeamClass.linkedIn;
-    _hobbies = firstTeamClassNotifier.currentFirstTeamClass.hobbies;
-    _instagram = firstTeamClassNotifier.currentFirstTeamClass.instagram;
-    _myDropline = firstTeamClassNotifier.currentFirstTeamClass.myDropline;
-    _name = firstTeamClassNotifier.currentFirstTeamClass.name;
-    _nickname = firstTeamClassNotifier.currentFirstTeamClass.nickname;
-    _philosophy = firstTeamClassNotifier.currentFirstTeamClass.philosophy;
-    _phone = firstTeamClassNotifier.currentFirstTeamClass.phone;
-    _captain = firstTeamClassNotifier.currentFirstTeamClass.captain;
-    _prefectPosition = firstTeamClassNotifier.currentFirstTeamClass.teamCaptaining;
-    _country = firstTeamClassNotifier.currentFirstTeamClass.constituentCountry;
-    _regionFrom = firstTeamClassNotifier.currentFirstTeamClass.regionFrom;
-    _twitter = firstTeamClassNotifier.currentFirstTeamClass.twitter;
-    _snapchat = firstTeamClassNotifier.currentFirstTeamClass.snapchat;
-    _tikTok = firstTeamClassNotifier.currentFirstTeamClass.tikTok;
-    _otherPositionsOfPlay = firstTeamClassNotifier.currentFirstTeamClass.otherPositionsOfPlay;
-    _favFootballLegend = firstTeamClassNotifier.currentFirstTeamClass.favFootballLegend;
-    _yearOfInception = firstTeamClassNotifier.currentFirstTeamClass.yearOfInception;
-    _leftOrRightFooted = firstTeamClassNotifier.currentFirstTeamClass.leftOrRightFooted;
-    _adidasOrNike = firstTeamClassNotifier.currentFirstTeamClass.adidasOrNike;
-    _ronaldoOrMessi = firstTeamClassNotifier.currentFirstTeamClass.ronaldoOrMessi;
-    _worstMoment = firstTeamClassNotifier.currentFirstTeamClass.worstMoment;
+    _autoBio = fourthTeamClassNotifier.currentFourthTeamClass.autoBio;
+    _bestMoment = fourthTeamClassNotifier.currentFourthTeamClass.bestMoment;
+    _dob = fourthTeamClassNotifier.currentFourthTeamClass.dob;
+    _dreamFC = fourthTeamClassNotifier.currentFourthTeamClass.dreamFC;
+    _positionPlaying = fourthTeamClassNotifier.currentFourthTeamClass.positionPlaying;
+    _email = fourthTeamClassNotifier.currentFourthTeamClass.email;
+    _facebook = fourthTeamClassNotifier.currentFourthTeamClass.facebook;
+    _linkedIn = fourthTeamClassNotifier.currentFourthTeamClass.linkedIn;
+    _hobbies = fourthTeamClassNotifier.currentFourthTeamClass.hobbies;
+    _instagram = fourthTeamClassNotifier.currentFourthTeamClass.instagram;
+    _myDropline = fourthTeamClassNotifier.currentFourthTeamClass.myDropline;
+    _name = fourthTeamClassNotifier.currentFourthTeamClass.name;
+    _nickname = fourthTeamClassNotifier.currentFourthTeamClass.nickname;
+    _philosophy = fourthTeamClassNotifier.currentFourthTeamClass.philosophy;
+    _phone = fourthTeamClassNotifier.currentFourthTeamClass.phone;
+    _captain = fourthTeamClassNotifier.currentFourthTeamClass.captain;
+    _prefectPosition = fourthTeamClassNotifier.currentFourthTeamClass.teamCaptaining;
+    _country = fourthTeamClassNotifier.currentFourthTeamClass.constituentCountry;
+    _regionFrom = fourthTeamClassNotifier.currentFourthTeamClass.regionFrom;
+    _twitter = fourthTeamClassNotifier.currentFourthTeamClass.twitter;
+    _snapchat = fourthTeamClassNotifier.currentFourthTeamClass.snapchat;
+    _tikTok = fourthTeamClassNotifier.currentFourthTeamClass.tikTok;
+    _otherPositionsOfPlay = fourthTeamClassNotifier.currentFourthTeamClass.otherPositionsOfPlay;
+    _favFootballLegend = fourthTeamClassNotifier.currentFourthTeamClass.favFootballLegend;
+    _yearOfInception = fourthTeamClassNotifier.currentFourthTeamClass.yearOfInception;
+    _leftOrRightFooted = fourthTeamClassNotifier.currentFourthTeamClass.leftOrRightFooted;
+    _adidasOrNike = fourthTeamClassNotifier.currentFourthTeamClass.adidasOrNike;
+    _ronaldoOrMessi = fourthTeamClassNotifier.currentFourthTeamClass.ronaldoOrMessi;
+    _worstMoment = fourthTeamClassNotifier.currentFourthTeamClass.worstMoment;
 
     loadFormData();
 
-    // resetVerificationTime();
-
     userBIO = <int, Widget>{
-      /** 0: Useful for CPFC 1st Version and other FC Apps, DND */
       0: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.start,
@@ -3118,7 +3115,7 @@ class _SubPageState extends State<SubPage> {
               return Padding(
                 padding: const EdgeInsets.only(top: 20.0),
                 child: Container(
-                  decoration: BoxDecoration(color: shapeDecorationColorThree.withAlpha(50), borderRadius: BorderRadius.circular(10)),
+                  decoration: BoxDecoration(color: shapeDecorationColorTwo.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                   child: Material(
                     color: materialBackgroundColor,
                     child: InkWell(
@@ -3157,7 +3154,7 @@ class _SubPageState extends State<SubPage> {
                   child: Padding(
                     padding: const EdgeInsets.only(top: 20.0),
                     child: Container(
-                      decoration: BoxDecoration(color: shapeDecorationColorThree.withAlpha(50), borderRadius: BorderRadius.circular(10)),
+                      decoration: BoxDecoration(color: shapeDecorationColorTwo.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                       child: Material(
                         color: materialBackgroundColor,
                         // child: InkWell(
@@ -3199,7 +3196,7 @@ class _SubPageState extends State<SubPage> {
               return Padding(
                 padding: const EdgeInsets.only(top: 20.0),
                 child: Container(
-                  decoration: BoxDecoration(color: shapeDecorationColorThree.withAlpha(50), borderRadius: BorderRadius.circular(10)),
+                  decoration: BoxDecoration(color: shapeDecorationColorTwo.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                   child: Material(
                     color: materialBackgroundColor,
                     child: InkWell(
@@ -3238,7 +3235,7 @@ class _SubPageState extends State<SubPage> {
                   child: Padding(
                     padding: const EdgeInsets.only(top: 20.0),
                     child: Container(
-                      decoration: BoxDecoration(color: shapeDecorationColorThree.withAlpha(50), borderRadius: BorderRadius.circular(10)),
+                      decoration: BoxDecoration(color: shapeDecorationColorTwo.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                       child: Material(
                         color: materialBackgroundColor,
                         // child: InkWell(
@@ -3280,7 +3277,7 @@ class _SubPageState extends State<SubPage> {
               return Padding(
                 padding: const EdgeInsets.only(top: 20.0),
                 child: Container(
-                  decoration: BoxDecoration(color: shapeDecorationColorThree.withAlpha(50), borderRadius: BorderRadius.circular(10)),
+                  decoration: BoxDecoration(color: shapeDecorationColorTwo.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                   child: Material(
                     color: materialBackgroundColor,
                     child: InkWell(
@@ -3319,7 +3316,7 @@ class _SubPageState extends State<SubPage> {
                   child: Padding(
                     padding: const EdgeInsets.only(top: 20.0),
                     child: Container(
-                      decoration: BoxDecoration(color: shapeDecorationColorThree.withAlpha(50), borderRadius: BorderRadius.circular(10)),
+                      decoration: BoxDecoration(color: shapeDecorationColorTwo.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                       child: Material(
                         color: materialBackgroundColor,
                         // child: InkWell(
@@ -3361,7 +3358,7 @@ class _SubPageState extends State<SubPage> {
               return Padding(
                 padding: const EdgeInsets.only(top: 20.0),
                 child: Container(
-                  decoration: BoxDecoration(color: shapeDecorationColorThree.withAlpha(50), borderRadius: BorderRadius.circular(10)),
+                  decoration: BoxDecoration(color: shapeDecorationColorTwo.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                   child: Material(
                     color: materialBackgroundColor,
                     child: InkWell(
@@ -3400,7 +3397,7 @@ class _SubPageState extends State<SubPage> {
                   child: Padding(
                     padding: const EdgeInsets.only(top: 20.0),
                     child: Container(
-                      decoration: BoxDecoration(color: shapeDecorationColorThree.withAlpha(50), borderRadius: BorderRadius.circular(10)),
+                      decoration: BoxDecoration(color: shapeDecorationColorTwo.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                       child: Material(
                         color: materialBackgroundColor,
                         // child: InkWell(
@@ -3442,7 +3439,7 @@ class _SubPageState extends State<SubPage> {
               return Padding(
                 padding: const EdgeInsets.only(top: 20.0),
                 child: Container(
-                  decoration: BoxDecoration(color: shapeDecorationColorThree.withAlpha(50), borderRadius: BorderRadius.circular(10)),
+                  decoration: BoxDecoration(color: shapeDecorationColorTwo.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                   child: Material(
                     color: materialBackgroundColor,
                     child: InkWell(
@@ -3481,7 +3478,7 @@ class _SubPageState extends State<SubPage> {
                   child: Padding(
                     padding: const EdgeInsets.only(top: 20.0),
                     child: Container(
-                      decoration: BoxDecoration(color: shapeDecorationColorThree.withAlpha(50), borderRadius: BorderRadius.circular(10)),
+                      decoration: BoxDecoration(color: shapeDecorationColorTwo.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                       child: Material(
                         color: materialBackgroundColor,
                         // child: InkWell(
@@ -3523,7 +3520,7 @@ class _SubPageState extends State<SubPage> {
               return Padding(
                 padding: const EdgeInsets.only(top: 20.0),
                 child: Container(
-                  decoration: BoxDecoration(color: shapeDecorationColorThree.withAlpha(50), borderRadius: BorderRadius.circular(10)),
+                  decoration: BoxDecoration(color: shapeDecorationColorTwo.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                   child: Material(
                     color: materialBackgroundColor,
                     child: InkWell(
@@ -3562,7 +3559,7 @@ class _SubPageState extends State<SubPage> {
                   child: Padding(
                     padding: const EdgeInsets.only(top: 20.0),
                     child: Container(
-                      decoration: BoxDecoration(color: shapeDecorationColorThree.withAlpha(50), borderRadius: BorderRadius.circular(10)),
+                      decoration: BoxDecoration(color: shapeDecorationColorTwo.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                       child: Material(
                         color: materialBackgroundColor,
                         // child: InkWell(
@@ -3604,7 +3601,7 @@ class _SubPageState extends State<SubPage> {
               return Padding(
                 padding: const EdgeInsets.only(top: 20.0),
                 child: Container(
-                  decoration: BoxDecoration(color: shapeDecorationColorThree.withAlpha(50), borderRadius: BorderRadius.circular(10)),
+                  decoration: BoxDecoration(color: shapeDecorationColorTwo.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                   child: Material(
                     color: materialBackgroundColor,
                     child: InkWell(
@@ -3643,7 +3640,7 @@ class _SubPageState extends State<SubPage> {
                   child: Padding(
                     padding: const EdgeInsets.only(top: 20.0),
                     child: Container(
-                      decoration: BoxDecoration(color: shapeDecorationColorThree.withAlpha(50), borderRadius: BorderRadius.circular(10)),
+                      decoration: BoxDecoration(color: shapeDecorationColorTwo.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                       child: Material(
                         color: materialBackgroundColor,
                         // child: InkWell(
@@ -3685,7 +3682,7 @@ class _SubPageState extends State<SubPage> {
               return Padding(
                 padding: const EdgeInsets.only(top: 20.0),
                 child: Container(
-                  decoration: BoxDecoration(color: shapeDecorationColorThree.withAlpha(50), borderRadius: BorderRadius.circular(10)),
+                  decoration: BoxDecoration(color: shapeDecorationColorTwo.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                   child: Material(
                     color: materialBackgroundColor,
                     child: InkWell(
@@ -3724,7 +3721,7 @@ class _SubPageState extends State<SubPage> {
                   child: Padding(
                     padding: const EdgeInsets.only(top: 20.0),
                     child: Container(
-                      decoration: BoxDecoration(color: shapeDecorationColorThree.withAlpha(50), borderRadius: BorderRadius.circular(10)),
+                      decoration: BoxDecoration(color: shapeDecorationColorTwo.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                       child: Material(
                         color: materialBackgroundColor,
                         // child: InkWell(
@@ -3766,7 +3763,7 @@ class _SubPageState extends State<SubPage> {
               return Padding(
                 padding: const EdgeInsets.only(top: 20.0),
                 child: Container(
-                  decoration: BoxDecoration(color: shapeDecorationColorThree.withAlpha(50), borderRadius: BorderRadius.circular(10)),
+                  decoration: BoxDecoration(color: shapeDecorationColorTwo.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                   child: Material(
                     color: materialBackgroundColor,
                     child: InkWell(
@@ -3805,7 +3802,7 @@ class _SubPageState extends State<SubPage> {
                   child: Padding(
                     padding: const EdgeInsets.only(top: 20.0),
                     child: Container(
-                      decoration: BoxDecoration(color: shapeDecorationColorThree.withAlpha(50), borderRadius: BorderRadius.circular(10)),
+                      decoration: BoxDecoration(color: shapeDecorationColorTwo.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                       child: Material(
                         color: materialBackgroundColor,
                         child: InkWell(
@@ -3846,7 +3843,7 @@ class _SubPageState extends State<SubPage> {
               return Padding(
                 padding: const EdgeInsets.only(top: 20.0),
                 child: Container(
-                  decoration: BoxDecoration(color: shapeDecorationColorThree.withAlpha(50), borderRadius: BorderRadius.circular(10)),
+                  decoration: BoxDecoration(color: shapeDecorationColorTwo.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                   child: Material(
                     color: materialBackgroundColor,
                     child: InkWell(
@@ -3885,7 +3882,7 @@ class _SubPageState extends State<SubPage> {
                   child: Padding(
                     padding: const EdgeInsets.only(top: 20.0),
                     child: Container(
-                      decoration: BoxDecoration(color: shapeDecorationColorThree.withAlpha(50), borderRadius: BorderRadius.circular(10)),
+                      decoration: BoxDecoration(color: shapeDecorationColorTwo.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                       child: Material(
                         color: materialBackgroundColor,
                         child: InkWell(
@@ -3926,7 +3923,7 @@ class _SubPageState extends State<SubPage> {
               return Padding(
                 padding: const EdgeInsets.only(top: 20.0),
                 child: Container(
-                  decoration: BoxDecoration(color: shapeDecorationColorThree.withAlpha(50), borderRadius: BorderRadius.circular(10)),
+                  decoration: BoxDecoration(color: shapeDecorationColorTwo.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                   child: Material(
                     color: materialBackgroundColor,
                     child: InkWell(
@@ -3965,7 +3962,7 @@ class _SubPageState extends State<SubPage> {
                   child: Padding(
                     padding: const EdgeInsets.only(top: 20.0),
                     child: Container(
-                      decoration: BoxDecoration(color: shapeDecorationColorThree.withAlpha(50), borderRadius: BorderRadius.circular(10)),
+                      decoration: BoxDecoration(color: shapeDecorationColorTwo.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                       child: Material(
                         color: materialBackgroundColor,
                         child: InkWell(
@@ -4006,7 +4003,7 @@ class _SubPageState extends State<SubPage> {
               return Padding(
                 padding: const EdgeInsets.only(top: 20.0),
                 child: Container(
-                  decoration: BoxDecoration(color: shapeDecorationColorThree.withAlpha(50), borderRadius: BorderRadius.circular(10)),
+                  decoration: BoxDecoration(color: shapeDecorationColorTwo.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                   child: Material(
                     color: materialBackgroundColor,
                     child: InkWell(
@@ -4045,7 +4042,7 @@ class _SubPageState extends State<SubPage> {
                   child: Padding(
                     padding: const EdgeInsets.only(top: 20.0),
                     child: Container(
-                      decoration: BoxDecoration(color: shapeDecorationColorThree.withAlpha(50), borderRadius: BorderRadius.circular(10)),
+                      decoration: BoxDecoration(color: shapeDecorationColorTwo.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                       child: Material(
                         color: materialBackgroundColor,
                         child: InkWell(
@@ -4086,7 +4083,7 @@ class _SubPageState extends State<SubPage> {
               return Padding(
                 padding: const EdgeInsets.only(top: 20.0),
                 child: Container(
-                  decoration: BoxDecoration(color: shapeDecorationColorThree.withAlpha(50), borderRadius: BorderRadius.circular(10)),
+                  decoration: BoxDecoration(color: shapeDecorationColorTwo.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                   child: Material(
                     color: materialBackgroundColor,
                     child: InkWell(
@@ -4125,7 +4122,7 @@ class _SubPageState extends State<SubPage> {
                   child: Padding(
                     padding: const EdgeInsets.only(top: 20.0),
                     child: Container(
-                      decoration: BoxDecoration(color: shapeDecorationColorThree.withAlpha(50), borderRadius: BorderRadius.circular(10)),
+                      decoration: BoxDecoration(color: shapeDecorationColorTwo.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                       child: Material(
                         color: materialBackgroundColor,
                         child: InkWell(
@@ -4166,7 +4163,7 @@ class _SubPageState extends State<SubPage> {
               return Padding(
                 padding: const EdgeInsets.only(top: 20.0),
                 child: Container(
-                  decoration: BoxDecoration(color: shapeDecorationColorThree.withAlpha(50), borderRadius: BorderRadius.circular(10)),
+                  decoration: BoxDecoration(color: shapeDecorationColorTwo.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                   child: Material(
                     color: materialBackgroundColor,
                     child: InkWell(
@@ -4205,7 +4202,7 @@ class _SubPageState extends State<SubPage> {
                   child: Padding(
                     padding: const EdgeInsets.only(top: 20.0),
                     child: Container(
-                      decoration: BoxDecoration(color: shapeDecorationColorThree.withAlpha(50), borderRadius: BorderRadius.circular(10)),
+                      decoration: BoxDecoration(color: shapeDecorationColorTwo.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                       child: Material(
                         color: materialBackgroundColor,
                         child: InkWell(
@@ -4246,7 +4243,7 @@ class _SubPageState extends State<SubPage> {
               return Padding(
                 padding: const EdgeInsets.only(top: 20.0),
                 child: Container(
-                  decoration: BoxDecoration(color: shapeDecorationColorThree.withAlpha(50), borderRadius: BorderRadius.circular(10)),
+                  decoration: BoxDecoration(color: shapeDecorationColorTwo.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                   child: Material(
                     color: materialBackgroundColor,
                     child: InkWell(
@@ -4285,7 +4282,7 @@ class _SubPageState extends State<SubPage> {
                   child: Padding(
                     padding: const EdgeInsets.only(top: 20.0),
                     child: Container(
-                      decoration: BoxDecoration(color: shapeDecorationColorThree.withAlpha(50), borderRadius: BorderRadius.circular(10)),
+                      decoration: BoxDecoration(color: shapeDecorationColorTwo.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                       child: Material(
                         color: materialBackgroundColor,
                         child: InkWell(
@@ -4326,7 +4323,7 @@ class _SubPageState extends State<SubPage> {
               return Padding(
                 padding: const EdgeInsets.only(top: 20),
                 child: Container(
-                  decoration: BoxDecoration(color: shapeDecorationColorThree.withAlpha(50), borderRadius: BorderRadius.circular(10)),
+                  decoration: BoxDecoration(color: shapeDecorationColorTwo.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                   child: Material(
                     color: materialBackgroundColor,
                     child: InkWell(
@@ -4363,7 +4360,7 @@ class _SubPageState extends State<SubPage> {
               return Visibility(
                   visible: !_isVisible,
                   child: Container(
-                    decoration: BoxDecoration(color: shapeDecorationColorThree.withAlpha(50), borderRadius: BorderRadius.circular(10)),
+                    decoration: BoxDecoration(color: shapeDecorationColorTwo.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                     child: Material(
                       color: materialBackgroundColor,
                       child: InkWell(
@@ -4403,7 +4400,7 @@ class _SubPageState extends State<SubPage> {
               return Padding(
                 padding: const EdgeInsets.only(top: 20.0),
                 child: Container(
-                  decoration: BoxDecoration(color: shapeDecorationColorThree.withAlpha(50), borderRadius: BorderRadius.circular(10)),
+                  decoration: BoxDecoration(color: shapeDecorationColorTwo.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                   child: Material(
                     color: materialBackgroundColor,
                     child: InkWell(
@@ -4442,7 +4439,7 @@ class _SubPageState extends State<SubPage> {
                   child: Padding(
                     padding: const EdgeInsets.only(top: 20.0),
                     child: Container(
-                      decoration: BoxDecoration(color: shapeDecorationColorThree.withAlpha(50), borderRadius: BorderRadius.circular(10)),
+                      decoration: BoxDecoration(color: shapeDecorationColorTwo.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                       child: Material(
                         color: materialBackgroundColor,
                         child: InkWell(
@@ -4483,7 +4480,7 @@ class _SubPageState extends State<SubPage> {
               return Padding(
                 padding: const EdgeInsets.only(top: 20.0),
                 child: Container(
-                  decoration: BoxDecoration(color: shapeDecorationColorThree.withAlpha(50), borderRadius: BorderRadius.circular(10)),
+                  decoration: BoxDecoration(color: shapeDecorationColorTwo.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                   child: Material(
                     color: materialBackgroundColor,
                     child: InkWell(
@@ -4522,7 +4519,7 @@ class _SubPageState extends State<SubPage> {
                   child: Padding(
                     padding: const EdgeInsets.only(top: 20.0),
                     child: Container(
-                      decoration: BoxDecoration(color: shapeDecorationColorThree.withAlpha(50), borderRadius: BorderRadius.circular(10)),
+                      decoration: BoxDecoration(color: shapeDecorationColorTwo.withAlpha(50), borderRadius: BorderRadius.circular(10)),
                       child: Material(
                         color: materialBackgroundColor,
                         child: InkWell(
@@ -4595,7 +4592,7 @@ class _SubPageState extends State<SubPage> {
           //           ),
           //         ),
           //         decoration: BoxDecoration(
-          //             color: shapeDecorationColorThree.withAlpha(50),
+          //             color: shapeDecorationColorTwo.withAlpha(50),
           //             borderRadius: new BorderRadius.circular(10)),
           //       ),
           //     );
@@ -4637,7 +4634,7 @@ class _SubPageState extends State<SubPage> {
           //               ),
           //             ),
           //             decoration: BoxDecoration(
-          //                 color: shapeDecorationColorThree.withAlpha(50),
+          //                 color: shapeDecorationColorTwo.withAlpha(50),
           //                 borderRadius: new BorderRadius.circular(10)),
           //           ),
           //         )
@@ -4650,17 +4647,8 @@ class _SubPageState extends State<SubPage> {
     super.initState();
   }
 
-  @override
-  void dispose() {
-    _confettiController!.dispose();
-    if (kDebugMode) {
-      print("Unregistered Listener");
-    }
-    super.dispose();
-  }
-
   Future<void> loadFormData() async {
-    String collectionName = 'FirstTeamClassPlayers';
+    String collectionName = 'FourthTeamClassPlayers';
 
     try {
       // Query the Firestore collection
@@ -4753,7 +4741,6 @@ class _SubPageState extends State<SubPage> {
         phoneNumber: phoneNumber,
         timeout: const Duration(seconds: 60),
         verificationCompleted: (PhoneAuthCredential credential) async {
-          // Handle auto verification completed (if needed)
           await auth.signInWithCredential(credential);
           if (kDebugMode) {
             print('Logged In Successfully');
@@ -4768,7 +4755,6 @@ class _SubPageState extends State<SubPage> {
           );
         },
         verificationFailed: (FirebaseAuthException e) {
-          // Handle verification failed
           if (kDebugMode) {
             print("Verification failed: ${e.message}");
           }
@@ -4782,14 +4768,11 @@ class _SubPageState extends State<SubPage> {
             fontSize: 16.0,
           );
 
-          // You might want to handle the error here or throw an exception
           throw Exception("Error sending OTP: ${e.message}");
         },
         codeSent: (String verificationId, int? resendToken) async {
-          // Save the verification ID to use it later
           _receivedId = verificationId;
 
-          // Display a message to the user to check their messages for the OTP
           Fluttertoast.showToast(
             msg: 'Success! OTP sent to your phone number',
             gravity: ToastGravity.BOTTOM,
@@ -4797,17 +4780,14 @@ class _SubPageState extends State<SubPage> {
             textColor: Colors.white,
             fontSize: 16.0,
           );
-          // Optionally, you can set a timer to automatically fill the OTP field after some delay
-          // For example, wait for 30 seconds before filling the OTP field
+
           await Future.delayed(const Duration(seconds: 5));
 
-          // Once OTP is successfully sent, set isOtpGenerated to true
           setState(() {
             isOtpGenerated = true;
           });
         },
         codeAutoRetrievalTimeout: (String verificationId) {
-          // Handle timeout (if needed)
           if (kDebugMode) {
             print('TimeOut');
           }
@@ -4824,7 +4804,6 @@ class _SubPageState extends State<SubPage> {
         textColor: Colors.white,
         fontSize: 16.0,
       );
-      // Handle any other errors that might occur during the verification process
       throw Exception("Error sending OTP: $e");
     }
   }
@@ -4840,21 +4819,15 @@ class _SubPageState extends State<SubPage> {
           print('User verification is Successful');
         }
 
-        // Save the verification timestamp only if it's not already set
         SharedPreferences prefs = await SharedPreferences.getInstance();
         String? userProperties = prefs.getString('verificationUserProperties');
-        String currentProperties = _name; // You can adjust this combination based on your requirements
+        String currentProperties = _name;
 
         if (userProperties == null || userProperties != currentProperties) {
-          // Only update the timestamp if the user's properties are not set or have changed
           prefs.setString('verificationUserProperties', currentProperties);
           prefs.setInt('verificationTime', DateTime.now().millisecondsSinceEpoch);
         }
 
-        // // Start the 30-minute timer
-        // isUserVerifiedRecently();
-
-        // Set isOtpVerified to true upon successful OTP verification
         setState(() {
           isOtpVerified = true;
         });
@@ -4871,7 +4844,6 @@ class _SubPageState extends State<SubPage> {
           Navigator.pop(context);
         }
 
-        // Check if modifying autobiography or image and show the appropriate dialog
         if (isModifyingAutobiography) {
           _showAutobiographyModificationDialog();
         } else {
@@ -4890,23 +4862,19 @@ class _SubPageState extends State<SubPage> {
         fontSize: 16.0,
       );
 
-      // Handle any other errors that might occur during the verification process
       throw Exception("Error verifying OTP: $e");
     }
   }
 
   void modifyProfile() async {
     if (await isUserVerifiedRecently()) {
-      // User has been verified in the last 30 minutes
-      // Modify profile without asking for OTP
       if (isModifyingAutobiography) {
         _showAutobiographyModificationDialog();
       } else {
         _showImageModificationDialog();
       }
     } else {
-      // User needs to send OTP for verification
-      await _showDialogAndVerify(); // Pass the context to the function
+      await _showDialogAndVerify();
       Fluttertoast.showToast(
         msg: "Click 'Generate OTP' first",
         gravity: ToastGravity.BOTTOM,
@@ -4922,112 +4890,103 @@ class _SubPageState extends State<SubPage> {
     final GlobalKey<FormState> dialogFormKey = GlobalKey<FormState>();
 
     showDialog<String>(
-        // barrierColor: const Color.fromRGBO(66, 67, 69, 1.0),
-        context: context,
-        builder: (BuildContext context) => PopScope(
-          onPopInvokedWithResult: (didPop, result) async {
-            // Perform your cleanup actions
-            otpCode = '';
-            isOTPComplete = false;
+      context: context,
+      builder: (BuildContext context) => PopScope(
+        onPopInvokedWithResult: (didPop, result) async {
+          otpCode = '';
+          isOTPComplete = false;
 
-            // Optionally handle the pop result
-            // You can do additional things based on `didPop` and `result`
-            if (didPop) {
-              // Allow the pop to proceed
-              Navigator.of(context).pop();
-            }
-          },
-          canPop: true, // Allow the pop action
-              child: AlertDialog(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20.0),
-                ),
-                backgroundColor: const Color.fromRGBO(223, 225, 229, 1.0),
-                title: const Text(
-                  "Please click 'Generate OTP', input your OTP from the sent sms.",
-                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.black),
-                ),
-                actions: <Widget>[
-                  TextButton(
-                    onPressed: () async {
-                      // User needs to send OTP for verification
-                      await _sendOtpToPhoneNumber();
-                    },
-                    child: const Text('Generate OTP', style: TextStyle(color: Colors.black)),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                            verifyOTPCode();
-                            setState(() {
-                              otpCode = '';
-                            });
-                          },
-                    child: const Text('Verify OTP', style: TextStyle(color: Colors.black)),
-                  ),
-                ],
-                content: Padding(
-                  padding: const EdgeInsets.all(6.0),
-                  child: AbsorbPointer(
-                    absorbing: !isOtpGenerated,
-                    child: Form(
-                      key: dialogFormKey,
-                      child: GestureDetector(
-                        onTap: () {
-                          // Show toast message if OTP is not generated
-                          if (!isOtpGenerated) {
-                            Fluttertoast.showToast(
-                              msg: 'Please generate OTP first',
-                              gravity: ToastGravity.BOTTOM,
-                              backgroundColor: Colors.red,
-                              textColor: Colors.white,
-                              fontSize: 16.0,
-                            );
-                          }
-                        },
-                        child: PinFieldAutoFill(
-                          autoFocus: true,
-                          currentCode: otpCode,
-                          decoration: BoxLooseDecoration(
-                            gapSpace: 5,
-                            radius: const Radius.circular(8),
-                            strokeColorBuilder: isOtpGenerated
-                                ? const FixedColorBuilder(Color(0xFFE16641))
-                                : const FixedColorBuilder(Colors.grey), // Use grey color if OTP is not generated
-                          ),
-                          codeLength: 6,
-                          onCodeChanged: (code) {
-                            if (kDebugMode) {
-                              print("OnCodeChanged : $code");
-                            }
-                            otpCode = code.toString();
-                            isOTPComplete = code!.length == 6;
-                          },
-                          onCodeSubmitted: (val) {
-                            if (kDebugMode) {
-                              print("OnCodeSubmitted : $val");
-                            }
-                            isOTPComplete = val.isEmpty;
-                            otpCode = '';
-                          },
-                        ),
-                      ),
+          if (didPop) {
+            Navigator.of(context).pop();
+          }
+        },
+        canPop: true,
+        child: AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20.0),
+          ),
+          backgroundColor: const Color.fromRGBO(223, 225, 229, 1.0),
+          title: const Text(
+            "Please click 'Generate OTP', input your OTP from the sent sms.",
+            style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.black),
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () async {
+                await _sendOtpToPhoneNumber();
+              },
+              child: const Text('Generate OTP', style: TextStyle(color: Colors.black)),
+            ),
+            TextButton(
+              onPressed: () {
+                verifyOTPCode();
+                setState(() {
+                  otpCode = '';
+                });
+              },
+              child: const Text('Verify OTP', style: TextStyle(color: Colors.black)),
+            ),
+          ],
+          content: Padding(
+            padding: const EdgeInsets.all(6.0),
+            child: AbsorbPointer(
+              absorbing: !isOtpGenerated,
+              child: Form(
+                key: dialogFormKey,
+                child: GestureDetector(
+                  onTap: () {
+                    if (!isOtpGenerated) {
+                      Fluttertoast.showToast(
+                        msg: 'Please generate OTP first',
+                        gravity: ToastGravity.BOTTOM,
+                        backgroundColor: Colors.red,
+                        textColor: Colors.white,
+                        fontSize: 16.0,
+                      );
+                    }
+                  },
+                  child: PinFieldAutoFill(
+                    autoFocus: true,
+                    currentCode: otpCode,
+                    decoration: BoxLooseDecoration(
+                      gapSpace: 5,
+                      radius: const Radius.circular(8),
+                      strokeColorBuilder: isOtpGenerated ? const FixedColorBuilder(Color(0xFFE16641)) : const FixedColorBuilder(Colors.grey),
                     ),
+                    codeLength: 6,
+                    onCodeChanged: (code) {
+                      if (kDebugMode) {
+                        print("OnCodeChanged : $code");
+                      }
+                      otpCode = code.toString();
+                      isOTPComplete = code!.length == 6;
+                    },
+                    onCodeSubmitted: (val) {
+                      if (kDebugMode) {
+                        print("OnCodeSubmitted : $val");
+                      }
+                      isOTPComplete = val.isEmpty;
+                      otpCode = '';
+                    },
                   ),
                 ),
               ),
-            ));
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   Future<bool> isUserVerifiedRecently() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? userProperties = prefs.getString('verificationUserProperties');
-    String currentProperties = _name; // Adjust this combination based on what you used for verification
+    String currentProperties = _name;
     if (kDebugMode) {
       print("User properties from SharedPreferences: $userProperties");
     }
 
     if (userProperties != null && userProperties == currentProperties) {
-      // Check if the last verification was within the last 30 minutes
       int? verificationTime = prefs.getInt('verificationTime');
       if (verificationTime != null) {
         DateTime now = DateTime.now();
@@ -5421,17 +5380,9 @@ class _SubPageState extends State<SubPage> {
                 const SizedBox(height: 40),
                 ElevatedButton(
                   onPressed: () async {
-                    try {
-                      await _submitForm();
-                      if (context.mounted) {
-                        Navigator.pop(context); // Close the dialog
-                      }
-                    } catch (e) {
-                      if (kDebugMode) {
-                        print("Error submitting form: $e");
-                      }
-                      // Handle the error, show a message, or log it as needed
-                      Fluttertoast.showToast(msg: "Error Loading up ,...", gravity: ToastGravity.BOTTOM, backgroundColor: backgroundColor);
+                    await _submitForm();
+                    if (context.mounted) {
+                      Navigator.pop(context); // Close the dialog
                     }
                   },
                   child: const Text('Update Autobiography'),
@@ -5463,7 +5414,7 @@ class _SubPageState extends State<SubPage> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     SizedBox(
                       width: MediaQuery.sizeOf(context).width * .6,
@@ -5516,7 +5467,7 @@ class _SubPageState extends State<SubPage> {
                         child: _imageOne != null
                             ? Image.file(_imageOne!, height: 100, width: 100, fit: BoxFit.cover)
                             : CachedNetworkImage(
-                                imageUrl: firstTeamClassNotifier.currentFirstTeamClass.image!,
+                                imageUrl: fourthTeamClassNotifier.currentFourthTeamClass.image!,
                                 fit: BoxFit.cover,
                                 placeholder: (context, url) => const CircularProgressIndicator(),
                                 errorWidget: (context, url, error) => Icon(MdiIcons.alertRhombus),
@@ -5537,7 +5488,7 @@ class _SubPageState extends State<SubPage> {
                         child: _imageTwo != null
                             ? Image.file(_imageTwo!, height: 100, width: 100, fit: BoxFit.cover)
                             : CachedNetworkImage(
-                                imageUrl: firstTeamClassNotifier.currentFirstTeamClass.imageTwo!,
+                                imageUrl: fourthTeamClassNotifier.currentFourthTeamClass.imageTwo!,
                                 fit: BoxFit.cover,
                                 placeholder: (context, url) => const CircularProgressIndicator(),
                                 errorWidget: (context, url, error) => Icon(MdiIcons.alertRhombus),
@@ -5551,9 +5502,6 @@ class _SubPageState extends State<SubPage> {
                 ElevatedButton(
                   onPressed: () async {
                     await _checkAndUpdatePhoto();
-                    if (context.mounted) {
-                      Navigator.pop(context); // Close the dialog
-                    }
                   },
                   child: const Text('Upload Photos'),
                 ),
@@ -5564,6 +5512,8 @@ class _SubPageState extends State<SubPage> {
       ),
     );
   }
+
+  int sharedValue = 0;
 
   facebookLink() async {
     showDialog(
@@ -5645,5 +5595,11 @@ class _SubPageState extends State<SubPage> {
       ),
     );
 //    }
+  }
+
+  @override
+  void dispose() {
+    _confettiController!.dispose();
+    super.dispose();
   }
 }

@@ -28,7 +28,10 @@ String subtitle = "We breed elite players here";
 
 String returningPlayersTitle = "Coventry Phoenix I";
 String newPlayersTitle = "Coventry Phoenix II";
-// String thirdTeamClassTitle = "Reserve Team Players";
+String thirdTeamClassTitle = "Reserve Team Players";
+String fourthTeamClassTitle = "Fourth Team Players";
+String fifthTeamClassTitle = "Fifth Team Players";
+String sixthTeamClassTitle = "Sixth Team Players";
 String captainsTitle = "CPFC Captains";
 String coachesTitle = "Coaching Staff";
 String managementBodyTitle = "Management Body";
@@ -44,6 +47,7 @@ String exitAppNo = "Oh No";
 String exitAppYes = "I Have To";
 
 String fmTitle = "CPFC More";
+String tmTitle = "Teams";
 String ytTitle = "Youtube Page";
 String aptTitle = "All Players Table";
 String tppTitle = "Top Performing Players";
@@ -90,7 +94,7 @@ class _SideBarState extends State<SideBar> with SingleTickerProviderStateMixin<S
   late Stream<DocumentSnapshot<Map<String, dynamic>>> firestoreStream;
 
   _onSelected(int index) {
-    if (index == 7 /**|| index == 8 */) {
+    if (index == 10 /**|| index == 8 */) {
       // Check if the selected item is "Club Sponsors"
       _isClubSponsorsClicked = true;
       // showToast("Club Sponsors Clicked"); // Show the toast message
@@ -285,114 +289,178 @@ class _SideBarState extends State<SideBar> with SingleTickerProviderStateMixin<S
                                 indent: 32,
                                 endIndent: 32,
                               ),
-                              Material(
-                                color: _currentNAVSelected == 0 ? gradientColorTwo.withOpacity(0.3) : materialBackgroundColor,
-                                child: InkWell(
-                                  splashColor: splashColorThree,
-                                  onTap: () {
-                                    _onSelected(0);
-                                    onIconPressed();
-                                    BlocProvider.of<NavigationBloc>(context).add(NavigationEvents.myFirstTeamClassPageClickedEvent);
-                                  },
-                                  child: Align(
-                                    alignment: Alignment.centerLeft,
-                                    child: MenuItems(
-                                      icon: MdiIcons.soccer,
-                                      title: returningPlayersTitle,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              Material(
-                                color: _currentNAVSelected == 1 ? gradientColorTwo.withOpacity(0.3) : materialBackgroundColor,
-                                child: InkWell(
-                                  splashColor: splashColorThree,
-                                  onTap: () {
-                                    _onSelected(1);
-                                    onIconPressed();
-                                    BlocProvider.of<NavigationBloc>(context).add(NavigationEvents.mySecondTeamClassPageClickedEvent);
-                                  },
-                                  child: Align(
-                                    alignment: Alignment.centerLeft,
-                                    child: MenuItems(
-                                      icon: MdiIcons.soccer,
-                                      title: newPlayersTitle,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              // Material(
-                              //   color: _currentNAVSelected == 2 ? gradientColorTwo.withOpacity(0.3) : materialBackgroundColor,
-                              //   child: InkWell(
-                              //     splashColor: splashColorThree,
-                              //     onTap: () {
-                              //       _onSelected(2);
-                              //       onIconPressed();
-                              //       BlocProvider.of<NavigationBloc>(context).add(NavigationEvents.myThirdTeamClassPageClickedEvent);
-                              //     },
-                              //     child: Align(
-                              //       alignment: Alignment.centerLeft,
-                              //       child: MenuItems(
-                              //         icon: MdiIcons.soccer,
-                              //         title: thirdTeamClassTitle,
-                              //       ),
-                              //     ),
-                              //   ),
-                              // ),
-                              Material(
-                                color: _currentNAVSelected == 3 ? gradientColorTwo.withOpacity(0.3) : materialBackgroundColor,
-                                child: InkWell(
-                                  splashColor: splashColorThree,
-                                  onTap: () {
-                                    _onSelected(3);
-                                    onIconPressed();
-                                    BlocProvider.of<NavigationBloc>(context).add(NavigationEvents.myCaptainsPageClickedEvent);
-                                  },
-                                  child: Align(
-                                    alignment: Alignment.centerLeft,
-                                    child: MenuItems(
-                                      icon: MdiIcons.accountStar,
-                                      title: captainsTitle,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              Material(
-                                color: _currentNAVSelected == 4 ? gradientColorTwo.withOpacity(0.3) : materialBackgroundColor,
-                                child: InkWell(
-                                  splashColor: splashColorThree,
-                                  onTap: () {
-                                    _onSelected(4);
-                                    onIconPressed();
-                                    BlocProvider.of<NavigationBloc>(context).add(NavigationEvents.myCoachesPageClickedEvent);
-                                  },
-                                  child: Align(
-                                    alignment: Alignment.centerLeft,
-                                    child: MenuItems(
-                                      icon: MdiIcons.podiumSilver,
-                                      title: coachesTitle,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              Material(
-                                color: _currentNAVSelected == 5 ? gradientColorTwo.withOpacity(0.3) : materialBackgroundColor,
-                                child: InkWell(
-                                  splashColor: splashColorThree,
-                                  onTap: () {
-                                    _onSelected(5);
-                                    onIconPressed();
-                                    BlocProvider.of<NavigationBloc>(context).add(NavigationEvents.myManagementBodyPageClickedEvent);
-                                  },
-                                  child: Align(
-                                    alignment: Alignment.centerLeft,
-                                    child: MenuItems(
-                                      icon: MdiIcons.accountTie,
-                                      title: managementBodyTitle,
-                                    ),
-                                  ),
-                                ),
-                              ),
+                              Theme(
+                                  data: ThemeData.dark().copyWith(primaryColor: Colors.white),
+                                  child: ExpansionTile(
+                                      title: MenuItems(
+                                        icon: SimpleIcons.spond,
+                                        title: tmTitle,
+                                      ),
+                                      children: <Widget>[
+                                        Material(
+                                          color: _currentNAVSelected == 0 ? gradientColorTwo.withOpacity(0.3) : materialBackgroundColor,
+                                          child: InkWell(
+                                            splashColor: splashColorThree,
+                                            onTap: () {
+                                              _onSelected(0);
+                                              onIconPressed();
+                                              BlocProvider.of<NavigationBloc>(context).add(NavigationEvents.myFirstTeamClassPageClickedEvent);
+                                            },
+                                            child: Align(
+                                              alignment: Alignment.centerLeft,
+                                              child: MenuItems(
+                                                icon: MdiIcons.soccer,
+                                                title: returningPlayersTitle,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        Material(
+                                          color: _currentNAVSelected == 1 ? gradientColorTwo.withOpacity(0.3) : materialBackgroundColor,
+                                          child: InkWell(
+                                            splashColor: splashColorThree,
+                                            onTap: () {
+                                              _onSelected(1);
+                                              onIconPressed();
+                                              BlocProvider.of<NavigationBloc>(context).add(NavigationEvents.mySecondTeamClassPageClickedEvent);
+                                            },
+                                            child: Align(
+                                              alignment: Alignment.centerLeft,
+                                              child: MenuItems(
+                                                icon: MdiIcons.soccer,
+                                                title: newPlayersTitle,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        Material(
+                                          color: _currentNAVSelected == 2 ? gradientColorTwo.withOpacity(0.3) : materialBackgroundColor,
+                                          child: InkWell(
+                                            splashColor: splashColorThree,
+                                            onTap: () {
+                                              _onSelected(2);
+                                              onIconPressed();
+                                              BlocProvider.of<NavigationBloc>(context).add(NavigationEvents.myThirdTeamClassPageClickedEvent);
+                                            },
+                                            child: Align(
+                                              alignment: Alignment.centerLeft,
+                                              child: MenuItems(
+                                                icon: MdiIcons.soccer,
+                                                title: thirdTeamClassTitle,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        Material(
+                                          color: _currentNAVSelected == 3 ? gradientColorTwo.withOpacity(0.3) : materialBackgroundColor,
+                                          child: InkWell(
+                                            splashColor: splashColorThree,
+                                            onTap: () {
+                                              _onSelected(3);
+                                              onIconPressed();
+                                              BlocProvider.of<NavigationBloc>(context).add(NavigationEvents.myFourthTeamClassPageClickedEvent);
+                                            },
+                                            child: Align(
+                                              alignment: Alignment.centerLeft,
+                                              child: MenuItems(
+                                                icon: MdiIcons.soccer,
+                                                title: thirdTeamClassTitle,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        Material(
+                                          color: _currentNAVSelected == 4 ? gradientColorTwo.withOpacity(0.3) : materialBackgroundColor,
+                                          child: InkWell(
+                                            splashColor: splashColorThree,
+                                            onTap: () {
+                                              _onSelected(4);
+                                              onIconPressed();
+                                              BlocProvider.of<NavigationBloc>(context).add(NavigationEvents.myFifthTeamClassPageClickedEvent);
+                                            },
+                                            child: Align(
+                                              alignment: Alignment.centerLeft,
+                                              child: MenuItems(
+                                                icon: MdiIcons.soccer,
+                                                title: thirdTeamClassTitle,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        Material(
+                                          color: _currentNAVSelected == 5 ? gradientColorTwo.withOpacity(0.3) : materialBackgroundColor,
+                                          child: InkWell(
+                                            splashColor: splashColorThree,
+                                            onTap: () {
+                                              _onSelected(5);
+                                              onIconPressed();
+                                              BlocProvider.of<NavigationBloc>(context).add(NavigationEvents.mySixthTeamClassPageClickedEvent);
+                                            },
+                                            child: Align(
+                                              alignment: Alignment.centerLeft,
+                                              child: MenuItems(
+                                                icon: MdiIcons.soccer,
+                                                title: thirdTeamClassTitle,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        Material(
+                                          color: _currentNAVSelected == 6 ? gradientColorTwo.withOpacity(0.3) : materialBackgroundColor,
+                                          child: InkWell(
+                                            splashColor: splashColorThree,
+                                            onTap: () {
+                                              _onSelected(6);
+                                              onIconPressed();
+                                              BlocProvider.of<NavigationBloc>(context).add(NavigationEvents.myCaptainsPageClickedEvent);
+                                            },
+                                            child: Align(
+                                              alignment: Alignment.centerLeft,
+                                              child: MenuItems(
+                                                icon: MdiIcons.accountStar,
+                                                title: captainsTitle,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        Material(
+                                          color: _currentNAVSelected == 7 ? gradientColorTwo.withOpacity(0.3) : materialBackgroundColor,
+                                          child: InkWell(
+                                            splashColor: splashColorThree,
+                                            onTap: () {
+                                              _onSelected(7);
+                                              onIconPressed();
+                                              BlocProvider.of<NavigationBloc>(context).add(NavigationEvents.myCoachesPageClickedEvent);
+                                            },
+                                            child: Align(
+                                              alignment: Alignment.centerLeft,
+                                              child: MenuItems(
+                                                icon: MdiIcons.podiumSilver,
+                                                title: coachesTitle,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        Material(
+                                          color: _currentNAVSelected == 8 ? gradientColorTwo.withOpacity(0.3) : materialBackgroundColor,
+                                          child: InkWell(
+                                            splashColor: splashColorThree,
+                                            onTap: () {
+                                              _onSelected(8);
+                                              onIconPressed();
+                                              BlocProvider.of<NavigationBloc>(context).add(NavigationEvents.myManagementBodyPageClickedEvent);
+                                            },
+                                            child: Align(
+                                              alignment: Alignment.centerLeft,
+                                              child: MenuItems(
+                                                icon: MdiIcons.accountTie,
+                                                title: managementBodyTitle,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ])),
+
                               Divider(
                                 height: 5,
                                 thickness: 0.5,
@@ -401,7 +469,7 @@ class _SideBarState extends State<SideBar> with SingleTickerProviderStateMixin<S
                                 endIndent: 15,
                               ),
                               Material(
-                                color: _currentNAVSelected == 6 ? gradientColorTwo.withOpacity(0.3) : materialBackgroundColor,
+                                color: _currentNAVSelected == 9 ? gradientColorTwo.withOpacity(0.3) : materialBackgroundColor,
                                 child: InkWell(
                                   splashColor: splashColorThree,
                                   onTap: () {
@@ -427,11 +495,11 @@ class _SideBarState extends State<SideBar> with SingleTickerProviderStateMixin<S
                                 endIndent: 15,
                               ),
                               Material(
-                                color: _currentNAVSelected == 7 ? gradientColorTwo.withOpacity(0.3) : materialBackgroundColor,
+                                color: _currentNAVSelected == 10 ? gradientColorTwo.withOpacity(0.3) : materialBackgroundColor,
                                 child: InkWell(
                                   splashColor: splashColorThree,
                                   onTap: () {
-                                    _onSelected(7);
+                                    _onSelected(10);
                                     onIconPressed();
                                     BlocProvider.of<NavigationBloc>(context).add(NavigationEvents.myClubSponsorsPageClickedEvent);
                                   },

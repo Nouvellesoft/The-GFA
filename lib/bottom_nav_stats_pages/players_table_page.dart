@@ -14,8 +14,17 @@ import 'package:toast/toast.dart';
 
 import '/details_pages/second_team_details_page.dart';
 import '/notifier/second_team_class_notifier.dart';
+import '../club_admin/others/view_club_population_page.dart';
+import '../details_pages/fifth_team_details_page.dart';
 import '../details_pages/first_team_details_page.dart';
+import '../details_pages/fourth_team_details_page.dart';
+import '../details_pages/sixth_team_details_page.dart';
+import '../details_pages/third_team_details_page.dart';
+import '../notifier/fifth_team_class_notifier.dart';
 import '../notifier/first_team_class_notifier.dart';
+import '../notifier/fourth_team_class_notifier.dart';
+import '../notifier/sixth_team_class_notifier.dart';
+import '../notifier/third_team_class_notifier.dart';
 
 Color conColor = const Color.fromRGBO(34, 40, 49, 1);
 Color? backgroundColor = const Color.fromRGBO(34, 40, 49, 1);
@@ -28,10 +37,12 @@ Color? appBarBackgroundColor = const Color.fromRGBO(34, 40, 49, 1);
 String lottieTrainingSoccerTitle = "assets/json/training_soccer.json";
 String lottieTrialSoccerTitle = "assets/json/trial_soccer.json";
 
-// final List<PlayersTable> playersTableList = [];
-
 FirstTeamClassNotifier? firstTeamClassNotifier;
 SecondTeamClassNotifier? secondTeamClassNotifier;
+ThirdTeamClassNotifier? thirdTeamClassNotifier;
+FourthTeamClassNotifier? fourthTeamClassNotifier;
+FifthTeamClassNotifier? fifthTeamClassNotifier;
+SixthTeamClassNotifier? sixthTeamClassNotifier;
 
 class PlayersTablePage extends StatefulWidget {
   final String clubId;
@@ -59,6 +70,10 @@ class PlayersTablePageState extends State<PlayersTablePage> {
   Widget _buildDataGrid() {
     firstTeamClassNotifier = Provider.of<FirstTeamClassNotifier>(context, listen: false);
     secondTeamClassNotifier = Provider.of<SecondTeamClassNotifier>(context, listen: false);
+    thirdTeamClassNotifier = Provider.of<ThirdTeamClassNotifier>(context, listen: false);
+    fourthTeamClassNotifier = Provider.of<FourthTeamClassNotifier>(context, listen: false);
+    fifthTeamClassNotifier = Provider.of<FifthTeamClassNotifier>(context, listen: false);
+    sixthTeamClassNotifier = Provider.of<SixthTeamClassNotifier>(context, listen: false);
     return StreamBuilder(
         stream: getDataFromFirestore(widget.clubId),
         builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -136,6 +151,14 @@ class PlayersTablePageState extends State<PlayersTablePage> {
 
                         var secondTeamPlayer = secondTeamClassNotifier?.secondTeamClassList.firstWhereOrNull((element) => element.name == playerName);
 
+                        var thirdTeamPlayer = thirdTeamClassNotifier?.thirdTeamClassList.firstWhereOrNull((element) => element.name == playerName);
+
+                        var fourthTeamPlayer = fourthTeamClassNotifier?.fourthTeamClassList.firstWhereOrNull((element) => element.name == playerName);
+
+                        var fifthTeamPlayer = fifthTeamClassNotifier?.fifthTeamClassList.firstWhereOrNull((element) => element.name == playerName);
+
+                        var sixthTeamPlayer = sixthTeamClassNotifier?.sixthTeamClassList.firstWhereOrNull((element) => element.name == playerName);
+
                         if (firstTeamPlayer != null) {
                           firstTeamClassNotifier?.currentFirstTeamClass = firstTeamPlayer;
                           navigateToSubPage(context, widget.clubId);
@@ -144,6 +167,26 @@ class PlayersTablePageState extends State<PlayersTablePage> {
                         } else if (secondTeamPlayer != null) {
                           secondTeamClassNotifier?.currentSecondTeamClass = secondTeamPlayer;
                           navigateToSecondTeamClassDetailsPage(context, widget.clubId);
+
+                          Toast.show("Loading up $playerName", duration: Toast.lengthLong, gravity: Toast.bottom, backgroundRadius: 10);
+                        } else if (thirdTeamPlayer != null) {
+                          thirdTeamClassNotifier?.currentThirdTeamClass = thirdTeamPlayer;
+                          navigateToThirdTeamClassDetailsPage(context, widget.clubId);
+
+                          Toast.show("Loading up $playerName", duration: Toast.lengthLong, gravity: Toast.bottom, backgroundRadius: 10);
+                        } else if (fourthTeamPlayer != null) {
+                          fourthTeamClassNotifier?.currentFourthTeamClass = fourthTeamPlayer;
+                          navigateToFourthTeamClassDetailsPage(context, widget.clubId);
+
+                          Toast.show("Loading up $playerName", duration: Toast.lengthLong, gravity: Toast.bottom, backgroundRadius: 10);
+                        } else if (fifthTeamPlayer != null) {
+                          fifthTeamClassNotifier?.currentFifthTeamClass = fifthTeamPlayer;
+                          navigateToFifthTeamClassDetailsPage(context, widget.clubId);
+
+                          Toast.show("Loading up $playerName", duration: Toast.lengthLong, gravity: Toast.bottom, backgroundRadius: 10);
+                        } else if (sixthTeamPlayer != null) {
+                          sixthTeamClassNotifier?.currentSixthTeamClass = sixthTeamPlayer;
+                          navigateToSixthTeamClassDetailsPage(context, widget.clubId);
 
                           Toast.show("Loading up $playerName", duration: Toast.lengthLong, gravity: Toast.bottom, backgroundRadius: 10);
                         } else {
@@ -309,13 +352,10 @@ class PlayersTablePageState extends State<PlayersTablePage> {
 
   @override
   void initState() {
-    // getDataFromFirestore();
-    // if (playersTableList.isEmpty) {
+    super.initState();
+
     playersTableDataSource = PlayersTableDataSource(playersTableList, widget.clubId);
     playersTableDataSource.sortedColumns.add(const SortColumnDetails(name: 'goals_scored', sortDirection: DataGridSortDirection.descending));
-    // }
-
-    super.initState();
 
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
@@ -373,19 +413,26 @@ class PlayersTablePageState extends State<PlayersTablePage> {
                       const PopupMenuItem<int>(
                         value: 0,
                         child: Text(
+                          "View Club Population",
+                          style: TextStyle(color: Color.fromRGBO(255, 141, 41, 1)),
+                        ),
+                      ),
+                      const PopupMenuItem<int>(
+                        value: 0,
+                        child: Text(
                           "Legend",
                           style: TextStyle(color: Color.fromRGBO(255, 141, 41, 1)),
                         ),
                       ),
                       const PopupMenuItem<int>(
-                        value: 1,
+                        value: 2,
                         child: Text(
                           "Training Days",
                           style: TextStyle(color: Color.fromRGBO(255, 141, 41, 1)),
                         ),
                       ),
                       const PopupMenuItem<int>(
-                        value: 2,
+                        value: 3,
                         child: Text(
                           "Trial Periods",
                           style: TextStyle(color: Color.fromRGBO(255, 141, 41, 1)),
@@ -395,6 +442,10 @@ class PlayersTablePageState extends State<PlayersTablePage> {
                 onSelected: (item) {
                   switch (item) {
                     case 0:
+                      Navigator.of(context).pop(false);
+                      navigateToViewClubPopulation(context, widget.clubId);
+                      break;
+                    case 1:
                       showDialog<String>(
                         context: context,
                         builder: (BuildContext context) => Dialog(
@@ -616,7 +667,7 @@ class PlayersTablePageState extends State<PlayersTablePage> {
                         ),
                       );
                       break;
-                    case 1:
+                    case 2:
                       showDialog<String>(
                         context: context,
                         builder: (BuildContext context) => Dialog(
@@ -704,7 +755,7 @@ class PlayersTablePageState extends State<PlayersTablePage> {
                         ),
                       );
                       break;
-                    case 2:
+                    case 3:
                       showDialog<String>(
                         context: context,
                         builder: (BuildContext context) => Dialog(
@@ -835,6 +886,10 @@ class PlayersTablePageState extends State<PlayersTablePage> {
     Navigator.of(context).pop(false);
     return Future.value(true);
   }
+
+  Future navigateToViewClubPopulation(BuildContext context, String clubId) async {
+    Navigator.push(context, MaterialPageRoute(builder: (context) => MyViewClubPopulationPage(clubId: clubId)));
+  }
 }
 
 class PlayersTableDataSource extends DataGridSource {
@@ -906,6 +961,10 @@ class PlayersTableDataSource extends DataGridSource {
               ? Builder(builder: (context) {
                   FirstTeamClassNotifier firstTeamClassNotifier = Provider.of<FirstTeamClassNotifier>(context);
                   SecondTeamClassNotifier secondTeamClassNotifier = Provider.of<SecondTeamClassNotifier>(context);
+                  ThirdTeamClassNotifier thirdTeamClassNotifier = Provider.of<ThirdTeamClassNotifier>(context);
+                  FourthTeamClassNotifier fourthTeamClassNotifier = Provider.of<FourthTeamClassNotifier>(context);
+                  FifthTeamClassNotifier fifthTeamClassNotifier = Provider.of<FifthTeamClassNotifier>(context);
+                  SixthTeamClassNotifier sixthTeamClassNotifier = Provider.of<SixthTeamClassNotifier>(context);
                   return GestureDetector(
                     onTap: () {
                       /// DG to PP
@@ -915,6 +974,14 @@ class PlayersTableDataSource extends DataGridSource {
 
                       var secondTeamPlayer = secondTeamClassNotifier.secondTeamClassList.firstWhereOrNull((element) => element.name == playerName);
 
+                      var thirdTeamPlayer = thirdTeamClassNotifier.thirdTeamClassList.firstWhereOrNull((element) => element.name == playerName);
+
+                      var fourthTeamPlayer = fourthTeamClassNotifier.fourthTeamClassList.firstWhereOrNull((element) => element.name == playerName);
+
+                      var fifthTeamPlayer = fifthTeamClassNotifier.fifthTeamClassList.firstWhereOrNull((element) => element.name == playerName);
+
+                      var sixthTeamPlayer = sixthTeamClassNotifier.sixthTeamClassList.firstWhereOrNull((element) => element.name == playerName);
+
                       if (firstTeamPlayer != null) {
                         firstTeamClassNotifier.currentFirstTeamClass = firstTeamPlayer;
                         navigateToSubPage(context, clubId);
@@ -923,6 +990,26 @@ class PlayersTableDataSource extends DataGridSource {
                       } else if (secondTeamPlayer != null) {
                         secondTeamClassNotifier.currentSecondTeamClass = secondTeamPlayer;
                         navigateToSecondTeamClassDetailsPage(context, clubId);
+
+                        Toast.show("Loading up $playerName", duration: Toast.lengthLong, gravity: Toast.bottom, backgroundRadius: 10);
+                      } else if (thirdTeamPlayer != null) {
+                        thirdTeamClassNotifier.currentThirdTeamClass = thirdTeamPlayer;
+                        navigateToThirdTeamClassDetailsPage(context, clubId);
+
+                        Toast.show("Loading up $playerName", duration: Toast.lengthLong, gravity: Toast.bottom, backgroundRadius: 10);
+                      } else if (fourthTeamPlayer != null) {
+                        fourthTeamClassNotifier.currentFourthTeamClass = fourthTeamPlayer;
+                        navigateToFourthTeamClassDetailsPage(context, clubId);
+
+                        Toast.show("Loading up $playerName", duration: Toast.lengthLong, gravity: Toast.bottom, backgroundRadius: 10);
+                      } else if (fifthTeamPlayer != null) {
+                        fifthTeamClassNotifier.currentFifthTeamClass = fifthTeamPlayer;
+                        navigateToFifthTeamClassDetailsPage(context, clubId);
+
+                        Toast.show("Loading up $playerName", duration: Toast.lengthLong, gravity: Toast.bottom, backgroundRadius: 10);
+                      } else if (sixthTeamPlayer != null) {
+                        sixthTeamClassNotifier.currentSixthTeamClass = sixthTeamPlayer;
+                        navigateToSixthTeamClassDetailsPage(context, clubId);
 
                         Toast.show("Loading up $playerName", duration: Toast.lengthLong, gravity: Toast.bottom, backgroundRadius: 10);
                       } else {
@@ -1011,4 +1098,20 @@ Future navigateToSubPage(context, String clubId) async {
 
 Future navigateToSecondTeamClassDetailsPage(context, String clubId) async {
   Navigator.push(context, MaterialPageRoute(builder: (context) => SecondTeamClassDetailsPage(clubId: clubId)));
+}
+
+Future navigateToThirdTeamClassDetailsPage(context, String clubId) async {
+  Navigator.push(context, MaterialPageRoute(builder: (context) => ThirdTeamClassDetailsPage(clubId: clubId)));
+}
+
+Future navigateToFourthTeamClassDetailsPage(context, String clubId) async {
+  Navigator.push(context, MaterialPageRoute(builder: (context) => FourthTeamClassDetailsPage(clubId: clubId)));
+}
+
+Future navigateToFifthTeamClassDetailsPage(context, String clubId) async {
+  Navigator.push(context, MaterialPageRoute(builder: (context) => FifthTeamClassDetailsPage(clubId: clubId)));
+}
+
+Future navigateToSixthTeamClassDetailsPage(context, String clubId) async {
+  Navigator.push(context, MaterialPageRoute(builder: (context) => SixthTeamClassDetailsPage(clubId: clubId)));
 }

@@ -5,14 +5,22 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../api/coaching_staff_api.dart';
+import '../../api/fifth_team_class_api.dart';
 import '../../api/first_team_class_api.dart';
+import '../../api/fourth_team_class_api.dart';
 import '../../api/management_body_api.dart';
 import '../../api/second_team_class_api.dart';
+import '../../api/sixth_team_class_api.dart';
+import '../../api/third_team_class_api.dart';
 import '../../notifier/all_club_members_notifier.dart';
 import '../../notifier/coaching_staff_notifier.dart';
+import '../../notifier/fifth_team_class_notifier.dart';
 import '../../notifier/first_team_class_notifier.dart';
+import '../../notifier/fourth_team_class_notifier.dart';
 import '../../notifier/management_body_notifier.dart';
 import '../../notifier/second_team_class_notifier.dart';
+import '../../notifier/sixth_team_class_notifier.dart';
+import '../../notifier/third_team_class_notifier.dart';
 
 Color backgroundColor = const Color.fromRGBO(78, 80, 106, 1.0);
 Color appBarBackgroundColor = const Color.fromRGBO(48, 50, 74, 1.0);
@@ -40,7 +48,12 @@ class MyViewClubPopulationPageState extends State<MyViewClubPopulationPage> {
     AllClubMembersNotifier allClubMembersNotifier = Provider.of<AllClubMembersNotifier>(context);
 
     // Calculate counts for Players, Coaches, and Managers
-    int playersCount = allClubMembersNotifier.firstTeamClassList.length + allClubMembersNotifier.secondTeamClassList.length;
+    int playersCount = allClubMembersNotifier.firstTeamClassList.length +
+        allClubMembersNotifier.secondTeamClassList.length +
+        allClubMembersNotifier.thirdTeamClassList.length +
+        allClubMembersNotifier.fourthTeamClassList.length +
+        allClubMembersNotifier.fifthTeamClassList.length +
+        allClubMembersNotifier.sixthTeamClassList.length;
     int coachesCount = allClubMembersNotifier.coachesClassList.length;
     int managersCount = allClubMembersNotifier.mgmtBodyClassList.length;
 
@@ -80,7 +93,12 @@ class MyViewClubPopulationPageState extends State<MyViewClubPopulationPage> {
                   child: InkWell(
                     onTap: () {},
                     child: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-                        stream: FirebaseFirestore.instance.collection('clubs').doc(widget.clubId).collection('SliversPages').doc('non_slivers_pages').snapshots(),
+                        stream: FirebaseFirestore.instance
+                            .collection('clubs')
+                            .doc(widget.clubId)
+                            .collection('SliversPages')
+                            .doc('non_slivers_pages')
+                            .snapshots(),
                         builder: (context, snapshot) {
                           if (!snapshot.hasData) {
                             return const CircularProgressIndicator();
@@ -329,6 +347,11 @@ class MyViewClubPopulationPageState extends State<MyViewClubPopulationPage> {
     // Fetch data for the first and second teams using their notifiers
     FirstTeamClassNotifier firstTeamNotifier = Provider.of<FirstTeamClassNotifier>(context, listen: false);
     SecondTeamClassNotifier secondTeamNotifier = Provider.of<SecondTeamClassNotifier>(context, listen: false);
+    ThirdTeamClassNotifier thirdTeamNotifier = Provider.of<ThirdTeamClassNotifier>(context, listen: false);
+    FourthTeamClassNotifier fourthTeamNotifier = Provider.of<FourthTeamClassNotifier>(context, listen: false);
+    FifthTeamClassNotifier fifthTeamNotifier = Provider.of<FifthTeamClassNotifier>(context, listen: false);
+    SixthTeamClassNotifier sixthTeamNotifier = Provider.of<SixthTeamClassNotifier>(context, listen: false);
+
     CoachesNotifier coachesNotifier = Provider.of<CoachesNotifier>(context, listen: false);
     ManagementBodyNotifier managementBodyNotifier = Provider.of<ManagementBodyNotifier>(context, listen: false);
 
@@ -336,6 +359,10 @@ class MyViewClubPopulationPageState extends State<MyViewClubPopulationPage> {
     Future.wait<void>([
       _fetchFirstTeamClassAndUpdateNotifier(firstTeamNotifier),
       _fetchSecondTeamClassAndUpdateNotifier(secondTeamNotifier),
+      _fetchThirdTeamClassAndUpdateNotifier(thirdTeamNotifier),
+      _fetchFourthTeamClassAndUpdateNotifier(fourthTeamNotifier),
+      _fetchFifthTeamClassAndUpdateNotifier(fifthTeamNotifier),
+      _fetchSixthTeamClassAndUpdateNotifier(sixthTeamNotifier),
       _fetchCoachesAndUpdateNotifier(coachesNotifier),
       _fetchManagementBodyAndUpdateNotifier(managementBodyNotifier),
     ]).then((_) {
@@ -345,6 +372,10 @@ class MyViewClubPopulationPageState extends State<MyViewClubPopulationPage> {
 
         allClubMembersNotifier.setFirstTeamMembers(firstTeamNotifier.firstTeamClassList);
         allClubMembersNotifier.setSecondTeamMembers(secondTeamNotifier.secondTeamClassList);
+        allClubMembersNotifier.setThirdTeamMembers(thirdTeamNotifier.thirdTeamClassList);
+        allClubMembersNotifier.setFourthTeamMembers(fourthTeamNotifier.fourthTeamClassList);
+        allClubMembersNotifier.setFifthTeamMembers(fifthTeamNotifier.fifthTeamClassList);
+        allClubMembersNotifier.setSixthTeamMembers(sixthTeamNotifier.sixthTeamClassList);
         allClubMembersNotifier.setCoachesList(coachesNotifier.coachesList);
         allClubMembersNotifier.setMGMTBodyList(managementBodyNotifier.managementBodyList);
       }
@@ -352,29 +383,49 @@ class MyViewClubPopulationPageState extends State<MyViewClubPopulationPage> {
   }
 
   Future<void> _fetchFirstTeamClassAndUpdateNotifier(FirstTeamClassNotifier firstTeamNotifier) async {
-
-      await getFirstTeamClass(firstTeamNotifier, widget.clubId);
+    await getFirstTeamClass(firstTeamNotifier, widget.clubId);
 
     setState(() {}); // Refresh the UI if needed
   }
 
   Future<void> _fetchSecondTeamClassAndUpdateNotifier(SecondTeamClassNotifier secondTeamNotifier) async {
+    await getSecondTeamClass(secondTeamNotifier, widget.clubId);
 
-      await getSecondTeamClass(secondTeamNotifier, widget.clubId);
+    setState(() {}); // Refresh the UI if needed
+  }
+
+  Future<void> _fetchThirdTeamClassAndUpdateNotifier(ThirdTeamClassNotifier thirdTeamNotifier) async {
+    await getThirdTeamClass(thirdTeamNotifier, widget.clubId);
+
+    setState(() {}); // Refresh the UI if needed
+  }
+
+  Future<void> _fetchFourthTeamClassAndUpdateNotifier(FourthTeamClassNotifier fourthTeamNotifier) async {
+    await getFourthTeamClass(fourthTeamNotifier, widget.clubId);
+
+    setState(() {}); // Refresh the UI if needed
+  }
+
+  Future<void> _fetchFifthTeamClassAndUpdateNotifier(FifthTeamClassNotifier fifthTeamNotifier) async {
+    await getFifthTeamClass(fifthTeamNotifier, widget.clubId);
+
+    setState(() {}); // Refresh the UI if needed
+  }
+
+  Future<void> _fetchSixthTeamClassAndUpdateNotifier(SixthTeamClassNotifier sixthTeamNotifier) async {
+    await getSixthTeamClass(sixthTeamNotifier, widget.clubId);
 
     setState(() {}); // Refresh the UI if needed
   }
 
   Future<void> _fetchCoachesAndUpdateNotifier(CoachesNotifier coachesNotifier) async {
-
-      await getCoaches(coachesNotifier, widget.clubId);
+    await getCoaches(coachesNotifier, widget.clubId);
 
     setState(() {}); // Refresh the UI if needed
   }
 
   Future<void> _fetchManagementBodyAndUpdateNotifier(ManagementBodyNotifier managementBodyNotifier) async {
-
-      await getManagementBody(managementBodyNotifier, widget.clubId);
+    await getManagementBody(managementBodyNotifier, widget.clubId);
 
     setState(() {}); // Refresh the UI if needed
   }

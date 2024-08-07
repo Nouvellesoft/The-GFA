@@ -31,14 +31,17 @@ import '../api/club_arial_images_api.dart';
 import '../api/club_captains_api.dart';
 import '../api/coaching_staff_api.dart';
 import '../api/cum_motm_players_stats_info_api.dart';
+import '../api/fifth_team_class_api.dart';
 import '../api/first_team_class_api.dart';
 import '../api/founders_reviews_comment_api.dart';
+import '../api/fourth_team_class_api.dart';
 import '../api/management_body_api.dart';
 import '../api/most_assists_players_stats_info_api.dart';
 import '../api/most_fouled_rc_players_stats_info_api.dart';
 import '../api/most_fouled_yc_players_stats_info_api.dart';
 import '../api/motm_players_stats_info_api.dart';
 import '../api/player_of_the_month_stats_info_api.dart';
+import '../api/sixth_team_class_api.dart';
 import '../api/third_team_class_api.dart';
 import '../api/top_defensive_players_stats_info_api.dart';
 import '../api/top_gk_players_stats_info_api.dart';
@@ -53,12 +56,15 @@ import '../home_page/home_page_deux.dart';
 import '../notifier/a_upcoming_matches_notifier.dart';
 import '../notifier/club_sponsors_notifier.dart';
 import '../notifier/cum_motm_players_stats_info_notifier.dart';
+import '../notifier/fifth_team_class_notifier.dart';
 import '../notifier/first_team_class_notifier.dart';
 import '../notifier/founders_reviews_comment_notifier.dart';
+import '../notifier/fourth_team_class_notifier.dart';
 import '../notifier/most_fouled_rc_players_stats_info_notifier.dart';
 import '../notifier/most_fouled_yc_players_stats_info_notifier.dart';
 import '../notifier/motm_players_stats_info_notifier.dart';
 import '../notifier/player_of_the_month_stats_info_notifier.dart';
+import '../notifier/sixth_team_class_notifier.dart';
 import '../notifier/third_team_class_notifier.dart';
 import '../notifier/top_defensive_players_stats_info_notifier.dart';
 import '../notifier/top_gk_players_stats_info_notifier.dart';
@@ -502,11 +508,7 @@ class _MyFirstTeamClassPage extends State<MyFirstTeamClassPage> {
   }
 
   Future navigateToSubPage(context) async {
-    Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => SubPage(clubId: widget.clubId
-                )));
+    Navigator.push(context, MaterialPageRoute(builder: (context) => SubPage(clubId: widget.clubId)));
   }
 
   Future navigateTablesAndStatsDetails(BuildContext context) async {
@@ -876,6 +878,15 @@ class _MyFirstTeamClassPage extends State<MyFirstTeamClassPage> {
     ThirdTeamClassNotifier thirdTeamClassNotifier = Provider.of<ThirdTeamClassNotifier>(context, listen: false);
     _fetchThirdTeamClassAndUpdateNotifier(thirdTeamClassNotifier);
 
+    FourthTeamClassNotifier fourthTeamClassNotifier = Provider.of<FourthTeamClassNotifier>(context, listen: false);
+    _fetchFourthTeamClassAndUpdateNotifier(fourthTeamClassNotifier);
+
+    FifthTeamClassNotifier fifthTeamClassNotifier = Provider.of<FifthTeamClassNotifier>(context, listen: false);
+    _fetchFifthTeamClassAndUpdateNotifier(fifthTeamClassNotifier);
+
+    SixthTeamClassNotifier sixthTeamClassNotifier = Provider.of<SixthTeamClassNotifier>(context, listen: false);
+    _fetchSixthTeamClassAndUpdateNotifier(sixthTeamClassNotifier);
+
     CaptainsNotifier captainsNotifier = Provider.of<CaptainsNotifier>(context, listen: false);
     _fetchCaptainsAndUpdateNotifier(captainsNotifier);
 
@@ -954,6 +965,24 @@ class _MyFirstTeamClassPage extends State<MyFirstTeamClassPage> {
 
   Future<void> _fetchThirdTeamClassAndUpdateNotifier(ThirdTeamClassNotifier thirdTeamClassNotifier) async {
     await getThirdTeamClass(thirdTeamClassNotifier, widget.clubId);
+
+    setState(() {}); // Refresh the UI if needed
+  }
+
+  Future<void> _fetchFourthTeamClassAndUpdateNotifier(FourthTeamClassNotifier fourthTeamClassNotifier) async {
+    await getFourthTeamClass(fourthTeamClassNotifier, widget.clubId);
+
+    setState(() {}); // Refresh the UI if needed
+  }
+
+  Future<void> _fetchFifthTeamClassAndUpdateNotifier(FifthTeamClassNotifier fifthTeamClassNotifier) async {
+    await getFifthTeamClass(fifthTeamClassNotifier, widget.clubId);
+
+    setState(() {}); // Refresh the UI if needed
+  }
+
+  Future<void> _fetchSixthTeamClassAndUpdateNotifier(SixthTeamClassNotifier sixthTeamClassNotifier) async {
+    await getSixthTeamClass(sixthTeamClassNotifier, widget.clubId);
 
     setState(() {}); // Refresh the UI if needed
   }

@@ -5,11 +5,19 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 
 import '/bloc_navigation_bloc/navigation_bloc.dart';
+import '../../api/fifth_team_class_api.dart';
 import '../../api/first_team_class_api.dart';
+import '../../api/fourth_team_class_api.dart';
 import '../../api/second_team_class_api.dart';
+import '../../api/sixth_team_class_api.dart';
+import '../../api/third_team_class_api.dart';
+import '../../notifier/fifth_team_class_notifier.dart';
 import '../../notifier/first_team_class_notifier.dart';
+import '../../notifier/fourth_team_class_notifier.dart';
 import '../../notifier/players_notifier.dart'; // Replace with your notifier
 import '../../notifier/second_team_class_notifier.dart';
+import '../../notifier/sixth_team_class_notifier.dart';
+import '../../notifier/third_team_class_notifier.dart';
 
 Color conColor = const Color.fromRGBO(194, 194, 220, 1.0);
 Color conColorTwo = const Color.fromRGBO(151, 147, 151, 1.0);
@@ -366,23 +374,61 @@ class MyModifyAddClubCaptainsPageState extends State<MyModifyAddClubCaptainsPage
     SecondTeamClassNotifier secondTeamClassNotifier = Provider.of<SecondTeamClassNotifier>(context, listen: false);
     _fetchSecondTeamClassAndUpdateNotifier(secondTeamClassNotifier);
 
+    ThirdTeamClassNotifier thirdTeamClassNotifier = Provider.of<ThirdTeamClassNotifier>(context, listen: false);
+    _fetchThirdTeamClassAndUpdateNotifier(thirdTeamClassNotifier);
+
+    FourthTeamClassNotifier fourthTeamClassNotifier = Provider.of<FourthTeamClassNotifier>(context, listen: false);
+    _fetchFourthTeamClassAndUpdateNotifier(fourthTeamClassNotifier);
+
+    FifthTeamClassNotifier fifthTeamClassNotifier = Provider.of<FifthTeamClassNotifier>(context, listen: false);
+    _fetchFifthTeamClassAndUpdateNotifier(fifthTeamClassNotifier);
+
+    SixthTeamClassNotifier sixthTeamClassNotifier = Provider.of<SixthTeamClassNotifier>(context, listen: false);
+    _fetchSixthTeamClassAndUpdateNotifier(sixthTeamClassNotifier);
+
     // Populate the PlayersNotifier with data from both teams
     PlayersNotifier playersNotifier = Provider.of<PlayersNotifier>(context, listen: false);
 
     playersNotifier.setFirstTeamPlayers(firstTeamClassNotifier.firstTeamClassList);
     playersNotifier.setSecondTeamPlayers(secondTeamClassNotifier.secondTeamClassList);
+    playersNotifier.setThirdTeamPlayers(thirdTeamClassNotifier.thirdTeamClassList);
+    playersNotifier.setFourthTeamPlayers(fourthTeamClassNotifier.fourthTeamClassList);
+    playersNotifier.setFifthTeamPlayers(fifthTeamClassNotifier.fifthTeamClassList);
+    playersNotifier.setSixthTeamPlayers(sixthTeamClassNotifier.sixthTeamClassList);
   }
 
   Future<void> _fetchFirstTeamClassAndUpdateNotifier(FirstTeamClassNotifier firstTeamNotifier) async {
-
-      await getFirstTeamClass(firstTeamNotifier, widget.clubId);
+    await getFirstTeamClass(firstTeamNotifier, widget.clubId);
 
     setState(() {}); // Refresh the UI if needed
   }
 
   Future<void> _fetchSecondTeamClassAndUpdateNotifier(SecondTeamClassNotifier secondTeamNotifier) async {
+    await getSecondTeamClass(secondTeamNotifier, widget.clubId);
 
-      await getSecondTeamClass(secondTeamNotifier, widget.clubId);
+    setState(() {}); // Refresh the UI if needed
+  }
+
+  Future<void> _fetchThirdTeamClassAndUpdateNotifier(ThirdTeamClassNotifier thirdTeamClassNotifier) async {
+    await getThirdTeamClass(thirdTeamClassNotifier, widget.clubId);
+
+    setState(() {}); // Refresh the UI if needed
+  }
+
+  Future<void> _fetchFourthTeamClassAndUpdateNotifier(FourthTeamClassNotifier fourthTeamClassNotifier) async {
+    await getFourthTeamClass(fourthTeamClassNotifier, widget.clubId);
+
+    setState(() {}); // Refresh the UI if needed
+  }
+
+  Future<void> _fetchFifthTeamClassAndUpdateNotifier(FifthTeamClassNotifier fifthTeamClassNotifier) async {
+    await getFifthTeamClass(fifthTeamClassNotifier, widget.clubId);
+
+    setState(() {}); // Refresh the UI if needed
+  }
+
+  Future<void> _fetchSixthTeamClassAndUpdateNotifier(SixthTeamClassNotifier sixthTeamClassNotifier) async {
+    await getSixthTeamClass(sixthTeamClassNotifier, widget.clubId);
 
     setState(() {}); // Refresh the UI if needed
   }
@@ -513,8 +559,12 @@ class MyModifyAddClubCaptainsPageState extends State<MyModifyAddClubCaptainsPage
     final firestore = FirebaseFirestore.instance;
 
     // Fetch the existing captain document ID
-    final querySnapshot =
-        await firestore.collection('clubs').doc(widget.clubId).collection('Captains').where('team_captaining', isEqualTo: selectedTeam.isNotEmpty ? selectedTeam : 'YourTeamHere').get();
+    final querySnapshot = await firestore
+        .collection('clubs')
+        .doc(widget.clubId)
+        .collection('Captains')
+        .where('team_captaining', isEqualTo: selectedTeam.isNotEmpty ? selectedTeam : 'YourTeamHere')
+        .get();
 
     for (final doc in querySnapshot.docs) {
       // Delete the existing captain document

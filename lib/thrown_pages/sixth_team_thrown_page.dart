@@ -14,15 +14,15 @@ import '../about_menu_details_pages/about_app.dart';
 import '../about_menu_details_pages/about_club.dart';
 import '../about_menu_details_pages/acronyms_meanings.dart';
 import '../about_menu_details_pages/who_we_are.dart';
-import '../api/third_team_class_api.dart';
+import '../api/sixth_team_class_api.dart';
 import '../bloc_navigation_bloc/navigation_bloc.dart';
 import '../bottom_nav_stats_pages/bottom_navigator.dart';
 import '../bottom_nav_stats_pages/players_table_page.dart';
 import '../club_admin/club_admin_page.dart';
-import '../details_pages/third_team_details_page.dart';
+import '../details_pages/sixth_team_details_page.dart';
 import '../home_page/home_page_deux.dart';
-import '../notifier/third_team_class_notifier.dart';
-import '../thrown_searches/third_team_thrown_search.dart';
+import '../notifier/sixth_team_class_notifier.dart';
+import '../thrown_searches/sixth_team_thrown_search.dart';
 
 String clubName = "Coventry Phoenix FC";
 String thrownName = "All Players List - B";
@@ -62,17 +62,17 @@ Color nabColor = const Color.fromRGBO(24, 26, 36, 1.0);
 Color paintColor = Colors.indigo;
 Color paintColorTwo = Colors.indigoAccent;
 
-class MyThirdTeamClassPage extends StatefulWidget implements NavigationStates {
+class MySixthTeamClassPage extends StatefulWidget implements NavigationStates {
   final String clubId;
-  const MyThirdTeamClassPage({super.key, this.title, required this.clubId});
+  const MySixthTeamClassPage({super.key, this.title, required this.clubId});
 
   final String? title;
 
   @override
-  State<MyThirdTeamClassPage> createState() => _MyThirdTeamClassPage();
+  State<MySixthTeamClassPage> createState() => _MySixthTeamClassPage();
 }
 
-class _MyThirdTeamClassPage extends State<MyThirdTeamClassPage> {
+class _MySixthTeamClassPage extends State<MySixthTeamClassPage> {
   final TextEditingController bugController = TextEditingController();
 
   late Stream<DocumentSnapshot<Map<String, dynamic>>> firestoreStream;
@@ -86,7 +86,7 @@ class _MyThirdTeamClassPage extends State<MyThirdTeamClassPage> {
   }
 
   Widget _buildProductItem(BuildContext context, int index) {
-    ThirdTeamClassNotifier thirdTeamClassNotifier = Provider.of<ThirdTeamClassNotifier>(context);
+    SixthTeamClassNotifier sixthTeamClassNotifier = Provider.of<SixthTeamClassNotifier>(context);
     return Padding(
       padding: const EdgeInsets.only(bottom: 8.0),
       child: Container(
@@ -99,8 +99,8 @@ class _MyThirdTeamClassPage extends State<MyThirdTeamClassPage> {
           child: InkWell(
             splashColor: splashColor,
             onTap: () {
-              thirdTeamClassNotifier.currentThirdTeamClass = thirdTeamClassNotifier.thirdTeamClassList[index];
-              navigateToThirdTeamClassDetailsPage(context);
+              sixthTeamClassNotifier.currentSixthTeamClass = sixthTeamClassNotifier.sixthTeamClassList[index];
+              navigateToSixthTeamClassDetailsPage(context);
             },
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
@@ -114,7 +114,7 @@ class _MyThirdTeamClassPage extends State<MyThirdTeamClassPage> {
                         borderRadius: const BorderRadius.only(topLeft: Radius.circular(10), bottomLeft: Radius.circular(10)),
                         image: DecorationImage(
                             alignment: const Alignment(0, -1),
-                            image: CachedNetworkImageProvider(thirdTeamClassNotifier.thirdTeamClassList[index].image!),
+                            image: CachedNetworkImageProvider(sixthTeamClassNotifier.sixthTeamClassList[index].image!),
                             fit: BoxFit.cover)),
                   ),
                   Padding(
@@ -126,10 +126,10 @@ class _MyThirdTeamClassPage extends State<MyThirdTeamClassPage> {
                           padding: const EdgeInsets.only(top: 30),
                           child: Row(
                             children: <Widget>[
-                              Text(thirdTeamClassNotifier.thirdTeamClassList[index].name!,
+                              Text(sixthTeamClassNotifier.sixthTeamClassList[index].name!,
                                   style: GoogleFonts.tenorSans(color: textColorTwo, fontSize: 17, fontWeight: FontWeight.w600)),
                               (() {
-                                if (thirdTeamClassNotifier.thirdTeamClassList[index].captain == "Yes") {
+                                if (sixthTeamClassNotifier.sixthTeamClassList[index].captain == "Yes") {
                                   return Row(
                                     children: <Widget>[
                                       const SizedBox(width: 10),
@@ -154,7 +154,7 @@ class _MyThirdTeamClassPage extends State<MyThirdTeamClassPage> {
                         ),
                         Padding(
                           padding: const EdgeInsets.only(top: 10),
-                          child: Text(thirdTeamClassNotifier.thirdTeamClassList[index].positionPlaying!,
+                          child: Text(sixthTeamClassNotifier.sixthTeamClassList[index].positionPlaying!,
                               style: GoogleFonts.varela(color: textColorThree, fontStyle: FontStyle.italic)),
                         ),
                       ],
@@ -207,8 +207,8 @@ class _MyThirdTeamClassPage extends State<MyThirdTeamClassPage> {
         false;
   }
 
-  Future navigateToThirdTeamClassDetailsPage(context) async {
-    Navigator.push(context, MaterialPageRoute(builder: (context) => ThirdTeamClassDetailsPage(clubId: widget.clubId)));
+  Future navigateToSixthTeamClassDetailsPage(context) async {
+    Navigator.push(context, MaterialPageRoute(builder: (context) => SixthTeamClassDetailsPage(clubId: widget.clubId)));
   }
 
   Future navigateTablesAndStatsDetails(BuildContext context) async {
@@ -430,8 +430,8 @@ class _MyThirdTeamClassPage extends State<MyThirdTeamClassPage> {
         .snapshots()
         .distinct(); // Ensure distinct events
 
-    ThirdTeamClassNotifier thirdTeamClassNotifier = Provider.of<ThirdTeamClassNotifier>(context, listen: false);
-    _fetchThirdTeamClassAndUpdateNotifier(thirdTeamClassNotifier);
+    SixthTeamClassNotifier sixthTeamClassNotifier = Provider.of<SixthTeamClassNotifier>(context, listen: false);
+    _fetchSixthTeamClassAndUpdateNotifier(sixthTeamClassNotifier);
 
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
@@ -439,14 +439,14 @@ class _MyThirdTeamClassPage extends State<MyThirdTeamClassPage> {
     ]);
   }
 
-  Future<void> _fetchThirdTeamClassAndUpdateNotifier(ThirdTeamClassNotifier thirdTeamNotifier) async {
-    await getThirdTeamClass(thirdTeamNotifier, widget.clubId);
+  Future<void> _fetchSixthTeamClassAndUpdateNotifier(SixthTeamClassNotifier sixthTeamNotifier) async {
+    await getSixthTeamClass(sixthTeamNotifier, widget.clubId);
     setState(() {}); // Refresh the UI if needed
   }
 
   @override
   Widget build(BuildContext context) {
-    ThirdTeamClassNotifier thirdTeamClassNotifier = Provider.of<ThirdTeamClassNotifier>(context);
+    SixthTeamClassNotifier sixthTeamClassNotifier = Provider.of<SixthTeamClassNotifier>(context);
 
     return PopScope(
       onPopInvokedWithResult: (didPop, result) async {
@@ -604,7 +604,7 @@ class _MyThirdTeamClassPage extends State<MyThirdTeamClassPage> {
                       onPressed: () {
                         showSearch(
                           context: context,
-                          delegate: MyThirdTeamClassSearch(all: thirdTeamClassNotifier.thirdTeamClassList, clubId: widget.clubId),
+                          delegate: MySixthTeamClassSearch(all: sixthTeamClassNotifier.sixthTeamClassList, clubId: widget.clubId),
                         );
                       },
                       tooltip: "Search",
@@ -652,7 +652,7 @@ class _MyThirdTeamClassPage extends State<MyThirdTeamClassPage> {
                 decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)),
                 child: ListView.builder(
                   itemBuilder: _buildProductItem,
-                  itemCount: thirdTeamClassNotifier.thirdTeamClassList.length,
+                  itemCount: sixthTeamClassNotifier.sixthTeamClassList.length,
                 ),
               ),
             ),

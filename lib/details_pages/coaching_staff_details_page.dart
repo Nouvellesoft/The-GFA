@@ -149,6 +149,7 @@ class _CoachesDetailsPage extends State<CoachesDetailsPage> {
   bool isOtpGenerated = true;
 
   bool isModifyingAutobiography = true; // Assuming modifying autobiography by default
+  bool isModifyingImage = true;
 
   ConfettiController? _confettiController;
 
@@ -534,19 +535,23 @@ class _CoachesDetailsPage extends State<CoachesDetailsPage> {
                   setState(() {
                     // Set the flag based on the selected item
                     isModifyingAutobiography = item == 0;
+                    isModifyingImage = item == 1;
                   });
 
                   if (item == 2) {
-                    // Fluttertoast.showToast(
-                    //   msg: 'Coming soon. Thanks',
-                    //   // Show success message (you can replace it with actual banner generation logic)
-                    //   gravity: ToastGravity.CENTER,
-                    //   backgroundColor: Colors.white,
-                    //   textColor: Colors.black,
-                    //   fontSize: 16.0,
-                    // );
-
-                    addCoachesCommentDialog(context);
+                    if (await isUserVerifiedRecently()) {
+                      addCoachesCommentDialog(context);
+                    } else {
+                      await _showDialogAndVerify();
+                      Fluttertoast.showToast(
+                        msg: "Click 'Generate OTP' first",
+                        gravity: ToastGravity.BOTTOM,
+                        toastLength: Toast.LENGTH_LONG,
+                        backgroundColor: Colors.white,
+                        textColor: Colors.black,
+                        fontSize: 16.0,
+                      );
+                    }
                   } else {
                     modifyProfile(); // Use modifyProfile function instead of _showAutobiographyModificationDialog or _showImageModificationDialog
                   }
@@ -3253,8 +3258,9 @@ class _CoachesDetailsPage extends State<CoachesDetailsPage> {
           fontSize: 16.0,
         );
 
-        // Close the OTP verification dialog upon success
-        Navigator.pop(context);
+        if (mounted) {
+          Navigator.pop(context);
+        }
 
         // Check if modifying autobiography or image and show the appropriate dialog
         if (isModifyingAutobiography) {

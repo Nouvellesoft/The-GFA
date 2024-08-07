@@ -4,15 +4,21 @@ import '/bottom_nav_stats_pages/social_media/b_youtube_page.dart';
 import '../thrown_pages/captains_thrown_page.dart';
 import '../thrown_pages/club_sponsors_thrown_page.dart';
 import '../thrown_pages/coaches_thrown_page.dart';
+import '../thrown_pages/fifth_team_thrown_page.dart';
 import '../thrown_pages/first_team_thrown_page.dart';
+import '../thrown_pages/fourth_team_thrown_page.dart';
 import '../thrown_pages/management_thrown_page.dart';
 import '../thrown_pages/second_team_thrown_page.dart';
+import '../thrown_pages/sixth_team_thrown_page.dart';
 import '../thrown_pages/third_team_thrown_page.dart';
 
 enum NavigationEvents {
   myFirstTeamClassPageClickedEvent,
   mySecondTeamClassPageClickedEvent,
   myThirdTeamClassPageClickedEvent,
+  myFourthTeamClassPageClickedEvent,
+  myFifthTeamClassPageClickedEvent,
+  mySixthTeamClassPageClickedEvent,
   myCoachesPageClickedEvent,
   myManagementBodyPageClickedEvent,
   myCaptainsPageClickedEvent,
@@ -38,6 +44,15 @@ class NavigationBloc extends Bloc<NavigationEvents, NavigationStates> {
         break;
       case NavigationEvents.myThirdTeamClassPageClickedEvent:
         yield MyThirdTeamClassPage(clubId: clubId);
+        break;
+      case NavigationEvents.myFourthTeamClassPageClickedEvent:
+        yield MyFourthTeamClassPage(clubId: clubId);
+        break;
+      case NavigationEvents.myFifthTeamClassPageClickedEvent:
+        yield MyFifthTeamClassPage(clubId: clubId);
+        break;
+      case NavigationEvents.mySixthTeamClassPageClickedEvent:
+        yield MySixthTeamClassPage(clubId: clubId);
         break;
       case NavigationEvents.myCoachesPageClickedEvent:
         yield MyCoachesPage(clubId: clubId);

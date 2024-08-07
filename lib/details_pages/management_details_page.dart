@@ -150,6 +150,7 @@ class _ManagementBodyDetailsPage extends State<ManagementBodyDetailsPage> {
   bool isOtpGenerated = true;
 
   bool isModifyingAutobiography = true; // Assuming modifying autobiography by default
+  bool isModifyingImage = true;
 
   ConfettiController? _confettiController;
 
@@ -535,10 +536,23 @@ class _ManagementBodyDetailsPage extends State<ManagementBodyDetailsPage> {
                   setState(() {
                     // Set the flag based on the selected item
                     isModifyingAutobiography = item == 0;
+                    isModifyingImage = item == 1;
                   });
 
                   if (item == 2) {
-                    addFoundersCommentDialog(context);
+                    if (await isUserVerifiedRecently()) {
+                      addFoundersCommentDialog(context);
+                    } else {
+                      await _showDialogAndVerify();
+                      Fluttertoast.showToast(
+                        msg: "Click 'Generate OTP' first",
+                        gravity: ToastGravity.BOTTOM,
+                        toastLength: Toast.LENGTH_LONG,
+                        backgroundColor: Colors.white,
+                        textColor: Colors.black,
+                        fontSize: 16.0,
+                      );
+                    }
                   } else {
                     modifyProfile(); // Use modifyProfile function instead of _showAutobiographyModificationDialog or _showImageModificationDialog
                   }
@@ -3245,14 +3259,17 @@ class _ManagementBodyDetailsPage extends State<ManagementBodyDetailsPage> {
           fontSize: 16.0,
         );
 
-        // Close the OTP verification dialog upon success
-        Navigator.pop(context);
+        if (mounted) {
+          Navigator.pop(context);
+        }
 
         // Check if modifying autobiography or image and show the appropriate dialog
         if (isModifyingAutobiography) {
           _showAutobiographyModificationDialog();
-        } else {
+        } else if (isModifyingImage) {
           _showImageModificationDialog();
+        } else {
+          addFoundersCommentDialog(context);
         }
       });
     } catch (e) {
@@ -3334,11 +3351,11 @@ class _ManagementBodyDetailsPage extends State<ManagementBodyDetailsPage> {
                   ),
                   TextButton(
                     onPressed: () {
-                            verifyOTPCode();
-                            setState(() {
-                              otpCode = '';
-                            });
-                          },
+                      verifyOTPCode();
+                      setState(() {
+                        otpCode = '';
+                      });
+                    },
                     child: const Text('Verify OTP', style: TextStyle(color: Colors.black)),
                   ),
                 ],

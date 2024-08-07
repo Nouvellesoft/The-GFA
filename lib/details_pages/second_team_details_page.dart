@@ -4840,7 +4840,9 @@ class _SecondTeamClassDetailsPage extends State<SecondTeamClassDetailsPage> {
           fontSize: 16.0,
         );
 
-        Navigator.pop(context);
+        if (mounted) {
+          Navigator.pop(context);
+        }
 
         if (isModifyingAutobiography) {
           _showAutobiographyModificationDialog();

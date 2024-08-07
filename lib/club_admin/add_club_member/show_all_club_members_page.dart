@@ -1,21 +1,32 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '/bloc_navigation_bloc/navigation_bloc.dart';
 import '../../api/coaching_staff_api.dart';
+import '../../api/fifth_team_class_api.dart';
 import '../../api/first_team_class_api.dart';
+import '../../api/fourth_team_class_api.dart';
 import '../../api/management_body_api.dart';
 import '../../api/second_team_class_api.dart';
+import '../../api/sixth_team_class_api.dart';
+import '../../api/third_team_class_api.dart';
 import '../../model/coaches.dart';
+import '../../model/fifth_team_class.dart';
 import '../../model/first_team_class.dart';
+import '../../model/fourth_team_class.dart';
 import '../../model/management_body.dart';
 import '../../model/second_team_class.dart';
+import '../../model/sixth_team_class.dart';
+import '../../model/third_team_class.dart';
 import '../../notifier/all_club_members_notifier.dart';
 import '../../notifier/coaching_staff_notifier.dart';
+import '../../notifier/fifth_team_class_notifier.dart';
 import '../../notifier/first_team_class_notifier.dart';
+import '../../notifier/fourth_team_class_notifier.dart';
 import '../../notifier/management_body_notifier.dart';
 import '../../notifier/second_team_class_notifier.dart';
+import '../../notifier/sixth_team_class_notifier.dart';
+import '../../notifier/third_team_class_notifier.dart';
 
 Color conColor = const Color.fromRGBO(194, 194, 220, 1.0);
 Color conColorTwo = const Color.fromRGBO(151, 147, 151, 1.0);
@@ -51,7 +62,6 @@ class MyShowAllClubMemberPageState extends State<MyShowAllClubMemberPage> {
   Map<String, String> memberDept = {}; // Map to store player-team mapping
   String selectedDept = ''; // Variable to store the selected team
 
-  // Modify your build method like this
   @override
   Widget build(BuildContext context) {
     // Use the AllClubMembersNotifier to access the combined list of allClubMembers
@@ -85,7 +95,12 @@ class MyShowAllClubMemberPageState extends State<MyShowAllClubMemberPage> {
                   String deptForMember = '';
 
                   // Determine the department based on the type of player
-                  if (player is FirstTeamClass || player is SecondTeamClass) {
+                  if (player is FirstTeamClass ||
+                      player is SecondTeamClass ||
+                      player is ThirdTeamClass ||
+                      player is FourthTeamClass ||
+                      player is FifthTeamClass ||
+                      player is SixthTeamClass) {
                     deptForMember = 'Player';
                   } else if (player is Coaches) {
                     deptForMember = 'Coach';
@@ -139,6 +154,18 @@ class MyShowAllClubMemberPageState extends State<MyShowAllClubMemberPage> {
     SecondTeamClassNotifier secondTeamClassNotifier = Provider.of<SecondTeamClassNotifier>(context, listen: false);
     _fetchSecondTeamClassAndUpdateNotifier(secondTeamClassNotifier);
 
+    ThirdTeamClassNotifier thirdTeamClassNotifier = Provider.of<ThirdTeamClassNotifier>(context, listen: false);
+    _fetchThirdTeamClassAndUpdateNotifier(thirdTeamClassNotifier);
+
+    FourthTeamClassNotifier fourthTeamClassNotifier = Provider.of<FourthTeamClassNotifier>(context, listen: false);
+    _fetchFourthTeamClassAndUpdateNotifier(fourthTeamClassNotifier);
+
+    FifthTeamClassNotifier fifthTeamClassNotifier = Provider.of<FifthTeamClassNotifier>(context, listen: false);
+    _fetchFifthTeamClassAndUpdateNotifier(fifthTeamClassNotifier);
+
+    SixthTeamClassNotifier sixthTeamClassNotifier = Provider.of<SixthTeamClassNotifier>(context, listen: false);
+    _fetchSixthTeamClassAndUpdateNotifier(sixthTeamClassNotifier);
+
     CoachesNotifier coachesNotifier = Provider.of<CoachesNotifier>(context, listen: false);
     _fetchCoachesAndUpdateNotifier(coachesNotifier);
 
@@ -150,34 +177,58 @@ class MyShowAllClubMemberPageState extends State<MyShowAllClubMemberPage> {
 
     allClubMembersNotifier.setFirstTeamMembers(firstTeamClassNotifier.firstTeamClassList);
     allClubMembersNotifier.setSecondTeamMembers(secondTeamClassNotifier.secondTeamClassList);
+    allClubMembersNotifier.setThirdTeamMembers(thirdTeamClassNotifier.thirdTeamClassList);
+    allClubMembersNotifier.setFourthTeamMembers(fourthTeamClassNotifier.fourthTeamClassList);
+    allClubMembersNotifier.setFifthTeamMembers(fifthTeamClassNotifier.fifthTeamClassList);
+    allClubMembersNotifier.setSixthTeamMembers(sixthTeamClassNotifier.sixthTeamClassList);
     allClubMembersNotifier.setCoachesList(coachesNotifier.coachesList);
     allClubMembersNotifier.setMGMTBodyList(managementBodyNotifier.managementBodyList);
   }
 
   Future<void> _fetchFirstTeamClassAndUpdateNotifier(FirstTeamClassNotifier firstTeamNotifier) async {
-
-      await getFirstTeamClass(firstTeamNotifier, widget.clubId);
+    await getFirstTeamClass(firstTeamNotifier, widget.clubId);
 
     setState(() {}); // Refresh the UI if needed
   }
 
   Future<void> _fetchSecondTeamClassAndUpdateNotifier(SecondTeamClassNotifier secondTeamNotifier) async {
+    await getSecondTeamClass(secondTeamNotifier, widget.clubId);
 
-      await getSecondTeamClass(secondTeamNotifier, widget.clubId);
+    setState(() {}); // Refresh the UI if needed
+  }
+
+  Future<void> _fetchThirdTeamClassAndUpdateNotifier(ThirdTeamClassNotifier thirdTeamClassNotifier) async {
+    await getThirdTeamClass(thirdTeamClassNotifier, widget.clubId);
+
+    setState(() {}); // Refresh the UI if needed
+  }
+
+  Future<void> _fetchFourthTeamClassAndUpdateNotifier(FourthTeamClassNotifier fourthTeamClassNotifier) async {
+    await getFourthTeamClass(fourthTeamClassNotifier, widget.clubId);
+
+    setState(() {}); // Refresh the UI if needed
+  }
+
+  Future<void> _fetchFifthTeamClassAndUpdateNotifier(FifthTeamClassNotifier fifthTeamClassNotifier) async {
+    await getFifthTeamClass(fifthTeamClassNotifier, widget.clubId);
+
+    setState(() {}); // Refresh the UI if needed
+  }
+
+  Future<void> _fetchSixthTeamClassAndUpdateNotifier(SixthTeamClassNotifier sixthTeamClassNotifier) async {
+    await getSixthTeamClass(sixthTeamClassNotifier, widget.clubId);
 
     setState(() {}); // Refresh the UI if needed
   }
 
   Future<void> _fetchCoachesAndUpdateNotifier(CoachesNotifier coachesNotifier) async {
-
-      await getCoaches(coachesNotifier, widget.clubId);
+    await getCoaches(coachesNotifier, widget.clubId);
 
     setState(() {}); // Refresh the UI if needed
   }
 
   Future<void> _fetchManagementBodyAndUpdateNotifier(ManagementBodyNotifier managementBodyNotifier) async {
-
-      await getManagementBody(managementBodyNotifier, widget.clubId);
+    await getManagementBody(managementBodyNotifier, widget.clubId);
 
     setState(() {}); // Refresh the UI if needed
   }
