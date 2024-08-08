@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '/bloc_navigation_bloc/navigation_bloc.dart';
@@ -14,42 +15,89 @@ class MyAddClubMemberPage extends StatefulWidget implements NavigationStates {
 }
 
 class MyAddClubMemberPageState extends State<MyAddClubMemberPage> {
-  // Define variables to store form input
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
-  String _selectedRole = 'First Team Players'; // Default value
-
-  // Create a list of role options for the dropdown menu
-  final List<String> _roleOptions = [
-    'First Team Players',
-    'Second Team Players',
-    'Third Team Players*',
-    'Fourth Team Players*',
-    'Fifth Team Players*',
-    'Sixth Team Players*',
-    'Coach',
-    'Manager'
-  ];
-
-  // Create a GlobalKey for the form
+  String _selectedRole = ''; // Default value is now an empty string
   final _formKey = GlobalKey<FormState>();
-
-  // Firebase Firestore instance
   final firestore = FirebaseFirestore.instance;
+  List<String> _roleOptions = [];
 
-  // Function to check if a member with the same name exists
+  @override
+  void initState() {
+    super.initState();
+    _fetchRoleOptions();
+  }
+
+  final Map<String, String> roleMapping = {
+    'FirstTeamClass': 'First Team Players',
+    'SecondTeamClass': 'Second Team Players',
+    'ThirdTeamClass': 'Third Team Players',
+    'FourthTeamClass': 'Fourth Team Players',
+    'FifthTeamClass': 'Fifth Team Players',
+    'SixthTeamClass': 'Sixth Team Players',
+    'Coaches': 'Coaches',
+    'ManagementBody': 'Management Body',
+  };
+
+  // Function to fetch role options dynamically from Firestore
+  Future<void> _fetchRoleOptions() async {
+    try {
+      final snapshot = await firestore.collection('clubs').doc(widget.clubId).collection('TeamClassVisibility').get();
+
+      final roles = snapshot.docs.where((doc) => doc['isVisible'] == true).map((doc) {
+        final id = doc['id'] as String;
+        return roleMapping[id] ?? id; // Use the mapped name or the id if no mapping exists
+      }).toList();
+
+      // Remove "Captains" from the list if it exists
+      roles.remove('Captains');
+
+      // Sort roles with players first, then coaches, then management
+      roles.sort((a, b) {
+        const playerRoles = [
+          'First Team Players',
+          'Second Team Players',
+          'Third Team Players',
+          'Fourth Team Players',
+          'Fifth Team Players',
+          'Sixth Team Players'
+        ];
+        const coachRoles = ['Coaches'];
+        const managementRoles = ['ManagementBody'];
+
+        int getRolePriority(String role) {
+          if (playerRoles.contains(role)) return 1;
+          if (coachRoles.contains(role)) return 2;
+          if (managementRoles.contains(role)) return 3;
+          return 4; // Default priority for other roles
+        }
+
+        return getRolePriority(a).compareTo(getRolePriority(b));
+      });
+
+      setState(() {
+        _roleOptions = roles;
+        if (_roleOptions.isNotEmpty) {
+          _selectedRole = _roleOptions.first; // Set the default selected role
+        }
+      });
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error fetching role options: $e');
+      }
+    }
+  }
+
   Future<bool> doesNameExist(String fullName, String collectionName) async {
     final querySnapshot = await firestore.collection('clubs').doc(widget.clubId).collection(collectionName).where('name', isEqualTo: fullName).get();
     return querySnapshot.docs.isNotEmpty;
   }
 
-  // Implement a function to handle form submission
   void _submitForm() async {
     if (_formKey.currentState!.validate()) {
-      final firestore = FirebaseFirestore.instance;
-      final firstName = _firstNameController.text;
-      final lastName = _lastNameController.text;
-      final fullName = '$firstName $lastName'; // Combine first and last names
+      final firstName = _firstNameController.text.trim().replaceAll(RegExp(r'\s+'), ' ');
+      final lastName = _lastNameController.text.trim().replaceAll(RegExp(r'\s+'), ' ');
+      final fullName = '$firstName $lastName';
       final role = _selectedRole;
       String collectionName = '';
       Map<String, dynamic> data = {};
@@ -133,7 +181,163 @@ class MyAddClubMemberPageState extends State<MyAddClubMemberPage> {
             'worst_moment': '',
           };
           break;
-        case 'Coach':
+        case 'Third Team Players':
+          collectionName = 'ThirdTeamClassPlayers';
+          data = {
+            'id': '10',
+            'autobio': '',
+            'best_moment': '',
+            'email': '',
+            'facebook': '',
+            'image':
+                'https://firebasestorage.googleapis.com/v0/b/cov-phoenix-fc.appspot.com/o/Players%2FAI_GENERATED%2Fai_player_1.jpg?alt=media&token=585caeeb-2d2c-4dd9-a298-c802f9998356',
+            'image_two':
+                'https://firebasestorage.googleapis.com/v0/b/cov-phoenix-fc.appspot.com/o/Players%2FAI_GENERATED%2Fai_player_2.jpg?alt=media&token=6f10032a-813e-476e-92ee-d34bb35bfff0',
+            'instagram': '',
+            'name': fullName,
+            'nickname': '',
+            'phone': '',
+            'team_captaining': '',
+            'captain': '',
+            'constituent_country': '',
+            'region_from': '',
+            'twitter': '',
+            'd_o_b': '',
+            'dream_fc': '',
+            'position_playing': '',
+            'snapchat': '',
+            'tiktok': '',
+            'linkedIn': '',
+            'other_positions_of_play': '',
+            'fav_football_legend': '',
+            'year_of_inception': '',
+            'adidas_or_nike': '',
+            'ronaldo_or_messi': '',
+            'left_or_right': '',
+            'hobbies': '',
+            'my_dropline': '',
+            'philosophy': '',
+            'worst_moment': '',
+          };
+          break;
+        case 'Fourth Team Players':
+          collectionName = 'FourthTeamClassPlayers';
+          data = {
+            'id': '10',
+            'autobio': '',
+            'best_moment': '',
+            'email': '',
+            'facebook': '',
+            'image':
+                'https://firebasestorage.googleapis.com/v0/b/cov-phoenix-fc.appspot.com/o/Players%2FAI_GENERATED%2Fai_player_1.jpg?alt=media&token=585caeeb-2d2c-4dd9-a298-c802f9998356',
+            'image_two':
+                'https://firebasestorage.googleapis.com/v0/b/cov-phoenix-fc.appspot.com/o/Players%2FAI_GENERATED%2Fai_player_2.jpg?alt=media&token=6f10032a-813e-476e-92ee-d34bb35bfff0',
+            'instagram': '',
+            'name': fullName,
+            'nickname': '',
+            'phone': '',
+            'team_captaining': '',
+            'captain': '',
+            'constituent_country': '',
+            'region_from': '',
+            'twitter': '',
+            'd_o_b': '',
+            'dream_fc': '',
+            'position_playing': '',
+            'snapchat': '',
+            'tiktok': '',
+            'linkedIn': '',
+            'other_positions_of_play': '',
+            'fav_football_legend': '',
+            'year_of_inception': '',
+            'adidas_or_nike': '',
+            'ronaldo_or_messi': '',
+            'left_or_right': '',
+            'hobbies': '',
+            'my_dropline': '',
+            'philosophy': '',
+            'worst_moment': '',
+          };
+          break;
+        case 'Fifth Team Players':
+          collectionName = 'FifthTeamClassPlayers';
+          data = {
+            'id': '10',
+            'autobio': '',
+            'best_moment': '',
+            'email': '',
+            'facebook': '',
+            'image':
+                'https://firebasestorage.googleapis.com/v0/b/cov-phoenix-fc.appspot.com/o/Players%2FAI_GENERATED%2Fai_player_1.jpg?alt=media&token=585caeeb-2d2c-4dd9-a298-c802f9998356',
+            'image_two':
+                'https://firebasestorage.googleapis.com/v0/b/cov-phoenix-fc.appspot.com/o/Players%2FAI_GENERATED%2Fai_player_2.jpg?alt=media&token=6f10032a-813e-476e-92ee-d34bb35bfff0',
+            'instagram': '',
+            'name': fullName,
+            'nickname': '',
+            'phone': '',
+            'team_captaining': '',
+            'captain': '',
+            'constituent_country': '',
+            'region_from': '',
+            'twitter': '',
+            'd_o_b': '',
+            'dream_fc': '',
+            'position_playing': '',
+            'snapchat': '',
+            'tiktok': '',
+            'linkedIn': '',
+            'other_positions_of_play': '',
+            'fav_football_legend': '',
+            'year_of_inception': '',
+            'adidas_or_nike': '',
+            'ronaldo_or_messi': '',
+            'left_or_right': '',
+            'hobbies': '',
+            'my_dropline': '',
+            'philosophy': '',
+            'worst_moment': '',
+          };
+          break;
+        case 'Sixth Team Players':
+          collectionName = 'SixthTeamClassPlayers';
+          data = {
+            'id': '10',
+            'autobio': '',
+            'best_moment': '',
+            'email': '',
+            'facebook': '',
+            'image':
+                'https://firebasestorage.googleapis.com/v0/b/cov-phoenix-fc.appspot.com/o/Players%2FAI_GENERATED%2Fai_player_1.jpg?alt=media&token=585caeeb-2d2c-4dd9-a298-c802f9998356',
+            'image_two':
+                'https://firebasestorage.googleapis.com/v0/b/cov-phoenix-fc.appspot.com/o/Players%2FAI_GENERATED%2Fai_player_2.jpg?alt=media&token=6f10032a-813e-476e-92ee-d34bb35bfff0',
+            'instagram': '',
+            'name': fullName,
+            'nickname': '',
+            'phone': '',
+            'team_captaining': '',
+            'captain': '',
+            'constituent_country': '',
+            'region_from': '',
+            'twitter': '',
+            'd_o_b': '',
+            'dream_fc': '',
+            'position_playing': '',
+            'snapchat': '',
+            'tiktok': '',
+            'linkedIn': '',
+            'other_positions_of_play': '',
+            'fav_football_legend': '',
+            'year_of_inception': '',
+            'adidas_or_nike': '',
+            'ronaldo_or_messi': '',
+            'left_or_right': '',
+            'hobbies': '',
+            'my_dropline': '',
+            'philosophy': '',
+            'worst_moment': '',
+          };
+          break;
+        case 'Coaches':
           collectionName = 'Coaches';
           data = {
             'id': '10',
@@ -195,58 +399,97 @@ class MyAddClubMemberPageState extends State<MyAddClubMemberPage> {
           break;
       }
 
+      // Check if the name exists in any of the player collections
+      bool nameExists = false;
+      const playerCollections = [
+        'FirstTeamClassPlayers',
+        'SecondTeamClassPlayers',
+        'ThirdTeamClassPlayers',
+        'FourthTeamClassPlayers',
+        'FifthTeamClassPlayers',
+        'SixthTeamClassPlayers'
+      ];
+
+      // Loop through each player collection to check if the name exists
+      for (var collection in playerCollections) {
+        if (await doesNameExist(fullName, collection)) {
+          nameExists = true;
+          break;
+        }
+      }
+
+      // If the name exists, show a Snackbar and do not proceed
+      if (nameExists && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('The name "$fullName" already exists in one of the player collections.'),
+          ),
+        );
+        return; // Exit early
+      }
+
+      // If name does not exist, proceed to add the data
       try {
         if (collectionName.isNotEmpty) {
-          data['name'] = fullName;
-          data['role'] = role;
+          await firestore.collection('clubs').doc(widget.clubId).collection(collectionName).add(data);
 
-          // Check if the member already exists
-          bool nameExists = await doesNameExist(fullName, collectionName);
+          // Adding player to PlayersTable collection for statistics
+          await firestore.collection('clubs').doc(widget.clubId).collection('PllayersTable').add({
+            'age': 0,
+            'assists': 0,
+            'clean_sheets_gk': 0,
+            'goals_conceded_gk_def': 0,
+            'goals_scored': 0,
+            'id': '10', // Assuming 'id' is a string, adjust as needed
+            'image': data['image'], // Use the same image URL as above
+            'man_of_the_match': '',
+            'man_of_the_match_cum': 0,
+            'matches_benched': 0,
+            'matches_played': 0,
+            'matches_started': 0,
+            'nationality': '',
+            'player_name': fullName,
+            'player_of_the_month': '0',
+            'player_position': '',
+            'player_value': 0,
+            'potm_cum': 0,
+            'preferred_foot': '',
+            'red_card': 0,
+            'yellow_card': 0,
+          });
 
-          if (nameExists) {
-            if (!mounted) return;
+          if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text('The name "$fullName" already exists in the $collectionName collection.'),
+                content: Text('$fullName has been added to the $collectionName collection and PlayersTable for statistics'),
               ),
             );
-          } else {
-            // Add the new member if the name doesn't exist
-            await firestore.collection('clubs').doc(widget.clubId).collection(collectionName).add(data);
-
-            if (!mounted) return;
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('New member added to $collectionName collection'),
-              ),
-            );
-
-            _firstNameController.clear();
-            _lastNameController.clear();
-            setState(() {
-              _selectedRole = 'First Team Players';
-            });
           }
+
+          _firstNameController.clear();
+          _lastNameController.clear();
+          setState(() {
+            _selectedRole = _roleOptions.first;
+          });
         } else {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Unsupported role: $role'),
+              ),
+            );
+          }
+        }
+      } catch (e) {
+        if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Unsupported role: $role'),
+              content: Text('Error adding member: $e'),
             ),
           );
         }
-      } catch (e) {
-        if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error adding member: $e'),
-          ),
-        );
       }
     }
-  }
-
-  Future<void> addDataToCollection(FirebaseFirestore firestore, String collectionName, Map<String, dynamic> data) async {
-    await firestore.collection('clubs').doc(widget.clubId).collection(collectionName).add(data);
   }
 
   @override
@@ -279,26 +522,29 @@ class MyAddClubMemberPageState extends State<MyAddClubMemberPage> {
                   return null;
                 },
               ),
-              DropdownButtonFormField<String>(
-                value: _selectedRole,
-                onChanged: (newValue) {
-                  setState(() {
-                    _selectedRole = newValue!;
-                  });
-                },
-                items: _roleOptions.map((role) {
-                  return DropdownMenuItem<String>(
-                    value: role,
-                    child: Text(role),
-                  );
-                }).toList(),
-                decoration: const InputDecoration(labelText: 'Role'),
-              ),
+              if (_roleOptions.isNotEmpty)
+                DropdownButtonFormField<String>(
+                  value: _selectedRole,
+                  onChanged: (newValue) {
+                    setState(() {
+                      _selectedRole = newValue!;
+                    });
+                  },
+                  items: _roleOptions.map((role) {
+                    return DropdownMenuItem<String>(
+                      value: role,
+                      child: Text(role),
+                    );
+                  }).toList(),
+                  decoration: const InputDecoration(labelText: 'Role'),
+                )
+              else
+                const Center(child: CircularProgressIndicator()),
               const SizedBox(height: 80),
               ElevatedButton(
                 onPressed: _submitForm,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color.fromRGBO(147, 165, 193, 1.0), // Change this color to your desired background color
+                  backgroundColor: const Color.fromRGBO(147, 165, 193, 1.0),
                 ),
                 child: const Text(
                   'Add Club Member',

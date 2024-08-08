@@ -6,6 +6,7 @@ import '../../api/coaching_staff_api.dart';
 import '../../api/fifth_team_class_api.dart';
 import '../../api/first_team_class_api.dart';
 import '../../api/fourth_team_class_api.dart';
+import '../../api/get_teams_visibility.dart';
 import '../../api/management_body_api.dart';
 import '../../api/second_team_class_api.dart';
 import '../../api/sixth_team_class_api.dart';
@@ -62,10 +63,17 @@ class MyShowAllClubMemberPageState extends State<MyShowAllClubMemberPage> {
   Map<String, String> memberDept = {}; // Map to store player-team mapping
   String selectedDept = ''; // Variable to store the selected team
 
+  Map<String, bool> teamClassVisibility = {};
+
   @override
   Widget build(BuildContext context) {
     // Use the AllClubMembersNotifier to access the combined list of allClubMembers
     AllClubMembersNotifier allClubMembersNotifier = Provider.of<AllClubMembersNotifier>(context);
+
+    // Check if visibility data has been loaded
+    if (teamClassVisibility.isEmpty) {
+      return const CircularProgressIndicator(); // Or any other loading widget
+    }
 
     // Create a copy of the allClubMembersList and sort it alphabetically by name
     List<dynamic> sortedMembers = List.from(allClubMembersNotifier.allClubMembersList);
@@ -90,29 +98,33 @@ class MyShowAllClubMemberPageState extends State<MyShowAllClubMemberPage> {
               child: ListView.builder(
                 itemCount: sortedMembers.length,
                 itemBuilder: (context, index) {
-                  final player = sortedMembers[index];
-                  final memberName = player.name ?? 'No Name';
+                  final teamMember = sortedMembers[index];
+                  final memberName = teamMember.name ?? 'No Name';
                   String deptForMember = '';
 
-                  // Determine the department based on the type of player
-                  if (player is FirstTeamClass ||
-                      player is SecondTeamClass ||
-                      player is ThirdTeamClass ||
-                      player is FourthTeamClass ||
-                      player is FifthTeamClass ||
-                      player is SixthTeamClass) {
+                  // Determine the department based on the type of teamMember and visibility
+                  if (teamMember is FirstTeamClass && teamClassVisibility['FirstTeamClass'] == true) {
                     deptForMember = 'Player';
-                  } else if (player is Coaches) {
-                    deptForMember = 'Coach';
-                  } else if (player is ManagementBody) {
-                    deptForMember = 'Manager';
+                  } else if (teamMember is SecondTeamClass && teamClassVisibility['SecondTeamClass'] == true) {
+                    deptForMember = 'Player';
+                  } else if (teamMember is ThirdTeamClass && teamClassVisibility['ThirdTeamClass'] == true) {
+                    deptForMember = 'Player';
+                  } else if (teamMember is FourthTeamClass && teamClassVisibility['FourthTeamClass'] == true) {
+                    deptForMember = 'Player';
+                  } else if (teamMember is FifthTeamClass && teamClassVisibility['FifthTeamClass'] == true) {
+                    deptForMember = 'Player';
+                  } else if (teamMember is SixthTeamClass && teamClassVisibility['SixthTeamClass'] == true) {
+                    deptForMember = 'Player';
+                  } else if (teamMember is Coaches && teamClassVisibility['Coaches'] == true) {
+                    deptForMember = 'Coaches';
+                  } else if (teamMember is ManagementBody && teamClassVisibility['ManagementBody'] == true) {
+                    deptForMember = 'ManagementBody';
+                  } else {
+                    return const SizedBox.shrink(); // Hide the item if it's not visible
                   }
 
                   // Assign color based on the department
                   Color memberColor = _getMemberColor(deptForMember);
-
-                  // final isCaptain = memberDept.containsKey(memberName);
-                  // final isSelected = selectedMemberNames.contains(memberName);
 
                   return ListTile(
                     title: Text(
@@ -146,6 +158,8 @@ class MyShowAllClubMemberPageState extends State<MyShowAllClubMemberPage> {
   @override
   void initState() {
     super.initState();
+
+    _fetchVisibilityData();
 
     // Fetch data for the first and second teams using their notifiers
     FirstTeamClassNotifier firstTeamClassNotifier = Provider.of<FirstTeamClassNotifier>(context, listen: false);
@@ -183,6 +197,11 @@ class MyShowAllClubMemberPageState extends State<MyShowAllClubMemberPage> {
     allClubMembersNotifier.setSixthTeamMembers(sixthTeamClassNotifier.sixthTeamClassList);
     allClubMembersNotifier.setCoachesList(coachesNotifier.coachesList);
     allClubMembersNotifier.setMGMTBodyList(managementBodyNotifier.managementBodyList);
+  }
+
+  Future<void> _fetchVisibilityData() async {
+    teamClassVisibility = await getTeamClassVisibility(widget.clubId);
+    setState(() {}); // Trigger a rebuild to reflect the visibility changes
   }
 
   Future<void> _fetchFirstTeamClassAndUpdateNotifier(FirstTeamClassNotifier firstTeamNotifier) async {
