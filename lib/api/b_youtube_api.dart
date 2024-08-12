@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-import '../model/b_youtube.dart';
+import '../model/b_youtube_model.dart';
 import '../notifier/b_youtube_notifier.dart';
 
 Future<void> getYouTube(YouTubeNotifier youTubeNotifier, String clubId) async {

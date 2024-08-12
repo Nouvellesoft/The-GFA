@@ -1,6 +1,8 @@
 import 'dart:collection';
+
 import 'package:flutter/cupertino.dart';
-import '../model/c_match_day_banner_for_club.dart';
+
+import '../model/c_match_day_banner_for_clubs_model.dart';
 
 class MatchDayBannerForClubNotifier with ChangeNotifier {
   List<MatchDayBannerForClub> _matchDayBannerForClubList = [];

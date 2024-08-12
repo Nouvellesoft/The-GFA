@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-import '../model/a_upcoming_matches.dart';
+import '../model/a_upcoming_matches_model.dart';
 import '../notifier/a_upcoming_matches_notifier.dart';
 
 Future<void> getUpcomingMatches(UpcomingMatchesNotifier upcomingMatchesNotifier, String clubId) async {

@@ -2,21 +2,17 @@ import 'dart:collection';
 
 import 'package:flutter/cupertino.dart';
 
-import '../model/players_stats_and_info.dart';
+import '../model/players_stats_and_info_model.dart';
 
 class MOTMPlayersStatsAndInfoNotifier with ChangeNotifier {
-  List<PlayersStatsAndInfo> _mOTMPlayersStatsAndInfoList =
-      <PlayersStatsAndInfo>[];
+  List<PlayersStatsAndInfo> _mOTMPlayersStatsAndInfoList = <PlayersStatsAndInfo>[];
   late PlayersStatsAndInfo _currentMOTMPlayersStatsAndInfo;
 
-  UnmodifiableListView<PlayersStatsAndInfo> get mOTMPlayersStatsAndInfoList =>
-      UnmodifiableListView(_mOTMPlayersStatsAndInfoList);
+  UnmodifiableListView<PlayersStatsAndInfo> get mOTMPlayersStatsAndInfoList => UnmodifiableListView(_mOTMPlayersStatsAndInfoList);
 
-  PlayersStatsAndInfo get currentMOTMPlayersStatsAndInfo =>
-      _currentMOTMPlayersStatsAndInfo;
+  PlayersStatsAndInfo get currentMOTMPlayersStatsAndInfo => _currentMOTMPlayersStatsAndInfo;
 
-  set mOTMPlayersStatsAndInfoList(
-      List<PlayersStatsAndInfo> mOTMPlayersStatsAndInfoList) {
+  set mOTMPlayersStatsAndInfoList(List<PlayersStatsAndInfo> mOTMPlayersStatsAndInfoList) {
     _mOTMPlayersStatsAndInfoList = mOTMPlayersStatsAndInfoList;
     notifyListeners();
   }

@@ -3,14 +3,14 @@ import 'dart:collection';
 
 import 'package:flutter/material.dart';
 
-import '../model/coaches.dart';
-import '../model/fifth_team_class.dart';
-import '../model/first_team_class.dart';
-import '../model/fourth_team_class.dart';
-import '../model/management_body.dart';
-import '../model/second_team_class.dart';
-import '../model/sixth_team_class.dart';
-import '../model/third_team_class.dart';
+import '../model/coaches_model.dart';
+import '../model/fifth_team_class_model.dart';
+import '../model/first_team_class_model.dart';
+import '../model/fourth_team_class_model.dart';
+import '../model/management_body_model.dart';
+import '../model/second_team_class_model.dart';
+import '../model/sixth_team_class_model.dart';
+import '../model/third_team_class_model.dart';
 
 class AllClubMembersNotifier with ChangeNotifier {
   List<FirstTeamClass> _firstTeamClassList = [];

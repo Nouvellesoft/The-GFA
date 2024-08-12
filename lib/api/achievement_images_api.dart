@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-import '../model/achievements.dart';
+import '../model/achievements_model.dart';
 import '../notifier/achievement_images_notifier.dart';
 
 Future<void> getAchievements(AchievementsNotifier achievementsNotifier, String clubId) async {

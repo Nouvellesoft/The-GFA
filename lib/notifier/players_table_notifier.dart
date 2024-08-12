@@ -1,13 +1,14 @@
 import 'dart:collection';
+
 import 'package:flutter/cupertino.dart';
-import '../model/players_table.dart';
+
+import '../model/players_table_model.dart';
 
 class PlayersTableNotifier with ChangeNotifier {
   List<PlayersTable> _playersTableList = [];
   late PlayersTable _currentPlayersTable;
 
-  UnmodifiableListView<PlayersTable> get playersTableList =>
-      UnmodifiableListView(_playersTableList);
+  UnmodifiableListView<PlayersTable> get playersTableList => UnmodifiableListView(_playersTableList);
 
   PlayersTable get currentPlayersTable => _currentPlayersTable;
 

@@ -8,6 +8,7 @@ import '../../api/coaching_staff_api.dart';
 import '../../api/fifth_team_class_api.dart';
 import '../../api/first_team_class_api.dart';
 import '../../api/fourth_team_class_api.dart';
+import '../../api/get_teams_visibility_api.dart';
 import '../../api/management_body_api.dart';
 import '../../api/second_team_class_api.dart';
 import '../../api/sixth_team_class_api.dart';
@@ -41,21 +42,12 @@ class MyViewClubPopulationPage extends StatefulWidget {
 
 class MyViewClubPopulationPageState extends State<MyViewClubPopulationPage> {
   int touchedIndex = 0;
+  late Future<Map<String, Map<String, dynamic>>> _teamVisibilityFuture;
 
   @override
   Widget build(BuildContext context) {
     // Use the AllClubMembersNotifier to access the combined list of allClubMembers
     AllClubMembersNotifier allClubMembersNotifier = Provider.of<AllClubMembersNotifier>(context);
-
-    // Calculate counts for Players, Coaches, and Managers
-    int playersCount = allClubMembersNotifier.firstTeamClassList.length +
-        allClubMembersNotifier.secondTeamClassList.length +
-        allClubMembersNotifier.thirdTeamClassList.length +
-        allClubMembersNotifier.fourthTeamClassList.length +
-        allClubMembersNotifier.fifthTeamClassList.length +
-        allClubMembersNotifier.sixthTeamClassList.length;
-    int coachesCount = allClubMembersNotifier.coachesClassList.length;
-    int managersCount = allClubMembersNotifier.mgmtBodyClassList.length;
 
     return Scaffold(
       backgroundColor: backgroundColor,
@@ -74,214 +66,235 @@ class MyViewClubPopulationPageState extends State<MyViewClubPopulationPage> {
       ),
       body: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            const SizedBox(height: 10),
-            // First Row: Two containers for Players
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Container 1
-                Container(
-                  width: MediaQuery.of(context).size.width / 2 - 20,
-                  height: MediaQuery.of(context).size.width / 2 - 20,
-                  color: Colors.transparent,
-                  child: InkWell(
-                    onTap: () {},
-                    child: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-                        stream: FirebaseFirestore.instance
-                            .collection('clubs')
-                            .doc(widget.clubId)
-                            .collection('SliversPages')
-                            .doc('non_slivers_pages')
-                            .snapshots(),
-                        builder: (context, snapshot) {
-                          if (!snapshot.hasData) {
-                            return const CircularProgressIndicator();
-                          }
-                          return CachedNetworkImage(
-                            imageUrl: snapshot.data?.data()!['club_icon'] ?? '',
-                            width: MediaQuery.of(context).size.width / 4,
-                            // Adjust the width
-                            height: MediaQuery.of(context).size.width / 4,
-                            // Adjust the height
-                            placeholder: (context, url) => const CircularProgressIndicator(),
-                            errorWidget: (context, url, error) => const Icon(Icons.error),
-                          );
-                        }),
-                  ),
-                ),
+        child: FutureBuilder<Map<String, Map<String, dynamic>>>(
+            future: _teamVisibilityFuture,
+            builder: (context, visibilitySnapshot) {
+              if (visibilitySnapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              } else if (visibilitySnapshot.hasError) {
+                return const Center(child: Text("Error loading visibility data"));
+              } else if (!visibilitySnapshot.hasData) {
+                return const Center(child: Text("No visibility data available"));
+              } else {
+                final teamVisibility = visibilitySnapshot.data!;
 
-                const SizedBox(width: 10),
-                // Container 2
-                Container(
-                  width: MediaQuery.of(context).size.width / 2 - 20,
-                  height: MediaQuery.of(context).size.width / 2 - 20,
-                  color: firstRowColorTwo,
-                  child: Material(
-                    color: Colors.transparent,
-                    child: InkWell(
-                      onTap: () {},
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          const Column(
-                            children: [
-                              Icon(
-                                Icons.sports_soccer,
-                                color: Colors.white,
-                                size: 30,
-                              ),
-                              Text(
-                                'Players',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ],
-                          ),
-                          Text(
-                            '$playersCount',
-                            style: const TextStyle(
-                              fontSize: 40, // Adjust the font size
-                              fontWeight: FontWeight.bold, // Make it bold
-                              color: Colors.white,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 10),
+                // Calculate filtered player counts based on visibility
+                int playersCount = _calculateVisiblePlayersCount(teamVisibility, allClubMembersNotifier);
+                final coachesCount = allClubMembersNotifier.coachesClassList.length;
+                final managersCount = allClubMembersNotifier.mgmtBodyClassList.length;
 
-            // Second Row: Two containers for Coaches and Managers
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                // Container 3
-                Container(
-                  width: MediaQuery.of(context).size.width / 2 - 20,
-                  height: MediaQuery.of(context).size.width / 2 - 20,
-                  color: secondRowColor,
-                  child: Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        onTap: () {},
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            const Column(children: [
-                              Icon(
-                                Icons.people,
-                                color: Colors.white,
-                                size: 30,
-                              ),
-                              Text(
-                                'Coaches',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ]),
-                            Text(
-                              '$coachesCount',
-                              style: const TextStyle(
-                                fontSize: 40, // Adjust the font size
-                                fontWeight: FontWeight.bold, // Make it bold
-                                color: Colors.white,
-                              ),
-                            ),
-                          ],
+                return Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    const SizedBox(height: 10),
+                    // First Row: Two containers for Players
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        // Container 1
+                        Container(
+                          width: MediaQuery.of(context).size.width / 2 - 20,
+                          height: MediaQuery.of(context).size.width / 2 - 20,
+                          color: Colors.transparent,
+                          child: InkWell(
+                            onTap: () {},
+                            child: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+                                stream: FirebaseFirestore.instance
+                                    .collection('clubs')
+                                    .doc(widget.clubId)
+                                    .collection('SliversPages')
+                                    .doc('non_slivers_pages')
+                                    .snapshots(),
+                                builder: (context, snapshot) {
+                                  if (!snapshot.hasData) {
+                                    return const CircularProgressIndicator();
+                                  }
+                                  return CachedNetworkImage(
+                                    imageUrl: snapshot.data?.data()!['club_icon'] ?? '',
+                                    width: MediaQuery.of(context).size.width / 4,
+                                    // Adjust the width
+                                    height: MediaQuery.of(context).size.width / 4,
+                                    // Adjust the height
+                                    placeholder: (context, url) => const CircularProgressIndicator(),
+                                    errorWidget: (context, url, error) => const Icon(Icons.error),
+                                  );
+                                }),
+                          ),
                         ),
-                      )),
-                ),
-                const SizedBox(width: 10),
-                // Container 4
-                Container(
-                    width: MediaQuery.of(context).size.width / 2 - 20,
-                    height: MediaQuery.of(context).size.width / 2 - 20,
-                    color: secondRowColorTwo,
-                    child: Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          onTap: () {},
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              const Column(children: [
-                                Icon(
-                                  Icons.business,
-                                  color: Colors.white,
-                                  size: 30,
+
+                        const SizedBox(width: 10),
+                        // Container 2
+                        Container(
+                          width: MediaQuery.of(context).size.width / 2 - 20,
+                          height: MediaQuery.of(context).size.width / 2 - 20,
+                          color: firstRowColorTwo,
+                          child: Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              onTap: () {},
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  const Column(
+                                    children: [
+                                      Icon(
+                                        Icons.sports_soccer,
+                                        color: Colors.white,
+                                        size: 30,
+                                      ),
+                                      Text(
+                                        'Players',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  Text(
+                                    '$playersCount',
+                                    style: const TextStyle(
+                                      fontSize: 40, // Adjust the font size
+                                      fontWeight: FontWeight.bold, // Make it bold
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+
+                    // Second Row: Two containers for Coaches and Managers
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        // Container 3
+                        Container(
+                          width: MediaQuery.of(context).size.width / 2 - 20,
+                          height: MediaQuery.of(context).size.width / 2 - 20,
+                          color: secondRowColor,
+                          child: Material(
+                              color: Colors.transparent,
+                              child: InkWell(
+                                onTap: () {},
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    const Column(children: [
+                                      Icon(
+                                        Icons.people,
+                                        color: Colors.white,
+                                        size: 30,
+                                      ),
+                                      Text(
+                                        'Coaches',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ]),
+                                    Text(
+                                      '$coachesCount',
+                                      style: const TextStyle(
+                                        fontSize: 40, // Adjust the font size
+                                        fontWeight: FontWeight.bold, // Make it bold
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                                Text(
-                                  'Managers',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    color: Colors.white,
+                              )),
+                        ),
+                        const SizedBox(width: 10),
+                        // Container 4
+                        Container(
+                            width: MediaQuery.of(context).size.width / 2 - 20,
+                            height: MediaQuery.of(context).size.width / 2 - 20,
+                            color: secondRowColorTwo,
+                            child: Material(
+                                color: Colors.transparent,
+                                child: InkWell(
+                                  onTap: () {},
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                    children: [
+                                      const Column(children: [
+                                        Icon(
+                                          Icons.business,
+                                          color: Colors.white,
+                                          size: 30,
+                                        ),
+                                        Text(
+                                          'Managers',
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      ]),
+                                      Text(
+                                        '$managersCount',
+                                        style: const TextStyle(
+                                          fontSize: 40, // Adjust the font size
+                                          fontWeight: FontWeight.bold, // Make it bold
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ))),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+
+                    // Third Row: Biggest rectangle for the Pie Chart
+                    Container(
+                        width: MediaQuery.of(context).size.width - 30,
+                        height: MediaQuery.of(context).size.width - 80,
+                        color: thirdRowColor,
+                        child: Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              onTap: () {},
+                              child: Center(
+                                child: PieChart(
+                                  PieChartData(
+                                    pieTouchData: PieTouchData(
+                                      touchCallback: (FlTouchEvent event, pieTouchResponse) {
+                                        setState(() {
+                                          if (!event.isInterestedForInteractions ||
+                                              pieTouchResponse == null ||
+                                              pieTouchResponse.touchedSection == null) {
+                                            touchedIndex = -1;
+                                            return;
+                                          }
+                                          touchedIndex = pieTouchResponse.touchedSection!.touchedSectionIndex;
+                                        });
+                                      },
+                                    ),
+                                    borderData: FlBorderData(
+                                      show: false,
+                                    ),
+                                    sectionsSpace: 0,
+                                    centerSpaceRadius: 0,
+                                    sections: showingSections(playersCount, coachesCount, managersCount),
                                   ),
                                 ),
-                              ]),
-                              Text(
-                                '$managersCount',
-                                style: const TextStyle(
-                                  fontSize: 40, // Adjust the font size
-                                  fontWeight: FontWeight.bold, // Make it bold
-                                  color: Colors.white,
-                                ),
                               ),
-                            ],
-                          ),
-                        ))),
-              ],
-            ),
-            const SizedBox(height: 10),
-
-            // Third Row: Biggest rectangle for the Pie Chart
-            Container(
-                width: MediaQuery.of(context).size.width - 30,
-                height: MediaQuery.of(context).size.width - 80,
-                color: thirdRowColor,
-                child: Material(
-                    color: Colors.transparent,
-                    child: InkWell(
-                      onTap: () {},
-                      child: Center(
-                        child: PieChart(
-                          PieChartData(
-                            pieTouchData: PieTouchData(
-                              touchCallback: (FlTouchEvent event, pieTouchResponse) {
-                                setState(() {
-                                  if (!event.isInterestedForInteractions || pieTouchResponse == null || pieTouchResponse.touchedSection == null) {
-                                    touchedIndex = -1;
-                                    return;
-                                  }
-                                  touchedIndex = pieTouchResponse.touchedSection!.touchedSectionIndex;
-                                });
-                              },
-                            ),
-                            borderData: FlBorderData(
-                              show: false,
-                            ),
-                            sectionsSpace: 0,
-                            centerSpaceRadius: 0,
-                            sections: showingSections(playersCount, coachesCount, managersCount),
-                          ),
-                        ),
-                      ),
-                    ))),
-          ],
-        ),
+                            ))),
+                  ],
+                );
+              }
+            }),
       ),
     );
   }
@@ -344,6 +357,9 @@ class MyViewClubPopulationPageState extends State<MyViewClubPopulationPage> {
   void initState() {
     super.initState();
 
+    _teamVisibilityFuture = getTeamClassVisibilityAndTitles(widget.clubId); // Fetch visibility data
+    // _fetchAllData();
+
     // Fetch data for the first and second teams using their notifiers
     FirstTeamClassNotifier firstTeamNotifier = Provider.of<FirstTeamClassNotifier>(context, listen: false);
     SecondTeamClassNotifier secondTeamNotifier = Provider.of<SecondTeamClassNotifier>(context, listen: false);
@@ -380,6 +396,25 @@ class MyViewClubPopulationPageState extends State<MyViewClubPopulationPage> {
         allClubMembersNotifier.setMGMTBodyList(managementBodyNotifier.managementBodyList);
       }
     });
+  }
+
+  int _calculateVisiblePlayersCount(Map<String, Map<String, dynamic>> teamVisibility, AllClubMembersNotifier notifier) {
+    // Calculate counts for Players based on visibility
+    List<dynamic> filteredPlayers = [];
+
+    filteredPlayers.addAll(notifier.firstTeamClassList.where((player) => teamVisibility['FirstTeamClass']?['isVisible'] == true));
+
+    filteredPlayers.addAll(notifier.secondTeamClassList.where((player) => teamVisibility['SecondTeamClass']?['isVisible'] == true));
+
+    filteredPlayers.addAll(notifier.thirdTeamClassList.where((player) => teamVisibility['ThirdTeamClass']?['isVisible'] == true));
+
+    filteredPlayers.addAll(notifier.fourthTeamClassList.where((player) => teamVisibility['FourthTeamClass']?['isVisible'] == true));
+
+    filteredPlayers.addAll(notifier.fifthTeamClassList.where((player) => teamVisibility['FifthTeamClass']?['isVisible'] == true));
+
+    filteredPlayers.addAll(notifier.sixthTeamClassList.where((player) => teamVisibility['SixthTeamClass']?['isVisible'] == true));
+
+    return filteredPlayers.length;
   }
 
   Future<void> _fetchFirstTeamClassAndUpdateNotifier(FirstTeamClassNotifier firstTeamNotifier) async {

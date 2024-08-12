@@ -10,12 +10,12 @@ import '../../api/get_teams_visibility_api.dart'; // Import the visibility API
 import '../../api/second_team_class_api.dart';
 import '../../api/sixth_team_class_api.dart';
 import '../../api/third_team_class_api.dart';
-import '../../model/fifth_team_class.dart';
-import '../../model/first_team_class.dart';
-import '../../model/fourth_team_class.dart';
-import '../../model/second_team_class.dart';
-import '../../model/sixth_team_class.dart';
-import '../../model/third_team_class.dart';
+import '../../model/fifth_team_class_model.dart';
+import '../../model/first_team_class_model.dart';
+import '../../model/fourth_team_class_model.dart';
+import '../../model/second_team_class_model.dart';
+import '../../model/sixth_team_class_model.dart';
+import '../../model/third_team_class_model.dart';
 import '../../notifier/fifth_team_class_notifier.dart';
 import '../../notifier/first_team_class_notifier.dart';
 import '../../notifier/fourth_team_class_notifier.dart';
@@ -285,7 +285,7 @@ class MyModifyClubPlayersPageState extends State<MyModifyClubPlayersPage> {
       await deletePlayerByName(firestore, 'SixthTeamClassPlayers', name);
 
       // Delete from PllayersTable collection
-      await deletePlayerFromCollection(firestore, 'PllayersTable', name);
+      await deletePlayerFromPTCollection(firestore, 'PllayersTable', name);
     }
 
     showSnackbar(selectedPlayers);
@@ -301,7 +301,7 @@ class MyModifyClubPlayersPageState extends State<MyModifyClubPlayersPage> {
     }
   }
 
-  Future<void> deletePlayerFromCollection(FirebaseFirestore firestore, String collection, String name) async {
+  Future<void> deletePlayerFromPTCollection(FirebaseFirestore firestore, String collection, String name) async {
     final querySnapshot = await firestore.collection('clubs').doc(widget.clubId).collection(collection).where('player_name', isEqualTo: name).get();
 
     for (final document in querySnapshot.docs) {

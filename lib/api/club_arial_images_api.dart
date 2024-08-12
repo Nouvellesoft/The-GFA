@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-import '../model/club_arial.dart';
+import '../model/club_arial_model.dart';
 import '../notifier/club_arial_notifier.dart';
 
 Future<void> getClubArial(ClubArialNotifier clubArialNotifier, String clubId) async {

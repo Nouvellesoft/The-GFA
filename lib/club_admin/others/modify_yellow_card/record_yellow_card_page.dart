@@ -6,7 +6,7 @@ import 'package:provider/provider.dart';
 
 import '/api/players_table_api.dart';
 import '/bloc_navigation_bloc/navigation_bloc.dart';
-import '/model/players_table.dart';
+import '/model/players_table_model.dart';
 import '/notifier/players_table_notifier.dart';
 
 Color backgroundColor = const Color.fromRGBO(129, 140, 148, 1.0);
@@ -23,6 +23,19 @@ class MyRecordYellowCardPageState extends State<MyRecordYellowCardPage> {
   TextEditingController searchController = TextEditingController();
 
   @override
+  void initState() {
+    super.initState();
+
+    PlayersTableNotifier playersTableNotifier = Provider.of<PlayersTableNotifier>(context, listen: false);
+    _fetchPlayersTableAndUpdateNotifier(playersTableNotifier);
+  }
+
+  Future<void> _fetchPlayersTableAndUpdateNotifier(PlayersTableNotifier playersTableNotifier) async {
+    await getPlayersTable(playersTableNotifier, widget.clubId, orderByGoalsScored: false);
+    setState(() {}); // Refresh the UI if needed
+  }
+
+  @override
   Widget build(BuildContext context) {
     PlayersTableNotifier playersTableNotifier = Provider.of<PlayersTableNotifier>(context);
 
@@ -34,7 +47,7 @@ class MyRecordYellowCardPageState extends State<MyRecordYellowCardPage> {
       backgroundColor: backgroundColor,
       appBar: AppBar(
         backgroundColor: backgroundColor,
-        automaticallyImplyLeading: false, // Set this property to false
+        automaticallyImplyLeading: false,
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(48.0),
           child: Padding(
@@ -42,17 +55,13 @@ class MyRecordYellowCardPageState extends State<MyRecordYellowCardPage> {
             child: TextField(
               controller: searchController,
               onChanged: (value) {
-                setState(() {
-                  // Trigger a rebuild with the updated search query
-                });
+                setState(() {});
               },
               style: const TextStyle(color: Colors.black),
-              // Change text color here
               cursorColor: Colors.black,
-              // Change cursor color here
               decoration: const InputDecoration(
                 labelText: 'Search',
-                labelStyle: TextStyle(color: Colors.black), // Change label color here
+                labelStyle: TextStyle(color: Colors.black),
                 border: OutlineInputBorder(
                   borderSide: BorderSide(color: Colors.black),
                 ),
@@ -68,7 +77,6 @@ class MyRecordYellowCardPageState extends State<MyRecordYellowCardPage> {
         padding: EdgeInsets.only(bottom: MediaQuery.of(context).size.width * 0.15),
         child: NotificationListener<ScrollNotification>(
           onNotification: (ScrollNotification scrollInfo) {
-            // You can add logic here to show/hide the scrollbar based on scroll position
             return true;
           },
           child: Scrollbar(
@@ -111,9 +119,6 @@ class MyRecordYellowCardPageState extends State<MyRecordYellowCardPage> {
                                 ),
                                 onPressed: () {
                                   Navigator.of(context).pop(false);
-                                  // Set the flag to false when "No" is pressed
-                                  // showSnackbarFlag = false;
-                                  return;
                                 },
                               ),
                               TextButton(
@@ -124,7 +129,6 @@ class MyRecordYellowCardPageState extends State<MyRecordYellowCardPage> {
                                 onPressed: () async {
                                   Navigator.of(context).pop(true);
 
-                                  // Find the document with the specific player name and update potm_cum by 1
                                   QuerySnapshot querySnapshot = await FirebaseFirestore.instance
                                       .collection('clubs')
                                       .doc(widget.clubId)
@@ -133,15 +137,12 @@ class MyRecordYellowCardPageState extends State<MyRecordYellowCardPage> {
                                       .get();
 
                                   if (querySnapshot.docs.isNotEmpty) {
-                                    // Update the first document found (assuming player names are unique)
                                     DocumentReference documentReference = querySnapshot.docs[0].reference;
 
-                                    // Increment potm_cum by 1
                                     documentReference.update({
                                       'yellow_card': FieldValue.increment(1),
                                     });
 
-                                    // Show a toast notification
                                     Fluttertoast.showToast(
                                       msg: '${player.playerName} is holding  🟨',
                                       toastLength: Toast.LENGTH_LONG,
@@ -168,19 +169,5 @@ class MyRecordYellowCardPageState extends State<MyRecordYellowCardPage> {
         ),
       ),
     );
-  }
-
-  @override
-  void initState() {
-    super.initState();
-
-    PlayersTableNotifier playersTableNotifier = Provider.of<PlayersTableNotifier>(context, listen: false);
-    _fetchPlayersTableAndUpdateNotifier(playersTableNotifier);
-  }
-
-  Future<void> _fetchPlayersTableAndUpdateNotifier(PlayersTableNotifier playersTableNotifier) async {
-    await getPlayersTable(playersTableNotifier, widget.clubId);
-
-    setState(() {}); // Refresh the UI if needed
   }
 }

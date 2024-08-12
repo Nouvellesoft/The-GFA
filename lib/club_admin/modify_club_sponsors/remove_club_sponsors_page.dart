@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '/api/club_sponsors_api.dart';
-import '/model/club_sponsors.dart';
+import '/model/club_sponsors_model.dart';
 import '/notifier/club_sponsors_notifier.dart';
 import '../../bloc_navigation_bloc/navigation_bloc.dart';
 

@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-import '../model/captains.dart';
+import '../model/captains_model.dart';
 import '../notifier/club_captains_notifier.dart';
 
 //Dependency in version [global use API]

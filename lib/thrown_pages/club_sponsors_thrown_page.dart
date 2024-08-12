@@ -14,7 +14,7 @@ import '/sidebar/sidebar_layout.dart';
 import '../club_admin/club_admin_page.dart';
 import '../details_pages/club_sponsors_details_page.dart';
 import '../home_page/home_page_deux.dart';
-import '../model/club_sponsors.dart';
+import '../model/club_sponsors_model.dart';
 
 String exitAppStatement = "Exit from App";
 String exitAppTitle = "Come on!";

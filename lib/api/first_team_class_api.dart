@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-import '../model/first_team_class.dart';
+import '../model/first_team_class_model.dart';
 import '../notifier/first_team_class_notifier.dart';
 
 getFirstTeamClass(FirstTeamClassNotifier firstTeamClassNotifier, String clubId) async {

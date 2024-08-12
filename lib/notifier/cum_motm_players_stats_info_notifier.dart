@@ -2,7 +2,7 @@ import 'dart:collection';
 
 import 'package:flutter/cupertino.dart';
 
-import '../model/players_stats_and_info.dart';
+import '../model/players_stats_and_info_model.dart';
 
 class CumMOTMPlayersStatsAndInfoNotifier with ChangeNotifier {
   List<PlayersStatsAndInfo> _cumMOTMPlayersStatsAndInfoList =

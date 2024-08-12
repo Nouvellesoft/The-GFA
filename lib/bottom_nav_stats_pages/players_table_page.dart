@@ -14,15 +14,18 @@ import 'package:toast/toast.dart';
 
 import '/details_pages/second_team_details_page.dart';
 import '/notifier/second_team_class_notifier.dart';
+import '../api/players_table_api.dart';
 import '../club_admin/others/view_club_population_page.dart';
 import '../details_pages/fifth_team_details_page.dart';
 import '../details_pages/first_team_details_page.dart';
 import '../details_pages/fourth_team_details_page.dart';
 import '../details_pages/sixth_team_details_page.dart';
 import '../details_pages/third_team_details_page.dart';
+import '../model/players_table_model.dart';
 import '../notifier/fifth_team_class_notifier.dart';
 import '../notifier/first_team_class_notifier.dart';
 import '../notifier/fourth_team_class_notifier.dart';
+import '../notifier/players_table_notifier.dart';
 import '../notifier/sixth_team_class_notifier.dart';
 import '../notifier/third_team_class_notifier.dart';
 
@@ -58,14 +61,14 @@ class PlayersTablePageState extends State<PlayersTablePage> {
 
   late PlayersTableDataSource playersTableDataSource;
 
-  Stream<QuerySnapshot> getDataFromFirestore(String clubId) {
-    return FirebaseFirestore.instance
-        .collection('clubs')
-        .doc(clubId)
-        .collection('PllayersTable')
-        .orderBy('goals_scored', descending: true)
-        .snapshots();
-  }
+  // Stream<QuerySnapshot> getDataFromFirestore(String clubId) {
+  //   return FirebaseFirestore.instance
+  //       .collection('clubs')
+  //       .doc(clubId)
+  //       .collection('PllayersTable')
+  //       .orderBy('goals_scored', descending: true)
+  //       .snapshots();
+  // }
 
   Widget _buildDataGrid() {
     firstTeamClassNotifier = Provider.of<FirstTeamClassNotifier>(context, listen: false);
@@ -74,155 +77,103 @@ class PlayersTablePageState extends State<PlayersTablePage> {
     fourthTeamClassNotifier = Provider.of<FourthTeamClassNotifier>(context, listen: false);
     fifthTeamClassNotifier = Provider.of<FifthTeamClassNotifier>(context, listen: false);
     sixthTeamClassNotifier = Provider.of<SixthTeamClassNotifier>(context, listen: false);
-    return StreamBuilder(
-        stream: getDataFromFirestore(widget.clubId),
-        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-          if (snapshot.hasData) {
-            if (playersTableList.isNotEmpty && !snapshot.data!.metadata.isFromCache) {
-              realTimeUpdate(var data) {
-                return DataGridRow(cells: [
-                  DataGridCell<String>(columnName: 'id', value: data.doc['id']),
-                  DataGridCell<String>(columnName: 'image', value: data.doc['image']),
-                  DataGridCell<String>(columnName: 'player_name', value: data.doc['player_name']),
-                  DataGridCell<int>(columnName: 'matches_played', value: data.doc['matches_played']),
-                  DataGridCell<int>(columnName: 'matches_started', value: data.doc['matches_started']),
-                  DataGridCell<int>(columnName: 'matches_benched', value: data.doc['matches_benched']),
-                  DataGridCell<int>(columnName: 'goals_scored', value: data.doc['goals_scored']),
-                  DataGridCell<int>(columnName: 'assists', value: data.doc['assists']),
-                  DataGridCell<int>(columnName: 'yellow_card', value: data.doc['yellow_card']),
-                  DataGridCell<int>(columnName: 'red_card', value: data.doc['red_card']),
-                  DataGridCell<String>(columnName: 'player_position', value: data.doc['player_position']),
-                  DataGridCell<String>(columnName: 'nationality', value: data.doc['nationality']),
-                ]);
-              }
 
-              for (var data in snapshot.data!.docChanges) {
-                if (data.type == DocumentChangeType.modified) {
-                  playersTableDataSource.dataGridRows[data.oldIndex] = realTimeUpdate(data);
-                  playersTableDataSource.updateDataGridSource();
-                } else if (data.type == DocumentChangeType.added) {
-                  playersTableDataSource.dataGridRows.add(realTimeUpdate(data));
-                  playersTableDataSource.updateDataGridSource();
-                } else if (data.type == DocumentChangeType.removed) {
-                  playersTableDataSource.dataGridRows.removeAt(data.oldIndex);
-                  playersTableDataSource.updateDataGridSource();
-                }
-              }
-            } else if (playersTableList.isEmpty) {
-              for (var data in snapshot.data!.docs) {
-                playersTableList.add(PlayersTable(
-                    id: data['id'],
-                    image: data['image'],
-                    playerName: data['player_name'],
-                    matchesPlayed: data['matches_played'],
-                    matchesStarted: data['matches_started'],
-                    matchesBenched: data['matches_benched'],
-                    goalsScored: data['goals_scored'],
-                    assists: data['assists'],
-                    playerPosition: data['player_position'],
-                    yellowCard: data['yellow_card'],
-                    redCard: data['red_card'],
-                    nationality: data['nationality']));
-              }
-              playersTableDataSource = PlayersTableDataSource(playersTableList, widget.clubId);
-            }
+    return FutureBuilder<List<PlayersTable>>(
+      future: fetchPlayersTable(),
+      builder: (BuildContext context, AsyncSnapshot<List<PlayersTable>> snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        } else if (snapshot.hasError) {
+          return Center(
+            child: Text('Error: ${snapshot.error}'),
+          );
+        } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+          playersTableList = snapshot.data!;
+          playersTableDataSource = PlayersTableDataSource(playersTableList, widget.clubId);
 
-            return SizedBox(
-              height: 700,
-              child: Material(
-                color: cardBackgroundColorTwo,
-                child: SfDataGridTheme(
-                  data: SfDataGridThemeData(
-                      // sortIcon: const Icon(Icons.arrow_circle_up),
-                      sortIconColor: Colors.white,
-                      headerColor: cardBackgroundColorTwo,
-                      gridLineColor: backgroundColor,
-                      gridLineStrokeWidth: 1.0),
-                  child: SfDataGrid(
-                    rowHeight: 50,
-                    source: playersTableDataSource,
-                    onCellTap: (details) {
-                      if (details.column.columnName == 'player_name' && details.rowColumnIndex.rowIndex > 0) {
-                        DataGridRow row = playersTableDataSource.effectiveRows.elementAt(details.rowColumnIndex.rowIndex - 1);
+          return SizedBox(
+            height: 700,
+            child: Material(
+              color: cardBackgroundColorTwo,
+              child: SfDataGridTheme(
+                data: SfDataGridThemeData(
+                    sortIconColor: Colors.white, headerColor: cardBackgroundColorTwo, gridLineColor: backgroundColor, gridLineStrokeWidth: 1.0),
+                child: SfDataGrid(
+                  rowHeight: 50,
+                  source: playersTableDataSource,
+                  onCellTap: (details) {
+                    if (details.column.columnName == 'player_name' && details.rowColumnIndex.rowIndex > 0) {
+                      DataGridRow row = playersTableDataSource.effectiveRows.elementAt(details.rowColumnIndex.rowIndex - 1);
 
-                        String playerName = row.getCells().firstWhere((element) => element.columnName == 'player_name').value.toString();
+                      String playerName = row.getCells().firstWhere((element) => element.columnName == 'player_name').value.toString();
 
-                        var firstTeamPlayer = firstTeamClassNotifier?.firstTeamClassList.firstWhereOrNull((element) => element.name == playerName);
+                      var firstTeamPlayer = firstTeamClassNotifier?.firstTeamClassList.firstWhereOrNull((element) => element.name == playerName);
+                      var secondTeamPlayer = secondTeamClassNotifier?.secondTeamClassList.firstWhereOrNull((element) => element.name == playerName);
+                      var thirdTeamPlayer = thirdTeamClassNotifier?.thirdTeamClassList.firstWhereOrNull((element) => element.name == playerName);
+                      var fourthTeamPlayer = fourthTeamClassNotifier?.fourthTeamClassList.firstWhereOrNull((element) => element.name == playerName);
+                      var fifthTeamPlayer = fifthTeamClassNotifier?.fifthTeamClassList.firstWhereOrNull((element) => element.name == playerName);
+                      var sixthTeamPlayer = sixthTeamClassNotifier?.sixthTeamClassList.firstWhereOrNull((element) => element.name == playerName);
 
-                        var secondTeamPlayer = secondTeamClassNotifier?.secondTeamClassList.firstWhereOrNull((element) => element.name == playerName);
-
-                        var thirdTeamPlayer = thirdTeamClassNotifier?.thirdTeamClassList.firstWhereOrNull((element) => element.name == playerName);
-
-                        var fourthTeamPlayer = fourthTeamClassNotifier?.fourthTeamClassList.firstWhereOrNull((element) => element.name == playerName);
-
-                        var fifthTeamPlayer = fifthTeamClassNotifier?.fifthTeamClassList.firstWhereOrNull((element) => element.name == playerName);
-
-                        var sixthTeamPlayer = sixthTeamClassNotifier?.sixthTeamClassList.firstWhereOrNull((element) => element.name == playerName);
-
-                        if (firstTeamPlayer != null) {
-                          firstTeamClassNotifier?.currentFirstTeamClass = firstTeamPlayer;
-                          navigateToSubPage(context, widget.clubId);
-
-                          Toast.show("Loading up $playerName", duration: Toast.lengthLong, gravity: Toast.bottom, backgroundRadius: 10);
-                        } else if (secondTeamPlayer != null) {
-                          secondTeamClassNotifier?.currentSecondTeamClass = secondTeamPlayer;
-                          navigateToSecondTeamClassDetailsPage(context, widget.clubId);
-
-                          Toast.show("Loading up $playerName", duration: Toast.lengthLong, gravity: Toast.bottom, backgroundRadius: 10);
-                        } else if (thirdTeamPlayer != null) {
-                          thirdTeamClassNotifier?.currentThirdTeamClass = thirdTeamPlayer;
-                          navigateToThirdTeamClassDetailsPage(context, widget.clubId);
-
-                          Toast.show("Loading up $playerName", duration: Toast.lengthLong, gravity: Toast.bottom, backgroundRadius: 10);
-                        } else if (fourthTeamPlayer != null) {
-                          fourthTeamClassNotifier?.currentFourthTeamClass = fourthTeamPlayer;
-                          navigateToFourthTeamClassDetailsPage(context, widget.clubId);
-
-                          Toast.show("Loading up $playerName", duration: Toast.lengthLong, gravity: Toast.bottom, backgroundRadius: 10);
-                        } else if (fifthTeamPlayer != null) {
-                          fifthTeamClassNotifier?.currentFifthTeamClass = fifthTeamPlayer;
-                          navigateToFifthTeamClassDetailsPage(context, widget.clubId);
-
-                          Toast.show("Loading up $playerName", duration: Toast.lengthLong, gravity: Toast.bottom, backgroundRadius: 10);
-                        } else if (sixthTeamPlayer != null) {
-                          sixthTeamClassNotifier?.currentSixthTeamClass = sixthTeamPlayer;
-                          navigateToSixthTeamClassDetailsPage(context, widget.clubId);
-
-                          Toast.show("Loading up $playerName", duration: Toast.lengthLong, gravity: Toast.bottom, backgroundRadius: 10);
-                        } else {
-                          Toast.show("We can't find $playerName", duration: Toast.lengthLong, gravity: Toast.bottom, backgroundRadius: 10);
-                        }
+                      if (firstTeamPlayer != null) {
+                        firstTeamClassNotifier?.currentFirstTeamClass = firstTeamPlayer;
+                        navigateToSubPage(context, widget.clubId);
+                        Toast.show("Loading up $playerName", duration: Toast.lengthLong, gravity: Toast.bottom, backgroundRadius: 10);
+                      } else if (secondTeamPlayer != null) {
+                        secondTeamClassNotifier?.currentSecondTeamClass = secondTeamPlayer;
+                        navigateToSecondTeamClassDetailsPage(context, widget.clubId);
+                        Toast.show("Loading up $playerName", duration: Toast.lengthLong, gravity: Toast.bottom, backgroundRadius: 10);
+                      } else if (thirdTeamPlayer != null) {
+                        thirdTeamClassNotifier?.currentThirdTeamClass = thirdTeamPlayer;
+                        navigateToThirdTeamClassDetailsPage(context, widget.clubId);
+                        Toast.show("Loading up $playerName", duration: Toast.lengthLong, gravity: Toast.bottom, backgroundRadius: 10);
+                      } else if (fourthTeamPlayer != null) {
+                        fourthTeamClassNotifier?.currentFourthTeamClass = fourthTeamPlayer;
+                        navigateToFourthTeamClassDetailsPage(context, widget.clubId);
+                        Toast.show("Loading up $playerName", duration: Toast.lengthLong, gravity: Toast.bottom, backgroundRadius: 10);
+                      } else if (fifthTeamPlayer != null) {
+                        fifthTeamClassNotifier?.currentFifthTeamClass = fifthTeamPlayer;
+                        navigateToFifthTeamClassDetailsPage(context, widget.clubId);
+                        Toast.show("Loading up $playerName", duration: Toast.lengthLong, gravity: Toast.bottom, backgroundRadius: 10);
+                      } else if (sixthTeamPlayer != null) {
+                        sixthTeamClassNotifier?.currentSixthTeamClass = sixthTeamPlayer;
+                        navigateToSixthTeamClassDetailsPage(context, widget.clubId);
+                        Toast.show("Loading up $playerName", duration: Toast.lengthLong, gravity: Toast.bottom, backgroundRadius: 10);
+                      } else {
+                        Toast.show("We can't find $playerName", duration: Toast.lengthLong, gravity: Toast.bottom, backgroundRadius: 10);
                       }
-                    },
-                    frozenColumnsCount: 3,
-                    frozenRowsCount: 0,
-                    allowSorting: true,
-                    allowTriStateSorting: true,
-                    // allowMultiColumnSorting: true,
-                    columnWidthMode: ColumnWidthMode.fill,
-                    tableSummaryRows: [
-                      GridTableSummaryRow(
-                          color: cardBackgroundColorTwo,
-                          showSummaryInRow: true,
-                          title: '{Goals} Goals and {Ass} Assists by {Count} players so far.',
-                          columns: [
-                            const GridSummaryColumn(name: 'Goals', columnName: 'goals_scored', summaryType: GridSummaryType.sum),
-                            const GridSummaryColumn(name: 'Ass', columnName: 'assists', summaryType: GridSummaryType.sum),
-                            const GridSummaryColumn(name: 'Count', columnName: 'id', summaryType: GridSummaryType.count),
-                          ],
-                          position: GridTableSummaryRowPosition.bottom)
-                    ],
-                    columns: getColumns,
-                  ),
+                    }
+                  },
+                  frozenColumnsCount: 3,
+                  frozenRowsCount: 0,
+                  allowSorting: true,
+                  allowTriStateSorting: true,
+                  columnWidthMode: ColumnWidthMode.fill,
+                  tableSummaryRows: [
+                    GridTableSummaryRow(
+                        color: cardBackgroundColorTwo,
+                        showSummaryInRow: true,
+                        title: '{Goals} Goals and {Ass} Assists by {Count} players so far.',
+                        columns: [
+                          const GridSummaryColumn(name: 'Goals', columnName: 'goals_scored', summaryType: GridSummaryType.sum),
+                          const GridSummaryColumn(name: 'Ass', columnName: 'assists', summaryType: GridSummaryType.sum),
+                          const GridSummaryColumn(name: 'Count', columnName: 'id', summaryType: GridSummaryType.count),
+                        ],
+                        position: GridTableSummaryRowPosition.bottom)
+                  ],
+                  columns: getColumns,
                 ),
               ),
-            );
-          } else {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-        });
+            ),
+          );
+        } else {
+          return const Center(
+            child: Text('No data available'),
+          );
+        }
+      },
+    );
   }
 
   List<GridColumn> get getColumns {
@@ -353,6 +304,7 @@ class PlayersTablePageState extends State<PlayersTablePage> {
   @override
   void initState() {
     super.initState();
+    fetchPlayersTable();
 
     playersTableDataSource = PlayersTableDataSource(playersTableList, widget.clubId);
     playersTableDataSource.sortedColumns.add(const SortColumnDetails(name: 'goals_scored', sortDirection: DataGridSortDirection.descending));
@@ -361,6 +313,16 @@ class PlayersTablePageState extends State<PlayersTablePage> {
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
+  }
+
+  Future<List<PlayersTable>> fetchPlayersTable() async {
+    // Instantiate the PlayersTableNotifier
+    PlayersTableNotifier playersTableNotifier = Provider.of<PlayersTableNotifier>(context, listen: false);
+
+    // Fetch the players table using the provided API
+    await getPlayersTable(playersTableNotifier, widget.clubId, orderByGoalsScored: true);
+
+    return playersTableList = playersTableNotifier.playersTableList;
   }
 
   @override
@@ -1060,36 +1022,6 @@ class PlayersTableDataSource extends DataGridSource {
   void updateDataGridSource() {
     notifyListeners();
   }
-}
-
-class PlayersTable {
-  // int? id;
-  String? id;
-  String? image;
-  String? playerName;
-  int? matchesPlayed;
-  int? matchesStarted;
-  int? matchesBenched;
-  int? goalsScored;
-  int? assists;
-  String? playerPosition;
-  int? yellowCard;
-  int? redCard;
-  String? nationality;
-
-  PlayersTable(
-      {this.id,
-      this.image,
-      this.playerName,
-      this.matchesPlayed,
-      this.matchesStarted,
-      this.matchesBenched,
-      this.goalsScored,
-      this.assists,
-      this.playerPosition,
-      this.yellowCard,
-      this.redCard,
-      this.nationality});
 }
 
 Future navigateToSubPage(context, String clubId) async {

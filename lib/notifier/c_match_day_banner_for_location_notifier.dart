@@ -2,14 +2,13 @@ import 'dart:collection';
 
 import 'package:flutter/cupertino.dart';
 
-import '../model/c_match_day_banner_for_location.dart';
+import '../model/c_match_day_banner_for_locations_model.dart';
 
 class MatchDayBannerForLocationNotifier with ChangeNotifier {
   List<MatchDayBannerForLocation> _matchDayBannerForLocationList = [];
   late MatchDayBannerForLocation _currentMatchDayBannerForLocation;
 
-  UnmodifiableListView<MatchDayBannerForLocation> get matchDayBannerForLocationList =>
-      UnmodifiableListView(_matchDayBannerForLocationList);
+  UnmodifiableListView<MatchDayBannerForLocation> get matchDayBannerForLocationList => UnmodifiableListView(_matchDayBannerForLocationList);
 
   MatchDayBannerForLocation get currentMatchDayBannerForLocation => _currentMatchDayBannerForLocation;
 

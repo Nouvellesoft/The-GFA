@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-import '../model/trainings_and_games_reels.dart';
+import '../model/trainings_and_games_reels_model.dart';
 import '../notifier/trainings_games_reels_notifier.dart';
 
 Future<void> getTrainingsAndGamesReels(TrainingsAndGamesReelsNotifier trainingsAndGamesReelsNotifier, String clubId) async {

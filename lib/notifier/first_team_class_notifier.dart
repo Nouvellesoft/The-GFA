@@ -2,7 +2,7 @@ import 'dart:collection';
 
 import 'package:flutter/cupertino.dart';
 
-import '../model/first_team_class.dart';
+import '../model/first_team_class_model.dart';
 
 class FirstTeamClassNotifier with ChangeNotifier {
   List<FirstTeamClass> _firstTeamClassList = [];

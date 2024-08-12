@@ -2,7 +2,7 @@ import 'dart:collection';
 
 import 'package:flutter/cupertino.dart';
 
-import '../model/fourth_team_class.dart';
+import '../model/fourth_team_class_model.dart';
 
 class FourthTeamClassNotifier with ChangeNotifier {
   List<FourthTeamClass> _fourthTeamClassList = [];

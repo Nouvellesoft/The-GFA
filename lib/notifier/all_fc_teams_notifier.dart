@@ -1,8 +1,10 @@
-import 'dart:collection';
 import 'dart:async';
-import '../model/c_match_day_banner_for_club.dart';
-import '../model/c_match_day_banner_for_club_opp.dart';
+import 'dart:collection';
+
 import 'package:flutter/material.dart';
+
+import '../model/c_match_day_banner_for_club_opps_model.dart';
+import '../model/c_match_day_banner_for_clubs_model.dart';
 
 class AllFCTeamsNotifier with ChangeNotifier {
   List<MatchDayBannerForClub> _matchDayBannerForClubList = [];

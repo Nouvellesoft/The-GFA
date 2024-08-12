@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-import '../model/fifth_team_class.dart';
+import '../model/fifth_team_class_model.dart';
 import '../notifier/fifth_team_class_notifier.dart';
 
 Future<void> getFifthTeamClass(FifthTeamClassNotifier fifthTeamClassNotifier, String clubId) async {

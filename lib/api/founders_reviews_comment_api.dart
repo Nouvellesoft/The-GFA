@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 
-import '../model/founders_reviews_comment.dart';
+import '../model/founders_reviews_comments_model.dart';
 import '../notifier/founders_reviews_comment_notifier.dart';
 
 Future<void> getFoundersReviewsComment(FoundersReviewsCommentNotifier foundersReviewsCommentNotifier, String clubId) async {

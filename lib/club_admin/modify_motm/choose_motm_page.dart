@@ -7,7 +7,7 @@ import 'package:provider/provider.dart';
 
 import '/api/players_table_api.dart';
 import '/bloc_navigation_bloc/navigation_bloc.dart';
-import '/model/players_table.dart';
+import '/model/players_table_model.dart';
 import '/notifier/players_table_notifier.dart';
 
 Color backgroundColor = const Color.fromRGBO(48, 50, 74, 1.0);
@@ -208,7 +208,7 @@ class MyMOTMPageState extends State<MyMOTMPage> {
   }
 
   Future<void> _fetchPlayersTableAndUpdateNotifier(PlayersTableNotifier playersTableNotifier) async {
-    await getPlayersTable(playersTableNotifier, widget.clubId);
+    await getPlayersTable(playersTableNotifier, widget.clubId, orderByGoalsScored: false);
 
     setState(() {}); // Refresh the UI if needed
   }

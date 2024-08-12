@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 
-import '../model/coaches_reviews_comment.dart';
+import '../model/coaches_reviews_comments_model.dart';
 import '../notifier/coaches_reviews_comment_notifier.dart';
 
 Future<void> getCoachesReviewsComment(CoachesReviewsCommentNotifier coachesReviewsCommentNotifier, String clubId) async {
@@ -32,7 +32,7 @@ Future<void> getCoachesReviewsComment(CoachesReviewsCommentNotifier coachesRevie
 
 // import 'package:cloud_firestore/cloud_firestore.dart';
 //
-// import '../model/coaches_reviews_comment.dart';
+// import '../model/coaches_reviews_comments_model.dart';
 // import '../notifier/coaches_reviews_comment_notifier.dart';
 //
 // getCoachesReviewsComment(

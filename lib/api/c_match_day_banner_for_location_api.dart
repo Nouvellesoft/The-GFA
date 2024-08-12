@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-import '../model/c_match_day_banner_for_location.dart';
+import '../model/c_match_day_banner_for_locations_model.dart';
 import '../notifier/c_match_day_banner_for_location_notifier.dart';
 
 Future<void> getMatchDayBannerForLocation(MatchDayBannerForLocationNotifier matchDayBannerForLocationNotifier, String clubId) async {

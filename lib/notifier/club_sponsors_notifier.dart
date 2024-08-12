@@ -1,13 +1,14 @@
 import 'dart:collection';
+
 import 'package:flutter/cupertino.dart';
-import '../model/club_sponsors.dart';
+
+import '../model/club_sponsors_model.dart';
 
 class ClubSponsorsNotifier with ChangeNotifier {
   List<ClubSponsors> _clubSponsorsList = [];
   late ClubSponsors _currentClubSponsors;
 
-  UnmodifiableListView<ClubSponsors> get clubSponsorsList =>
-      UnmodifiableListView(_clubSponsorsList);
+  UnmodifiableListView<ClubSponsors> get clubSponsorsList => UnmodifiableListView(_clubSponsorsList);
 
   ClubSponsors get currentClubSponsors => _currentClubSponsors;
 

@@ -3,12 +3,12 @@ import 'dart:collection';
 
 import 'package:flutter/material.dart';
 
-import '../model/fifth_team_class.dart';
-import '../model/first_team_class.dart';
-import '../model/fourth_team_class.dart';
-import '../model/second_team_class.dart';
-import '../model/sixth_team_class.dart';
-import '../model/third_team_class.dart';
+import '../model/fifth_team_class_model.dart';
+import '../model/first_team_class_model.dart';
+import '../model/fourth_team_class_model.dart';
+import '../model/second_team_class_model.dart';
+import '../model/sixth_team_class_model.dart';
+import '../model/third_team_class_model.dart';
 
 class PlayersNotifier with ChangeNotifier {
   List<FirstTeamClass> _firstTeamClassList = [];

@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-import '../model/a_past_matches.dart';
+import '../model/a_past_matches_model.dart';
 import '../notifier/a_past_matches_notifier.dart';
 
 Future<void> getPastMatches(PastMatchesNotifier pastMatchesNotifier, String clubId) async {

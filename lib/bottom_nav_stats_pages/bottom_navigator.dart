@@ -12,6 +12,7 @@ import '../api/most_fouled_rc_players_stats_info_api.dart';
 import '../api/most_fouled_yc_players_stats_info_api.dart';
 import '../api/motm_players_stats_info_api.dart';
 import '../api/player_of_the_month_stats_info_api.dart';
+import '../api/players_table_api.dart';
 import '../api/top_defensive_players_stats_info_api.dart';
 import '../api/top_gk_players_stats_info_api.dart';
 import '../api/top_goals_players_stats_info_api.dart';
@@ -24,6 +25,7 @@ import '../notifier/most_fouled_rc_players_stats_info_notifier.dart';
 import '../notifier/most_fouled_yc_players_stats_info_notifier.dart';
 import '../notifier/motm_players_stats_info_notifier.dart';
 import '../notifier/player_of_the_month_stats_info_notifier.dart';
+import '../notifier/players_table_notifier.dart';
 import '../notifier/top_defensive_players_stats_info_notifier.dart';
 import '../notifier/top_gk_players_stats_info_notifier.dart';
 import '../notifier/top_goals_players_stats_info_notifier.dart';
@@ -218,6 +220,15 @@ class _BottomNavigatorState extends State<BottomNavigator> {
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
+
+    PlayersTableNotifier playersTableNotifier = Provider.of<PlayersTableNotifier>(context, listen: false);
+    _fetchPlayersTableAndUpdateNotifier(playersTableNotifier);
+  }
+
+  Future<void> _fetchPlayersTableAndUpdateNotifier(PlayersTableNotifier playersTableNotifier) async {
+    await getPlayersTable(playersTableNotifier, widget.clubId, orderByGoalsScored: true);
+
+    setState(() {}); // Refresh the UI if needed
   }
 
   Future<void> _fetchTrainingsAndGamesReelsAndUpdateNotifier(TrainingsAndGamesReelsNotifier notifier) async {

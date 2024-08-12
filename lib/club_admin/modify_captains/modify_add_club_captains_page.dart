@@ -8,9 +8,16 @@ import '/bloc_navigation_bloc/navigation_bloc.dart';
 import '../../api/fifth_team_class_api.dart';
 import '../../api/first_team_class_api.dart';
 import '../../api/fourth_team_class_api.dart';
+import '../../api/get_teams_visibility_api.dart';
 import '../../api/second_team_class_api.dart';
 import '../../api/sixth_team_class_api.dart';
 import '../../api/third_team_class_api.dart';
+import '../../model/fifth_team_class_model.dart';
+import '../../model/first_team_class_model.dart';
+import '../../model/fourth_team_class_model.dart';
+import '../../model/second_team_class_model.dart';
+import '../../model/sixth_team_class_model.dart';
+import '../../model/third_team_class_model.dart';
 import '../../notifier/fifth_team_class_notifier.dart';
 import '../../notifier/first_team_class_notifier.dart';
 import '../../notifier/fourth_team_class_notifier.dart';
@@ -52,6 +59,8 @@ class MyModifyAddClubCaptainsPageState extends State<MyModifyAddClubCaptainsPage
   bool isShowingSplash = false;
   int splashColorIndex = 0;
 
+  late Future<Map<String, Map<String, dynamic>>> _teamVisibilityFuture;
+
   // Define a flag to determine whether to show the Snackbar
   bool showSnackbarFlag = true;
 
@@ -66,10 +75,6 @@ class MyModifyAddClubCaptainsPageState extends State<MyModifyAddClubCaptainsPage
   Widget build(BuildContext context) {
     // Use the PlayersNotifier to access the combined list of players
     playersNotifier = Provider.of<PlayersNotifier>(context);
-
-    // Create a copy of the allClubMembersList and sort it alphabetically by name
-    List<dynamic> sortedPlayers = List.from(playersNotifier!.playersList);
-    sortedPlayers.sort((a, b) => (a.name ?? 'No Name').toLowerCase().compareTo((b.name ?? 'No Name').toLowerCase()));
 
     return Scaffold(
       backgroundColor: backgroundColor,
@@ -106,86 +111,122 @@ class MyModifyAddClubCaptainsPageState extends State<MyModifyAddClubCaptainsPage
           // Hide the keyboard when tapping outside the text field
           FocusManager.instance.primaryFocus?.unfocus();
         },
-        child: RefreshIndicator(
-          onRefresh: () async {
-            // Refresh the data when the user pulls down the list
-            await refreshData();
-          },
-          child: StreamBuilder<QuerySnapshot>(
-            stream: FirebaseFirestore.instance.collection('clubs').doc(widget.clubId).collection('Captains').snapshots(),
+        child: FutureBuilder<Map<String, Map<String, dynamic>>>(
+            future: _teamVisibilityFuture,
             builder: (context, snapshot) {
-              if (!snapshot.hasData) {
-                return const Center(
-                  child: CircularProgressIndicator(),
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              } else if (snapshot.hasError) {
+                return const Center(child: Text("Error loading data"));
+              } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                return const Center(child: Text("No visibility data available"));
+              } else {
+                final teamVisibility = snapshot.data!;
+
+                // Filter players based on visibility
+                List<dynamic> filteredPlayers = playersNotifier!.playersList.where((player) {
+                  if (player is FirstTeamClass && teamVisibility['FirstTeamClass']?['isVisible'] != true) {
+                    return false;
+                  } else if (player is SecondTeamClass && teamVisibility['SecondTeamClass']?['isVisible'] != true) {
+                    return false;
+                  } else if (player is ThirdTeamClass && teamVisibility['ThirdTeamClass']?['isVisible'] != true) {
+                    return false;
+                  } else if (player is FourthTeamClass && teamVisibility['FourthTeamClass']?['isVisible'] != true) {
+                    return false;
+                  } else if (player is FifthTeamClass && teamVisibility['FifthTeamClass']?['isVisible'] != true) {
+                    return false;
+                  } else if (player is SixthTeamClass && teamVisibility['SixthTeamClass']?['isVisible'] != true) {
+                    return false;
+                  } else {
+                    return true;
+                  }
+                }).toList();
+
+                // Sort filtered players alphabetically by name
+                filteredPlayers.sort((a, b) => (a.name ?? 'No Name').toLowerCase().compareTo((b.name ?? 'No Name').toLowerCase()));
+
+                return RefreshIndicator(
+                  onRefresh: () async {
+                    // Refresh the data when the user pulls down the list
+                    await refreshData();
+                  },
+                  child: StreamBuilder<QuerySnapshot>(
+                    stream: FirebaseFirestore.instance.collection('clubs').doc(widget.clubId).collection('Captains').snapshots(),
+                    builder: (context, snapshot) {
+                      if (!snapshot.hasData) {
+                        return const Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      }
+
+                      // Create a map to store player-team mappings based on Firestore data
+                      Map<String, String> playerCaptains = {};
+
+                      for (var doc in snapshot.data!.docs) {
+                        final playerName = doc['name'] as String?;
+                        final teamCaptaining = doc['team_captaining'] as String?;
+                        if (playerName != null && teamCaptaining != null) {
+                          playerCaptains[playerName] = teamCaptaining;
+                        }
+                      }
+
+                      // Update the playerTeams map with the Firestore data
+                      playerTeams = playerCaptains;
+
+                      return Padding(
+                        padding: EdgeInsets.only(bottom: MediaQuery.of(context).size.width * 0.25),
+                        child: NotificationListener<ScrollNotification>(
+                          onNotification: (ScrollNotification scrollInfo) {
+                            // You can add logic here to show/hide the scrollbar based on scroll position
+                            return true;
+                          },
+                          child: Scrollbar(
+                            child: ListView.builder(
+                              itemCount: filteredPlayers.length,
+                              itemBuilder: (context, index) {
+                                final player = filteredPlayers[index];
+                                final playerName = player.name ?? 'No Name';
+                                // final playerImage = player.image ?? 'No Image';
+                                // final isCaptain = playerTeams.containsKey(playerName);
+                                final isSelected = selectedPlayerNames.contains(playerName);
+                                final teamForPlayer = playerTeams[playerName];
+
+                                return ListTile(
+                                  title: Text(
+                                    '$playerName ${teamForPlayer != null ? '($teamForPlayer)' : ''}',
+                                    style: const TextStyle(color: Colors.white),
+                                  ),
+                                  trailing: isEditing
+                                      ? Checkbox(
+                                          activeColor: Colors.white,
+                                          checkColor: backgroundColor,
+                                          value: isSelected, // Check by player name
+                                          onChanged: (value) {
+                                            setState(() {
+                                              if (value != null) {
+                                                if (value && !isSelected) {
+                                                  // Player is selected, and not already in the list
+                                                  selectedPlayerNames.add(playerName);
+                                                } else if (!value && isSelected) {
+                                                  // Player is unselected, and in the list
+                                                  selectedPlayerNames.remove(playerName);
+                                                }
+                                              }
+                                            });
+                                          },
+                                        )
+                                      : null,
+                                );
+                              },
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
                 );
               }
-
-              // Create a map to store player-team mappings based on Firestore data
-              Map<String, String> playerCaptains = {};
-
-              for (var doc in snapshot.data!.docs) {
-                final playerName = doc['name'] as String?;
-                final teamCaptaining = doc['team_captaining'] as String?;
-                if (playerName != null && teamCaptaining != null) {
-                  playerCaptains[playerName] = teamCaptaining;
-                }
-              }
-
-              // Update the playerTeams map with the Firestore data
-              playerTeams = playerCaptains;
-
-              return Padding(
-                padding: EdgeInsets.only(bottom: MediaQuery.of(context).size.width * 0.25),
-                child: NotificationListener<ScrollNotification>(
-                  onNotification: (ScrollNotification scrollInfo) {
-                    // You can add logic here to show/hide the scrollbar based on scroll position
-                    return true;
-                  },
-                  child: Scrollbar(
-                    child: ListView.builder(
-                      itemCount: sortedPlayers.length,
-                      itemBuilder: (context, index) {
-                        final player = sortedPlayers[index];
-                        final playerName = player.name ?? 'No Name';
-                        // final playerImage = player.image ?? 'No Image';
-                        // final isCaptain = playerTeams.containsKey(playerName);
-                        final isSelected = selectedPlayerNames.contains(playerName);
-                        final teamForPlayer = playerTeams[playerName];
-
-                        return ListTile(
-                          title: Text(
-                            '$playerName ${teamForPlayer != null ? '($teamForPlayer)' : ''}',
-                            style: const TextStyle(color: Colors.white),
-                          ),
-                          trailing: isEditing
-                              ? Checkbox(
-                                  activeColor: Colors.white,
-                                  checkColor: backgroundColor,
-                                  value: isSelected, // Check by player name
-                                  onChanged: (value) {
-                                    setState(() {
-                                      if (value != null) {
-                                        if (value && !isSelected) {
-                                          // Player is selected, and not already in the list
-                                          selectedPlayerNames.add(playerName);
-                                        } else if (!value && isSelected) {
-                                          // Player is unselected, and in the list
-                                          selectedPlayerNames.remove(playerName);
-                                        }
-                                      }
-                                    });
-                                  },
-                                )
-                              : null,
-                        );
-                      },
-                    ),
-                  ),
-                ),
-              );
-            },
-          ),
-        ),
+            }),
       ),
       bottomSheet: isEditing
           ? SingleChildScrollView(
@@ -342,6 +383,57 @@ class MyModifyAddClubCaptainsPageState extends State<MyModifyAddClubCaptainsPage
                   );
                 },
               ),
+              ListTile(
+                title: const Text(
+                  'Fourth Team',
+                  style: TextStyle(color: Colors.white),
+                ),
+                onTap: () {
+                  Navigator.of(context).pop('Fourth Team');
+                  setState(() {
+                    isTeamSelected = true;
+                  });
+                  Fluttertoast.showToast(
+                    msg: 'Fourth Team selected',
+                    toastLength: Toast.LENGTH_SHORT,
+                    gravity: ToastGravity.BOTTOM,
+                  );
+                },
+              ),
+              ListTile(
+                title: const Text(
+                  'Fifth Team',
+                  style: TextStyle(color: Colors.white),
+                ),
+                onTap: () {
+                  Navigator.of(context).pop('Fifth Team');
+                  setState(() {
+                    isTeamSelected = true;
+                  });
+                  Fluttertoast.showToast(
+                    msg: 'Fifth Team selected',
+                    toastLength: Toast.LENGTH_SHORT,
+                    gravity: ToastGravity.BOTTOM,
+                  );
+                },
+              ),
+              ListTile(
+                title: const Text(
+                  'Sixth Team',
+                  style: TextStyle(color: Colors.white),
+                ),
+                onTap: () {
+                  Navigator.of(context).pop('Sixth Team');
+                  setState(() {
+                    isTeamSelected = true;
+                  });
+                  Fluttertoast.showToast(
+                    msg: 'Sixth Team selected',
+                    toastLength: Toast.LENGTH_SHORT,
+                    gravity: ToastGravity.BOTTOM,
+                  );
+                },
+              ),
             ],
           ),
         );
@@ -366,6 +458,8 @@ class MyModifyAddClubCaptainsPageState extends State<MyModifyAddClubCaptainsPage
   @override
   void initState() {
     super.initState();
+
+    _teamVisibilityFuture = getTeamClassVisibilityAndTitles(widget.clubId);
 
     // Fetch data for the first and second teams using their notifiers
     FirstTeamClassNotifier firstTeamClassNotifier = Provider.of<FirstTeamClassNotifier>(context, listen: false);

@@ -2,14 +2,13 @@ import 'dart:collection';
 
 import 'package:flutter/cupertino.dart';
 
-import '../model/club_arial.dart';
+import '../model/club_arial_model.dart';
 
 class ClubArialNotifier with ChangeNotifier {
   List<ClubArial> _clubArialList = [];
   late ClubArial _currentClubArial;
 
-  UnmodifiableListView<ClubArial> get clubArialList =>
-      UnmodifiableListView(_clubArialList);
+  UnmodifiableListView<ClubArial> get clubArialList => UnmodifiableListView(_clubArialList);
 
   ClubArial get currentClubArial => _currentClubArial;
 

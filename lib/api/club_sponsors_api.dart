@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-import '../model/club_sponsors.dart';
+import '../model/club_sponsors_model.dart';
 import '../notifier/club_sponsors_notifier.dart';
 
 Future<void> getClubSponsors(ClubSponsorsNotifier clubSponsorsNotifier, String clubId) async {

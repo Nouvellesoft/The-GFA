@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 
 import '/bloc_navigation_bloc/navigation_bloc.dart';
 import '../../api/coaching_staff_api.dart';
-import '../../model/coaches.dart';
+import '../../model/coaches_model.dart';
 import '../../notifier/coaching_staff_notifier.dart';
 
 Color backgroundColor = const Color.fromRGBO(187, 192, 195, 1.0);

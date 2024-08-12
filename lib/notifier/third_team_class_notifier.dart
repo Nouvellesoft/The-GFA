@@ -2,14 +2,13 @@ import 'dart:collection';
 
 import 'package:flutter/cupertino.dart';
 
-import '../model/third_team_class.dart';
+import '../model/third_team_class_model.dart';
 
 class ThirdTeamClassNotifier with ChangeNotifier {
   List<ThirdTeamClass> _thirdTeamClassList = [];
   late ThirdTeamClass _currentThirdTeamClass;
 
-  UnmodifiableListView<ThirdTeamClass> get thirdTeamClassList =>
-      UnmodifiableListView(_thirdTeamClassList);
+  UnmodifiableListView<ThirdTeamClass> get thirdTeamClassList => UnmodifiableListView(_thirdTeamClassList);
 
   ThirdTeamClass get currentThirdTeamClass => _currentThirdTeamClass;
 

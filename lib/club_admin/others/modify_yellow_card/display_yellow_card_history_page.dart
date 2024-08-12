@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '/api/players_table_api.dart';
-import '/model/players_table.dart';
+import '/model/players_table_model.dart';
 import '../../../bloc_navigation_bloc/navigation_bloc.dart';
 import '../../../notifier/players_table_notifier.dart';
 
@@ -27,7 +27,7 @@ class MyDisplayYellowCardHistoryPageState extends State<MyDisplayYellowCardHisto
 
   Future<void> _fetchPlayersTableAndUpdateNotifier() async {
     PlayersTableNotifier playersTableNotifier = Provider.of<PlayersTableNotifier>(context, listen: false);
-    await getPlayersTable(playersTableNotifier, widget.clubId);
+    await getPlayersTable(playersTableNotifier, widget.clubId, orderByGoalsScored: false);
 
     if (mounted) {
       setState(() {

@@ -2,14 +2,13 @@ import 'dart:collection';
 
 import 'package:flutter/cupertino.dart';
 
-import '../model/management_body.dart';
+import '../model/management_body_model.dart';
 
 class ManagementBodyNotifier with ChangeNotifier {
   List<ManagementBody> _managementBodyList = [];
   late ManagementBody _currentManagementBody;
 
-  UnmodifiableListView<ManagementBody> get managementBodyList =>
-      UnmodifiableListView(_managementBodyList);
+  UnmodifiableListView<ManagementBody> get managementBodyList => UnmodifiableListView(_managementBodyList);
 
   ManagementBody get currentManagementBody => _currentManagementBody;
 

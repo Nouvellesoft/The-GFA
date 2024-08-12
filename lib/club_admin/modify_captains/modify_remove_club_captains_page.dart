@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 
 import '/bloc_navigation_bloc/navigation_bloc.dart';
 import '../../api/club_captains_api.dart';
-import '../../model/captains.dart';
+import '../../model/captains_model.dart';
 import '../../notifier/club_captains_notifier.dart';
 
 Color conColor = const Color.fromRGBO(194, 194, 220, 1.0);

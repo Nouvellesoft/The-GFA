@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 
 import '/bloc_navigation_bloc/navigation_bloc.dart';
 import '../../api/management_body_api.dart';
-import '../../model/management_body.dart';
+import '../../model/management_body_model.dart';
 import '../../notifier/management_body_notifier.dart';
 
 Color backgroundColor = const Color.fromRGBO(187, 192, 195, 1.0);

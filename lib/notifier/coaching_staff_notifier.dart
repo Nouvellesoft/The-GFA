@@ -2,7 +2,7 @@ import 'dart:collection';
 
 import 'package:flutter/cupertino.dart';
 
-import '../model/coaches.dart';
+import '../model/coaches_model.dart';
 
 class CoachesNotifier with ChangeNotifier {
   List<Coaches> _coachesList = [];

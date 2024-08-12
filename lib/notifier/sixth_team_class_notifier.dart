@@ -2,7 +2,7 @@ import 'dart:collection';
 
 import 'package:flutter/cupertino.dart';
 
-import '../model/sixth_team_class.dart';
+import '../model/sixth_team_class_model.dart';
 
 class SixthTeamClassNotifier with ChangeNotifier {
   List<SixthTeamClass> _sixthTeamClassList = [];

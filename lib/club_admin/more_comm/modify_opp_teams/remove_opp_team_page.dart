@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 import '/api/c_match_day_banner_for_club_opp_api.dart';
 import '/notifier/c_match_day_banner_for_club_opp_notifier.dart';
 import '../../../bloc_navigation_bloc/navigation_bloc.dart';
-import '../../../model/c_match_day_banner_for_club_opp.dart';
+import '../../../model/c_match_day_banner_for_club_opps_model.dart';
 
 late MatchDayBannerForClubOppNotifier matchDayBannerForClubOppNotifier;
 

@@ -2,14 +2,13 @@ import 'dart:collection';
 
 import 'package:flutter/cupertino.dart';
 
-import '../model/c_match_day_banner_for_league.dart';
+import '../model/c_match_day_banner_for_leagues_model.dart';
 
 class MatchDayBannerForLeagueNotifier with ChangeNotifier {
   List<MatchDayBannerForLeague> _matchDayBannerForLeagueList = [];
   late MatchDayBannerForLeague _currentMatchDayBannerForLeague;
 
-  UnmodifiableListView<MatchDayBannerForLeague> get matchDayBannerForLeagueList =>
-      UnmodifiableListView(_matchDayBannerForLeagueList);
+  UnmodifiableListView<MatchDayBannerForLeague> get matchDayBannerForLeagueList => UnmodifiableListView(_matchDayBannerForLeagueList);
 
   MatchDayBannerForLeague get currentMatchDayBannerForLeague => _currentMatchDayBannerForLeague;
 

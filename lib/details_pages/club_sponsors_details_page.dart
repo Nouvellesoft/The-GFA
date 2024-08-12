@@ -8,7 +8,7 @@ import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '/notifier/club_sponsors_notifier.dart';
-import '../model/club_sponsors.dart';
+import '../model/club_sponsors_model.dart';
 
 Color conColor = const Color.fromRGBO(194, 194, 220, 1.0);
 Color conColorTwo = const Color.fromRGBO(151, 147, 151, 1.0);

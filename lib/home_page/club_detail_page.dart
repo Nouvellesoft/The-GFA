@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../api/first_team_class_api.dart';
-import '../model/first_team_class.dart';
+import '../model/first_team_class_model.dart';
 import '../notifier/first_team_class_notifier.dart';
 
 class ClubDetailPage extends StatefulWidget {

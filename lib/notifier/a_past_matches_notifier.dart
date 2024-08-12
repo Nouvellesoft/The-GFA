@@ -2,14 +2,13 @@ import 'dart:collection';
 
 import 'package:flutter/cupertino.dart';
 
-import '../model/a_past_matches.dart';
+import '../model/a_past_matches_model.dart';
 
 class PastMatchesNotifier with ChangeNotifier {
   List<PastMatches> _pastMatchesList = [];
   late PastMatches _currentPastMatches;
 
-  UnmodifiableListView<PastMatches> get pastMatchesList =>
-      UnmodifiableListView(_pastMatchesList);
+  UnmodifiableListView<PastMatches> get pastMatchesList => UnmodifiableListView(_pastMatchesList);
 
   PastMatches get currentPastMatches => _currentPastMatches;
 

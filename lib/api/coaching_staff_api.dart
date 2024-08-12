@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-import '../model/coaches.dart';
+import '../model/coaches_model.dart';
 import '../notifier/coaching_staff_notifier.dart';
 
 Future<void> getCoaches(CoachesNotifier coachesNotifier, String clubId) async {

@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../../../api/c_match_day_banner_for_location_api.dart';
 import '../../../bloc_navigation_bloc/navigation_bloc.dart';
-import '../../../model/c_match_day_banner_for_location.dart';
+import '../../../model/c_match_day_banner_for_locations_model.dart';
 import '../../../notifier/c_match_day_banner_for_location_notifier.dart';
 
 late MatchDayBannerForLocationNotifier matchDayBannerForLocationNotifier;
