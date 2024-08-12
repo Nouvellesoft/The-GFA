@@ -6,9 +6,16 @@ import '/bloc_navigation_bloc/navigation_bloc.dart';
 import '../../api/fifth_team_class_api.dart';
 import '../../api/first_team_class_api.dart';
 import '../../api/fourth_team_class_api.dart';
+import '../../api/get_teams_visibility_api.dart'; // Import the visibility API
 import '../../api/second_team_class_api.dart';
 import '../../api/sixth_team_class_api.dart';
 import '../../api/third_team_class_api.dart';
+import '../../model/fifth_team_class.dart';
+import '../../model/first_team_class.dart';
+import '../../model/fourth_team_class.dart';
+import '../../model/second_team_class.dart';
+import '../../model/sixth_team_class.dart';
+import '../../model/third_team_class.dart';
 import '../../notifier/fifth_team_class_notifier.dart';
 import '../../notifier/first_team_class_notifier.dart';
 import '../../notifier/fourth_team_class_notifier.dart';
@@ -32,15 +39,85 @@ class MyModifyClubPlayersPage extends StatefulWidget implements NavigationStates
 class MyModifyClubPlayersPageState extends State<MyModifyClubPlayersPage> {
   bool isEditing = false; // Flag to determine if the user is in "Edit" mode
   List<dynamic> selectedPlayers = []; // List to store selected players
+  late Future<Map<String, Map<String, dynamic>>> _teamVisibilityFuture;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _teamVisibilityFuture = getTeamClassVisibilityAndTitles(widget.clubId);
+
+    // Fetch data for the teams using their notifiers
+    _fetchTeamData();
+  }
+
+  Future<void> _fetchTeamData() async {
+    FirstTeamClassNotifier firstTeamClassNotifier = Provider.of<FirstTeamClassNotifier>(context, listen: false);
+    await _fetchFirstTeamClassAndUpdateNotifier(firstTeamClassNotifier);
+
+    SecondTeamClassNotifier secondTeamClassNotifier = Provider.of<SecondTeamClassNotifier>(context, listen: false);
+    await _fetchSecondTeamClassAndUpdateNotifier(secondTeamClassNotifier);
+
+    ThirdTeamClassNotifier thirdTeamClassNotifier = Provider.of<ThirdTeamClassNotifier>(context, listen: false);
+    await _fetchThirdTeamClassAndUpdateNotifier(thirdTeamClassNotifier);
+
+    FourthTeamClassNotifier fourthTeamClassNotifier = Provider.of<FourthTeamClassNotifier>(context, listen: false);
+    await _fetchFourthTeamClassAndUpdateNotifier(fourthTeamClassNotifier);
+
+    FifthTeamClassNotifier fifthTeamClassNotifier = Provider.of<FifthTeamClassNotifier>(context, listen: false);
+    await _fetchFifthTeamClassAndUpdateNotifier(fifthTeamClassNotifier);
+
+    SixthTeamClassNotifier sixthTeamClassNotifier = Provider.of<SixthTeamClassNotifier>(context, listen: false);
+    await _fetchSixthTeamClassAndUpdateNotifier(sixthTeamClassNotifier);
+
+    PlayersNotifier playersNotifier = Provider.of<PlayersNotifier>(context, listen: false);
+    playersNotifier.setFirstTeamPlayers(firstTeamClassNotifier.firstTeamClassList);
+    playersNotifier.setSecondTeamPlayers(secondTeamClassNotifier.secondTeamClassList);
+    playersNotifier.setThirdTeamPlayers(thirdTeamClassNotifier.thirdTeamClassList);
+    playersNotifier.setFourthTeamPlayers(fourthTeamClassNotifier.fourthTeamClassList);
+    playersNotifier.setFifthTeamPlayers(fifthTeamClassNotifier.fifthTeamClassList);
+    playersNotifier.setSixthTeamPlayers(sixthTeamClassNotifier.sixthTeamClassList);
+  }
+
+  Future<void> _fetchFirstTeamClassAndUpdateNotifier(FirstTeamClassNotifier firstTeamNotifier) async {
+    await getFirstTeamClass(firstTeamNotifier, widget.clubId);
+    setState(() {}); // Refresh the UI if needed
+  }
+
+  Future<void> _fetchSecondTeamClassAndUpdateNotifier(SecondTeamClassNotifier secondTeamNotifier) async {
+    await getSecondTeamClass(secondTeamNotifier, widget.clubId);
+    setState(() {}); // Refresh the UI if needed
+  }
+
+  Future<void> _fetchThirdTeamClassAndUpdateNotifier(ThirdTeamClassNotifier thirdTeamClassNotifier) async {
+    await getThirdTeamClass(thirdTeamClassNotifier, widget.clubId);
+    setState(() {}); // Refresh the UI if needed
+  }
+
+  Future<void> _fetchFourthTeamClassAndUpdateNotifier(FourthTeamClassNotifier fourthTeamClassNotifier) async {
+    await getFourthTeamClass(fourthTeamClassNotifier, widget.clubId);
+    setState(() {}); // Refresh the UI if needed
+  }
+
+  Future<void> _fetchFifthTeamClassAndUpdateNotifier(FifthTeamClassNotifier fifthTeamClassNotifier) async {
+    await getFifthTeamClass(fifthTeamClassNotifier, widget.clubId);
+    setState(() {}); // Refresh the UI if needed
+  }
+
+  Future<void> _fetchSixthTeamClassAndUpdateNotifier(SixthTeamClassNotifier sixthTeamClassNotifier) async {
+    await getSixthTeamClass(sixthTeamClassNotifier, widget.clubId);
+    setState(() {}); // Refresh the UI if needed
+  }
+
+  Future<void> refreshData() async {
+    await _fetchTeamData();
+    setState(() {}); // Ensure the UI updates with the latest data
+  }
 
   @override
   Widget build(BuildContext context) {
     // Use the PlayersNotifier to access the combined list of players
     playersNotifier = Provider.of<PlayersNotifier>(context);
-
-    // Create a copy of the allClubMembersList and sort it alphabetically by name
-    List<dynamic> sortedPlayers = List.from(playersNotifier!.playersList);
-    sortedPlayers.sort((a, b) => (a.name ?? 'No Name').toLowerCase().compareTo((b.name ?? 'No Name').toLowerCase()));
 
     return Scaffold(
       backgroundColor: backgroundColor,
@@ -48,11 +125,9 @@ class MyModifyClubPlayersPageState extends State<MyModifyClubPlayersPage> {
         backgroundColor: backgroundColor,
         title: const Text('All Players'),
         actions: [
-          // Add a button to toggle "Edit" mode
           IconButton(
             icon: Icon(isEditing ? Icons.done : Icons.edit),
             onPressed: () {
-              // Toggle "Edit" mode and clear selected players list
               setState(() {
                 isEditing = !isEditing;
                 selectedPlayers.clear();
@@ -64,51 +139,83 @@ class MyModifyClubPlayersPageState extends State<MyModifyClubPlayersPage> {
       body: GestureDetector(
         behavior: HitTestBehavior.translucent,
         onTap: () {
-          // Hide the keyboard when tapping outside the text field
           FocusManager.instance.primaryFocus?.unfocus();
         },
-        child: RefreshIndicator(
-          onRefresh: () async {
-            // Refresh the data when the user pulls down the list
-            await refreshData();
-          },
-          child: Padding(
-            padding: EdgeInsets.only(bottom: MediaQuery.of(context).size.width * 0.25),
-            child: NotificationListener<ScrollNotification>(
-              onNotification: (ScrollNotification scrollInfo) {
-                // You can add logic here to show/hide the scrollbar based on scroll position
-                return true;
-              },
-              child: Scrollbar(
-                child: ListView.builder(
-                  itemCount: sortedPlayers.length,
-                  itemBuilder: (context, index) {
-                    final player = sortedPlayers[index];
-                    return ListTile(
-                      title: Text(player.name ?? 'No Name'),
-                      trailing: isEditing
-                          ? Checkbox(
-                              activeColor: Colors.white,
-                              checkColor: Colors.black,
-                              value: selectedPlayers.contains(player),
-                              onChanged: (value) {
-                                setState(() {
-                                  if (value != null && value) {
-                                    selectedPlayers.add(player);
-                                  } else {
-                                    selectedPlayers.remove(player);
-                                  }
-                                });
-                              },
-                            )
-                          : null, // Show checkbox only in "Edit" mode
-                      // Add other player information you want to display
-                    );
-                  },
+        child: FutureBuilder<Map<String, Map<String, dynamic>>>(
+          future: _teamVisibilityFuture,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (snapshot.hasError) {
+              return const Center(child: Text("Error loading data"));
+            } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+              return const Center(child: Text("No visibility data available"));
+            } else {
+              final teamVisibility = snapshot.data!;
+
+              // Filter players based on visibility
+              List<dynamic> filteredPlayers = playersNotifier!.playersList.where((player) {
+                if (player is FirstTeamClass && teamVisibility['FirstTeamClass']?['isVisible'] != true) {
+                  return false;
+                } else if (player is SecondTeamClass && teamVisibility['SecondTeamClass']?['isVisible'] != true) {
+                  return false;
+                } else if (player is ThirdTeamClass && teamVisibility['ThirdTeamClass']?['isVisible'] != true) {
+                  return false;
+                } else if (player is FourthTeamClass && teamVisibility['FourthTeamClass']?['isVisible'] != true) {
+                  return false;
+                } else if (player is FifthTeamClass && teamVisibility['FifthTeamClass']?['isVisible'] != true) {
+                  return false;
+                } else if (player is SixthTeamClass && teamVisibility['SixthTeamClass']?['isVisible'] != true) {
+                  return false;
+                } else {
+                  return true;
+                }
+              }).toList();
+
+              // Sort filtered players alphabetically by name
+              filteredPlayers.sort((a, b) => (a.name ?? 'No Name').toLowerCase().compareTo((b.name ?? 'No Name').toLowerCase()));
+
+              return RefreshIndicator(
+                onRefresh: refreshData,
+                child: Padding(
+                  padding: EdgeInsets.only(bottom: MediaQuery.of(context).size.width * 0.25),
+                  child: NotificationListener<ScrollNotification>(
+                    onNotification: (ScrollNotification scrollInfo) {
+                      return true;
+                    },
+                    child: Scrollbar(
+                      child: ListView.builder(
+                        itemCount: filteredPlayers.length,
+                        itemBuilder: (context, index) {
+                          final player = filteredPlayers[index];
+                          return ListTile(
+                            title: Text(player.name ?? 'No Name'),
+                            trailing: isEditing
+                                ? Checkbox(
+                                    activeColor: Colors.white,
+                                    checkColor: Colors.black,
+                                    value: selectedPlayers.contains(player),
+                                    onChanged: (value) {
+                                      setState(() {
+                                        if (value != null && value) {
+                                          selectedPlayers.add(player);
+                                        } else {
+                                          selectedPlayers.remove(player);
+                                        }
+                                      });
+                                    },
+                                  )
+                                : null, // Show checkbox only in "Edit" mode
+                            // Add other player information you want to display
+                          );
+                        },
+                      ),
+                    ),
+                  ),
                 ),
-              ),
-            ),
-          ),
+              );
+            }
+          },
         ),
       ),
       bottomSheet: isEditing
@@ -121,11 +228,10 @@ class MyModifyClubPlayersPageState extends State<MyModifyClubPlayersPage> {
                 padding: const EdgeInsets.all(16.0),
                 child: Row(
                   children: [
-                    // const Text('Selected\nPlayers:'),
                     const SizedBox(width: 8.0),
                     Expanded(
                       child: SingleChildScrollView(
-                        scrollDirection: Axis.horizontal, // Set the scroll direction to horizontal
+                        scrollDirection: Axis.horizontal,
                         child: Wrap(
                           children: selectedPlayers.map((player) {
                             return Chip(
@@ -147,7 +253,6 @@ class MyModifyClubPlayersPageState extends State<MyModifyClubPlayersPage> {
                     ElevatedButton(
                       onPressed: () async {
                         await deleteSelectedPlayers(selectedPlayers);
-                        // Clear selected players list after deletion
                         setState(() {
                           selectedPlayers.clear();
                         });
@@ -161,101 +266,30 @@ class MyModifyClubPlayersPageState extends State<MyModifyClubPlayersPage> {
                 ),
               ),
             )
-          : null, // Show selected players at the bottom only in "Edit" mode
+          : null,
     );
-  }
-
-  @override
-  void initState() {
-    super.initState();
-
-    // Fetch data for the first and second teams using their notifiers
-    FirstTeamClassNotifier firstTeamClassNotifier = Provider.of<FirstTeamClassNotifier>(context, listen: false);
-    _fetchFirstTeamClassAndUpdateNotifier(firstTeamClassNotifier);
-
-    SecondTeamClassNotifier secondTeamClassNotifier = Provider.of<SecondTeamClassNotifier>(context, listen: false);
-    _fetchSecondTeamClassAndUpdateNotifier(secondTeamClassNotifier);
-
-    ThirdTeamClassNotifier thirdTeamClassNotifier = Provider.of<ThirdTeamClassNotifier>(context, listen: false);
-    _fetchThirdTeamClassAndUpdateNotifier(thirdTeamClassNotifier);
-
-    FourthTeamClassNotifier fourthTeamClassNotifier = Provider.of<FourthTeamClassNotifier>(context, listen: false);
-    _fetchFourthTeamClassAndUpdateNotifier(fourthTeamClassNotifier);
-
-    FifthTeamClassNotifier fifthTeamClassNotifier = Provider.of<FifthTeamClassNotifier>(context, listen: false);
-    _fetchFifthTeamClassAndUpdateNotifier(fifthTeamClassNotifier);
-
-    SixthTeamClassNotifier sixthTeamClassNotifier = Provider.of<SixthTeamClassNotifier>(context, listen: false);
-    _fetchSixthTeamClassAndUpdateNotifier(sixthTeamClassNotifier);
-
-    // Populate the PlayersNotifier with data from both teams
-    PlayersNotifier playersNotifier = Provider.of<PlayersNotifier>(context, listen: false);
-
-    playersNotifier.setFirstTeamPlayers(firstTeamClassNotifier.firstTeamClassList);
-    playersNotifier.setSecondTeamPlayers(secondTeamClassNotifier.secondTeamClassList);
-    playersNotifier.setThirdTeamPlayers(thirdTeamClassNotifier.thirdTeamClassList);
-    playersNotifier.setFourthTeamPlayers(fourthTeamClassNotifier.fourthTeamClassList);
-    playersNotifier.setFifthTeamPlayers(fifthTeamClassNotifier.fifthTeamClassList);
-    playersNotifier.setSixthTeamPlayers(sixthTeamClassNotifier.sixthTeamClassList);
-  }
-
-  Future<void> _fetchFirstTeamClassAndUpdateNotifier(FirstTeamClassNotifier firstTeamNotifier) async {
-    await getFirstTeamClass(firstTeamNotifier, widget.clubId);
-
-    setState(() {}); // Refresh the UI if needed
-  }
-
-  Future<void> _fetchSecondTeamClassAndUpdateNotifier(SecondTeamClassNotifier secondTeamNotifier) async {
-    await getSecondTeamClass(secondTeamNotifier, widget.clubId);
-
-    setState(() {}); // Refresh the UI if needed
-  }
-
-  Future<void> _fetchThirdTeamClassAndUpdateNotifier(ThirdTeamClassNotifier thirdTeamClassNotifier) async {
-    await getThirdTeamClass(thirdTeamClassNotifier, widget.clubId);
-
-    setState(() {}); // Refresh the UI if needed
-  }
-
-  Future<void> _fetchFourthTeamClassAndUpdateNotifier(FourthTeamClassNotifier fourthTeamClassNotifier) async {
-    await getFourthTeamClass(fourthTeamClassNotifier, widget.clubId);
-
-    setState(() {}); // Refresh the UI if needed
-  }
-
-  Future<void> _fetchFifthTeamClassAndUpdateNotifier(FifthTeamClassNotifier fifthTeamClassNotifier) async {
-    await getFifthTeamClass(fifthTeamClassNotifier, widget.clubId);
-
-    setState(() {}); // Refresh the UI if needed
-  }
-
-  Future<void> _fetchSixthTeamClassAndUpdateNotifier(SixthTeamClassNotifier sixthTeamClassNotifier) async {
-    await getSixthTeamClass(sixthTeamClassNotifier, widget.clubId);
-
-    setState(() {}); // Refresh the UI if needed
   }
 
   Future<void> deleteSelectedPlayers(List<dynamic> selectedPlayers) async {
     final firestore = FirebaseFirestore.instance;
 
-    // Iterate through the selected players and delete them
     for (final player in selectedPlayers) {
-      // Assuming 'name' is a unique identifier
       final name = player.name;
 
-      // Delete from both collections
+      // Delete from team collections
       await deletePlayerByName(firestore, 'FirstTeamClassPlayers', name);
       await deletePlayerByName(firestore, 'SecondTeamClassPlayers', name);
       await deletePlayerByName(firestore, 'ThirdTeamClassPlayers', name);
       await deletePlayerByName(firestore, 'FourthTeamClassPlayers', name);
       await deletePlayerByName(firestore, 'FifthTeamClassPlayers', name);
       await deletePlayerByName(firestore, 'SixthTeamClassPlayers', name);
+
+      // Delete from PllayersTable collection
+      await deletePlayerFromCollection(firestore, 'PllayersTable', name);
     }
 
-    // Show a Snackbar message indicating the players that have been removed
     showSnackbar(selectedPlayers);
 
-    // Refresh the data to trigger a UI update
     await refreshData();
   }
 
@@ -267,35 +301,12 @@ class MyModifyClubPlayersPageState extends State<MyModifyClubPlayersPage> {
     }
   }
 
-  Future<void> refreshData() async {
-    FirstTeamClassNotifier firstTeamClassNotifier = Provider.of<FirstTeamClassNotifier>(context, listen: false);
-    await _fetchFirstTeamClassAndUpdateNotifier(firstTeamClassNotifier);
+  Future<void> deletePlayerFromCollection(FirebaseFirestore firestore, String collection, String name) async {
+    final querySnapshot = await firestore.collection('clubs').doc(widget.clubId).collection(collection).where('player_name', isEqualTo: name).get();
 
-    SecondTeamClassNotifier secondTeamClassNotifier = Provider.of<SecondTeamClassNotifier>(context, listen: false);
-    await _fetchSecondTeamClassAndUpdateNotifier(secondTeamClassNotifier);
-
-    ThirdTeamClassNotifier thirdTeamClassNotifier = Provider.of<ThirdTeamClassNotifier>(context, listen: false);
-    _fetchThirdTeamClassAndUpdateNotifier(thirdTeamClassNotifier);
-
-    FourthTeamClassNotifier fourthTeamClassNotifier = Provider.of<FourthTeamClassNotifier>(context, listen: false);
-    _fetchFourthTeamClassAndUpdateNotifier(fourthTeamClassNotifier);
-
-    FifthTeamClassNotifier fifthTeamClassNotifier = Provider.of<FifthTeamClassNotifier>(context, listen: false);
-    _fetchFifthTeamClassAndUpdateNotifier(fifthTeamClassNotifier);
-
-    SixthTeamClassNotifier sixthTeamClassNotifier = Provider.of<SixthTeamClassNotifier>(context, listen: false);
-    _fetchSixthTeamClassAndUpdateNotifier(sixthTeamClassNotifier);
-
-    PlayersNotifier playersNotifier = Provider.of<PlayersNotifier>(context, listen: false);
-    playersNotifier.setFirstTeamPlayers(firstTeamClassNotifier.firstTeamClassList);
-    playersNotifier.setSecondTeamPlayers(secondTeamClassNotifier.secondTeamClassList);
-    playersNotifier.setThirdTeamPlayers(thirdTeamClassNotifier.thirdTeamClassList);
-    playersNotifier.setFourthTeamPlayers(fourthTeamClassNotifier.fourthTeamClassList);
-    playersNotifier.setFifthTeamPlayers(fifthTeamClassNotifier.fifthTeamClassList);
-    playersNotifier.setSixthTeamPlayers(sixthTeamClassNotifier.sixthTeamClassList);
-
-    // Call setState to ensure the UI is updated with the latest data
-    setState(() {});
+    for (final document in querySnapshot.docs) {
+      await document.reference.delete();
+    }
   }
 
   void showSnackbar(List<dynamic> players) {

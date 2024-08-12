@@ -16,7 +16,7 @@ import 'package:simple_icons/simple_icons.dart';
 
 import '/bottom_nav_stats_pages/players_stats_info_page.dart';
 import '/bottom_nav_stats_pages/players_table_page.dart';
-import '../api/get_teams_visibility.dart';
+import '../api/get_teams_visibility_api.dart';
 import '../bloc_navigation_bloc/navigation_bloc.dart';
 import '../bottom_nav_stats_pages/bottom_navigator.dart';
 import '../bottom_nav_stats_pages/matches_page/a_tabview_matches_page.dart';
@@ -27,15 +27,15 @@ import '../sidebar/menu_item.dart';
 String clubName = "Coventry Phoenix FC";
 String subtitle = "We breed elite players here";
 
-String returningPlayersTitle = "Coventry Phoenix I";
-String newPlayersTitle = "Coventry Phoenix II";
-String thirdTeamClassTitle = "Reserve Team Players";
-String fourthTeamClassTitle = "Fourth Team Players";
-String fifthTeamClassTitle = "Fifth Team Players";
-String sixthTeamClassTitle = "Sixth Team Players";
-String captainsTitle = "CPFC Captains";
-String coachesTitle = "Coaching Staff";
-String managementBodyTitle = "Management Body";
+const String defaultReturningPlayersTitle = "Coventry Phoenix I";
+const String defaultNewPlayersTitle = "Coventry Phoenix II";
+const String defaultThirdTeamClassTitle = "Reserve Team Players";
+const String defaultFourthTeamClassTitle = "Fourth Team Players";
+const String defaultFifthTeamClassTitle = "Fifth Team Players";
+const String defaultSixthTeamClassTitle = "Sixth Team Players";
+const String defaultCaptainsTitle = "CPFC Captains";
+const String defaultCoachesTitle = "Coaching Staff";
+const String defaultManagementBodyTitle = "Management Body";
 String sponsorsTitle = "Club Sponsors";
 // String adminTitle = "Club Admin";
 
@@ -93,7 +93,7 @@ class _SideBarState extends State<SideBar> with SingleTickerProviderStateMixin<S
   bool _isClubSponsorsClicked = false; // New variable to track the "Club Sponsors" click
 
   late Stream<DocumentSnapshot<Map<String, dynamic>>> firestoreStream;
-  late Future<Map<String, bool>> _teamVisibilityFuture;
+  late Future<Map<String, Map<String, dynamic>>> _teamVisibilityFuture;
 
   _onSelected(int index) {
     if (index == 10 /**|| index == 8 */) {
@@ -130,7 +130,7 @@ class _SideBarState extends State<SideBar> with SingleTickerProviderStateMixin<S
     isSidebarOpenedStream = isSidebarOpenedStreamController.stream;
     isSidebarOpenedSink = isSidebarOpenedStreamController.sink;
 
-    _teamVisibilityFuture = getTeamClassVisibility(widget.clubId);
+    _teamVisibilityFuture = getTeamClassVisibilityAndTitles(widget.clubId);
 
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
@@ -294,7 +294,7 @@ class _SideBarState extends State<SideBar> with SingleTickerProviderStateMixin<S
                                 endIndent: 32,
                               ),
 
-                              FutureBuilder<Map<String, bool>>(
+                              FutureBuilder<Map<String, Map<String, dynamic>>>(
                                 future: _teamVisibilityFuture,
                                 builder: (context, snapshot) {
                                   if (snapshot.connectionState == ConnectionState.waiting) {
@@ -305,15 +305,27 @@ class _SideBarState extends State<SideBar> with SingleTickerProviderStateMixin<S
                                     return const Center(child: Text("No visibility data available"));
                                   }
 
-                                  final teamVisibility = snapshot.data!;
-                                  final visibleTeams = teamVisibility.values.where((isVisible) => isVisible).toList();
+                                  final teamData = snapshot.data!;
+                                  final visibleTeams = teamData.values.where((data) => data['isVisible'] as bool).toList();
 
-                                  // If 4 or fewer teams are visible, don't use Theme and ExpansionTile
+                                  // Define titles based on fetched data or default to hardcoded ones
+                                  final String returningPlayersTitle =
+                                      teamData['FirstTeamClass']?['title'] as String? ?? defaultReturningPlayersTitle;
+                                  final String newPlayersTitle = teamData['SecondTeamClass']?['title'] as String? ?? defaultNewPlayersTitle;
+                                  final String thirdTeamClassTitle = teamData['ThirdTeamClass']?['title'] as String? ?? defaultThirdTeamClassTitle;
+                                  final String fourthTeamClassTitle = teamData['FourthTeamClass']?['title'] as String? ?? defaultFourthTeamClassTitle;
+                                  final String fifthTeamClassTitle = teamData['FifthTeamClass']?['title'] as String? ?? defaultFifthTeamClassTitle;
+                                  final String sixthTeamClassTitle = teamData['SixthTeamClass']?['title'] as String? ?? defaultSixthTeamClassTitle;
+                                  final String captainsTitle = teamData['Captains']?['title'] as String? ?? defaultCaptainsTitle;
+                                  final String coachesTitle = teamData['Coaches']?['title'] as String? ?? defaultCoachesTitle;
+                                  final String managementBodyTitle = teamData['ManagementBody']?['title'] as String? ?? defaultManagementBodyTitle;
+
+                                  // If 5 or fewer teams are visible, don't use Theme and ExpansionTile
                                   if (visibleTeams.length <= 5) {
                                     return Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        if (teamVisibility['FirstTeamClass'] ?? true)
+                                        if (teamData['FirstTeamClass']?['isVisible'] ?? true)
                                           _buildTeamMenuItem(
                                             context,
                                             index: 0,
@@ -321,7 +333,7 @@ class _SideBarState extends State<SideBar> with SingleTickerProviderStateMixin<S
                                             title: returningPlayersTitle,
                                             event: NavigationEvents.myFirstTeamClassPageClickedEvent,
                                           ),
-                                        if (teamVisibility['SecondTeamClass'] ?? true)
+                                        if (teamData['SecondTeamClass']?['isVisible'] ?? true)
                                           _buildTeamMenuItem(
                                             context,
                                             index: 1,
@@ -329,7 +341,7 @@ class _SideBarState extends State<SideBar> with SingleTickerProviderStateMixin<S
                                             title: newPlayersTitle,
                                             event: NavigationEvents.mySecondTeamClassPageClickedEvent,
                                           ),
-                                        if (teamVisibility['ThirdTeamClass'] ?? true)
+                                        if (teamData['ThirdTeamClass']?['isVisible'] ?? true)
                                           _buildTeamMenuItem(
                                             context,
                                             index: 2,
@@ -337,39 +349,39 @@ class _SideBarState extends State<SideBar> with SingleTickerProviderStateMixin<S
                                             title: thirdTeamClassTitle,
                                             event: NavigationEvents.myThirdTeamClassPageClickedEvent,
                                           ),
-                                        if (teamVisibility['FourthTeamClass'] ?? true)
+                                        if (teamData['FourthTeamClass']?['isVisible'] ?? true)
                                           _buildTeamMenuItem(
                                             context,
                                             index: 3,
                                             icon: MdiIcons.soccer,
-                                            title: thirdTeamClassTitle,
+                                            title: fourthTeamClassTitle,
                                             event: NavigationEvents.myFourthTeamClassPageClickedEvent,
                                           ),
-                                        if (teamVisibility['FifthTeamClass'] ?? true)
+                                        if (teamData['FifthTeamClass']?['isVisible'] ?? true)
                                           _buildTeamMenuItem(
                                             context,
                                             index: 4,
                                             icon: MdiIcons.soccer,
-                                            title: thirdTeamClassTitle,
+                                            title: fifthTeamClassTitle,
                                             event: NavigationEvents.myFifthTeamClassPageClickedEvent,
                                           ),
-                                        if (teamVisibility['SixthTeamClass'] ?? true)
+                                        if (teamData['SixthTeamClass']?['isVisible'] ?? true)
                                           _buildTeamMenuItem(
                                             context,
                                             index: 5,
                                             icon: MdiIcons.soccer,
-                                            title: thirdTeamClassTitle,
+                                            title: sixthTeamClassTitle,
                                             event: NavigationEvents.mySixthTeamClassPageClickedEvent,
                                           ),
-                                        if (teamVisibility['Captains'] ?? true)
-                                        _buildTeamMenuItem(
-                                          context,
-                                          index: 6,
-                                          icon: MdiIcons.accountStar,
-                                          title: captainsTitle,
-                                          event: NavigationEvents.myCaptainsPageClickedEvent,
-                                        ),
-                                        if (teamVisibility['Coaches'] ?? true)
+                                        if (teamData['Captains']?['isVisible'] ?? true)
+                                          _buildTeamMenuItem(
+                                            context,
+                                            index: 6,
+                                            icon: MdiIcons.accountStar,
+                                            title: captainsTitle,
+                                            event: NavigationEvents.myCaptainsPageClickedEvent,
+                                          ),
+                                        if (teamData['Coaches']?['isVisible'] ?? true)
                                           _buildTeamMenuItem(
                                             context,
                                             index: 7,
@@ -377,7 +389,7 @@ class _SideBarState extends State<SideBar> with SingleTickerProviderStateMixin<S
                                             title: coachesTitle,
                                             event: NavigationEvents.myCoachesPageClickedEvent,
                                           ),
-                                        if (teamVisibility['ManagementBody'] ?? true)
+                                        if (teamData['ManagementBody']?['isVisible'] ?? true)
                                           _buildTeamMenuItem(
                                             context,
                                             index: 8,
@@ -389,7 +401,7 @@ class _SideBarState extends State<SideBar> with SingleTickerProviderStateMixin<S
                                     );
                                   }
 
-                                  // If more than 4 teams are visible, use Theme and ExpansionTile
+                                  // If more than 5 teams are visible, use Theme and ExpansionTile
                                   return Theme(
                                     data: ThemeData.dark().copyWith(primaryColor: Colors.white),
                                     child: ExpansionTile(
@@ -398,7 +410,7 @@ class _SideBarState extends State<SideBar> with SingleTickerProviderStateMixin<S
                                         title: tmTitle,
                                       ),
                                       children: [
-                                        if (teamVisibility['FirstTeamClass'] ?? true)
+                                        if (teamData['FirstTeamClass']?['isVisible'] ?? true)
                                           _buildTeamMenuItem(
                                             context,
                                             index: 0,
@@ -406,7 +418,7 @@ class _SideBarState extends State<SideBar> with SingleTickerProviderStateMixin<S
                                             title: returningPlayersTitle,
                                             event: NavigationEvents.myFirstTeamClassPageClickedEvent,
                                           ),
-                                        if (teamVisibility['SecondTeamClass'] ?? true)
+                                        if (teamData['SecondTeamClass']?['isVisible'] ?? true)
                                           _buildTeamMenuItem(
                                             context,
                                             index: 1,
@@ -414,7 +426,7 @@ class _SideBarState extends State<SideBar> with SingleTickerProviderStateMixin<S
                                             title: newPlayersTitle,
                                             event: NavigationEvents.mySecondTeamClassPageClickedEvent,
                                           ),
-                                        if (teamVisibility['ThirdTeamClass'] ?? true)
+                                        if (teamData['ThirdTeamClass']?['isVisible'] ?? true)
                                           _buildTeamMenuItem(
                                             context,
                                             index: 2,
@@ -422,38 +434,39 @@ class _SideBarState extends State<SideBar> with SingleTickerProviderStateMixin<S
                                             title: thirdTeamClassTitle,
                                             event: NavigationEvents.myThirdTeamClassPageClickedEvent,
                                           ),
-                                        if (teamVisibility['FourthTeamClass'] ?? true)
+                                        if (teamData['FourthTeamClass']?['isVisible'] ?? true)
                                           _buildTeamMenuItem(
                                             context,
                                             index: 3,
                                             icon: MdiIcons.soccer,
-                                            title: thirdTeamClassTitle,
+                                            title: fourthTeamClassTitle,
                                             event: NavigationEvents.myFourthTeamClassPageClickedEvent,
                                           ),
-                                        if (teamVisibility['FifthTeamClass'] ?? true)
+                                        if (teamData['FifthTeamClass']?['isVisible'] ?? true)
                                           _buildTeamMenuItem(
                                             context,
                                             index: 4,
                                             icon: MdiIcons.soccer,
-                                            title: thirdTeamClassTitle,
+                                            title: fifthTeamClassTitle,
                                             event: NavigationEvents.myFifthTeamClassPageClickedEvent,
                                           ),
-                                        if (teamVisibility['SixthTeamClass'] ?? true)
+                                        if (teamData['SixthTeamClass']?['isVisible'] ?? true)
                                           _buildTeamMenuItem(
                                             context,
                                             index: 5,
                                             icon: MdiIcons.soccer,
-                                            title: thirdTeamClassTitle,
+                                            title: sixthTeamClassTitle,
                                             event: NavigationEvents.mySixthTeamClassPageClickedEvent,
                                           ),
-                                        _buildTeamMenuItem(
-                                          context,
-                                          index: 6,
-                                          icon: MdiIcons.accountStar,
-                                          title: captainsTitle,
-                                          event: NavigationEvents.myCaptainsPageClickedEvent,
-                                        ),
-                                        if (teamVisibility['Coaches'] ?? true)
+                                        if (teamData['Captains']?['isVisible'] ?? true)
+                                          _buildTeamMenuItem(
+                                            context,
+                                            index: 6,
+                                            icon: MdiIcons.accountStar,
+                                            title: captainsTitle,
+                                            event: NavigationEvents.myCaptainsPageClickedEvent,
+                                          ),
+                                        if (teamData['Coaches']?['isVisible'] ?? true)
                                           _buildTeamMenuItem(
                                             context,
                                             index: 7,
@@ -461,7 +474,7 @@ class _SideBarState extends State<SideBar> with SingleTickerProviderStateMixin<S
                                             title: coachesTitle,
                                             event: NavigationEvents.myCoachesPageClickedEvent,
                                           ),
-                                        if (teamVisibility['ManagementBody'] ?? true)
+                                        if (teamData['ManagementBody']?['isVisible'] ?? true)
                                           _buildTeamMenuItem(
                                             context,
                                             index: 8,
