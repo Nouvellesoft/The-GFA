@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:giffy_dialog/giffy_dialog.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_core/theme.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
@@ -14,6 +15,7 @@ import 'package:toast/toast.dart';
 
 import '/details_pages/second_team_details_page.dart';
 import '/notifier/second_team_class_notifier.dart';
+import '../api/get_club_aspect_visibility_api.dart';
 import '../api/players_table_api.dart';
 import '../club_admin/others/view_club_population_page.dart';
 import '../details_pages/fifth_team_details_page.dart';
@@ -58,8 +60,8 @@ class PlayersTablePage extends StatefulWidget {
 
 class PlayersTablePageState extends State<PlayersTablePage> {
   List<PlayersTable> playersTableList = [];
-
   late PlayersTableDataSource playersTableDataSource;
+  Map<String, Map<String, dynamic>> aspectVisibilitySettings = {};
 
   // Stream<QuerySnapshot> getDataFromFirestore(String clubId) {
   //   return FirebaseFirestore.instance
@@ -91,7 +93,7 @@ class PlayersTablePageState extends State<PlayersTablePage> {
           );
         } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
           playersTableList = snapshot.data!;
-          playersTableDataSource = PlayersTableDataSource(playersTableList, widget.clubId);
+          playersTableDataSource = PlayersTableDataSource(playersTableList, widget.clubId, aspectVisibilitySettings);
 
           return SizedBox(
             height: 700,
@@ -154,7 +156,7 @@ class PlayersTablePageState extends State<PlayersTablePage> {
                     GridTableSummaryRow(
                         color: cardBackgroundColorTwo,
                         showSummaryInRow: true,
-                        title: '{Goals} Goals and {Ass} Assists by {Count} players so far.',
+                        title: _buildSummaryTitle(),
                         columns: [
                           const GridSummaryColumn(name: 'Goals', columnName: 'goals_scored', summaryType: GridSummaryType.sum),
                           const GridSummaryColumn(name: 'Ass', columnName: 'assists', summaryType: GridSummaryType.sum),
@@ -177,7 +179,7 @@ class PlayersTablePageState extends State<PlayersTablePage> {
   }
 
   List<GridColumn> get getColumns {
-    return <GridColumn>[
+    List<GridColumn> columns = <GridColumn>[
       GridColumn(
           columnName: 'id',
           width: 45,
@@ -210,15 +212,20 @@ class PlayersTablePageState extends State<PlayersTablePage> {
                 style: TextStyle(color: Colors.white70),
                 overflow: TextOverflow.ellipsis,
               ))),
-      GridColumn(
+    ];
+    // Conditionally add columns based on visibility
+    if (aspectVisibilitySettings['matches_played']?['isVisible'] ?? true) {
+      columns.add(GridColumn(
           columnName: 'matches_played',
           width: 50,
           label: Container(
               alignment: Alignment.centerLeft,
               child: const Text(' MP', //'Matches Played',
                   style: TextStyle(color: Colors.white70),
-                  overflow: TextOverflow.ellipsis))),
-      GridColumn(
+                  overflow: TextOverflow.ellipsis))));
+    }
+    if (aspectVisibilitySettings['goals_scored']?['isVisible'] ?? true) {
+      columns.add(GridColumn(
           columnName: 'goals_scored',
           allowSorting: true,
           width: 50,
@@ -229,34 +236,42 @@ class PlayersTablePageState extends State<PlayersTablePage> {
                 style: TextStyle(color: goalsScoredTextColor, fontWeight: FontWeight.bold, fontStyle: FontStyle.italic),
                 textAlign: TextAlign.left,
                 overflow: TextOverflow.ellipsis,
-              ))),
-      // GridColumn(
-      //     columnName: 'assists',
-      //     width: 50,
-      //     label: Container(
-      //         alignment: Alignment.centerLeft,
-      //         child: const Text(
-      //           ' A', //'Assists'
-      //           style: TextStyle(color: Colors.white70),
-      //           overflow: TextOverflow.ellipsis,
-      //         ))),
-      GridColumn(
+              ))));
+    }
+    if (aspectVisibilitySettings['assists']?['isVisible'] ?? true) {
+      columns.add(GridColumn(
+          columnName: 'assists',
+          width: 50,
+          label: Container(
+              alignment: Alignment.centerLeft,
+              child: const Text(
+                ' A', //'Assists'
+                style: TextStyle(color: Colors.white70),
+                overflow: TextOverflow.ellipsis,
+              ))));
+    }
+    if (aspectVisibilitySettings['matches_started']?['isVisible'] ?? true) {
+      columns.add(GridColumn(
           columnName: 'matches_started',
           width: 50,
           label: Container(
               alignment: Alignment.centerLeft,
               child: const Text(' MS', //'Matches Played',
                   style: TextStyle(color: Colors.white70),
-                  overflow: TextOverflow.ellipsis))),
-      GridColumn(
+                  overflow: TextOverflow.ellipsis))));
+    }
+    if (aspectVisibilitySettings['matches_benched']?['isVisible'] ?? true) {
+      columns.add(GridColumn(
           columnName: 'matches_benched',
           width: 50,
           label: Container(
               alignment: Alignment.centerLeft,
               child: const Text(' MB', //'Matches Played',
                   style: TextStyle(color: Colors.white70),
-                  overflow: TextOverflow.ellipsis))),
-      GridColumn(
+                  overflow: TextOverflow.ellipsis))));
+    }
+    if (aspectVisibilitySettings['yellow_card']?['isVisible'] ?? true) {
+      columns.add(GridColumn(
           columnName: 'yellow_card',
           width: 50,
           label: Container(
@@ -265,8 +280,10 @@ class PlayersTablePageState extends State<PlayersTablePage> {
                 'YC', //'Yellow\nCard'
                 style: TextStyle(color: Colors.white70),
                 overflow: TextOverflow.ellipsis,
-              ))),
-      GridColumn(
+              ))));
+    }
+    if (aspectVisibilitySettings['red_card']?['isVisible'] ?? true) {
+      columns.add(GridColumn(
           columnName: 'red_card',
           width: 50,
           label: Container(
@@ -275,8 +292,10 @@ class PlayersTablePageState extends State<PlayersTablePage> {
                 'RC', //'Red\nCard'
                 style: TextStyle(color: Colors.white70),
                 overflow: TextOverflow.ellipsis,
-              ))),
-      GridColumn(
+              ))));
+    }
+    if (aspectVisibilitySettings['player_position']?['isVisible'] ?? true) {
+      columns.add(GridColumn(
           columnName: 'player_position',
           width: 60,
           label: Container(
@@ -285,8 +304,10 @@ class PlayersTablePageState extends State<PlayersTablePage> {
                 '  PP', //'Player Position'
                 style: TextStyle(color: Colors.white70),
                 overflow: TextOverflow.ellipsis,
-              ))),
-      GridColumn(
+              ))));
+    }
+    if (aspectVisibilitySettings['nationality']?['isVisible'] ?? true) {
+      columns.add(GridColumn(
           columnName: 'nationality',
           width: 120,
           label: Container(
@@ -297,22 +318,31 @@ class PlayersTablePageState extends State<PlayersTablePage> {
                   color: Colors.white70,
                 ),
                 overflow: TextOverflow.ellipsis,
-              ))),
-    ];
+              ))));
+    }
+    return columns;
   }
 
   @override
   void initState() {
     super.initState();
-    fetchPlayersTable();
-
-    playersTableDataSource = PlayersTableDataSource(playersTableList, widget.clubId);
-    playersTableDataSource.sortedColumns.add(const SortColumnDetails(name: 'goals_scored', sortDirection: DataGridSortDirection.descending));
+    fetchVisibilitySettings().then((_) {
+      fetchPlayersTable().then((_) {
+        setState(() {
+          playersTableDataSource = PlayersTableDataSource(playersTableList, widget.clubId, aspectVisibilitySettings);
+          playersTableDataSource.sortedColumns.add(const SortColumnDetails(name: 'goals_scored', sortDirection: DataGridSortDirection.descending));
+        });
+      });
+    });
 
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
+  }
+
+  Future<void> fetchVisibilitySettings() async {
+    aspectVisibilitySettings = await getClubAspectVisibilityAndTitles(widget.clubId);
   }
 
   Future<List<PlayersTable>> fetchPlayersTable() async {
@@ -323,6 +353,35 @@ class PlayersTablePageState extends State<PlayersTablePage> {
     await getPlayersTable(playersTableNotifier, widget.clubId, orderByGoalsScored: true);
 
     return playersTableList = playersTableNotifier.playersTableList;
+  }
+
+  String _buildSummaryTitle() {
+    bool isGoalsVisible = aspectVisibilitySettings['goals_scored']?['isVisible'] ?? false;
+    bool isAssistsVisible = aspectVisibilitySettings['assists']?['isVisible'] ?? false;
+
+    // Calculate total goals and assists from the data source
+    int totalGoals = playersTableList.fold(0, (total, player) => total + (player.goalsScored ?? 0));
+    int totalAssists = playersTableList.fold(0, (total, player) => total + (player.assists ?? 0));
+
+    // Helper function to get singular or plural form
+    String pluralize(String word, int count) => count == 1 ? word : '${word}s';
+
+    // Determine title based on visibility and counts
+    if (totalGoals == 0 && totalAssists == 0) {
+      return '{Count} players in this Football Club';
+    } else if (isGoalsVisible && isAssistsVisible) {
+      if (totalAssists == 0) {
+        return '$totalGoals ${pluralize('Goal', totalGoals)} by {Count} players so far.';
+      } else {
+        return '$totalGoals ${pluralize('Goal', totalGoals)} and $totalAssists ${pluralize('Assist', totalAssists)} by {Count} players so far.';
+      }
+    } else if (isGoalsVisible) {
+      return '$totalGoals ${pluralize('Goal', totalGoals)} by {Count} players so far.';
+    } else if (isAssistsVisible) {
+      return '$totalAssists ${pluralize('Assist', totalAssists)} by {Count} players so far.';
+    } else {
+      return '{Count} players in this Football Club';
+    }
   }
 
   @override
@@ -346,11 +405,10 @@ class PlayersTablePageState extends State<PlayersTablePage> {
         appBar: AppBar(
           centerTitle: true,
           title: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-              stream:
-                  FirebaseFirestore.instance.collection('clubs').doc(widget.clubId).collection('SliversPages').doc('non_slivers_pages').snapshots(),
+              stream: FirebaseFirestore.instance.collection('clubs').doc(widget.clubId).collection('AboutClub').doc('about_club_page').snapshots(),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
-                  return Text(snapshot.data?.data()!['players_table'], style: TextStyle(color: appBarIconColor, fontSize: 17));
+                  return Text(snapshot.data?.data()!['club_name'], style: TextStyle(color: appBarIconColor, fontSize: 17));
                 } else {
                   return const Center(
                     child: CircularProgressIndicator(),
@@ -380,7 +438,7 @@ class PlayersTablePageState extends State<PlayersTablePage> {
                         ),
                       ),
                       const PopupMenuItem<int>(
-                        value: 0,
+                        value: 1,
                         child: Text(
                           "Legend",
                           style: TextStyle(color: Color.fromRGBO(255, 141, 41, 1)),
@@ -404,7 +462,6 @@ class PlayersTablePageState extends State<PlayersTablePage> {
                 onSelected: (item) {
                   switch (item) {
                     case 0:
-                      Navigator.of(context).pop(false);
                       navigateToViewClubPopulation(context, widget.clubId);
                       break;
                     case 1:
@@ -667,40 +724,31 @@ class PlayersTablePageState extends State<PlayersTablePage> {
                                   child: Padding(
                                     padding: const EdgeInsets.all(8.0),
                                     child: Text.rich(
-                                      textAlign: TextAlign.justify,
                                       TextSpan(
-                                        children: <TextSpan>[
-                                          // TextSpan(
-                                          //     text:  'Tuesdays\n',
-                                          //     style: GoogleFonts.aldrich(
-                                          //       color: Colors.white70,
-                                          //       fontSize: 22,
-                                          //       fontWeight: FontWeight.w700,
-                                          //     )),
-                                          // TextSpan(
-                                          //     text:
-                                          //     '  🔹At Moat House Leisure, Winston Ave, Coventry CV2 1EA [7pm - 8pm].\n\n\n\n\n',
-                                          //     style: GoogleFonts.aldrich(
-                                          //       color: Colors.white70,
-                                          //       fontSize: 14,
-                                          //       fontWeight: FontWeight.w300,
-                                          //     )),
+                                        children: <InlineSpan>[
                                           TextSpan(
-                                              text: 'Thursdays\n',
-                                              style: GoogleFonts.aldrich(
-                                                color: Colors.white70,
-                                                fontSize: 17,
-                                                fontWeight: FontWeight.w700,
-                                              )),
+                                            text: 'Thursdays\n',
+                                            style: GoogleFonts.aldrich(
+                                              color: Colors.white70,
+                                              fontSize: 17,
+                                              fontWeight: FontWeight.w700,
+                                            ),
+                                          ),
+                                          const WidgetSpan(
+                                            alignment: PlaceholderAlignment.middle, // Aligns the icon with the text
+                                            child: Icon(Icons.loyalty, color: Colors.blueAccent, size: 14), // Your icon here
+                                          ),
                                           TextSpan(
-                                              text: '  🔹At The Alan Higgs Centre, Allard Way, Coventry CV3 1HW [8pm - 10pm].',
-                                              style: GoogleFonts.aldrich(
-                                                color: Colors.white70,
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.w300,
-                                              )),
+                                            text: ' At The Alan Higgs Centre, Allard Way, Coventry CV3 1HW [8pm - 10pm].',
+                                            style: GoogleFonts.aldrich(
+                                              color: Colors.white70,
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w300,
+                                            ),
+                                          ),
                                         ],
                                       ),
+                                      textAlign: TextAlign.justify,
                                     ),
                                   ),
                                 ),
@@ -757,7 +805,7 @@ class PlayersTablePageState extends State<PlayersTablePage> {
                                     child: Text.rich(
                                       textAlign: TextAlign.justify,
                                       TextSpan(
-                                        children: <TextSpan>[
+                                        children: <InlineSpan>[
                                           TextSpan(
                                               text: 'Monthly\n',
                                               style: GoogleFonts.aldrich(
@@ -765,8 +813,12 @@ class PlayersTablePageState extends State<PlayersTablePage> {
                                                 fontSize: 14,
                                                 fontWeight: FontWeight.w700,
                                               )),
+                                          WidgetSpan(
+                                            alignment: PlaceholderAlignment.middle, // Aligns the icon with the text
+                                            child: Icon(MdiIcons.starFourPoints, color: Colors.blueAccent, size: 14), // Your icon here
+                                          ),
                                           TextSpan(
-                                              text: '  🔹Every month we hold trials on Thursdays between 8pm-10pm.\n\n',
+                                              text: ' Every month we hold trials on Thursdays between 8pm-10pm.\n\n',
                                               style: GoogleFonts.aldrich(
                                                 color: Colors.white70,
                                                 fontSize: 12,
@@ -779,8 +831,12 @@ class PlayersTablePageState extends State<PlayersTablePage> {
                                                 fontSize: 14,
                                                 fontWeight: FontWeight.w700,
                                               )),
+                                          WidgetSpan(
+                                            alignment: PlaceholderAlignment.middle, // Aligns the icon with the text
+                                            child: Icon(MdiIcons.starFourPoints, color: Colors.blueAccent, size: 14), // Your icon here
+                                          ),
                                           TextSpan(
-                                              text: ' 🔹At The Alan Higgs Centre, Allard Way, Coventry CV3 1HW.\n\n',
+                                              text: ' At The Alan Higgs Centre, Allard Way, Coventry CV3 1HW.\n\n',
                                               style: GoogleFonts.aldrich(
                                                 color: Colors.white70,
                                                 fontSize: 12,
@@ -793,8 +849,12 @@ class PlayersTablePageState extends State<PlayersTablePage> {
                                                 fontSize: 14,
                                                 fontWeight: FontWeight.w700,
                                               )),
+                                          WidgetSpan(
+                                            alignment: PlaceholderAlignment.middle, // Aligns the icon with the text
+                                            child: Icon(MdiIcons.starFourPoints, color: Colors.blueAccent, size: 14), // Your icon here
+                                          ),
                                           TextSpan(
-                                              text: '  🔹Come on time, prepare to be tested and we wish you good luck.\n\n',
+                                              text: ' Come on time, prepare to be tested and we wish you good luck.\n\n',
                                               style: GoogleFonts.aldrich(
                                                 color: Colors.white70,
                                                 fontSize: 12,
@@ -855,15 +915,14 @@ class PlayersTablePageState extends State<PlayersTablePage> {
 }
 
 class PlayersTableDataSource extends DataGridSource {
-  PlayersTableDataSource(this.playersTableList, this.clubId) {
-    sort();
+  final String clubId;
+  List<PlayersTable> playersTableList = [];
+  List<DataGridRow> dataGridRows = <DataGridRow>[];
+  final Map<String, Map<String, dynamic>> aspectVisibilitySettings;
+
+  PlayersTableDataSource(this.playersTableList, this.clubId, this.aspectVisibilitySettings) {
     _buildDataRow();
   }
-
-  final String clubId; // Add this line
-  List<PlayersTable> playersTableList = [];
-
-  List<DataGridRow> dataGridRows = <DataGridRow>[];
 
   @override
   List<DataGridRow> get rows => dataGridRows.isEmpty ? [] : dataGridRows;
@@ -878,15 +937,20 @@ class PlayersTableDataSource extends DataGridSource {
               DataGridCell<int>(columnName: 'id', value: itemCount++),
               DataGridCell<String>(columnName: 'image', value: e.image),
               DataGridCell<String>(columnName: 'player_name', value: e.playerName),
-              DataGridCell<int>(columnName: 'matches_played', value: e.matchesPlayed),
-              DataGridCell<int>(columnName: 'goals_scored', value: e.goalsScored),
-              // DataGridCell<int>(columnName: 'assists', value: e.assists),
-              DataGridCell<int>(columnName: 'matches_started', value: e.matchesStarted),
-              DataGridCell<int>(columnName: 'matches_benched', value: e.matchesBenched),
-              DataGridCell<int>(columnName: 'yellow_card', value: e.yellowCard),
-              DataGridCell<int>(columnName: 'red_card', value: e.redCard),
-              DataGridCell<String>(columnName: 'player_position', value: e.playerPosition),
-              DataGridCell<String>(columnName: 'nationality', value: e.nationality),
+              if (aspectVisibilitySettings['matches_played']?['isVisible'] ?? true)
+                DataGridCell<int>(columnName: 'matches_played', value: e.matchesPlayed),
+              if (aspectVisibilitySettings['goals_scored']?['isVisible'] ?? true) DataGridCell<int>(columnName: 'goals_scored', value: e.goalsScored),
+              if (aspectVisibilitySettings['assists']?['isVisible'] ?? true) DataGridCell<int>(columnName: 'assists', value: e.assists),
+              if (aspectVisibilitySettings['matches_started']?['isVisible'] ?? true)
+                DataGridCell<int>(columnName: 'matches_started', value: e.matchesStarted),
+              if (aspectVisibilitySettings['matches_benched']?['isVisible'] ?? true)
+                DataGridCell<int>(columnName: 'matches_benched', value: e.matchesBenched),
+              if (aspectVisibilitySettings['yellow_card']?['isVisible'] ?? true) DataGridCell<int>(columnName: 'yellow_card', value: e.yellowCard),
+              if (aspectVisibilitySettings['red_card']?['isVisible'] ?? true) DataGridCell<int>(columnName: 'red_card', value: e.redCard),
+              if (aspectVisibilitySettings['player_position']?['isVisible'] ?? true)
+                DataGridCell<String>(columnName: 'player_position', value: e.playerPosition),
+              if (aspectVisibilitySettings['nationality']?['isVisible'] ?? true)
+                DataGridCell<String>(columnName: 'nationality', value: e.nationality),
             ]))
         .toList();
   }
@@ -894,11 +958,70 @@ class PlayersTableDataSource extends DataGridSource {
   @override
   Widget buildTableSummaryCellWidget(
       GridTableSummaryRow? summaryRow, GridSummaryColumn? summaryColumn, RowColumnIndex? rowColumnIndex, String? summaryValue) {
-    // TODO: implement buildTableSummaryCellWidget
+    // Define colors
+    Color goalsColor = Colors.blue; // Customize as needed
+    Color assistsColor = Colors.blue; // Customize as needed
+    Color countColor = Colors.orange; // Color for {Count}
+    Color numberColor = Colors.blue; // Color for numbers (e.g., 10, 56)
+    Color restColor = Colors.white70; // Default color for other text
+
+    if (summaryValue == null) return Container();
+
+    // Create a widget for rich text
+    TextSpan span = TextSpan(
+      style: const TextStyle(fontWeight: FontWeight.bold),
+      children: _buildTextSpans(summaryValue, goalsColor, assistsColor, countColor, numberColor, restColor),
+    );
+
     return Container(
       padding: const EdgeInsets.all(15.0),
-      child: Text(summaryValue!, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white70)),
+      child: RichText(
+        text: span,
+        textAlign: TextAlign.center, // Center the text inside the container
+      ),
     );
+  }
+
+// Helper method to build text spans
+  List<TextSpan> _buildTextSpans(String text, Color goalsColor, Color assistsColor, Color countColor, Color numberColor, Color restColor) {
+    List<TextSpan> spans = [];
+    final RegExp goalRegex = RegExp(r'(\d+ \bGoal\b(s)?|Goal(s)?)');
+    final RegExp assistRegex = RegExp(r'(\d+ \bAssist\b(s)?|Assist(s)?)');
+    final RegExp countRegex = RegExp(r'\{Count\}');
+    final RegExp numberRegex = RegExp(r'\d+'); // Regex to match numbers
+
+    int lastMatchEnd = 0;
+
+    // Use a combined regex to find all patterns we want to match
+    final RegExp combinedRegex = RegExp(r'(\d+ \bGoal\b(s)?|Goal(s)?|\d+ \bAssist\b(s)?|Assist(s)?|\{Count\}|\d+)');
+
+    for (final match in combinedRegex.allMatches(text)) {
+      if (lastMatchEnd < match.start) {
+        spans.add(TextSpan(text: text.substring(lastMatchEnd, match.start), style: TextStyle(color: restColor)));
+      }
+
+      String matchedText = text.substring(match.start, match.end);
+      if (goalRegex.hasMatch(matchedText)) {
+        spans.add(TextSpan(text: matchedText, style: TextStyle(color: goalsColor, fontWeight: FontWeight.bold)));
+      } else if (assistRegex.hasMatch(matchedText)) {
+        spans.add(TextSpan(text: matchedText, style: TextStyle(color: assistsColor, fontWeight: FontWeight.bold)));
+      } else if (countRegex.hasMatch(matchedText)) {
+        spans.add(TextSpan(text: matchedText, style: TextStyle(color: countColor, fontWeight: FontWeight.bold)));
+      } else if (numberRegex.hasMatch(matchedText)) {
+        spans.add(TextSpan(text: matchedText, style: TextStyle(color: numberColor, fontWeight: FontWeight.bold)));
+      } else {
+        spans.add(TextSpan(text: matchedText, style: TextStyle(color: restColor)));
+      }
+
+      lastMatchEnd = match.end;
+    }
+
+    // Add remaining text after the last match
+    if (lastMatchEnd < text.length) {
+      spans.add(TextSpan(text: text.substring(lastMatchEnd), style: TextStyle(color: restColor)));
+    }
+
+    return spans;
   }
 
   @override

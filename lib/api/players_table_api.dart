@@ -8,7 +8,7 @@ import '../model/second_team_class_model.dart';
 import '../model/sixth_team_class_model.dart';
 import '../model/third_team_class_model.dart';
 import '../notifier/players_table_notifier.dart';
-import 'get_teams_visibility_api.dart';
+import 'get_teams_classes_visibility_api.dart';
 
 Future<void> getPlayersTable(PlayersTableNotifier playersTableNotifier, String clubId, {bool orderByGoalsScored = true}) async {
   // Get visibility data

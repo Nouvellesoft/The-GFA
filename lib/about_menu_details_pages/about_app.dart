@@ -3,11 +3,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-String clubName = "Coventry Phoenix FC";
+String clubName = "";
 String title = "About Developer";
-String clubAlmanac = "$clubName App, 2023";
+String clubAlmanac = "$clubName App, 2024";
 String developerWebsite = "https://novelsoft.co.uk/";
 
 String googlePlayServicesPolicyWebsite = "https://play.google.com/about/privacy-security-deception/";
@@ -22,7 +23,9 @@ String gmailPolicyWebsite = "https://firebase.google.com/support/privacy/";
 String mailFIRST = "mailto:";
 String mailSECOND = "?subject=Hello ";
 
-String aboutApp = "PLEASE READ CAREFULLY.\n\nThe GFA (Grassroot Football App) was engineered and developed by 'Nouvellesoft.io Inc.'";
+String aboutApp = " was engineered and developed by ";
+String theGFA = "The GFA (Grassroot Football App)";
+String nouvellesoftTitle = "'Nouvellesoft.io Inc.'";
 String blemish =
     '"Do not be concerned about the blemishes and imperfections you may notice on the software, it is those blemishes that prove that the app is authentic. :)"';
 String copyrightTerms =
@@ -85,7 +88,7 @@ String privacyPolicyChanges1 =
     "We may update our Privacy Policy from time to time. Thus, you are advised to review this page periodically for any changes. We will notify you of any changes by posting the new Privacy Policy on this page. This policy is effective as of 2021-04-30";
 String contactUs = "Contact Us";
 String contactUs1 =
-    "If you have any questions or suggestions about our Terms and Conditions, Disclaimer, Privacy Policy, Software do not hesitate to send an email by clicking me too.";
+    "If you have any questions or suggestions about our Terms and Conditions, Disclaimer, Privacy Policy, Software do not hesitate to send an email by clicking here.";
 String termsEtConditionsMore = "For more information about our terms and conditions, please click me.";
 
 Color backgroundColor = const Color.fromRGBO(40, 38, 38, 1.0);
@@ -109,10 +112,12 @@ class AboutAppDetails extends StatefulWidget {
 // This class represents the stateful widget that displays the details about the app.
 class _AboutAppDetailsState extends State<AboutAppDetails> {
   final _email = "david.oludepo@gmail.com";
+  final _emailTwo = "david@nouvellesoft.io";
   final _instagram = "nouvellesoft";
   final _twitter = "novelsoftinc";
   final _facebook = "novelsoft";
   final _linkedIn = "nouvellesoft";
+  final _calendly = "david-oludepo";
 
   String mailFIRST = "mailto:";
   String mailSECOND = "?subject=Hello ";
@@ -120,663 +125,696 @@ class _AboutAppDetailsState extends State<AboutAppDetails> {
   String urlFacebook = "https://facebook.com/";
   String urlLinkedIn = "https://linkedin.com/company/";
   String urlInstagram = "https://instagram.com/";
+  String urlCalendly = "https://calendly.com/david-oludepo";
 
   late Stream<DocumentSnapshot<Map<String, dynamic>>> firestoreStream;
 
   @override
   Widget build(BuildContext context) {
-    // Scaffold widget provides a framework for implementing the basic material design visual layout structure of the app.
-    // It is the root of the widget tree for this screen.
-    return Scaffold(
-      // Background color of the scaffold.
-      backgroundColor: backgroundColor,
-      // AppBar widget provides a header section in the scaffold.
-      appBar: AppBar(
-        // Title of the app bar.
-        title: Text(
-          title,
-          style: TextStyle(color: appBarTextColor),
-        ),
-        // Whether to center the title.
-        centerTitle: true,
-        // Elevation of the app bar shadow.
-        elevation: 10,
-        // Background color of the app bar.
-        backgroundColor: appBarBackgroundColor,
-        // Leading widget of the app bar.
-        leading: IconButton(
-          // Icon to be displayed.
-          icon: Icon(Icons.arrow_back_ios, color: appBarIconColor),
-          // Function to be called when the icon is pressed.
-          onPressed: () {
-            // Navigate to the previous screen when the back arrow is pressed.
-            Navigator.pop(context);
-          },
-        ),
-        actions: [
-          PopupMenuButton<int>(
-            color: Colors.white,
-            icon: const Icon(
-              Icons.more_vert,
-              color: Colors.white,
-            ),
-            itemBuilder: (context) => [
-              const PopupMenuItem<int>(
-                value: 0,
-                child: Text(
-                  "Follow us on Instagram",
-                  style: TextStyle(color: Colors.black),
-                ),
+    return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+        // Stream that emits snapshots of the current contents of the Firestore document.
+        stream: firestoreStream,
+        // Function that gets called each time a new snapshot is available.
+        builder: (context, snapshot) {
+          // Check if the snapshot has data.
+          if (!snapshot.hasData) {
+            // If the snapshot doesn't have data, return a circular progress indicator to indicate that the data is loading.
+            return const CircularProgressIndicator();
+          }
+          clubName = snapshot.data!.data()!['club_name'];
+
+          // If the snapshot has data, return a container with an image background.
+          return Scaffold(
+            // Background color of the scaffold.
+            backgroundColor: backgroundColor,
+            // AppBar widget provides a header section in the scaffold.
+            appBar: AppBar(
+              // Title of the app bar.
+              title: Text(
+                title,
+                style: TextStyle(color: appBarTextColor),
               ),
-              const PopupMenuItem<int>(
-                value: 1,
-                child: Text(
-                  "Follow us on Twitter",
-                  style: TextStyle(color: Colors.black),
-                ),
-              ),
-              const PopupMenuItem<int>(
-                value: 2,
-                child: Text(
-                  "Follow us on Facebook",
-                  style: TextStyle(color: Colors.black),
-                ),
-              ),
-              const PopupMenuItem<int>(
-                value: 3,
-                child: Text(
-                  "Follow us on LinkedIn",
-                  style: TextStyle(color: Colors.black),
-                ),
-              ),
-              const PopupMenuItem<int>(
-                value: 4,
-                child: Text(
-                  "Send us an Email",
-                  style: TextStyle(color: Colors.black),
-                ),
-              ),
-            ],
-            onSelected: (item) {
-              switch (item) {
-                case 0:
-                  launchSocialMedia(_instagram, urlInstagram);
-                  break;
-                case 1:
-                  launchSocialMedia(_twitter, urlTwitter);
-                  break;
-                case 2:
-                  launchSocialMedia(_facebook, urlFacebook);
-                  break;
-                case 3:
-                  launchSocialMedia(_linkedIn, urlLinkedIn);
-                  break;
-                case 4:
-                  launchURL(mailFIRST + _email + mailSECOND);
-                  break;
-              }
-            },
-          ),
-        ],
-      ),
-      // Body widget of the scaffold.
-      body: SingleChildScrollView(
-        child: Column(
-          // Alignment of the children widgets in the column.
-          mainAxisAlignment: MainAxisAlignment.start,
-          // List of children widgets of the column.
-          children: <Widget>[
-            // Card widget displays content within a Material Design card.
-            Card(
-              // Elevation of the card shadow.
+              // Whether to center the title.
+              centerTitle: true,
+              // Elevation of the app bar shadow.
               elevation: 10,
-              // Margin of the card.
-              margin: const EdgeInsets.all(20),
-              // StreamBuilder widget listens to the Firestore collection and rebuilds itself whenever the collection changes.
-              child: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-                // Stream that emits snapshots of the current contents of the Firestore document.
-                stream: firestoreStream,
-                // Function that gets called each time a new snapshot is available.
-                builder: (context, snapshot) {
-                  // Check if the snapshot has data.
-                  if (!snapshot.hasData) {
-                    // If the snapshot doesn't have data, return a circular progress indicator to indicate that the data is loading.
-                    return const CircularProgressIndicator();
-                  }
-                  // If the snapshot has data, return a container with an image background.
-                  return Container(
-                    // Height of the container.
-                    height: 300,
-                    // Decoration of the container.
-                    decoration: BoxDecoration(
-                      // Image to be displayed as the background of the container.
-                      image: DecorationImage(
-                        // Cached network image provider that loads the image from the network and caches it.
-                        image: CachedNetworkImageProvider(
-                          snapshot.data?.data()!['about_app_page'],
-                        ),
-                        // Fit of the image within the container.
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  );
+              // Background color of the app bar.
+              backgroundColor: appBarBackgroundColor,
+              // Leading widget of the app bar.
+              leading: IconButton(
+                // Icon to be displayed.
+                icon: Icon(Icons.arrow_back_ios, color: appBarIconColor),
+                // Function to be called when the icon is pressed.
+                onPressed: () {
+                  // Navigate to the previous screen when the back arrow is pressed.
+                  Navigator.pop(context);
                 },
               ),
-            ),
-            // This widget displays a Card with multiple TextSpan widgets that contain legal terms and information
-            Card(
-              // Sets the margin of the card
-              margin: const EdgeInsets.all(20),
-              // Sets the background color of the card
-              color: cardBackgroundColor,
-              child: Column(
-                // Aligns children to the start of the main axis (vertical)
-                mainAxisAlignment: MainAxisAlignment.start,
-                // Aligns children to the end of the cross axis (horizontal)
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  // Adds a centered Card widget at the top of the column with the app title
-                  Center(
-                    child: Padding(
-                      padding: const EdgeInsets.only(
-                        top: 20,
+              actions: [
+                PopupMenuButton<int>(
+                  color: Colors.white,
+                  icon: const Icon(
+                    Icons.more_vert,
+                    color: Colors.white,
+                  ),
+                  itemBuilder: (context) => [
+                    const PopupMenuItem<int>(
+                      value: 0,
+                      child: Text(
+                        "Follow us on Instagram",
+                        style: TextStyle(color: Colors.black),
                       ),
-                      child: Card(
-                        color: headingCardColor,
-                        child: Padding(
-                          padding: const EdgeInsets.only(top: 15, bottom: 15, left: 30, right: 30),
-                          child: Text(
-                            // The app title
-                            clubAlmanac,
-                            textAlign: TextAlign.center,
-                            style: TextStyle(fontSize: 15, fontStyle: FontStyle.italic, color: headingCardTextColor, fontWeight: FontWeight.w700),
+                    ),
+                    const PopupMenuItem<int>(
+                      value: 1,
+                      child: Text(
+                        "Follow us on Twitter",
+                        style: TextStyle(color: Colors.black),
+                      ),
+                    ),
+                    const PopupMenuItem<int>(
+                      value: 2,
+                      child: Text(
+                        "Follow us on Facebook",
+                        style: TextStyle(color: Colors.black),
+                      ),
+                    ),
+                    const PopupMenuItem<int>(
+                      value: 3,
+                      child: Text(
+                        "Follow us on LinkedIn",
+                        style: TextStyle(color: Colors.black),
+                      ),
+                    ),
+                    const PopupMenuItem<int>(
+                      value: 4,
+                      child: Text(
+                        "Send us an Email",
+                        style: TextStyle(color: Colors.black),
+                      ),
+                    ),
+                  ],
+                  onSelected: (item) {
+                    switch (item) {
+                      case 0:
+                        launchSocialMedia(_instagram, urlInstagram);
+                        break;
+                      case 1:
+                        launchSocialMedia(_twitter, urlTwitter);
+                        break;
+                      case 2:
+                        launchSocialMedia(_facebook, urlFacebook);
+                        break;
+                      case 3:
+                        launchSocialMedia(_linkedIn, urlLinkedIn);
+                        break;
+                      case 4:
+                        launchURL(mailFIRST + _email + mailSECOND);
+                        break;
+                    }
+                  },
+                ),
+              ],
+            ),
+            // Body widget of the scaffold.
+            body: SingleChildScrollView(
+              child: Column(
+                // Alignment of the children widgets in the column.
+                mainAxisAlignment: MainAxisAlignment.start,
+                // List of children widgets of the column.
+                children: <Widget>[
+                  // Card widget displays content within a Material Design card.
+                  Card(
+                    // Elevation of the card shadow.
+                    elevation: 10,
+                    // Margin of the card.
+                    margin: const EdgeInsets.all(20),
+                    // StreamBuilder widget listens to the Firestore collection and rebuilds itself whenever the collection changes.
+                    child: Container(
+                      // Height of the container.
+                      height: 300,
+                      // Decoration of the container.
+                      decoration: BoxDecoration(
+                        // Image to be displayed as the background of the container.
+                        image: DecorationImage(
+                          // Cached network image provider that loads the image from the network and caches it.
+                          image: CachedNetworkImageProvider(
+                            snapshot.data?.data()!['about_app_page'],
                           ),
+                          // Fit of the image within the container.
+                          fit: BoxFit.cover,
                         ),
                       ),
                     ),
                   ),
-                  const SizedBox(height: 15),
-                  Wrap(
-                    alignment: WrapAlignment.start,
-                    spacing: -30.0,
-                    runSpacing: 9.0,
-                    children: [
-                      SocialMediaButton(
-                        icon: FontAwesomeIcons.facebook,
-                        onPressed: () {
-                          launchSocialMedia(_facebook, urlFacebook);
-                        },
-                      ),
-                      SocialMediaButton(
-                        icon: FontAwesomeIcons.instagram,
-                        onPressed: () {
-                          launchSocialMedia(_instagram, urlInstagram);
-                        },
-                      ),
-                      SocialMediaButton(
-                        icon: FontAwesomeIcons.linkedin,
-                        onPressed: () {
-                          launchSocialMedia(_linkedIn, urlLinkedIn);
-                        },
-                      ),
-                      SocialMediaButton(
-                        icon: FontAwesomeIcons.twitter,
-                        onPressed: () {
-                          launchSocialMedia(_twitter, urlTwitter);
-                        },
-                      ),
-                      SocialMediaButton(
-                        icon: Icons.email,
-                        onPressed: () {
-                          launchURL(mailFIRST + _email + mailSECOND);
-                        },
-                      ),
-                      SocialMediaButton(
-                        icon: FontAwesomeIcons.calendarCheck,
-                        onPressed: () {
-                          dynamic calendlyUrl = "https://calendly.com/david-oludepo";
-                          launchURL(calendlyUrl);
-                        },
-                      ),
-                      SocialMediaButton(
-                        icon: FontAwesomeIcons.google,
-                        onPressed: () {
-                          dynamic websiteUrl = "https://novelsoft.co.uk";
-                          launchURL(websiteUrl);
-                        },
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  // Adds a RichText widget with multiple TextSpan widgets that contain legal terms and information
-                  Padding(
-                    padding: const EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 10),
-                    child: RichText(
-                      // Aligns the text to be justified
-                      textAlign: TextAlign.justify,
-                      text: TextSpan(
-                        children: <TextSpan>[
-                          // Displays the app description text
-                          TextSpan(
-                            text: '$aboutApp\n\n\n',
-                            style: TextStyle(
-                              fontSize: 15,
-                              color: cardTextColor,
-                              fontWeight: FontWeight.w600,
+                  // This widget displays a Card with multiple TextSpan widgets that contain legal terms and information
+                  Card(
+                    // Sets the margin of the card
+                    margin: const EdgeInsets.all(20),
+                    // Sets the background color of the card
+                    color: cardBackgroundColor,
+                    child: Column(
+                      // Aligns children to the start of the main axis (vertical)
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      // Aligns children to the end of the cross axis (horizontal)
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        // Adds a centered Card widget at the top of the column with the app title
+                        Center(
+                          child: Padding(
+                            padding: const EdgeInsets.only(
+                              top: 20,
                             ),
-                          ),
-                          // Displays a disclaimer text
-                          TextSpan(
-                            text: '$blemish\n\n\n',
-                            style: TextStyle(fontSize: 14, color: cardTextColor, fontWeight: FontWeight.w300, fontStyle: FontStyle.italic),
-                          ),
-                          // Displays the terms and conditions text
-                          TextSpan(
-                            text: '$termsEtConditions\n\n',
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: cardTextColor,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                          // Displays the copyright text
-                          TextSpan(
-                            text: '$copyrightTerms\n\n',
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: cardTextColor,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                          // Displays additional terms and conditions
-                          TextSpan(
-                            text: '$termsEtConditions2\n\n',
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: cardTextColor,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                          // Displays more terms and conditions
-                          TextSpan(
-                            text: '$termsEtConditions3\n\n',
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: cardTextColor,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                          TextSpan(
-                            text: '$termsEtConditions4\n\n',
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: cardTextColor,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                          TextSpan(
-                            text: '$termsEtConditions5\n\n',
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: cardTextColor,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                          TextSpan(
-                            text: '$termsEtConditions6\n\n',
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: cardTextColor,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                          TextSpan(
-                            text: '$termsEtConditions7\n\n',
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: cardTextColor,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                          TextSpan(
-                            text: '$disclaimer\n\n',
-                            style: TextStyle(
-                              fontSize: 15,
-                              color: cardTextColor,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          TextSpan(
-                            text: '$disclaimer1\n\n\n',
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: cardTextColor,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                          TextSpan(
-                            text: '$privacyPolicy\n\n',
-                            style: TextStyle(
-                              fontSize: 15,
-                              color: cardTextColor,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          TextSpan(
-                            text: '$privacyPolicy1\n\n',
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: cardTextColor,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                          TextSpan(
-                            text: '$privacyPolicy2\n\n',
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: cardTextColor,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                          TextSpan(
-                            text: '$privacyPolicy3\n\n\n',
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: cardTextColor,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                          TextSpan(
-                            text: '$infoCollection\n\n',
-                            style: TextStyle(
-                              fontSize: 15,
-                              color: cardTextColor,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          TextSpan(
-                            text: '$infoCollection1\n\n',
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: cardTextColor,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                          TextSpan(
-                            text: '$infoCollection2\n\n',
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: cardTextColor,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                          TextSpan(
-                            text: '$infoCollection3\n\n',
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: cardTextColor,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                          TextSpan(
-                              text: '$infoCollectionLink1\n\n',
-                              style: TextStyle(
-                                fontSize: 15,
-                                color: cardTextColor,
-                                fontWeight: FontWeight.w400,
-                                decoration: TextDecoration.underline,
+                            child: Card(
+                              color: headingCardColor,
+                              child: Padding(
+                                padding: const EdgeInsets.only(top: 15, bottom: 15, left: 30, right: 30),
+                                child: Text(
+                                  // The app title
+                                  clubAlmanac,
+                                  textAlign: TextAlign.center,
+                                  style:
+                                      TextStyle(fontSize: 15, fontStyle: FontStyle.italic, color: headingCardTextColor, fontWeight: FontWeight.w700),
+                                ),
                               ),
-                              recognizer: TapGestureRecognizer()
-                                ..onTap = () {
-                                  launchUrl(googlePlayServicesPolicyWebsite as Uri);
-                                }),
-                          TextSpan(
-                              text: '$infoCollectionLink2\n\n',
-                              style: TextStyle(
-                                fontSize: 15,
-                                color: cardTextColor,
-                                fontWeight: FontWeight.w400,
-                                decoration: TextDecoration.underline,
-                              ),
-                              recognizer: TapGestureRecognizer()
-                                ..onTap = () {
-                                  launchUrl(googleAnalyticsFirebasePolicyWebsite as Uri);
-                                }),
-                          TextSpan(
-                              text: '$infoCollectionLink3\n\n',
-                              style: TextStyle(
-                                fontSize: 15,
-                                color: cardTextColor,
-                                fontWeight: FontWeight.w400,
-                                decoration: TextDecoration.underline,
-                              ),
-                              recognizer: TapGestureRecognizer()
-                                ..onTap = () {
-                                  launchUrl(firebaseCrashlyticsPolicyWebsite as Uri);
-                                }),
-                          TextSpan(
-                              text: '$infoCollectionLink4\n\n',
-                              style: TextStyle(
-                                fontSize: 15,
-                                color: cardTextColor,
-                                fontWeight: FontWeight.w400,
-                                decoration: TextDecoration.underline,
-                              ),
-                              recognizer: TapGestureRecognizer()
-                                ..onTap = () {
-                                  launchUrl(facebookPolicyWebsite as Uri);
-                                }),
-                          TextSpan(
-                              text: '$infoCollectionLink5\n\n',
-                              style: TextStyle(
-                                fontSize: 15,
-                                color: cardTextColor,
-                                fontWeight: FontWeight.w400,
-                                decoration: TextDecoration.underline,
-                              ),
-                              recognizer: TapGestureRecognizer()
-                                ..onTap = () {
-                                  launchUrl(twitterPolicyWebsite as Uri);
-                                }),
-                          TextSpan(
-                              text: '$infoCollectionLink6\n\n',
-                              style: TextStyle(
-                                fontSize: 15,
-                                color: cardTextColor,
-                                fontWeight: FontWeight.w400,
-                                decoration: TextDecoration.underline,
-                              ),
-                              recognizer: TapGestureRecognizer()
-                                ..onTap = () {
-                                  launchUrl(instagramPolicyWebsite as Uri);
-                                }),
-                          TextSpan(
-                              text: '$infoCollectionLink7\n\n',
-                              style: TextStyle(
-                                fontSize: 15,
-                                color: cardTextColor,
-                                fontWeight: FontWeight.w400,
-                                decoration: TextDecoration.underline,
-                              ),
-                              recognizer: TapGestureRecognizer()
-                                ..onTap = () {
-                                  launchUrl(linkedInPolicyWebsite as Uri);
-                                }),
-                          TextSpan(
-                              text: '$infoCollectionLink8\n\n\n',
-                              style: TextStyle(
-                                fontSize: 15,
-                                color: cardTextColor,
-                                fontWeight: FontWeight.w400,
-                                decoration: TextDecoration.underline,
-                              ),
-                              recognizer: TapGestureRecognizer()
-                                ..onTap = () {
-                                  launchUrl(gmailPolicyWebsite as Uri);
-                                }),
-                          TextSpan(
-                            text: '$logData\n\n',
-                            style: TextStyle(
-                              fontSize: 15,
-                              color: cardTextColor,
-                              fontWeight: FontWeight.bold,
                             ),
                           ),
-                          TextSpan(
-                            text: '$logData1\n\n\n',
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: cardTextColor,
-                              fontWeight: FontWeight.w400,
+                        ),
+                        const SizedBox(height: 15),
+                        Wrap(
+                          alignment: WrapAlignment.start,
+                          spacing: -30.0,
+                          runSpacing: 9.0,
+                          children: [
+                            SocialMediaButton(
+                              icon: FontAwesomeIcons.facebook,
+                              onPressed: () {
+                                launchSocialMedia(_facebook, urlFacebook);
+                              },
+                            ),
+                            SocialMediaButton(
+                              icon: FontAwesomeIcons.instagram,
+                              onPressed: () {
+                                launchSocialMedia(_instagram, urlInstagram);
+                              },
+                            ),
+                            SocialMediaButton(
+                              icon: FontAwesomeIcons.linkedin,
+                              onPressed: () {
+                                launchSocialMedia(_linkedIn, urlLinkedIn);
+                              },
+                            ),
+                            SocialMediaButton(
+                              icon: FontAwesomeIcons.xTwitter,
+                              onPressed: () {
+                                launchSocialMedia(_twitter, urlTwitter);
+                              },
+                            ),
+                            SocialMediaButton(
+                              icon: Icons.email,
+                              onPressed: () {
+                                launchURL(mailFIRST + _email + mailSECOND);
+                              },
+                            ),
+                            SocialMediaButton(
+                              icon: FontAwesomeIcons.calendarCheck,
+                              onPressed: () {
+                                dynamic calendlyUrl = urlCalendly + _calendly;
+                                launchURL(calendlyUrl);
+                              },
+                            ),
+                            SocialMediaButton(
+                              icon: MdiIcons.searchWeb,
+                              onPressed: () {
+                                dynamic websiteUrl = developerWebsite;
+                                launchURL(websiteUrl);
+                              },
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 20),
+                        // Adds a RichText widget with multiple TextSpan widgets that contain legal terms and information
+                        Padding(
+                          padding: const EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 10),
+                          child: RichText(
+                            // Aligns the text to be justified
+                            textAlign: TextAlign.justify,
+                            text: TextSpan(
+                              children: <TextSpan>[
+                                // Displays the app description text
+                                // Displays the "PLEASE READ CAREFULLY." part in white
+                                TextSpan(
+                                  text: 'PLEASE READ CAREFULLY.\n\n',
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    color: cardTextColor, // Change this to the desired color for the text
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                // Displays "The GFA" part in blue
+                                TextSpan(
+                                  text: theGFA,
+                                  style: const TextStyle(
+                                    fontSize: 15,
+                                    color: Colors.blue, // Set the color to blue
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                TextSpan(
+                                  text: aboutApp,
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    color: cardTextColor, // Change this to the desired color for the text
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                // Displays the rest of the text in white
+                                TextSpan(
+                                  text: '$nouvellesoftTitle\n\n',
+                                  style: TextStyle(
+                                      fontSize: 15,
+                                      color: cardTextColor, // Change this to the desired color for the text
+                                      fontWeight: FontWeight.w600,
+                                      decoration: TextDecoration.underline),
+                                  recognizer: TapGestureRecognizer()
+                                    ..onTap = () {
+                                      // Handle URL launch here
+                                      launchURL(developerWebsite);
+                                    },
+                                ),
+                                // Displays a disclaimer text
+                                TextSpan(
+                                  text: '$blemish\n\n\n',
+                                  style: TextStyle(fontSize: 14, color: cardTextColor, fontWeight: FontWeight.w300, fontStyle: FontStyle.italic),
+                                ),
+                                // Displays the terms and conditions text
+                                TextSpan(
+                                  text: '$termsEtConditions\n\n',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: cardTextColor,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                                // Displays the copyright text
+                                TextSpan(
+                                  text: '$copyrightTerms\n\n',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: cardTextColor,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                                // Displays additional terms and conditions
+                                TextSpan(
+                                  text: '$termsEtConditions2\n\n',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: cardTextColor,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                                // Displays more terms and conditions
+                                TextSpan(
+                                  text: '$termsEtConditions3\n\n',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: cardTextColor,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                                TextSpan(
+                                  text: '$termsEtConditions4\n\n',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: cardTextColor,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                                TextSpan(
+                                  text: '$termsEtConditions5\n\n',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: cardTextColor,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                                TextSpan(
+                                  text: '$termsEtConditions6\n\n',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: cardTextColor,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                                TextSpan(
+                                  text: '$termsEtConditions7\n\n',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: cardTextColor,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                                TextSpan(
+                                  text: '$disclaimer\n\n',
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    color: cardTextColor,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                TextSpan(
+                                  text: '$disclaimer1\n\n\n',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: cardTextColor,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                                TextSpan(
+                                  text: '$privacyPolicy\n\n',
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    color: cardTextColor,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                TextSpan(
+                                  text: '$privacyPolicy1\n\n',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: cardTextColor,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                                TextSpan(
+                                  text: '$privacyPolicy2\n\n',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: cardTextColor,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                                TextSpan(
+                                  text: '$privacyPolicy3\n\n\n',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: cardTextColor,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                                TextSpan(
+                                  text: '$infoCollection\n\n',
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    color: cardTextColor,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                TextSpan(
+                                  text: '$infoCollection1\n\n',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: cardTextColor,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                                TextSpan(
+                                  text: '$infoCollection2\n\n',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: cardTextColor,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                                TextSpan(
+                                  text: '$infoCollection3\n\n',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: cardTextColor,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                                TextSpan(
+                                    text: '$infoCollectionLink1\n\n',
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      color: cardTextColor,
+                                      fontWeight: FontWeight.w400,
+                                      decoration: TextDecoration.underline,
+                                    ),
+                                    recognizer: TapGestureRecognizer()
+                                      ..onTap = () {
+                                        launchUrl(googlePlayServicesPolicyWebsite as Uri);
+                                      }),
+                                TextSpan(
+                                    text: '$infoCollectionLink2\n\n',
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      color: cardTextColor,
+                                      fontWeight: FontWeight.w400,
+                                      decoration: TextDecoration.underline,
+                                    ),
+                                    recognizer: TapGestureRecognizer()
+                                      ..onTap = () {
+                                        launchUrl(googleAnalyticsFirebasePolicyWebsite as Uri);
+                                      }),
+                                TextSpan(
+                                    text: '$infoCollectionLink3\n\n',
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      color: cardTextColor,
+                                      fontWeight: FontWeight.w400,
+                                      decoration: TextDecoration.underline,
+                                    ),
+                                    recognizer: TapGestureRecognizer()
+                                      ..onTap = () {
+                                        launchUrl(firebaseCrashlyticsPolicyWebsite as Uri);
+                                      }),
+                                TextSpan(
+                                    text: '$infoCollectionLink4\n\n',
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      color: cardTextColor,
+                                      fontWeight: FontWeight.w400,
+                                      decoration: TextDecoration.underline,
+                                    ),
+                                    recognizer: TapGestureRecognizer()
+                                      ..onTap = () {
+                                        launchUrl(facebookPolicyWebsite as Uri);
+                                      }),
+                                TextSpan(
+                                    text: '$infoCollectionLink5\n\n',
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      color: cardTextColor,
+                                      fontWeight: FontWeight.w400,
+                                      decoration: TextDecoration.underline,
+                                    ),
+                                    recognizer: TapGestureRecognizer()
+                                      ..onTap = () {
+                                        launchUrl(twitterPolicyWebsite as Uri);
+                                      }),
+                                TextSpan(
+                                    text: '$infoCollectionLink6\n\n',
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      color: cardTextColor,
+                                      fontWeight: FontWeight.w400,
+                                      decoration: TextDecoration.underline,
+                                    ),
+                                    recognizer: TapGestureRecognizer()
+                                      ..onTap = () {
+                                        launchUrl(instagramPolicyWebsite as Uri);
+                                      }),
+                                TextSpan(
+                                    text: '$infoCollectionLink7\n\n',
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      color: cardTextColor,
+                                      fontWeight: FontWeight.w400,
+                                      decoration: TextDecoration.underline,
+                                    ),
+                                    recognizer: TapGestureRecognizer()
+                                      ..onTap = () {
+                                        launchUrl(linkedInPolicyWebsite as Uri);
+                                      }),
+                                TextSpan(
+                                    text: '$infoCollectionLink8\n\n\n',
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      color: cardTextColor,
+                                      fontWeight: FontWeight.w400,
+                                      decoration: TextDecoration.underline,
+                                    ),
+                                    recognizer: TapGestureRecognizer()
+                                      ..onTap = () {
+                                        launchUrl(gmailPolicyWebsite as Uri);
+                                      }),
+                                TextSpan(
+                                  text: '$logData\n\n',
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    color: cardTextColor,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                TextSpan(
+                                  text: '$logData1\n\n\n',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: cardTextColor,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                                TextSpan(
+                                  text: '$serviceProviders\n\n',
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    color: cardTextColor,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                TextSpan(
+                                  text: '$serviceProviders1\n\n',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: cardTextColor,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                                TextSpan(
+                                  text: '$serviceProviders2\n',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: cardTextColor,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                                TextSpan(
+                                  text: '$serviceProviders3\n',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: cardTextColor,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                                TextSpan(
+                                  text: '$serviceProviders4\n',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: cardTextColor,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                                TextSpan(
+                                  text: '$serviceProviders5\n\n',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: cardTextColor,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                                TextSpan(
+                                  text: '$serviceProviders6\n\n\n',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: cardTextColor,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                                TextSpan(
+                                  text: '$security\n\n',
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    color: cardTextColor,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                TextSpan(
+                                  text: '$security1\n\n\n',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: cardTextColor,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                                TextSpan(
+                                  text: '$childrenPrivacy\n\n',
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    color: cardTextColor,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                TextSpan(
+                                  text: '$childrenPrivacy1\n\n\n',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: cardTextColor,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                                TextSpan(
+                                  text: '$privacyPolicyChanges\n\n',
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    color: cardTextColor,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                TextSpan(
+                                  text: '$privacyPolicyChanges1\n\n\n',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: cardTextColor,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                                TextSpan(
+                                  text: '$contactUs\n\n',
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    color: cardTextColor,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                TextSpan(
+                                    text: '$termsEtConditionsMore\n\n',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: cardTextColor,
+                                      fontWeight: FontWeight.w500,
+                                      fontStyle: FontStyle.italic,
+                                    ),
+                                    recognizer: TapGestureRecognizer()
+                                      ..onTap = () {
+                                        launchUrl(developerWebsite as Uri);
+                                      }),
+                                TextSpan(
+                                    text: '$contactUs1\n\n',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: cardTextColor,
+                                      fontWeight: FontWeight.w500,
+                                      fontStyle: FontStyle.italic,
+                                    ),
+                                    recognizer: TapGestureRecognizer()
+                                      ..onTap = () {
+                                        launchURL("$mailFIRST$_emailTwo$mailSECOND");
+                                      }),
+                              ],
                             ),
                           ),
-                          TextSpan(
-                            text: '$serviceProviders\n\n',
-                            style: TextStyle(
-                              fontSize: 15,
-                              color: cardTextColor,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          TextSpan(
-                            text: '$serviceProviders1\n\n',
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: cardTextColor,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                          TextSpan(
-                            text: '$serviceProviders2\n',
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: cardTextColor,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                          TextSpan(
-                            text: '$serviceProviders3\n',
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: cardTextColor,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                          TextSpan(
-                            text: '$serviceProviders4\n',
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: cardTextColor,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                          TextSpan(
-                            text: '$serviceProviders5\n\n',
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: cardTextColor,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                          TextSpan(
-                            text: '$serviceProviders6\n\n\n',
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: cardTextColor,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                          TextSpan(
-                            text: '$security\n\n',
-                            style: TextStyle(
-                              fontSize: 15,
-                              color: cardTextColor,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          TextSpan(
-                            text: '$security1\n\n\n',
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: cardTextColor,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                          TextSpan(
-                            text: '$childrenPrivacy\n\n',
-                            style: TextStyle(
-                              fontSize: 15,
-                              color: cardTextColor,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          TextSpan(
-                            text: '$childrenPrivacy1\n\n\n',
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: cardTextColor,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                          TextSpan(
-                            text: '$privacyPolicyChanges\n\n',
-                            style: TextStyle(
-                              fontSize: 15,
-                              color: cardTextColor,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          TextSpan(
-                            text: '$privacyPolicyChanges1\n\n\n',
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: cardTextColor,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                          TextSpan(
-                            text: '$contactUs\n\n',
-                            style: TextStyle(
-                              fontSize: 15,
-                              color: cardTextColor,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          TextSpan(
-                              text: '$termsEtConditionsMore\n\n',
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: cardTextColor,
-                                fontWeight: FontWeight.w500,
-                                fontStyle: FontStyle.italic,
-                              ),
-                              recognizer: TapGestureRecognizer()
-                                ..onTap = () {
-                                  launchUrl(developerWebsite as Uri);
-                                }),
-                          TextSpan(
-                              text: '$contactUs1\n\n',
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: cardTextColor,
-                                fontWeight: FontWeight.w500,
-                                fontStyle: FontStyle.italic,
-                              ),
-                              recognizer: TapGestureRecognizer()
-                                ..onTap = () {
-                                  launchURL("${mailFIRST}hello@nouvellesoft.io$mailSECOND");
-                                }),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
               ),
             ),
-          ],
-        ),
-      ),
-    );
+          );
+        });
   }
 
   @override
@@ -786,8 +824,8 @@ class _AboutAppDetailsState extends State<AboutAppDetails> {
     firestoreStream = FirebaseFirestore.instance
         .collection('clubs')
         .doc(widget.clubId)
-        .collection('SliversPages')
-        .doc('non_slivers_pages')
+        .collection('AboutClub')
+        .doc('about_club_page')
         .snapshots()
         .distinct(); // Ensure distinct events
   }

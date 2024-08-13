@@ -20,8 +20,9 @@ import 'package:sms_autofill/sms_autofill.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../notifier/first_team_class_notifier.dart';
+import '../notifier/club_global_notifier.dart';
 
-String clubName = "Coventry Phoenix FC";
+String clubName = "";
 
 String callFIRST = "tel:+44";
 String smsFIRST = "sms:+44";
@@ -537,6 +538,7 @@ class _SubPageState extends State<SubPage> {
 
   @override
   Widget build(BuildContext context) {
+    clubName = Provider.of<ClubGlobalProvider>(context).clubName;
     firstTeamClassNotifier = Provider.of<FirstTeamClassNotifier>(context, listen: true);
 
     return ConfettiWidget(
@@ -4925,19 +4927,19 @@ class _SubPageState extends State<SubPage> {
         // barrierColor: const Color.fromRGBO(66, 67, 69, 1.0),
         context: context,
         builder: (BuildContext context) => PopScope(
-          onPopInvokedWithResult: (didPop, result) async {
-            // Perform your cleanup actions
-            otpCode = '';
-            isOTPComplete = false;
+              onPopInvokedWithResult: (didPop, result) async {
+                // Perform your cleanup actions
+                otpCode = '';
+                isOTPComplete = false;
 
-            // Optionally handle the pop result
-            // You can do additional things based on `didPop` and `result`
-            if (didPop) {
-              // Allow the pop to proceed
-              Navigator.of(context).pop();
-            }
-          },
-          canPop: true, // Allow the pop action
+                // Optionally handle the pop result
+                // You can do additional things based on `didPop` and `result`
+                if (didPop) {
+                  // Allow the pop to proceed
+                  Navigator.of(context).pop();
+                }
+              },
+              canPop: true, // Allow the pop action
               child: AlertDialog(
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20.0),
@@ -4957,11 +4959,11 @@ class _SubPageState extends State<SubPage> {
                   ),
                   TextButton(
                     onPressed: () {
-                            verifyOTPCode();
-                            setState(() {
-                              otpCode = '';
-                            });
-                          },
+                      verifyOTPCode();
+                      setState(() {
+                        otpCode = '';
+                      });
+                    },
                     child: const Text('Verify OTP', style: TextStyle(color: Colors.black)),
                   ),
                 ],

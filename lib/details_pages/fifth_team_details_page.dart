@@ -19,9 +19,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sms_autofill/sms_autofill.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../notifier/club_global_notifier.dart';
 import '../notifier/fifth_team_class_notifier.dart';
 
-String clubName = "Coventry Phoenix FC";
+String clubName = "";
 
 String callFIRST = "tel:+44";
 String smsFIRST = "sms:+44";
@@ -536,6 +537,7 @@ class _FifthTeamClassDetailsPage extends State<FifthTeamClassDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
+    clubName = Provider.of<ClubGlobalProvider>(context).clubName;
     fifthTeamClassNotifier = Provider.of<FifthTeamClassNotifier>(context, listen: true);
 
     return ConfettiWidget(

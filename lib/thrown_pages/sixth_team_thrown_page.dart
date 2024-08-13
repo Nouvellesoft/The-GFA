@@ -21,10 +21,11 @@ import '../bottom_nav_stats_pages/players_table_page.dart';
 import '../club_admin/club_admin_page.dart';
 import '../details_pages/sixth_team_details_page.dart';
 import '../home_page/home_page_deux.dart';
+import '../notifier/club_global_notifier.dart';
 import '../notifier/sixth_team_class_notifier.dart';
 import '../thrown_searches/sixth_team_thrown_search.dart';
 
-String clubName = "Coventry Phoenix FC";
+String clubName = "";
 String thrownName = "All Players List - B";
 
 String exitAppStatement = "Exit from App";
@@ -248,7 +249,7 @@ class _MySixthTeamClassPage extends State<MySixthTeamClassPage> {
   }
 
   void navigateToAppStore(context) async {
-    LaunchReview.launch(androidAppId: 'com.icdatinnovations.coventry_phoenix_fc', iOSAppId: '1637554276');
+    LaunchReview.launch(androidAppId: 'com.nouvellesoft.thegfa', iOSAppId: '1637554276');
     Navigator.of(context).pop(false);
   }
 
@@ -378,7 +379,7 @@ class _MySixthTeamClassPage extends State<MySixthTeamClassPage> {
 
                 // Retrieve the stored passcode from Firestore
                 DocumentSnapshot<Map<String, dynamic>> snapshot =
-                    await FirebaseFirestore.instance.collection('clubs').doc(widget.clubId).collection('SliversPages').doc('non_slivers_pages').get();
+                    await FirebaseFirestore.instance.collection('clubs').doc(widget.clubId).collection('AboutClub').doc('about_club_page').get();
 
                 String storedPasscode = snapshot.data()!['admin_passcode'] ?? '';
 
@@ -446,6 +447,7 @@ class _MySixthTeamClassPage extends State<MySixthTeamClassPage> {
 
   @override
   Widget build(BuildContext context) {
+    clubName = Provider.of<ClubGlobalProvider>(context).clubName;
     SixthTeamClassNotifier sixthTeamClassNotifier = Provider.of<SixthTeamClassNotifier>(context);
 
     return PopScope(

@@ -35,14 +35,14 @@ class MyChangePagesCoverPhotoPageState extends State<MyChangePagesCoverPhotoPage
     try {
       String imageUrl = await _uploadImageToStorage(image, 'sliver_image_${DateTime.now().millisecondsSinceEpoch}.jpg');
 
-      if (documentId == 'non_slivers_pages' && imageIndex == 5) {
+      if (documentId == 'about_club_page' && imageIndex == 5) {
         // Update 'sidebar_page' field in the 'non_slivers_pages' document
-        await firestore.collection('clubs').doc(widget.clubId).collection('SliversPages').doc(documentId).update({
+        await firestore.collection('clubs').doc(widget.clubId).collection('AboutClub').doc(documentId).update({
           'sidebar_page': imageUrl,
         });
       } else {
         // Update 'slivers_page_$imageIndex' field in other documents
-        await firestore.collection('clubs').doc(widget.clubId).collection('SliversPages').doc(documentId).update({
+        await firestore.collection('clubs').doc(widget.clubId).collection('AboutClub').doc(documentId).update({
           'slivers_page_$imageIndex': imageUrl,
         });
       }

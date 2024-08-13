@@ -228,8 +228,8 @@ class MySocialMediaPageState extends State<MySocialMediaPage> {
     firestoreStream = FirebaseFirestore.instance
         .collection('clubs')
         .doc(widget.clubId)
-        .collection('SliversPages')
-        .doc('non_slivers_pages')
+        .collection('AboutClub')
+        .doc('about_club_page')
         .snapshots()
         .distinct(); // Ensure distinct events
 

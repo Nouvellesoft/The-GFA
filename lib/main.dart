@@ -11,6 +11,7 @@ import 'package:flutter/services.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:the_gfa/home_page/club_lists.dart';
+import 'package:the_gfa/notifier/club_global_notifier.dart';
 import 'package:the_gfa/notifier/fifth_team_class_notifier.dart';
 import 'package:the_gfa/notifier/fourth_team_class_notifier.dart';
 import 'package:the_gfa/notifier/sixth_team_class_notifier.dart';
@@ -180,6 +181,9 @@ void main() async {
       ),
       ChangeNotifierProvider(
         create: (context) => PlayersTableNotifier(),
+      ),
+      ChangeNotifierProvider(
+        create: (context) => ClubGlobalProvider(),
       ),
     ], child: const MyApp()));
 

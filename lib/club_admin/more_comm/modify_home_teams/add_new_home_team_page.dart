@@ -1,8 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:provider/provider.dart';
 
 import '../../../bloc_navigation_bloc/navigation_bloc.dart';
+import '../../../notifier/club_global_notifier.dart';
 
 class MyAddNewHomeTeamPage extends StatefulWidget implements NavigationStates {
   final String clubId;
@@ -17,8 +19,12 @@ class MyAddNewHomeTeamPageState extends State<MyAddNewHomeTeamPage> {
   bool _isSubmitting = false;
   final _formKey = GlobalKey<FormState>();
 
+  String clubName = '';
+
   @override
   Widget build(BuildContext context) {
+    clubName = Provider.of<ClubGlobalProvider>(context).clubName;
+
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -29,9 +35,9 @@ class MyAddNewHomeTeamPageState extends State<MyAddNewHomeTeamPage> {
               SizedBox(height: MediaQuery.sizeOf(context).height * 0.05),
               TextFormField(
                 controller: _homeTeamNameController,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'Home Team Name',
-                  hintText: "Coventry Phoenix U14",
+                  hintText: "$clubName U14",
                 ),
                 validator: (value) {
                   if (value!.isEmpty) {

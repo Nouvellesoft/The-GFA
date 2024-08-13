@@ -6,7 +6,7 @@ import '../../api/coaching_staff_api.dart';
 import '../../api/fifth_team_class_api.dart';
 import '../../api/first_team_class_api.dart';
 import '../../api/fourth_team_class_api.dart';
-import '../../api/get_teams_visibility_api.dart';
+import '../../api/get_teams_classes_visibility_api.dart';
 import '../../api/management_body_api.dart';
 import '../../api/second_team_class_api.dart';
 import '../../api/sixth_team_class_api.dart';

@@ -1,14 +1,20 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:provider/provider.dart';
 
+import '../notifier/club_global_notifier.dart';
 import '../sidebar/sidebar_layout.dart';
+
+String clubName = '';
 
 class PandCTransitions extends StatelessWidget {
   const PandCTransitions({super.key});
 
   @override
   Widget build(BuildContext context) {
+    clubName = Provider.of<ClubGlobalProvider>(context).clubName;
+
     return Scaffold(
       backgroundColor: Colors.black,
       body: Center(
@@ -61,9 +67,9 @@ class PandCTransitions extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           // const SizedBox(height: 60),
-          const Text(
-            'Welcome to\n Coventry Phoenix FC App',
-            style: TextStyle(
+           Text(
+            "Welcome to\n + $clubName + App",
+            style: const TextStyle(
               color: Colors.white,
               fontSize: 18,
               fontWeight: FontWeight.bold,
@@ -158,8 +164,8 @@ class PandCTransitions extends StatelessWidget {
 
                 // Retrieve the stored passcode from Firestore
                 DocumentSnapshot<Map<String, dynamic>> snapshot = await FirebaseFirestore.instance
-                    .collection('SliversPages') // Replace with your Firestore collection
-                    .doc('non_slivers_pages') // Replace with your Firestore document
+                    .collection('AboutClub') // Replace with your Firestore collection
+                    .doc('about_club_page') // Replace with your Firestore document
                     .get();
 
                 String storedPasscode = snapshot.data()!['admin_passcode'] ?? '';

@@ -2,11 +2,10 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
-String clubName = "Coventry Phoenix FC";
+String clubName = "FC - Football Club\n\n";
 String acronymTitle = "Acronym Meanings";
 String acronym = "The following acronym(s) are used in the apps and their meanings are detailed.";
 String icdat = "ICDAT - I Can Do All Things\n\n";
-String cpfc = "CPFC - Coventry Phoenix FC\n\n";
 String apt = "A.P.T. - All Players Table\n\n";
 String id = "ID - Identification\n\n";
 String mp = "MP - Matches Played\n\n";
@@ -151,7 +150,7 @@ class _AcronymsMeaningsState extends State<AcronymsMeanings> {
                                 ),
                               ),
                               TextSpan(
-                                text: cpfc,
+                                text: clubName,
                                 style: TextStyle(
                                   fontSize: 13,
                                   color: cardTextColor,
@@ -372,8 +371,8 @@ class _AcronymsMeaningsState extends State<AcronymsMeanings> {
     firestoreStream = FirebaseFirestore.instance
         .collection('clubs')
         .doc(widget.clubId)
-        .collection('SliversPages')
-        .doc('non_slivers_pages')
+        .collection('AboutClub')
+        .doc('about_club_page')
         .snapshots()
         .distinct(); // Ensure distinct events
   }

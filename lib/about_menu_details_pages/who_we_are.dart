@@ -73,7 +73,7 @@ class _WhoWeAreState extends State<WhoWeAre> {
                 elevation: 10,
                 margin: const EdgeInsets.all(20),
                 child: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-                  stream: FirebaseFirestore.instance.collection('SliversPages').doc('non_slivers_pages').snapshots(),
+                  stream: FirebaseFirestore.instance.collection('AboutClub').doc('about_club_page').snapshots(),
                   builder: (context, snapshot) {
                     if (!snapshot.hasData) {
                       return const SizedBox(height: 300, child: CircularProgressIndicator());

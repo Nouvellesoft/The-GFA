@@ -21,10 +21,11 @@ import '../bottom_nav_stats_pages/players_table_page.dart';
 import '../club_admin/club_admin_page.dart';
 import '../details_pages/management_details_page.dart';
 import '../home_page/home_page_deux.dart';
+import '../notifier/club_global_notifier.dart';
 import '../notifier/management_body_notifier.dart';
 import '../thrown_searches/management_thrown_search.dart';
 
-String clubName = "Coventry Phoenix FC";
+String clubName = "";
 String thrownName = "Management";
 
 String exitAppStatement = "Exit from App";
@@ -220,7 +221,7 @@ class _MyManagementBodyPage extends State<MyManagementBodyPage> {
   }
 
   void navigateToAppStore(context) async {
-    LaunchReview.launch(androidAppId: 'com.icdatinnovations.coventry_phoenix_fc', iOSAppId: '1637554276');
+    LaunchReview.launch(androidAppId: 'com.nouvellesoft.thegfa', iOSAppId: '1637554276');
     Navigator.of(context).pop(false);
   }
 
@@ -346,7 +347,7 @@ class _MyManagementBodyPage extends State<MyManagementBodyPage> {
 
                 // Retrieve the stored passcode from Firestore
                 DocumentSnapshot<Map<String, dynamic>> snapshot =
-                    await FirebaseFirestore.instance.collection('clubs').doc(widget.clubId).collection('SliversPages').doc('non_slivers_pages').get();
+                    await FirebaseFirestore.instance.collection('clubs').doc(widget.clubId).collection('AboutClub').doc('about_club_page').get();
 
                 String storedPasscode = snapshot.data()!['admin_passcode'] ?? '';
 
@@ -415,6 +416,7 @@ class _MyManagementBodyPage extends State<MyManagementBodyPage> {
 
   @override
   Widget build(BuildContext context) {
+    clubName = Provider.of<ClubGlobalProvider>(context).clubName;
     ManagementBodyNotifier managementBodyNotifier = Provider.of<ManagementBodyNotifier>(context);
 
     return PopScope(

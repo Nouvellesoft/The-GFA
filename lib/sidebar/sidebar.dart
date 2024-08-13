@@ -16,19 +16,20 @@ import 'package:simple_icons/simple_icons.dart';
 
 import '/bottom_nav_stats_pages/players_stats_info_page.dart';
 import '/bottom_nav_stats_pages/players_table_page.dart';
-import '../api/get_teams_visibility_api.dart';
+import '../api/get_teams_classes_visibility_api.dart';
 import '../bloc_navigation_bloc/navigation_bloc.dart';
 import '../bottom_nav_stats_pages/bottom_navigator.dart';
 import '../bottom_nav_stats_pages/matches_page/a_tabview_matches_page.dart';
 import '../bottom_nav_stats_pages/social_media/b_tabview_social_media_page.dart';
+import '../notifier/club_global_notifier.dart';
 import '../notifier/sidebar_notifier.dart';
 import '../sidebar/menu_item.dart';
 
-String clubName = "Coventry Phoenix FC";
+String clubName = "";
 String subtitle = "We breed elite players here";
 
-const String defaultReturningPlayersTitle = "Coventry Phoenix I";
-const String defaultNewPlayersTitle = "Coventry Phoenix II";
+const String defaultReturningPlayersTitle = "First Team Players";
+const String defaultNewPlayersTitle = "Second Team Players";
 const String defaultThirdTeamClassTitle = "Reserve Team Players";
 const String defaultFourthTeamClassTitle = "Fourth Team Players";
 const String defaultFifthTeamClassTitle = "Fifth Team Players";
@@ -93,6 +94,7 @@ class _SideBarState extends State<SideBar> with SingleTickerProviderStateMixin<S
   bool _isClubSponsorsClicked = false; // New variable to track the "Club Sponsors" click
 
   late Stream<DocumentSnapshot<Map<String, dynamic>>> firestoreStream;
+  late Stream<DocumentSnapshot<Map<String, dynamic>>> firestoreStreamTwo;
   late Future<Map<String, Map<String, dynamic>>> _teamVisibilityFuture;
 
   _onSelected(int index) {
@@ -122,6 +124,14 @@ class _SideBarState extends State<SideBar> with SingleTickerProviderStateMixin<S
         .doc(widget.clubId)
         .collection('SliversPages')
         .doc('slivers_pages')
+        .snapshots()
+        .distinct(); // Ensure distinct events
+
+    firestoreStreamTwo = FirebaseFirestore.instance
+        .collection('clubs')
+        .doc(widget.clubId)
+        .collection('AboutClub')
+        .doc('about_club_page')
         .snapshots()
         .distinct(); // Ensure distinct events
 
@@ -207,63 +217,78 @@ class _SideBarState extends State<SideBar> with SingleTickerProviderStateMixin<S
                                           return const Center(child: CircularProgressIndicator());
                                         } else {
                                           return Container(
-                                            width: MediaQuery.of(context).size.width,
-                                            height: MediaQuery.of(context).size.height * 0.4,
-                                            decoration: BoxDecoration(
-                                              image: DecorationImage(
-                                                alignment: const Alignment(0, -0.8),
-                                                image: CachedNetworkImageProvider(
-                                                  // snapshot.data?.data()!['sidebar_page'],
-                                                  snapshot.data?.data()!['slivers_page_7'],
-                                                ),
-                                                fit: BoxFit.cover,
-                                              ),
-                                              gradient: LinearGradient(
-                                                begin: Alignment.topLeft,
-                                                end: Alignment.bottomRight,
-                                                colors: [linearGradientColor, linearGradientColorTwo.withAlpha(50)],
-                                                stops: const [0.3, 1],
-                                              ),
-                                              boxShadow: [
-                                                BoxShadow(
-                                                  color: boxShadowColor,
-                                                  blurRadius: 12,
-                                                  offset: const Offset(3, 12),
-                                                )
-                                              ],
-                                              borderRadius: BorderRadius.circular(10),
-                                            ),
-                                            child: Material(
-                                              color: materialBackgroundColor,
-                                              child: InkWell(
-                                                splashColor: splashColor,
-                                                onTap: () {},
-                                                child: Align(
-                                                  alignment: const Alignment(0, 0.9),
-                                                  child: ListTile(
-                                                    title: Text(
-                                                      clubName.toUpperCase(),
-                                                      style: GoogleFonts.gorditas(
-                                                          color: textColor,
-                                                          fontSize: 19,
-                                                          fontWeight: FontWeight.w700,
-                                                          shadows: <Shadow>[
-                                                            Shadow(blurRadius: 50, color: textShadowColor, offset: Offset.fromDirection(100, 12))
-                                                          ]),
-                                                    ),
-                                                    subtitle: Text(
-                                                      subtitle,
-                                                      style: GoogleFonts.varela(
-                                                        color: textColor,
-                                                        fontWeight: FontWeight.w500,
-                                                        fontSize: 16,
-                                                      ),
-                                                    ),
+                                              width: MediaQuery.of(context).size.width,
+                                              height: MediaQuery.of(context).size.height * 0.4,
+                                              decoration: BoxDecoration(
+                                                image: DecorationImage(
+                                                  alignment: const Alignment(0, -0.8),
+                                                  image: CachedNetworkImageProvider(
+                                                    // snapshot.data?.data()!['sidebar_page'],
+                                                    snapshot.data?.data()!['slivers_page_7'],
                                                   ),
+                                                  fit: BoxFit.cover,
                                                 ),
+                                                gradient: LinearGradient(
+                                                  begin: Alignment.topLeft,
+                                                  end: Alignment.bottomRight,
+                                                  colors: [linearGradientColor, linearGradientColorTwo.withAlpha(50)],
+                                                  stops: const [0.3, 1],
+                                                ),
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                    color: boxShadowColor,
+                                                    blurRadius: 12,
+                                                    offset: const Offset(3, 12),
+                                                  )
+                                                ],
+                                                borderRadius: BorderRadius.circular(10),
                                               ),
-                                            ),
-                                          );
+                                              child: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+                                                  stream: firestoreStreamTwo,
+                                                  builder: (context, snapshot) {
+                                                    if (snapshot.connectionState == ConnectionState.waiting) {
+                                                      return const Center(child: CircularProgressIndicator());
+                                                    } else {
+                                                      var data = snapshot.data!.data()!;
+                                                      final clubGlobalProvider = Provider.of<ClubGlobalProvider>(context, listen: false);
+                                                      clubGlobalProvider.setClubName(data['club_name']);
+                                                      clubName = snapshot.data?.data()!['club_name'];
+
+                                                      return Material(
+                                                        color: materialBackgroundColor,
+                                                        child: InkWell(
+                                                          splashColor: splashColor,
+                                                          onTap: () {},
+                                                          child: Align(
+                                                            alignment: const Alignment(0, 0.9),
+                                                            child: ListTile(
+                                                              title: Text(
+                                                                clubName.toUpperCase(),
+                                                                style: GoogleFonts.gorditas(
+                                                                    color: textColor,
+                                                                    fontSize: 19,
+                                                                    fontWeight: FontWeight.w700,
+                                                                    shadows: <Shadow>[
+                                                                      Shadow(
+                                                                          blurRadius: 50,
+                                                                          color: textShadowColor,
+                                                                          offset: Offset.fromDirection(100, 12))
+                                                                    ]),
+                                                              ),
+                                                              subtitle: Text(
+                                                                subtitle,
+                                                                style: GoogleFonts.varela(
+                                                                  color: textColor,
+                                                                  fontWeight: FontWeight.w500,
+                                                                  fontSize: 16,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      );
+                                                    }
+                                                  }));
                                         }
                                       },
                                     ),
@@ -552,11 +577,11 @@ class _SideBarState extends State<SideBar> with SingleTickerProviderStateMixin<S
                                       ),
                                       children: <Widget>[
                                         Material(
-                                          color: _currentNAVSelected == 8 ? containerBackgroundColor.withOpacity(0.3) : materialBackgroundColor,
+                                          color: _currentNAVSelected == 11 ? containerBackgroundColor.withOpacity(0.3) : materialBackgroundColor,
                                           child: InkWell(
                                             splashColor: splashColorTwo,
                                             onTap: () {
-                                              _onSelected(8);
+                                              _onSelected(11);
                                               onIconPressed();
                                               Navigator.push(
                                                 context,
@@ -579,11 +604,11 @@ class _SideBarState extends State<SideBar> with SingleTickerProviderStateMixin<S
                                           ),
                                         ),
                                         Material(
-                                          color: _currentNAVSelected == 9 ? containerBackgroundColor.withOpacity(0.3) : materialBackgroundColor,
+                                          color: _currentNAVSelected == 12 ? containerBackgroundColor.withOpacity(0.3) : materialBackgroundColor,
                                           child: InkWell(
                                             splashColor: splashColorTwo,
                                             onTap: () {
-                                              _onSelected(9);
+                                              _onSelected(12);
                                               onIconPressed();
                                               Navigator.push(
                                                 context,
@@ -606,11 +631,11 @@ class _SideBarState extends State<SideBar> with SingleTickerProviderStateMixin<S
                                           ),
                                         ),
                                         Material(
-                                          color: _currentNAVSelected == 10 ? containerBackgroundColor.withOpacity(0.3) : materialBackgroundColor,
+                                          color: _currentNAVSelected == 13 ? containerBackgroundColor.withOpacity(0.3) : materialBackgroundColor,
                                           child: InkWell(
                                             splashColor: splashColorTwo,
                                             onTap: () {
-                                              _onSelected(10);
+                                              _onSelected(13);
                                               onIconPressed();
                                               Navigator.push(
                                                 context,
@@ -658,11 +683,11 @@ class _SideBarState extends State<SideBar> with SingleTickerProviderStateMixin<S
                                         // ),
 
                                         Material(
-                                          color: _currentNAVSelected == 12 ? containerBackgroundColor.withOpacity(0.3) : materialBackgroundColor,
+                                          color: _currentNAVSelected == 14 ? containerBackgroundColor.withOpacity(0.3) : materialBackgroundColor,
                                           child: InkWell(
                                             splashColor: splashColorTwo,
                                             onTap: () {
-                                              _onSelected(12);
+                                              _onSelected(14);
                                               onIconPressed();
                                               Navigator.push(
                                                 context,

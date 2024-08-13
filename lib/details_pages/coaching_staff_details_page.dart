@@ -18,9 +18,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sms_autofill/sms_autofill.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../notifier/club_global_notifier.dart';
 import '../notifier/coaching_staff_notifier.dart';
 
-String clubName = "Coventry Phoenix FC";
+String clubName = "";
 
 String callFIRST = "tel:+44";
 String smsFIRST = "sms:+44";
@@ -188,11 +189,11 @@ class _CoachesDetailsPage extends State<CoachesDetailsPage> {
 
   final List<String> _coachingTeamOptions = [
     'Select One',
-    'Coventry Phoenix 1sts',
-    'Coventry Phoenix Reserves',
-    'Coventry Phoenix 3rds',
-    "Coventry Phoenix U'18s",
-    "Coventry Phoenix O'35s",
+    '$clubName 1sts',
+    '$clubName Reserves',
+    '$clubName 3rds',
+    "$clubName U'18s",
+    "$clubName O'35s",
   ];
 
   DateTime selectedDateA = DateTime(2023, 12, 25, 14, 15);
@@ -464,6 +465,7 @@ class _CoachesDetailsPage extends State<CoachesDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
+    clubName = Provider.of<ClubGlobalProvider>(context).clubName;
     coachesNotifier = Provider.of<CoachesNotifier>(context, listen: true);
 
     return ConfettiWidget(
@@ -3348,11 +3350,11 @@ class _CoachesDetailsPage extends State<CoachesDetailsPage> {
                   ),
                   TextButton(
                     onPressed: () {
-                            verifyOTPCode();
-                            setState(() {
-                              otpCode = '';
-                            });
-                          },
+                      verifyOTPCode();
+                      setState(() {
+                        otpCode = '';
+                      });
+                    },
                     child: const Text('Verify OTP', style: TextStyle(color: Colors.black)),
                   ),
                 ],

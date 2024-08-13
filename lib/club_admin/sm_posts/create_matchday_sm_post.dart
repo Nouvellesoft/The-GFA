@@ -34,6 +34,7 @@ import '/notifier/c_match_day_banner_for_location_notifier.dart';
 import '/notifier/club_sponsors_notifier.dart';
 import '../../api/club_sponsors_api.dart';
 import '../../notifier/all_fc_teams_notifier.dart';
+import '../../notifier/club_global_notifier.dart';
 
 Color backgroundColor = const Color.fromRGBO(34, 36, 54, 1.0);
 Color appBarTextColor = const Color.fromRGBO(255, 107, 53, 1.0);
@@ -95,6 +96,8 @@ class CreateMatchDaySocialMediaPostState extends State<CreateMatchDaySocialMedia
   List<String> lastThreeSelectedTeamB = [];
   List<String> lastThreeSelectedLeagueNames = [];
 
+  String clubName = '';
+
   String? selectedTeamA = ''; // Store selected team A name
   String? selectedTeamB = ''; // Store selected team B name
   String? selectedLeague = '';
@@ -149,7 +152,7 @@ class CreateMatchDaySocialMediaPostState extends State<CreateMatchDaySocialMedia
 
   @override
   Widget build(BuildContext context) {
-    // Use the AllFCTeamsNotifier to access the combined list of AllFCTeams
+    clubName = Provider.of<ClubGlobalProvider>(context).clubName;
     allFCTeamsNotifier = Provider.of<AllFCTeamsNotifier>(context);
 
     // Create a copy of the allClubMembersList and sort it alphabetically by name
@@ -954,8 +957,8 @@ class CreateMatchDaySocialMediaPostState extends State<CreateMatchDaySocialMedia
                               stream: FirebaseFirestore.instance
                                   .collection('clubs')
                                   .doc(widget.clubId)
-                                  .collection('SliversPages')
-                                  .doc('non_slivers_pages')
+                                  .collection('AboutClub')
+                                  .doc('about_club_page')
                                   .snapshots(),
                               builder: (context, snapshot) {
                                 if (!snapshot.hasData) {
@@ -1999,7 +2002,7 @@ ${selectedSponsorNames.isNotEmpty ? 'We are proudly sponsored by ${selectedSpons
     }
 
     // Share all the downloaded images
-    await Share.shareXFiles(localImagePaths, text: matchDayInfo, subject: 'Coventry Phoenix FC');
+    await Share.shareXFiles(localImagePaths, text: matchDayInfo, subject: clubName);
   }
 
   //////////////////////////////////////////////////////////////////////

@@ -8,7 +8,7 @@ import '../model/second_team_class_model.dart';
 import '../model/sixth_team_class_model.dart';
 import '../model/third_team_class_model.dart';
 import '../notifier/most_fouled_rc_players_stats_info_notifier.dart';
-import 'get_teams_visibility_api.dart';
+import 'get_teams_classes_visibility_api.dart';
 
 Future<void> getMostFouledRCPlayersStatsAndInfo(
     MostFouledRCPlayersStatsAndInfoNotifier mostFouledRCPlayersStatsAndInfoNotifier, String clubId) async {

@@ -6,7 +6,7 @@ import '/bloc_navigation_bloc/navigation_bloc.dart';
 import '../../api/fifth_team_class_api.dart';
 import '../../api/first_team_class_api.dart';
 import '../../api/fourth_team_class_api.dart';
-import '../../api/get_teams_visibility_api.dart'; // Import the visibility API
+import '../../api/get_teams_classes_visibility_api.dart'; // Import the visibility API
 import '../../api/second_team_class_api.dart';
 import '../../api/sixth_team_class_api.dart';
 import '../../api/third_team_class_api.dart';

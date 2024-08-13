@@ -8,7 +8,7 @@ import '../../api/coaching_staff_api.dart';
 import '../../api/fifth_team_class_api.dart';
 import '../../api/first_team_class_api.dart';
 import '../../api/fourth_team_class_api.dart';
-import '../../api/get_teams_visibility_api.dart';
+import '../../api/get_teams_classes_visibility_api.dart';
 import '../../api/management_body_api.dart';
 import '../../api/second_team_class_api.dart';
 import '../../api/sixth_team_class_api.dart';
@@ -60,7 +60,7 @@ class MyViewClubPopulationPageState extends State<MyViewClubPopulationPage> {
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios, color: appBarArrowColor),
           onPressed: () {
-            navigateMyApp(context);
+            Navigator.pop(context);
           },
         ),
       ),
@@ -105,8 +105,8 @@ class MyViewClubPopulationPageState extends State<MyViewClubPopulationPage> {
                                 stream: FirebaseFirestore.instance
                                     .collection('clubs')
                                     .doc(widget.clubId)
-                                    .collection('SliversPages')
-                                    .doc('non_slivers_pages')
+                                    .collection('AboutClub')
+                                    .doc('about_club_page')
                                     .snapshots(),
                                 builder: (context, snapshot) {
                                   if (!snapshot.hasData) {
@@ -464,8 +464,4 @@ class MyViewClubPopulationPageState extends State<MyViewClubPopulationPage> {
 
     setState(() {}); // Refresh the UI if needed
   }
-}
-
-Future navigateMyApp(context) async {
-  Navigator.of(context).pop(false);
 }

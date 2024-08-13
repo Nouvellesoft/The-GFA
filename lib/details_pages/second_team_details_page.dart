@@ -19,9 +19,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sms_autofill/sms_autofill.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../notifier/club_global_notifier.dart';
 import '../notifier/second_team_class_notifier.dart';
 
-String clubName = "Coventry Phoenix FC";
+String clubName = "";
 
 String callFIRST = "tel:+44";
 String smsFIRST = "sms:+44";
@@ -537,6 +538,7 @@ class _SecondTeamClassDetailsPage extends State<SecondTeamClassDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
+    clubName = Provider.of<ClubGlobalProvider>(context).clubName;
     secondTeamClassNotifier = Provider.of<SecondTeamClassNotifier>(context, listen: true);
 
     return ConfettiWidget(
@@ -4951,9 +4953,7 @@ class _SecondTeamClassDetailsPage extends State<SecondTeamClassDetailsPage> {
                     decoration: BoxLooseDecoration(
                       gapSpace: 5,
                       radius: const Radius.circular(8),
-                      strokeColorBuilder: isOtpGenerated
-                          ? const FixedColorBuilder(Color(0xFFE16641))
-                          : const FixedColorBuilder(Colors.grey),
+                      strokeColorBuilder: isOtpGenerated ? const FixedColorBuilder(Color(0xFFE16641)) : const FixedColorBuilder(Colors.grey),
                     ),
                     codeLength: 6,
                     onCodeChanged: (code) {
@@ -5006,7 +5006,7 @@ class _SecondTeamClassDetailsPage extends State<SecondTeamClassDetailsPage> {
     prefs.remove('verificationTime');
   }
 
-    void _showAutobiographyModificationDialog() {
+  void _showAutobiographyModificationDialog() {
     // final GlobalKey<FormState> dialogFormKey = GlobalKey<FormState>();
 
     showDialog<String>(

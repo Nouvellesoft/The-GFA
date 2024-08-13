@@ -68,7 +68,7 @@ Color? potmColorSeven = Colors.grey[200];
 Color? potmColorEight = Colors.deepOrangeAccent;
 Color? dialogColor = const Color.fromRGBO(184, 106, 65, 1.0);
 
-String clubName = "Coventry Phoenix FC";
+
 String topGoalScorersTitle = "Top 10 Goal Scorers";
 String topGoalScorersEmptyTitle = "No Goals Scored Yet";
 String topAssistsPlayersTitle = "Top 10 Most Assists Players";

@@ -54,6 +54,7 @@ import '../club_admin/club_admin_page.dart';
 import '../details_pages/first_team_details_page.dart';
 import '../home_page/home_page_deux.dart';
 import '../notifier/a_upcoming_matches_notifier.dart';
+import '../notifier/club_global_notifier.dart';
 import '../notifier/club_sponsors_notifier.dart';
 import '../notifier/cum_motm_players_stats_info_notifier.dart';
 import '../notifier/fifth_team_class_notifier.dart';
@@ -72,7 +73,7 @@ import '../notifier/top_goals_players_stats_info_notifier.dart';
 import '../notifier/trainings_games_reels_notifier.dart';
 import '../thrown_searches/first_team_thrown_search.dart';
 
-String clubName = "Coventry Phoenix FC";
+String clubName = "";
 // String postcode = "CV1 3WQ";
 String city = "Coventry";
 String stateName = "West Midlands";
@@ -150,6 +151,7 @@ class _MyFirstTeamClassPage extends State<MyFirstTeamClassPage> {
 
   @override
   Widget build(BuildContext context) {
+    clubName = Provider.of<ClubGlobalProvider>(context).clubName;
     FirstTeamClassNotifier firstTeamClassNotifier = Provider.of<FirstTeamClassNotifier>(context);
 
     return PopScope(
@@ -548,7 +550,7 @@ class _MyFirstTeamClassPage extends State<MyFirstTeamClassPage> {
   }
 
   void navigateToAppStore(context) async {
-    LaunchReview.launch(androidAppId: 'com.icdatinnovations.coventry_phoenix_fc', iOSAppId: '1637554276');
+    LaunchReview.launch(androidAppId: 'com.nouvellesoft.thegfa', iOSAppId: '1637554276');
     Navigator.of(context).pop(false);
   }
 
@@ -678,12 +680,8 @@ class _MyFirstTeamClassPage extends State<MyFirstTeamClassPage> {
 
                 try {
                   // Retrieve the stored passcode from Firestore
-                  DocumentSnapshot<Map<String, dynamic>> snapshot = await FirebaseFirestore.instance
-                      .collection('clubs')
-                      .doc(widget.clubId)
-                      .collection('SliversPages')
-                      .doc('non_slivers_pages')
-                      .get();
+                  DocumentSnapshot<Map<String, dynamic>> snapshot =
+                      await FirebaseFirestore.instance.collection('clubs').doc(widget.clubId).collection('AboutClub').doc('about_club_page').get();
 
                   // Check if the document exists and retrieve the passcode
                   if (snapshot.exists) {

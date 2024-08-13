@@ -17,6 +17,7 @@ import 'package:share_plus/share_plus.dart';
 
 import '/bloc_navigation_bloc/navigation_bloc.dart';
 import '../../api/club_sponsors_api.dart';
+import '../../notifier/club_global_notifier.dart';
 import '../../notifier/club_sponsors_notifier.dart';
 
 Color modalBackgroundColor = const Color.fromRGBO(33, 37, 41, 1.0);
@@ -54,6 +55,8 @@ class CreateSponsorsShoutOutSMPost extends StatefulWidget implements NavigationS
 }
 
 class _CreateSponsorsShoutOutSMPostState extends State<CreateSponsorsShoutOutSMPost> {
+  String clubName = "";
+
   String? selectedBannerLowResImageUrl;
   String? selectedBannerHighResImageUrl;
 
@@ -64,6 +67,7 @@ class _CreateSponsorsShoutOutSMPostState extends State<CreateSponsorsShoutOutSMP
 
   @override
   Widget build(BuildContext context) {
+    clubName = Provider.of<ClubGlobalProvider>(context).clubName;
     clubSponsorsNotifier = Provider.of<ClubSponsorsNotifier>(context);
 
     return PopScope(
@@ -471,7 +475,7 @@ class _CreateSponsorsShoutOutSMPostState extends State<CreateSponsorsShoutOutSMP
     await File(imagePath).writeAsBytes(sharePngBytes!);
 
     // Share the image with caption and text
-    await Share.shareXFiles([XFile(imagePath)], text: text, subject: 'Coventry Phoenix FC');
+    await Share.shareXFiles([XFile(imagePath)], text: text, subject: clubName);
 
     // await Share(sharePngBytes).writeAsBytesSync(bytes);
 

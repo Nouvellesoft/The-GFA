@@ -19,6 +19,7 @@ import 'package:share_plus/share_plus.dart';
 import '../../api/c_match_day_banner_for_location_api.dart';
 import '../../bloc_navigation_bloc/navigation_bloc.dart';
 import '../../notifier/c_match_day_banner_for_location_notifier.dart';
+import '../../notifier/club_global_notifier.dart';
 
 Color backgroundColor = const Color.fromRGBO(34, 36, 54, 1.0);
 Color appBarTextColor = const Color.fromRGBO(255, 107, 53, 1.0);
@@ -59,6 +60,8 @@ class CreateUpcomingEventSMPost extends StatefulWidget implements NavigationStat
 }
 
 class _CreateUpcomingEventSMPostState extends State<CreateUpcomingEventSMPost> {
+  String clubName = '';
+
   String? selectedBannerLowResImageUrl;
   String? selectedBannerHighResImageUrl;
 
@@ -175,6 +178,8 @@ class _CreateUpcomingEventSMPostState extends State<CreateUpcomingEventSMPost> {
 
   @override
   Widget build(BuildContext context) {
+    clubName = Provider.of<ClubGlobalProvider>(context).clubName;
+
     formattedTimeA = DateFormat.jm().format(selectedDateA); // Formats time in 12-hour format with AM/PM
     formattedTimeB = DateFormat.jm().format(selectedDateB); // Formats time in 12-hour format with AM/PM
     matchDayBannerForLocationNotifier = Provider.of<MatchDayBannerForLocationNotifier>(context);
@@ -246,7 +251,7 @@ class _CreateUpcomingEventSMPostState extends State<CreateUpcomingEventSMPost> {
                       labelText: 'Event Summary',
                       labelStyle: const TextStyle(fontSize: 20, color: Colors.white70),
                       floatingLabelStyle: TextStyle(color: cardBackgroundColor),
-                      hintText: "Coventry Phoenix will be holding open trials for our new under 18s youth team",
+                      hintText: "$clubName will be holding open trials for our new under 18s youth team",
                       hintStyle: const TextStyle(color: Colors.white70, fontSize: 13),
                       contentPadding: const EdgeInsets.symmetric(vertical: 15.0),
                     ),
@@ -988,7 +993,7 @@ class _CreateUpcomingEventSMPostState extends State<CreateUpcomingEventSMPost> {
     await File(imagePath).writeAsBytes(sharePngBytes!);
 
     // Share the image with caption and text
-    await Share.shareXFiles([XFile(imagePath)], text: text, subject: 'Coventry Phoenix FC');
+    await Share.shareXFiles([XFile(imagePath)], text: text, subject: clubName);
 
     // await Share(sharePngBytes).writeAsBytesSync(bytes);
 

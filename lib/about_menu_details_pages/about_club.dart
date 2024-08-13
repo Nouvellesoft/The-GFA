@@ -4,24 +4,33 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_swiper_null_safety/flutter_swiper_null_safety.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
+import 'package:the_gfa/notifier/club_global_notifier.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../api/achievement_images_api.dart';
 import '../api/club_arial_images_api.dart';
 import '../api/coaching_staff_api.dart';
+import '../api/fifth_team_class_api.dart';
 import '../api/first_team_class_api.dart';
+import '../api/fourth_team_class_api.dart';
+import '../api/get_teams_classes_visibility_api.dart';
 import '../api/management_body_api.dart';
 import '../api/second_team_class_api.dart';
+import '../api/sixth_team_class_api.dart';
+import '../api/third_team_class_api.dart';
 import '../notifier/achievement_images_notifier.dart';
 import '../notifier/all_club_members_notifier.dart';
 import '../notifier/club_arial_notifier.dart';
 import '../notifier/coaching_staff_notifier.dart';
+import '../notifier/fifth_team_class_notifier.dart';
 import '../notifier/first_team_class_notifier.dart';
+import '../notifier/fourth_team_class_notifier.dart';
 import '../notifier/management_body_notifier.dart';
 import '../notifier/second_team_class_notifier.dart';
+import '../notifier/sixth_team_class_notifier.dart';
+import '../notifier/third_team_class_notifier.dart';
 
 String clubName = '';
 String aboutClub = "About $clubName";
@@ -46,7 +55,8 @@ String clubArialViewsSwipe = "Swipe left or right for more photos";
 String clubArialViews = "Some Arial views of $clubName";
 String clubAchievementsSwipe = "Swipe left or right for more photos";
 String clubAchievements = "Some of our Past Achievements";
-String moreInfoAboutClubURL = "https://twitter.com/";
+String moreInfoAboutClubURL = "https://twitter.com/"; //Maybe something else, Use DB instead
+String clubOnlineMediaField = ''; //Maybe something else, Use DB instead
 
 Color backgroundColor = const Color.fromRGBO(207, 118, 90, 1.0);
 Color cardBackgroundColor = const Color.fromRGBO(207, 116, 87, 1.0);
@@ -86,7 +96,8 @@ class AboutClubDetails extends StatefulWidget {
 
 class _AboutClubDetailsState extends State<AboutClubDetails> {
   late Stream<DocumentSnapshot<Map<String, dynamic>>> firestoreStreamOne;
-  late Stream<DocumentSnapshot<Map<String, dynamic>>> firestoreStreamTwo;
+
+  late Future<Map<String, Map<String, dynamic>>> _teamVisibilityFuture;
 
   final controlla = PageController(
     initialPage: 0,
@@ -116,6 +127,30 @@ class _AboutClubDetailsState extends State<AboutClubDetails> {
     setState(() {}); // Refresh the UI if needed
   }
 
+  Future<void> _fetchThirdTeamClassAndUpdateNotifier(ThirdTeamClassNotifier thirdTeamNotifier) async {
+    await getThirdTeamClass(thirdTeamNotifier, widget.clubId);
+
+    setState(() {}); // Refresh the UI if needed
+  }
+
+  Future<void> _fetchFourthTeamClassAndUpdateNotifier(FourthTeamClassNotifier fourthTeamNotifier) async {
+    await getFourthTeamClass(fourthTeamNotifier, widget.clubId);
+
+    setState(() {}); // Refresh the UI if needed
+  }
+
+  Future<void> _fetchFifthTeamClassAndUpdateNotifier(FifthTeamClassNotifier fifthTeamNotifier) async {
+    await getFifthTeamClass(fifthTeamNotifier, widget.clubId);
+
+    setState(() {}); // Refresh the UI if needed
+  }
+
+  Future<void> _fetchSixthTeamClassAndUpdateNotifier(SixthTeamClassNotifier sixthTeamNotifier) async {
+    await getSixthTeamClass(sixthTeamNotifier, widget.clubId);
+
+    setState(() {}); // Refresh the UI if needed
+  }
+
   Future<void> _fetchCoachesAndUpdateNotifier(CoachesNotifier coachesNotifier) async {
     await getCoaches(coachesNotifier, widget.clubId);
     setState(() {}); // Refresh the UI if needed
@@ -130,6 +165,8 @@ class _AboutClubDetailsState extends State<AboutClubDetails> {
   void initState() {
     super.initState();
 
+    _teamVisibilityFuture = getTeamClassVisibilityAndTitles(widget.clubId);
+
     firestoreStreamOne = FirebaseFirestore.instance
         .collection('clubs')
         .doc(widget.clubId)
@@ -138,22 +175,14 @@ class _AboutClubDetailsState extends State<AboutClubDetails> {
         .snapshots()
         .distinct(); // Ensure distinct events
 
-    firestoreStreamTwo = FirebaseFirestore.instance
-        .collection('clubs')
-        .doc(widget.clubId)
-        .collection('SliversPages')
-        .doc('slivers_pages')
-        .snapshots()
-        .distinct(); // Ensure distinct events
-
-    Fluttertoast.showToast(
-      msg: 'Please Note: Not fully updated',
-      // Show success message (you can replace it with actual banner generation logic)
-      gravity: ToastGravity.BOTTOM,
-      backgroundColor: Colors.white,
-      textColor: Colors.black,
-      fontSize: 16.0,
-    );
+    // Fluttertoast.showToast(
+    //   msg: 'Please Note: Not fully updated',
+    //   // Show success message (you can replace it with actual banner generation logic)
+    //   gravity: ToastGravity.BOTTOM,
+    //   backgroundColor: Colors.white,
+    //   textColor: Colors.black,
+    //   fontSize: 16.0,
+    // );
 
     ClubArialNotifier clubArialNotifier = Provider.of<ClubArialNotifier>(context, listen: false);
     _fetchClubArialAndUpdateNotifier(clubArialNotifier);
@@ -164,6 +193,11 @@ class _AboutClubDetailsState extends State<AboutClubDetails> {
     // Fetch data for the first and second teams using their notifiers
     FirstTeamClassNotifier firstTeamNotifier = Provider.of<FirstTeamClassNotifier>(context, listen: false);
     SecondTeamClassNotifier secondTeamNotifier = Provider.of<SecondTeamClassNotifier>(context, listen: false);
+    ThirdTeamClassNotifier thirdTeamNotifier = Provider.of<ThirdTeamClassNotifier>(context, listen: false);
+    FourthTeamClassNotifier fourthTeamNotifier = Provider.of<FourthTeamClassNotifier>(context, listen: false);
+    FifthTeamClassNotifier fifthTeamNotifier = Provider.of<FifthTeamClassNotifier>(context, listen: false);
+    SixthTeamClassNotifier sixthTeamNotifier = Provider.of<SixthTeamClassNotifier>(context, listen: false);
+
     CoachesNotifier coachesNotifier = Provider.of<CoachesNotifier>(context, listen: false);
     ManagementBodyNotifier managementBodyNotifier = Provider.of<ManagementBodyNotifier>(context, listen: false);
 
@@ -171,31 +205,34 @@ class _AboutClubDetailsState extends State<AboutClubDetails> {
     Future.wait<void>([
       _fetchFirstTeamClassAndUpdateNotifier(firstTeamNotifier),
       _fetchSecondTeamClassAndUpdateNotifier(secondTeamNotifier),
+      _fetchThirdTeamClassAndUpdateNotifier(thirdTeamNotifier),
+      _fetchFourthTeamClassAndUpdateNotifier(fourthTeamNotifier),
+      _fetchFifthTeamClassAndUpdateNotifier(fifthTeamNotifier),
+      _fetchSixthTeamClassAndUpdateNotifier(sixthTeamNotifier),
       _fetchCoachesAndUpdateNotifier(coachesNotifier),
       _fetchManagementBodyAndUpdateNotifier(managementBodyNotifier),
     ]).then((_) {
       // Set the data after fetching
-      if (!mounted) return;
-      AllClubMembersNotifier allClubMembersNotifier = Provider.of<AllClubMembersNotifier>(context, listen: false);
+      if (mounted) {
+        AllClubMembersNotifier allClubMembersNotifier = Provider.of<AllClubMembersNotifier>(context, listen: false);
 
-      allClubMembersNotifier.setFirstTeamMembers(firstTeamNotifier.firstTeamClassList);
-      allClubMembersNotifier.setSecondTeamMembers(secondTeamNotifier.secondTeamClassList);
-      allClubMembersNotifier.setCoachesList(coachesNotifier.coachesList);
-      allClubMembersNotifier.setMGMTBodyList(managementBodyNotifier.managementBodyList);
+        allClubMembersNotifier.setFirstTeamMembers(firstTeamNotifier.firstTeamClassList);
+        allClubMembersNotifier.setSecondTeamMembers(secondTeamNotifier.secondTeamClassList);
+        allClubMembersNotifier.setThirdTeamMembers(thirdTeamNotifier.thirdTeamClassList);
+        allClubMembersNotifier.setFourthTeamMembers(fourthTeamNotifier.fourthTeamClassList);
+        allClubMembersNotifier.setFifthTeamMembers(fifthTeamNotifier.fifthTeamClassList);
+        allClubMembersNotifier.setSixthTeamMembers(sixthTeamNotifier.sixthTeamClassList);
+        allClubMembersNotifier.setCoachesList(coachesNotifier.coachesList);
+        allClubMembersNotifier.setMGMTBodyList(managementBodyNotifier.managementBodyList);
+      }
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    clubName = Provider.of<ClubGlobalProvider>(context).clubName;
     AchievementsNotifier achievementsNotifier = Provider.of<AchievementsNotifier>(context);
-
-    // Use the AllClubMembersNotifier to access the combined list of allClubMembers
     AllClubMembersNotifier allClubMembersNotifier = Provider.of<AllClubMembersNotifier>(context);
-
-    // Calculate counts for Players, Coaches, and Managers
-    int playersCount = allClubMembersNotifier.firstTeamClassList.length + allClubMembersNotifier.secondTeamClassList.length;
-    int coachesCount = allClubMembersNotifier.coachesClassList.length;
-    int managersCount = allClubMembersNotifier.mgmtBodyClassList.length;
 
     return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
         stream: firestoreStreamOne,
@@ -203,7 +240,8 @@ class _AboutClubDetailsState extends State<AboutClubDetails> {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Container();
           } else {
-            clubName = snapshot.data!.data()!['club_name'];
+            // Access the 'onlineSM' field from the document
+            clubOnlineMediaField = snapshot.data!.data()!['online_handle'];
 
             // Update whyClub after fetching clubName
             whyClub = "WHY $clubName?".toUpperCase();
@@ -418,86 +456,104 @@ class _AboutClubDetailsState extends State<AboutClubDetails> {
                       child: Material(
                         color: materialColor,
                         child: InkWell(
-                          splashColor: cardTextColor,
-                          onTap: () {
-                            // Handle onTap event
-                          },
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: <Widget>[
-                              Padding(
-                                padding: const EdgeInsets.only(top: 15, bottom: 30, left: 10),
-                                child: Text(
-                                  populationChart,
-                                  textAlign: TextAlign.left,
-                                  style: TextStyle(
-                                    color: cardTextColor,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                              IgnorePointer(
-                                child: Container(
-                                  width: MediaQuery.of(context).size.width * 0.4,
-                                  height: MediaQuery.of(context).size.width * 0.4,
-                                  color: Colors.transparent,
-                                  child: Material(
-                                    color: Colors.transparent,
-                                    child: InkWell(
-                                      onTap: () {
-                                        // Handle inner InkWell onTap event
-                                      },
-                                      child: PieChart(
-                                        PieChartData(
-                                          pieTouchData: PieTouchData(
-                                            touchCallback: (FlTouchEvent event, pieTouchResponse) {
-                                              setState(() {
-                                                if (!event.isInterestedForInteractions ||
-                                                    pieTouchResponse == null ||
-                                                    pieTouchResponse.touchedSection == null) {
-                                                  touchedIndex = -1;
-                                                  return;
-                                                }
-                                                touchedIndex = pieTouchResponse.touchedSection!.touchedSectionIndex;
-                                              });
-                                            },
+                            splashColor: cardTextColor,
+                            onTap: () {
+                              // Handle onTap event
+                            },
+                            child: FutureBuilder<Map<String, Map<String, dynamic>>>(
+                                future: _teamVisibilityFuture,
+                                builder: (context, visibilitySnapshot) {
+                                  if (visibilitySnapshot.connectionState == ConnectionState.waiting) {
+                                    return const Center(child: CircularProgressIndicator());
+                                  } else if (visibilitySnapshot.hasError) {
+                                    return const Center(child: Text("Error loading visibility data"));
+                                  } else if (!visibilitySnapshot.hasData) {
+                                    return const Center(child: Text("No visibility data available"));
+                                  } else {
+                                    final teamVisibility = visibilitySnapshot.data!;
+
+                                    // Calculate filtered player counts based on visibility
+                                    int playersCount = _calculateVisiblePlayersCount(teamVisibility, allClubMembersNotifier);
+                                    final coachesCount = allClubMembersNotifier.coachesClassList.length;
+                                    final managersCount = allClubMembersNotifier.mgmtBodyClassList.length;
+
+                                    return Column(
+                                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      children: <Widget>[
+                                        Padding(
+                                          padding: const EdgeInsets.only(top: 15, bottom: 30, left: 10),
+                                          child: Text(
+                                            populationChart,
+                                            textAlign: TextAlign.left,
+                                            style: TextStyle(
+                                              color: cardTextColor,
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.bold,
+                                            ),
                                           ),
-                                          borderData: FlBorderData(
-                                            show: false,
-                                          ),
-                                          sectionsSpace: 0,
-                                          centerSpaceRadius: 0,
-                                          sections: showingSections(playersCount, coachesCount, managersCount),
                                         ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 20),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    'Players: $playersCount',
-                                    style: const TextStyle(color: Colors.white70, fontWeight: FontWeight.bold),
-                                  ),
-                                  Text(
-                                    'Coaches: $coachesCount',
-                                    style: const TextStyle(color: Colors.white70, fontWeight: FontWeight.bold),
-                                  ),
-                                  Text(
-                                    'Managers: $managersCount',
-                                    style: const TextStyle(color: Colors.white70, fontWeight: FontWeight.bold),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
+                                        IgnorePointer(
+                                          child: Container(
+                                            width: MediaQuery.of(context).size.width * 0.4,
+                                            height: MediaQuery.of(context).size.width * 0.4,
+                                            color: Colors.transparent,
+                                            child: Material(
+                                              color: Colors.transparent,
+                                              child: InkWell(
+                                                onTap: () {
+                                                  // Handle inner InkWell onTap event
+                                                },
+                                                child: PieChart(
+                                                  PieChartData(
+                                                    pieTouchData: PieTouchData(
+                                                      touchCallback: (FlTouchEvent event, pieTouchResponse) {
+                                                        setState(() {
+                                                          if (!event.isInterestedForInteractions ||
+                                                              pieTouchResponse == null ||
+                                                              pieTouchResponse.touchedSection == null) {
+                                                            touchedIndex = -1;
+                                                            return;
+                                                          }
+                                                          touchedIndex = pieTouchResponse.touchedSection!.touchedSectionIndex;
+                                                        });
+                                                      },
+                                                    ),
+                                                    borderData: FlBorderData(
+                                                      show: false,
+                                                    ),
+                                                    sectionsSpace: 0,
+                                                    centerSpaceRadius: 0,
+                                                    sections: showingSections(playersCount, coachesCount, managersCount),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        const SizedBox(height: 20),
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                          crossAxisAlignment: CrossAxisAlignment.center,
+                                          children: [
+                                            Text(
+                                              'Players: $playersCount',
+                                              style: const TextStyle(color: Colors.white70, fontWeight: FontWeight.bold),
+                                            ),
+                                            Text(
+                                              'Coaches: $coachesCount',
+                                              style: const TextStyle(color: Colors.white70, fontWeight: FontWeight.bold),
+                                            ),
+                                            Text(
+                                              'Managers: $managersCount',
+                                              style: const TextStyle(color: Colors.white70, fontWeight: FontWeight.bold),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    );
+                                  }
+                                })),
                       ),
                     ),
                   ),
@@ -783,49 +839,63 @@ class _AboutClubDetailsState extends State<AboutClubDetails> {
                       ),
                     ),
                   ],
-
-                  StreamBuilder<DocumentSnapshot>(
-                    stream: firestoreStreamTwo,
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const CircularProgressIndicator();
-                      }
-
-                      if (snapshot.hasError) {
-                        return Text('Error: ${snapshot.error}');
-                      }
-
-                      var data = snapshot.data?.data() as Map<String, dynamic>?;
-
-                      // Access the 'twitter' field from the document
-                      var twitterField = data?['twitter_handle'];
-
-                      return Padding(
-                        padding: const EdgeInsets.only(left: 20, bottom: 30, top: 20),
-                        child: RichText(
-                          text: TextSpan(
-                            text: 'More info about the club: Coventry Phoenix FC',
+                  Padding(
+                    padding: const EdgeInsets.only(left: 20, bottom: 30, top: 20),
+                    child: RichText(
+                      text: TextSpan(
+                        children: [
+                          TextSpan(
+                            text: 'More info about the club: ',
                             style: TextStyle(
                               fontSize: 15,
                               color: cardTextColor, // Change color as needed
                               fontWeight: FontWeight.w800,
                               fontStyle: FontStyle.italic,
                             ),
+                          ),
+                          TextSpan(
+                            text: clubName,
+                            style: TextStyle(
+                              fontSize: 15,
+                              color: cardTextColor, // Change color as needed
+                              fontWeight: FontWeight.w800,
+                              fontStyle: FontStyle.italic,
+                              decoration: TextDecoration.underline, // Underline added here
+                            ),
                             recognizer: TapGestureRecognizer()
                               ..onTap = () {
                                 // Handle URL launch here
-                                launchURL(moreInfoAboutClubURL + twitterField);
+                                launchURL(/**moreInfoAboutClubURL +*/ clubOnlineMediaField);
                               },
                           ),
-                        ),
-                      );
-                    },
+                        ],
+                      ),
+                    ),
                   )
                 ],
               ),
             ),
           );
         });
+  }
+
+  int _calculateVisiblePlayersCount(Map<String, Map<String, dynamic>> teamVisibility, AllClubMembersNotifier notifier) {
+    // Calculate counts for Players based on visibility
+    List<dynamic> filteredPlayers = [];
+
+    filteredPlayers.addAll(notifier.firstTeamClassList.where((player) => teamVisibility['FirstTeamClass']?['isVisible'] == true));
+
+    filteredPlayers.addAll(notifier.secondTeamClassList.where((player) => teamVisibility['SecondTeamClass']?['isVisible'] == true));
+
+    filteredPlayers.addAll(notifier.thirdTeamClassList.where((player) => teamVisibility['ThirdTeamClass']?['isVisible'] == true));
+
+    filteredPlayers.addAll(notifier.fourthTeamClassList.where((player) => teamVisibility['FourthTeamClass']?['isVisible'] == true));
+
+    filteredPlayers.addAll(notifier.fifthTeamClassList.where((player) => teamVisibility['FifthTeamClass']?['isVisible'] == true));
+
+    filteredPlayers.addAll(notifier.sixthTeamClassList.where((player) => teamVisibility['SixthTeamClass']?['isVisible'] == true));
+
+    return filteredPlayers.length;
   }
 
   Future launchURL(String url) async {
