@@ -130,7 +130,7 @@ class MyAddNewOppTeamPageState extends State<MyAddNewOppTeamPage> {
           'id': '10',
           'club_name': awayTeamName,
           'club_icon': imageUrl ??
-              'https://firebasestorage.googleapis.com/v0/b/cov-phoenix-fc.appspot.com/o/ClubLogos%2Fno_club_image.jpeg?alt=media&token=bfe1214e-8669-446b-ba88-b719fa9ec628',
+              'https://firebasestorage.googleapis.com/v0/b/the-gfa.appspot.com/o/a_club_opp_clubs%2Fno_club_opp_logo%2Fno_opp_club_image.jpg?alt=media&token=7132419a-3caf-484e-86a4-6656d540e878',
           // Provide a default URL if image is not selected
         });
 

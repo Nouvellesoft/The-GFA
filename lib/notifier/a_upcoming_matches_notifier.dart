@@ -21,4 +21,11 @@ class UpcomingMatchesNotifier with ChangeNotifier {
     _currentUpcomingMatches = upcomingMatches;
     notifyListeners();
   }
+
+  Future<void> updateClubIconFromProvider(String clubId, String clubIcon) async {
+    for (var match in _upcomingMatchesList) {
+      match.updateClubIcon(clubId, clubIcon);
+    }
+    notifyListeners();
+  }
 }

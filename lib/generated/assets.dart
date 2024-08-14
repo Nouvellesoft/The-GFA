@@ -25,6 +25,7 @@ class Assets {
   static const String imagesMgmtPageSliver = 'assets/images/mgmt_page_sliver.gif';
   static const String imagesMonthlyPhotos = 'assets/images/monthly_photos.gif';
   static const String imagesNoClubImage = 'assets/images/no_club_image.jpeg';
+  static const String imagesNoOppClubImage = 'assets/images/no_opp_club_image.jpg';
   static const String imagesNouvellesoftFrontPage = 'assets/images/nouvellesoft_front_page.jpg';
   static const String imagesSecondPageSliver = 'assets/images/second_page_sliver.gif';
   static const String imagesSidebarPageSliver = 'assets/images/sidebar_page_sliver.gif';

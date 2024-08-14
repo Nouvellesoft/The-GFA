@@ -3,6 +3,7 @@ import 'dart:collection';
 import 'package:flutter/cupertino.dart';
 
 import '../model/a_past_matches_model.dart';
+import 'club_global_notifier.dart';
 
 class PastMatchesNotifier with ChangeNotifier {
   List<PastMatches> _pastMatchesList = [];
@@ -19,6 +20,13 @@ class PastMatchesNotifier with ChangeNotifier {
 
   set currentPastMatches(PastMatches pastMatches) {
     _currentPastMatches = pastMatches;
+    notifyListeners();
+  }
+
+  void updateClubIconFromProvider(ClubGlobalProvider clubGlobalProvider) {
+    for (var match in _pastMatchesList) {
+      match.updateClubIcon(clubGlobalProvider.clubName, clubGlobalProvider.clubIcon);
+    }
     notifyListeners();
   }
 }

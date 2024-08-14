@@ -1,5 +1,4 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -14,6 +13,7 @@ import '../../api/second_team_class_api.dart';
 import '../../api/sixth_team_class_api.dart';
 import '../../api/third_team_class_api.dart';
 import '../../notifier/all_club_members_notifier.dart';
+import '../../notifier/club_global_notifier.dart';
 import '../../notifier/coaching_staff_notifier.dart';
 import '../../notifier/fifth_team_class_notifier.dart';
 import '../../notifier/first_team_class_notifier.dart';
@@ -44,9 +44,11 @@ class MyViewClubPopulationPageState extends State<MyViewClubPopulationPage> {
   int touchedIndex = 0;
   late Future<Map<String, Map<String, dynamic>>> _teamVisibilityFuture;
 
+  String clubIcon = '';
+
   @override
   Widget build(BuildContext context) {
-    // Use the AllClubMembersNotifier to access the combined list of allClubMembers
+    clubIcon = Provider.of<ClubGlobalProvider>(context).clubIcon;
     AllClubMembersNotifier allClubMembersNotifier = Provider.of<AllClubMembersNotifier>(context);
 
     return Scaffold(
@@ -100,29 +102,16 @@ class MyViewClubPopulationPageState extends State<MyViewClubPopulationPage> {
                           height: MediaQuery.of(context).size.width / 2 - 20,
                           color: Colors.transparent,
                           child: InkWell(
-                            onTap: () {},
-                            child: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-                                stream: FirebaseFirestore.instance
-                                    .collection('clubs')
-                                    .doc(widget.clubId)
-                                    .collection('AboutClub')
-                                    .doc('about_club_page')
-                                    .snapshots(),
-                                builder: (context, snapshot) {
-                                  if (!snapshot.hasData) {
-                                    return const CircularProgressIndicator();
-                                  }
-                                  return CachedNetworkImage(
-                                    imageUrl: snapshot.data?.data()!['club_icon'] ?? '',
-                                    width: MediaQuery.of(context).size.width / 4,
-                                    // Adjust the width
-                                    height: MediaQuery.of(context).size.width / 4,
-                                    // Adjust the height
-                                    placeholder: (context, url) => const CircularProgressIndicator(),
-                                    errorWidget: (context, url, error) => const Icon(Icons.error),
-                                  );
-                                }),
-                          ),
+                              onTap: () {},
+                              child: CachedNetworkImage(
+                                imageUrl: clubIcon,
+                                width: MediaQuery.of(context).size.width / 4,
+                                // Adjust the width
+                                height: MediaQuery.of(context).size.width / 4,
+                                // Adjust the height
+                                placeholder: (context, url) => const CircularProgressIndicator(),
+                                errorWidget: (context, url, error) => const Icon(Icons.error),
+                              )),
                         ),
 
                         const SizedBox(width: 10),

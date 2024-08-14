@@ -933,8 +933,9 @@ class _MyFirstTeamClassPage extends State<MyFirstTeamClassPage> {
     FoundersReviewsCommentNotifier foundersReviewsNotifier = Provider.of<FoundersReviewsCommentNotifier>(context, listen: false);
     _fetchFoundersReviewsCommentAndUpdateNotifier(foundersReviewsNotifier);
 
+    ClubGlobalProvider clubGlobalProvider = Provider.of<ClubGlobalProvider>(context, listen: false);
     UpcomingMatchesNotifier upcomingMatchesNotifier = Provider.of<UpcomingMatchesNotifier>(context, listen: false);
-    _fetchUpcomingMatchesAndUpdateNotifier(upcomingMatchesNotifier);
+    _fetchUpcomingMatchesAndUpdateNotifier(upcomingMatchesNotifier, clubGlobalProvider);
 
     ClubSponsorsNotifier clubSponsorsNotifier = Provider.of<ClubSponsorsNotifier>(context, listen: false);
     _fetchClubSponsorsAndUpdateNotifier(clubSponsorsNotifier);
@@ -961,56 +962,56 @@ class _MyFirstTeamClassPage extends State<MyFirstTeamClassPage> {
     setState(() {}); // Refresh the UI if needed
   }
 
-  Future<void> _fetchThirdTeamClassAndUpdateNotifier(ThirdTeamClassNotifier thirdTeamClassNotifier) async {
-    await getThirdTeamClass(thirdTeamClassNotifier, widget.clubId);
+  Future<void> _fetchThirdTeamClassAndUpdateNotifier(ThirdTeamClassNotifier thirdTeamNotifier) async {
+    await getThirdTeamClass(thirdTeamNotifier, widget.clubId);
 
     setState(() {}); // Refresh the UI if needed
   }
 
-  Future<void> _fetchFourthTeamClassAndUpdateNotifier(FourthTeamClassNotifier fourthTeamClassNotifier) async {
-    await getFourthTeamClass(fourthTeamClassNotifier, widget.clubId);
+  Future<void> _fetchFourthTeamClassAndUpdateNotifier(FourthTeamClassNotifier fourthTeamNotifier) async {
+    await getFourthTeamClass(fourthTeamNotifier, widget.clubId);
 
     setState(() {}); // Refresh the UI if needed
   }
 
-  Future<void> _fetchFifthTeamClassAndUpdateNotifier(FifthTeamClassNotifier fifthTeamClassNotifier) async {
-    await getFifthTeamClass(fifthTeamClassNotifier, widget.clubId);
+  Future<void> _fetchFifthTeamClassAndUpdateNotifier(FifthTeamClassNotifier fifthTeamNotifier) async {
+    await getFifthTeamClass(fifthTeamNotifier, widget.clubId);
 
     setState(() {}); // Refresh the UI if needed
   }
 
-  Future<void> _fetchSixthTeamClassAndUpdateNotifier(SixthTeamClassNotifier sixthTeamClassNotifier) async {
-    await getSixthTeamClass(sixthTeamClassNotifier, widget.clubId);
+  Future<void> _fetchSixthTeamClassAndUpdateNotifier(SixthTeamClassNotifier sixthTeamNotifier) async {
+    await getSixthTeamClass(sixthTeamNotifier, widget.clubId);
 
     setState(() {}); // Refresh the UI if needed
   }
 
-  Future<void> _fetchCaptainsAndUpdateNotifier(CaptainsNotifier captainsNotifier) async {
-    await getCaptains(captainsNotifier, widget.clubId);
+  Future<void> _fetchCaptainsAndUpdateNotifier(CaptainsNotifier notifier) async {
+    await getCaptains(notifier, widget.clubId);
 
     setState(() {}); // Refresh the UI if needed
   }
 
-  Future<void> _fetchCoachesAndUpdateNotifier(CoachesNotifier coachesNotifier) async {
-    await getCoaches(coachesNotifier, widget.clubId);
+  Future<void> _fetchCoachesAndUpdateNotifier(CoachesNotifier notifier) async {
+    await getCoaches(notifier, widget.clubId);
 
     setState(() {}); // Refresh the UI if needed
   }
 
-  Future<void> _fetchManagementBodyAndUpdateNotifier(ManagementBodyNotifier managementBodyNotifier) async {
-    await getManagementBody(managementBodyNotifier, widget.clubId);
+  Future<void> _fetchManagementBodyAndUpdateNotifier(ManagementBodyNotifier notifier) async {
+    await getManagementBody(notifier, widget.clubId);
 
     setState(() {}); // Refresh the UI if needed
   }
 
-  Future<void> _fetchClubArialAndUpdateNotifier(ClubArialNotifier clubArialNotifier) async {
-    await getClubArial(clubArialNotifier, widget.clubId);
+  Future<void> _fetchClubArialAndUpdateNotifier(ClubArialNotifier notifier) async {
+    await getClubArial(notifier, widget.clubId);
 
     setState(() {}); // Refresh the UI if needed
   }
 
-  Future<void> _fetchAchievementsAndUpdateNotifier(AchievementsNotifier achievementsNotifier) async {
-    await getAchievements(achievementsNotifier, widget.clubId);
+  Future<void> _fetchAchievementsAndUpdateNotifier(AchievementsNotifier notifier) async {
+    await getAchievements(notifier, widget.clubId);
 
     setState(() {}); // Refresh the UI if needed
   }
@@ -1081,8 +1082,8 @@ class _MyFirstTeamClassPage extends State<MyFirstTeamClassPage> {
     setState(() {});
   }
 
-  Future<void> _fetchUpcomingMatchesAndUpdateNotifier(UpcomingMatchesNotifier notifier) async {
-    await getUpcomingMatches(notifier, widget.clubId);
+  Future<void> _fetchUpcomingMatchesAndUpdateNotifier(UpcomingMatchesNotifier notifier, ClubGlobalProvider clubGlobalProvider) async {
+    await getUpcomingMatches(notifier, widget.clubId, clubGlobalProvider.clubIcon);
 
     setState(() {});
   }

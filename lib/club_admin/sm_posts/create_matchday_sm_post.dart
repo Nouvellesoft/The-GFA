@@ -96,7 +96,7 @@ class CreateMatchDaySocialMediaPostState extends State<CreateMatchDaySocialMedia
   List<String> lastThreeSelectedTeamB = [];
   List<String> lastThreeSelectedLeagueNames = [];
 
-  String clubName = '';
+  String clubNameGlobal = '';
 
   String? selectedTeamA = ''; // Store selected team A name
   String? selectedTeamB = ''; // Store selected team B name
@@ -152,7 +152,7 @@ class CreateMatchDaySocialMediaPostState extends State<CreateMatchDaySocialMedia
 
   @override
   Widget build(BuildContext context) {
-    clubName = Provider.of<ClubGlobalProvider>(context).clubName;
+    clubNameGlobal = Provider.of<ClubGlobalProvider>(context).clubName;
     allFCTeamsNotifier = Provider.of<AllFCTeamsNotifier>(context);
 
     // Create a copy of the allClubMembersList and sort it alphabetically by name
@@ -238,7 +238,7 @@ class CreateMatchDaySocialMediaPostState extends State<CreateMatchDaySocialMedia
                                           image: DecorationImage(
                                               image: CachedNetworkImageProvider(
                                                 matchDayBannerForClubNotifier!.matchDayBannerForClubList
-                                                    .firstWhere((team) => team.clubName == selectedTeamA)
+                                                    .firstWhere((team) => team.teamName == selectedTeamA)
                                                     .clubIcon!,
                                               ),
                                               fit: BoxFit.cover)),
@@ -1119,7 +1119,7 @@ class CreateMatchDaySocialMediaPostState extends State<CreateMatchDaySocialMedia
                   onTap: () {
                     Navigator.pop(context);
                     setState(() {
-                      selectedTeamA = matchDayBannerForClubNotifier!.matchDayBannerForClubList[index].clubName!;
+                      selectedTeamA = matchDayBannerForClubNotifier!.matchDayBannerForClubList[index].teamName!;
                       // Rearrange list based on the latest selection
                       if (lastThreeSelectedTeamA.contains(selectedTeamA)) {
                         lastThreeSelectedTeamA.remove(selectedTeamA);
@@ -1131,7 +1131,7 @@ class CreateMatchDaySocialMediaPostState extends State<CreateMatchDaySocialMedia
                     });
                   },
                   title: Text(
-                    matchDayBannerForClubNotifier!.matchDayBannerForClubList[index].clubName!,
+                    matchDayBannerForClubNotifier!.matchDayBannerForClubList[index].teamName!,
                     style: const TextStyle(fontSize: 17, color: Colors.white70, fontWeight: FontWeight.w600),
                   ),
                   leading: Container(
@@ -1655,12 +1655,12 @@ class CreateMatchDaySocialMediaPostState extends State<CreateMatchDaySocialMedia
                               width: 30,
                               height: 30,
                               child: matchDayBannerForClubNotifier!.matchDayBannerForClubList
-                                          .firstWhereOrNull((team) => team.clubName == selectedTeamA)
+                                          .firstWhereOrNull((team) => team.teamName == selectedTeamA)
                                           ?.clubIcon !=
                                       null
                                   ? Image.network(
                                       matchDayBannerForClubNotifier!.matchDayBannerForClubList
-                                          .firstWhereOrNull((team) => team.clubName == selectedTeamA)!
+                                          .firstWhereOrNull((team) => team.teamName == selectedTeamA)!
                                           .clubIcon!,
                                     )
                                   : Image.asset('assets/images/cpfc_logo.jpeg'), // Replace 'default_icon.png' with your actual asset path
@@ -2002,7 +2002,7 @@ ${selectedSponsorNames.isNotEmpty ? 'We are proudly sponsored by ${selectedSpons
     }
 
     // Share all the downloaded images
-    await Share.shareXFiles(localImagePaths, text: matchDayInfo, subject: clubName);
+    await Share.shareXFiles(localImagePaths, text: matchDayInfo, subject: clubNameGlobal);
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -2090,6 +2090,8 @@ ${selectedSponsorNames.isNotEmpty ? 'We are proudly sponsored by ${selectedSpons
 
   @override
   void initState() {
+    ClubGlobalProvider clubGlobalProvider = Provider.of<ClubGlobalProvider>(context, listen: false);
+
     MatchDayBannerForClubNotifier matchDayBannerForClubNotifier = Provider.of<MatchDayBannerForClubNotifier>(context, listen: false);
 
     MatchDayBannerForClubOppNotifier matchDayBannerForClubOppNotifier = Provider.of<MatchDayBannerForClubOppNotifier>(context, listen: false);
@@ -2104,7 +2106,7 @@ ${selectedSponsorNames.isNotEmpty ? 'We are proudly sponsored by ${selectedSpons
     // selectedSponsors = List<bool>.generate(clubSponsorsNotifier.clubSponsorsList.length, (index) => false);
     selectedSponsors = List<bool>.filled(clubSponsorsNotifier.clubSponsorsList.length, false);
 
-    _fetchMatchDayBannerForClubNotifier(matchDayBannerForClubNotifier);
+    _fetchMatchDayBannerForClubNotifier(matchDayBannerForClubNotifier, clubGlobalProvider);
     _fetchMatchDayBannerForClubOppNotifier(matchDayBannerForClubOppNotifier);
     _fetchMatchDayBannerForLeagueNotifier(matchDayBannerForLeagueNotifier);
     _fetchMatchDayBannerForLocationNotifier(matchDayBannerForLocationNotifier);
@@ -2124,8 +2126,9 @@ ${selectedSponsorNames.isNotEmpty ? 'We are proudly sponsored by ${selectedSpons
     ]);
   }
 
-  Future<void> _fetchMatchDayBannerForClubNotifier(MatchDayBannerForClubNotifier matchDayBannerForClubNotifier) async {
-    await getMatchDayBannerForClub(matchDayBannerForClubNotifier, widget.clubId);
+  Future<void> _fetchMatchDayBannerForClubNotifier(
+      MatchDayBannerForClubNotifier matchDayBannerForClubNotifier, ClubGlobalProvider clubGlobalProvider) async {
+    await getMatchDayBannerForClub(matchDayBannerForClubNotifier, clubGlobalProvider, widget.clubId);
 
     setState(() {}); // Refresh the UI if needed
   }

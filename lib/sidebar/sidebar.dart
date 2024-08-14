@@ -26,7 +26,8 @@ import '../notifier/sidebar_notifier.dart';
 import '../sidebar/menu_item.dart';
 
 String clubName = "";
-String subtitle = "We breed elite players here";
+String sidebarSubtitle = "";
+String sidebarClubLogo = "";
 
 const String defaultReturningPlayersTitle = "First Team Players";
 const String defaultNewPlayersTitle = "Second Team Players";
@@ -95,6 +96,7 @@ class _SideBarState extends State<SideBar> with SingleTickerProviderStateMixin<S
 
   late Stream<DocumentSnapshot<Map<String, dynamic>>> firestoreStream;
   late Stream<DocumentSnapshot<Map<String, dynamic>>> firestoreStreamTwo;
+  late StreamSubscription<DocumentSnapshot<Map<String, dynamic>>> streamSubscriptionTwo;
   late Future<Map<String, Map<String, dynamic>>> _teamVisibilityFuture;
 
   _onSelected(int index) {
@@ -135,6 +137,21 @@ class _SideBarState extends State<SideBar> with SingleTickerProviderStateMixin<S
         .snapshots()
         .distinct(); // Ensure distinct events
 
+    // Listen to the stream
+    streamSubscriptionTwo = firestoreStreamTwo.listen((snapshot) {
+      if (snapshot.exists && mounted) {
+        var data = snapshot.data()!;
+        final clubGlobalProvider = Provider.of<ClubGlobalProvider>(context, listen: false);
+        clubGlobalProvider.setClubName(data['club_name']);
+        clubGlobalProvider.setClubLogo(data['club_logo']);
+        clubGlobalProvider.setClubIcon(data['club_icon']);
+
+        clubName = data['club_name'];
+        sidebarSubtitle = data['sidebar_subtitle'];
+        sidebarClubLogo = data['club_logo'];
+      }
+    });
+
     _animationController = AnimationController(vsync: this, duration: _animationDuration);
     isSidebarOpenedStreamController = PublishSubject<bool>();
     isSidebarOpenedStream = isSidebarOpenedStreamController.stream;
@@ -146,6 +163,11 @@ class _SideBarState extends State<SideBar> with SingleTickerProviderStateMixin<S
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
   }
 
   @override
@@ -217,97 +239,96 @@ class _SideBarState extends State<SideBar> with SingleTickerProviderStateMixin<S
                                           return const Center(child: CircularProgressIndicator());
                                         } else {
                                           return Container(
-                                              width: MediaQuery.of(context).size.width,
-                                              height: MediaQuery.of(context).size.height * 0.4,
-                                              decoration: BoxDecoration(
-                                                image: DecorationImage(
-                                                  alignment: const Alignment(0, -0.8),
-                                                  image: CachedNetworkImageProvider(
-                                                    // snapshot.data?.data()!['sidebar_page'],
-                                                    snapshot.data?.data()!['slivers_page_7'],
-                                                  ),
-                                                  fit: BoxFit.cover,
+                                            width: MediaQuery.of(context).size.width,
+                                            height: MediaQuery.of(context).size.height * 0.4,
+                                            decoration: BoxDecoration(
+                                              image: DecorationImage(
+                                                alignment: const Alignment(0, -0.8),
+                                                image: CachedNetworkImageProvider(
+                                                  snapshot.data?.data()!['slivers_page_7'],
                                                 ),
-                                                gradient: LinearGradient(
-                                                  begin: Alignment.topLeft,
-                                                  end: Alignment.bottomRight,
-                                                  colors: [linearGradientColor, linearGradientColorTwo.withAlpha(50)],
-                                                  stops: const [0.3, 1],
-                                                ),
-                                                boxShadow: [
-                                                  BoxShadow(
-                                                    color: boxShadowColor,
-                                                    blurRadius: 12,
-                                                    offset: const Offset(3, 12),
-                                                  )
-                                                ],
-                                                borderRadius: BorderRadius.circular(10),
+                                                fit: BoxFit.cover,
                                               ),
-                                              child: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-                                                  stream: firestoreStreamTwo,
-                                                  builder: (context, snapshot) {
-                                                    if (snapshot.connectionState == ConnectionState.waiting) {
-                                                      return const Center(child: CircularProgressIndicator());
-                                                    } else {
-                                                      var data = snapshot.data!.data()!;
-                                                      final clubGlobalProvider = Provider.of<ClubGlobalProvider>(context, listen: false);
-                                                      clubGlobalProvider.setClubName(data['club_name']);
-                                                      clubName = snapshot.data?.data()!['club_name'];
-
-                                                      return Material(
-                                                        color: materialBackgroundColor,
-                                                        child: InkWell(
-                                                          splashColor: splashColor,
-                                                          onTap: () {},
-                                                          child: Align(
-                                                            alignment: const Alignment(0, 0.9),
-                                                            child: ListTile(
-                                                              title: Text(
-                                                                clubName.toUpperCase(),
-                                                                style: GoogleFonts.gorditas(
-                                                                    color: textColor,
-                                                                    fontSize: 19,
-                                                                    fontWeight: FontWeight.w700,
-                                                                    shadows: <Shadow>[
-                                                                      Shadow(
-                                                                          blurRadius: 50,
-                                                                          color: textShadowColor,
-                                                                          offset: Offset.fromDirection(100, 12))
-                                                                    ]),
-                                                              ),
-                                                              subtitle: Text(
-                                                                subtitle,
-                                                                style: GoogleFonts.varela(
-                                                                  color: textColor,
-                                                                  fontWeight: FontWeight.w500,
-                                                                  fontSize: 16,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      );
-                                                    }
-                                                  }));
+                                              gradient: LinearGradient(
+                                                begin: Alignment.topLeft,
+                                                end: Alignment.bottomRight,
+                                                colors: [linearGradientColor, linearGradientColorTwo.withAlpha(50)],
+                                                stops: const [0.3, 1],
+                                              ),
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color: boxShadowColor,
+                                                  blurRadius: 12,
+                                                  offset: const Offset(3, 12),
+                                                )
+                                              ],
+                                              borderRadius: BorderRadius.circular(10),
+                                            ),
+                                            child: Material(
+                                              color: materialBackgroundColor,
+                                              child: InkWell(
+                                                splashColor: splashColor,
+                                                onTap: () {},
+                                                child: Align(
+                                                  alignment: const Alignment(0, 0.9),
+                                                  child: ListTile(
+                                                    title: Text(
+                                                      clubName.toUpperCase(),
+                                                      style: GoogleFonts.gorditas(
+                                                          color: textColor,
+                                                          fontSize: 19,
+                                                          fontWeight: FontWeight.w700,
+                                                          shadows: <Shadow>[
+                                                            Shadow(blurRadius: 50, color: textShadowColor, offset: Offset.fromDirection(100, 12))
+                                                          ]),
+                                                    ),
+                                                    subtitle: Text(
+                                                      sidebarSubtitle,
+                                                      style: GoogleFonts.varela(
+                                                        color: textColor,
+                                                        fontWeight: FontWeight.w500,
+                                                        fontSize: 16,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          );
                                         }
                                       },
                                     ),
                                   ),
-                                  Padding(
-                                    padding: const EdgeInsets.all(12.0),
-                                    child: Align(
-                                      alignment: Alignment.topLeft,
-                                      child: Opacity(
-                                        opacity: 0.6,
-                                        child: Container(
-                                          width: 140.0,
-                                          height: 140.0,
-                                          decoration: const BoxDecoration(
-                                              shape: BoxShape.circle, image: DecorationImage(image: AssetImage('assets/images/cpfc_logo.jpeg'))),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
+                                  StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+                                      stream: firestoreStreamTwo,
+                                      builder: (context, snapshot) {
+                                        if (snapshot.connectionState == ConnectionState.waiting) {
+                                          return const Center(child: CircularProgressIndicator());
+                                        } else {
+                                          return Padding(
+                                            padding: const EdgeInsets.all(12.0),
+                                            child: Align(
+                                              alignment: Alignment.topLeft,
+                                              child: Opacity(
+                                                opacity: 0.6,
+                                                child: Container(
+                                                  width: 140.0,
+                                                  height: 140.0,
+                                                  decoration: BoxDecoration(
+                                                    shape: BoxShape.circle,
+                                                    image: DecorationImage(
+                                                      image: CachedNetworkImageProvider(
+                                                        snapshot.data?.data()!['club_logo'],
+                                                      ),
+                                                      fit: BoxFit.cover,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          );
+                                        }
+                                      }),
                                 ],
                               ),
 

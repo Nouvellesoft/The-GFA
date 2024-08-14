@@ -2,8 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../model/a_past_matches_model.dart';
 import '../notifier/a_past_matches_notifier.dart';
+import '../notifier/club_global_notifier.dart';
 
-Future<void> getPastMatches(PastMatchesNotifier pastMatchesNotifier, String clubId) async {
+Future<void> getPastMatches(PastMatchesNotifier pastMatchesNotifier, ClubGlobalProvider clubGlobalProvider, String clubId) async {
   QuerySnapshot snapshot =
       await FirebaseFirestore.instance.collection('clubs').doc(clubId).collection('PastMatches').orderBy('id', descending: true).limit(20).get();
 
@@ -25,4 +26,5 @@ Future<void> getPastMatches(PastMatchesNotifier pastMatchesNotifier, String club
   }
 
   pastMatchesNotifier.pastMatchesList = pastMatchesList;
+  pastMatchesNotifier.updateClubIconFromProvider(clubGlobalProvider);
 }

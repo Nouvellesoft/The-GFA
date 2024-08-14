@@ -20,10 +20,12 @@ class MyAddNewHomeTeamPageState extends State<MyAddNewHomeTeamPage> {
   final _formKey = GlobalKey<FormState>();
 
   String clubName = '';
+  String clubIcon = '';
 
   @override
   Widget build(BuildContext context) {
     clubName = Provider.of<ClubGlobalProvider>(context).clubName;
+    clubIcon = Provider.of<ClubGlobalProvider>(context).clubIcon;
 
     return Scaffold(
       body: Padding(
@@ -88,9 +90,8 @@ class MyAddNewHomeTeamPageState extends State<MyAddNewHomeTeamPage> {
         // Update Firestore document with data
         await FirebaseFirestore.instance.collection('clubs').doc(widget.clubId).collection('MatchDayBannerForClub').add({
           'id': '10',
-          'club_name': homeTeamName,
-          'club_icon':
-              'https://firebasestorage.googleapis.com/v0/b/cov-phoenix-fc.appspot.com/o/ClubLogos%2Fcov_phoenix_fc_bg_less.png?alt=media&token=66244d85-23d2-443a-8251-0d35b6ae2137',
+          'team_name': homeTeamName,
+          'club_icon': clubIcon,
           // Provide a default URL if image is not selected
         });
 
@@ -120,7 +121,7 @@ class MyAddNewHomeTeamPageState extends State<MyAddNewHomeTeamPage> {
         .collection('clubs')
         .doc(widget.clubId)
         .collection('MatchDayBannerForClub')
-        .where('club_name', isEqualTo: homeTeamName)
+        .where('team_name', isEqualTo: homeTeamName)
         .get();
 
     return querySnapshot.docs.isNotEmpty;

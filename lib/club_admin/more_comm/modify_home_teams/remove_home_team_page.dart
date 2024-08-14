@@ -6,6 +6,7 @@ import '/api/c_match_day_banner_for_club_api.dart';
 import '../../../bloc_navigation_bloc/navigation_bloc.dart';
 import '../../../model/c_match_day_banner_for_clubs_model.dart';
 import '../../../notifier/c_match_day_banner_for_club_notifier.dart';
+import '../../../notifier/club_global_notifier.dart';
 
 late MatchDayBannerForClubNotifier matchDayBannerForClubNotifier;
 
@@ -68,7 +69,7 @@ class MyRemoveNewHomeTeamPageState extends State<MyRemoveNewHomeTeamPage> {
                 itemBuilder: (context, index) {
                   final homeTeamName = matchDayBannerForClubNotifier.matchDayBannerForClubList[index]; // Replace with your actual data structure
                   return ListTile(
-                    title: Text(homeTeamName.clubName!),
+                    title: Text(homeTeamName.teamName!),
                     trailing: isEditing
                         ? Checkbox(
                             activeColor: const Color.fromRGBO(147, 165, 193, 1.0),
@@ -119,7 +120,7 @@ class MyRemoveNewHomeTeamPageState extends State<MyRemoveNewHomeTeamPage> {
                           children: selectedHomeTeams.map((homeTeams) {
                             return Chip(
                               label: Text(
-                                homeTeams.clubName ?? '',
+                                homeTeams.teamName ?? '',
                                 style: const TextStyle(fontSize: 12),
                               ),
                               onDeleted: () {
@@ -164,14 +165,14 @@ class MyRemoveNewHomeTeamPageState extends State<MyRemoveNewHomeTeamPage> {
 
     // Iterate through the selected management and delete them
     for (final homeTeams in selectedHomeTeams) {
-      final homeTeamsName = homeTeams.clubName; // Get the name of the clubCaptains
+      final homeTeamsName = homeTeams.teamName; // Get the name of the clubCaptains
       if (homeTeamsName != null) {
         // Delete management with matching names
         await firestore
             .collection('clubs')
             .doc(widget.clubId)
             .collection('MatchDayBannerForClub')
-            .where('club_name', isEqualTo: homeTeamsName)
+            .where('team_name', isEqualTo: homeTeamsName)
             .get()
             .then((querySnapshot) {
           for (var doc in querySnapshot.docs) {
@@ -190,14 +191,16 @@ class MyRemoveNewHomeTeamPageState extends State<MyRemoveNewHomeTeamPage> {
 
   @override
   void initState() {
+    ClubGlobalProvider clubGlobalNotifier = Provider.of<ClubGlobalProvider>(context, listen: false);
     MatchDayBannerForClubNotifier matchDayBannerForClubNotifier = Provider.of<MatchDayBannerForClubNotifier>(context, listen: false);
-    _fetchMatchDayBannerForClubAndUpdateNotifier(matchDayBannerForClubNotifier);
+    _fetchMatchDayBannerForClubAndUpdateNotifier(matchDayBannerForClubNotifier, clubGlobalNotifier);
 
     super.initState();
   }
 
-  Future<void> _fetchMatchDayBannerForClubAndUpdateNotifier(MatchDayBannerForClubNotifier matchDayBannerForClubNotifier) async {
-    await getMatchDayBannerForClub(matchDayBannerForClubNotifier, widget.clubId);
+  Future<void> _fetchMatchDayBannerForClubAndUpdateNotifier(
+      MatchDayBannerForClubNotifier matchDayBannerForClubNotifier, ClubGlobalProvider clubGlobalNotifier) async {
+    await getMatchDayBannerForClub(matchDayBannerForClubNotifier, clubGlobalNotifier, widget.clubId);
 
     setState(() {}); // Refresh the UI if needed
   }

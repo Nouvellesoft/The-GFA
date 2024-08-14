@@ -1,11 +1,21 @@
 class MatchDayBannerForClub {
   String? clubIcon;
-  String? clubName;
+  String? teamName;
   dynamic id;
+
+  MatchDayBannerForClub({
+    this.teamName,
+    this.clubIcon,
+    this.id,
+  });
 
   MatchDayBannerForClub.fromMap(Map<String?, dynamic> data) {
     id = data['id'];
-    clubName = data['club_name'];
-    clubIcon = data['club_icon'];
+    teamName = data['team_name'];
+    clubIcon = data['club_icon']; // Initially set from Firestore
+  }
+
+  void updateClubIcon(String icon) {
+    clubIcon = icon;
   }
 }

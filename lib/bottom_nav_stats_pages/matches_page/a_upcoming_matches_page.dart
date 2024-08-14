@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 
 import '../../api/a_upcoming_matches_api.dart';
 import '../../notifier/a_upcoming_matches_notifier.dart';
+import '../../notifier/club_global_notifier.dart';
 import 'a_past_matches_page.dart';
 
 Color nabColor = const Color.fromRGBO(56, 56, 60, 1);
@@ -27,16 +28,17 @@ class UpcomingMatchesPageState extends State<UpcomingMatchesPage> with TickerPro
 
   String results = 'Results';
 
-  Future<void> _fetchUpcomingMatchesAndUpdateNotifier(UpcomingMatchesNotifier upcomingMatchesNotifier) async {
-    await getUpcomingMatches(upcomingMatchesNotifier, widget.clubId);
+  Future<void> _fetchUpcomingMatchesAndUpdateNotifier(UpcomingMatchesNotifier upcomingMatchesNotifier, ClubGlobalProvider clubGlobalProvider) async {
+    await getUpcomingMatches(upcomingMatchesNotifier, widget.clubId, clubGlobalProvider.clubIcon);
 
     setState(() {}); // Refresh the UI if needed
   }
 
   @override
   void initState() {
+    ClubGlobalProvider clubGlobalProvider = Provider.of<ClubGlobalProvider>(context, listen: false);
     UpcomingMatchesNotifier upcomingMatchesNotifier = Provider.of<UpcomingMatchesNotifier>(context, listen: false);
-    _fetchUpcomingMatchesAndUpdateNotifier(upcomingMatchesNotifier);
+    _fetchUpcomingMatchesAndUpdateNotifier(upcomingMatchesNotifier, clubGlobalProvider);
 
     super.initState();
     _controller = AnimationController(
@@ -114,6 +116,18 @@ class AnimCardState extends State<AnimCard> {
   @override
   Widget build(BuildContext context) {
     UpcomingMatchesNotifier upcomingMatchesNotifier = Provider.of<UpcomingMatchesNotifier>(context);
+    ClubGlobalProvider clubGlobalProvider = Provider.of<ClubGlobalProvider>(context);
+
+    String homeTeamIcon = upcomingMatchesNotifier.upcomingMatchesList[widget.index].homeTeamIcon!;
+    String awayTeamIcon = upcomingMatchesNotifier.upcomingMatchesList[widget.index].awayTeamIcon!;
+
+    // Replace icons with clubIcon if it matches the club
+    if (upcomingMatchesNotifier.upcomingMatchesList[widget.index].homeTeam == clubGlobalProvider.clubName) {
+      homeTeamIcon = clubGlobalProvider.clubIcon;
+    }
+    if (upcomingMatchesNotifier.upcomingMatchesList[widget.index].awayTeam == clubGlobalProvider.clubName) {
+      awayTeamIcon = clubGlobalProvider.clubIcon;
+    }
 
     return Column(
       children: [
@@ -171,7 +185,8 @@ class AnimCardState extends State<AnimCard> {
                                 decoration: BoxDecoration(
                                     borderRadius: const BorderRadius.all(Radius.circular(5)),
                                     image: DecorationImage(
-                                        image: CachedNetworkImageProvider(upcomingMatchesNotifier.upcomingMatchesList[widget.index].homeTeamIcon!),
+                                        // image: CachedNetworkImageProvider(upcomingMatchesNotifier.upcomingMatchesList[widget.index].homeTeamIcon!),
+                                        image: CachedNetworkImageProvider(clubGlobalProvider.clubIcon),
                                         fit: BoxFit.cover)),
                               ),
                             ),
@@ -237,7 +252,8 @@ class AnimCardState extends State<AnimCard> {
                                 decoration: BoxDecoration(
                                     borderRadius: const BorderRadius.all(Radius.circular(5)),
                                     image: DecorationImage(
-                                        image: CachedNetworkImageProvider(upcomingMatchesNotifier.upcomingMatchesList[widget.index].awayTeamIcon!),
+                                        // image: CachedNetworkImageProvider(upcomingMatchesNotifier.upcomingMatchesList[widget.index].awayTeamIcon!),
+                                        image: CachedNetworkImageProvider(awayTeamIcon),
                                         fit: BoxFit.cover)),
                               ),
                             ),

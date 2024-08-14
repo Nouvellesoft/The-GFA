@@ -89,23 +89,23 @@ class MyModifyClubPlayersPageState extends State<MyModifyClubPlayersPage> {
     setState(() {}); // Refresh the UI if needed
   }
 
-  Future<void> _fetchThirdTeamClassAndUpdateNotifier(ThirdTeamClassNotifier thirdTeamClassNotifier) async {
-    await getThirdTeamClass(thirdTeamClassNotifier, widget.clubId);
+  Future<void> _fetchThirdTeamClassAndUpdateNotifier(ThirdTeamClassNotifier thirdTeamNotifier) async {
+    await getThirdTeamClass(thirdTeamNotifier, widget.clubId);
     setState(() {}); // Refresh the UI if needed
   }
 
-  Future<void> _fetchFourthTeamClassAndUpdateNotifier(FourthTeamClassNotifier fourthTeamClassNotifier) async {
-    await getFourthTeamClass(fourthTeamClassNotifier, widget.clubId);
+  Future<void> _fetchFourthTeamClassAndUpdateNotifier(FourthTeamClassNotifier fourthTeamNotifier) async {
+    await getFourthTeamClass(fourthTeamNotifier, widget.clubId);
     setState(() {}); // Refresh the UI if needed
   }
 
-  Future<void> _fetchFifthTeamClassAndUpdateNotifier(FifthTeamClassNotifier fifthTeamClassNotifier) async {
-    await getFifthTeamClass(fifthTeamClassNotifier, widget.clubId);
+  Future<void> _fetchFifthTeamClassAndUpdateNotifier(FifthTeamClassNotifier fifthTeamNotifier) async {
+    await getFifthTeamClass(fifthTeamNotifier, widget.clubId);
     setState(() {}); // Refresh the UI if needed
   }
 
-  Future<void> _fetchSixthTeamClassAndUpdateNotifier(SixthTeamClassNotifier sixthTeamClassNotifier) async {
-    await getSixthTeamClass(sixthTeamClassNotifier, widget.clubId);
+  Future<void> _fetchSixthTeamClassAndUpdateNotifier(SixthTeamClassNotifier sixthTeamNotifier) async {
+    await getSixthTeamClass(sixthTeamNotifier, widget.clubId);
     setState(() {}); // Refresh the UI if needed
   }
 

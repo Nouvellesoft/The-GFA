@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -25,9 +28,13 @@ import '../api/c_match_day_banner_for_league_api.dart';
 import '../api/c_match_day_banner_for_location_api.dart';
 import '../api/club_captains_api.dart';
 import '../api/coaching_staff_api.dart';
+import '../api/fifth_team_class_api.dart';
 import '../api/first_team_class_api.dart';
+import '../api/fourth_team_class_api.dart';
 import '../api/management_body_api.dart';
 import '../api/second_team_class_api.dart';
+import '../api/sixth_team_class_api.dart';
+import '../api/third_team_class_api.dart';
 import '../notifier/all_club_members_notifier.dart';
 import '../notifier/all_fc_teams_notifier.dart';
 import '../notifier/c_match_day_banner_for_club_notifier.dart';
@@ -35,11 +42,16 @@ import '../notifier/c_match_day_banner_for_club_opp_notifier.dart';
 import '../notifier/c_match_day_banner_for_league_notifier.dart';
 import '../notifier/c_match_day_banner_for_location_notifier.dart';
 import '../notifier/club_captains_notifier.dart';
+import '../notifier/club_global_notifier.dart';
 import '../notifier/coaching_staff_notifier.dart';
+import '../notifier/fifth_team_class_notifier.dart';
 import '../notifier/first_team_class_notifier.dart';
+import '../notifier/fourth_team_class_notifier.dart';
 import '../notifier/management_body_notifier.dart';
 import '../notifier/players_notifier.dart';
 import '../notifier/second_team_class_notifier.dart';
+import '../notifier/sixth_team_class_notifier.dart';
+import '../notifier/third_team_class_notifier.dart';
 import 'modify_captains/a_tabview_modify_club_captains_page.dart';
 import 'modify_club_sponsors/a_tabview_modify_club_sponsors_page.dart';
 import 'modify_member/modify_players_page.dart';
@@ -110,6 +122,9 @@ class MyClubAdminPage extends StatefulWidget implements NavigationStates {
 }
 
 class MyClubAdminPageState extends State<MyClubAdminPage> {
+  late Stream<DocumentSnapshot<Map<String, dynamic>>> firestoreStream;
+  late StreamSubscription<DocumentSnapshot<Map<String, dynamic>>> streamSubscription;
+
   Future launchURL(String url) async {
     final scaffoldMessenger = ScaffoldMessenger.of(context);
     if (await canLaunchUrl(Uri.parse(url))) {
@@ -926,12 +941,31 @@ class MyClubAdminPageState extends State<MyClubAdminPage> {
 
   @override
   void initState() {
+    super.initState();
+
+    firestoreStream = FirebaseFirestore.instance
+        .collection('clubs')
+        .doc(widget.clubId)
+        .collection('AboutClub')
+        .doc('about_club_page')
+        .snapshots()
+        .distinct(); // Ensure distinct events
+
+    // Listen to the stream
+    streamSubscription = firestoreStream.listen((snapshot) {
+      if (snapshot.exists && mounted) {
+        var data = snapshot.data()!;
+        final clubGlobalProvider = Provider.of<ClubGlobalProvider>(context, listen: false);
+        clubGlobalProvider.setClubName(data['club_name']);
+        clubGlobalProvider.setClubLogo(data['club_logo']);
+        clubGlobalProvider.setClubIcon(data['club_icon']);
+      }
+    });
+
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
-    super.initState();
-
     // Initialize Firebase first
     Firebase.initializeApp().whenComplete(() {
       if (kDebugMode) {
@@ -946,6 +980,18 @@ class MyClubAdminPageState extends State<MyClubAdminPage> {
     SecondTeamClassNotifier secondTeamClassNotifier = Provider.of<SecondTeamClassNotifier>(context, listen: false);
     _fetchSecondTeamClassAndUpdateNotifier(secondTeamClassNotifier);
 
+    ThirdTeamClassNotifier thirdTeamClassNotifier = Provider.of<ThirdTeamClassNotifier>(context, listen: false);
+    _fetchThirdTeamClassAndUpdateNotifier(thirdTeamClassNotifier);
+
+    FourthTeamClassNotifier fourthTeamClassNotifier = Provider.of<FourthTeamClassNotifier>(context, listen: false);
+    _fetchFourthTeamClassAndUpdateNotifier(fourthTeamClassNotifier);
+
+    FifthTeamClassNotifier fifthTeamClassNotifier = Provider.of<FifthTeamClassNotifier>(context, listen: false);
+    _fetchFifthTeamClassAndUpdateNotifier(fifthTeamClassNotifier);
+
+    SixthTeamClassNotifier sixthTeamClassNotifier = Provider.of<SixthTeamClassNotifier>(context, listen: false);
+    _fetchSixthTeamClassAndUpdateNotifier(sixthTeamClassNotifier);
+
     CaptainsNotifier captainsNotifier = Provider.of<CaptainsNotifier>(context, listen: false);
     _fetchCaptainsAndUpdateNotifier(captainsNotifier);
 
@@ -958,43 +1004,62 @@ class MyClubAdminPageState extends State<MyClubAdminPage> {
     ClubSponsorsNotifier clubSponsorsNotifier = Provider.of<ClubSponsorsNotifier>(context, listen: false);
     _fetchClubSponsorsAndUpdateNotifier(clubSponsorsNotifier);
 
-    // Populate the PlayersNotifier with data from both teams
-    PlayersNotifier playersNotifier = Provider.of<PlayersNotifier>(context, listen: false);
+    // Use WidgetsBinding to defer setState calls until after the first frame
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Populate the PlayersNotifier with data from six teams
+      PlayersNotifier playersNotifier = Provider.of<PlayersNotifier>(context, listen: false);
 
-    playersNotifier.setFirstTeamPlayers(firstTeamClassNotifier.firstTeamClassList);
-    playersNotifier.setSecondTeamPlayers(secondTeamClassNotifier.secondTeamClassList);
+      playersNotifier.setFirstTeamPlayers(firstTeamClassNotifier.firstTeamClassList);
+      playersNotifier.setSecondTeamPlayers(secondTeamClassNotifier.secondTeamClassList);
+      playersNotifier.setThirdTeamPlayers(thirdTeamClassNotifier.thirdTeamClassList);
+      playersNotifier.setFourthTeamPlayers(fourthTeamClassNotifier.fourthTeamClassList);
+      playersNotifier.setFifthTeamPlayers(fifthTeamClassNotifier.fifthTeamClassList);
+      playersNotifier.setSixthTeamPlayers(sixthTeamClassNotifier.sixthTeamClassList);
 
-    // Populate the AllClubMembersNotifier with data from both teams
-    AllClubMembersNotifier allClubMembersNotifier = Provider.of<AllClubMembersNotifier>(context, listen: false);
+      // Populate the AllClubMembersNotifier with data from six teams
+      AllClubMembersNotifier allClubMembersNotifier = Provider.of<AllClubMembersNotifier>(context, listen: false);
 
-    allClubMembersNotifier.setFirstTeamMembers(firstTeamClassNotifier.firstTeamClassList);
-    allClubMembersNotifier.setSecondTeamMembers(secondTeamClassNotifier.secondTeamClassList);
-    allClubMembersNotifier.setCoachesList(coachesNotifier.coachesList);
-    allClubMembersNotifier.setMGMTBodyList(managementBodyNotifier.managementBodyList);
+      allClubMembersNotifier.setFirstTeamMembers(firstTeamClassNotifier.firstTeamClassList);
+      allClubMembersNotifier.setSecondTeamMembers(secondTeamClassNotifier.secondTeamClassList);
+      allClubMembersNotifier.setThirdTeamMembers(thirdTeamClassNotifier.thirdTeamClassList);
+      allClubMembersNotifier.setFourthTeamMembers(fourthTeamClassNotifier.fourthTeamClassList);
+      allClubMembersNotifier.setFifthTeamMembers(fifthTeamClassNotifier.fifthTeamClassList);
+      allClubMembersNotifier.setSixthTeamMembers(sixthTeamClassNotifier.sixthTeamClassList);
+      allClubMembersNotifier.setCoachesList(coachesNotifier.coachesList);
+      allClubMembersNotifier.setMGMTBodyList(managementBodyNotifier.managementBodyList);
 
-    MatchDayBannerForClubNotifier matchDayBannerForClubNotifier = Provider.of<MatchDayBannerForClubNotifier>(context, listen: false);
+      // Fetch and set match day banners
+      ClubGlobalProvider clubGlobalProvider = Provider.of<ClubGlobalProvider>(context, listen: false);
+      MatchDayBannerForClubNotifier matchDayBannerForClubNotifier = Provider.of<MatchDayBannerForClubNotifier>(context, listen: false);
+      MatchDayBannerForClubOppNotifier matchDayBannerForClubOppNotifier = Provider.of<MatchDayBannerForClubOppNotifier>(context, listen: false);
+      MatchDayBannerForLeagueNotifier matchDayBannerForLeagueNotifier = Provider.of<MatchDayBannerForLeagueNotifier>(context, listen: false);
+      MatchDayBannerForLocationNotifier matchDayBannerForLocationNotifier = Provider.of<MatchDayBannerForLocationNotifier>(context, listen: false);
 
-    MatchDayBannerForClubOppNotifier matchDayBannerForClubOppNotifier = Provider.of<MatchDayBannerForClubOppNotifier>(context, listen: false);
+      _fetchMatchDayBannerForClubNotifier(matchDayBannerForClubNotifier, clubGlobalProvider);
+      _fetchMatchDayBannerForClubOppNotifier(matchDayBannerForClubOppNotifier);
+      _fetchMatchDayBannerForLeagueNotifier(matchDayBannerForLeagueNotifier);
+      _fetchMatchDayBannerForLocationNotifier(matchDayBannerForLocationNotifier);
 
-    MatchDayBannerForLeagueNotifier matchDayBannerForLeagueNotifier = Provider.of<MatchDayBannerForLeagueNotifier>(context, listen: false);
+      // Update all teams
+      AllFCTeamsNotifier allFCTeamsNotifier = Provider.of<AllFCTeamsNotifier>(context, listen: false);
+      allFCTeamsNotifier.setMatchDayBannerForClubAllFCTeams(matchDayBannerForClubNotifier.matchDayBannerForClubList);
+      allFCTeamsNotifier.setMatchDayBannerForClubOppAllFCTeams(matchDayBannerForClubOppNotifier.matchDayBannerForClubOppList);
 
-    MatchDayBannerForLocationNotifier matchDayBannerForLocationNotifier = Provider.of<MatchDayBannerForLocationNotifier>(context, listen: false);
-
-    _fetchMatchDayBannerForClubNotifier(matchDayBannerForClubNotifier);
-    _fetchMatchDayBannerForClubOppNotifier(matchDayBannerForClubOppNotifier);
-    _fetchMatchDayBannerForLeagueNotifier(matchDayBannerForLeagueNotifier);
-    _fetchMatchDayBannerForLocationNotifier(matchDayBannerForLocationNotifier);
-
-    AllFCTeamsNotifier allFCTeamsNotifier = Provider.of<AllFCTeamsNotifier>(context, listen: false);
-
-    allFCTeamsNotifier.setMatchDayBannerForClubAllFCTeams(matchDayBannerForClubNotifier.matchDayBannerForClubList);
-    allFCTeamsNotifier.setMatchDayBannerForClubOppAllFCTeams(matchDayBannerForClubOppNotifier.matchDayBannerForClubOppList);
-
-    setState(() {});
+      // Trigger UI update
+      setState(() {});
+    });
   }
 
-  Future<void> _fetchMatchDayBannerForClubNotifier(MatchDayBannerForClubNotifier matchDayBannerForClubNotifier) async {
-    await getMatchDayBannerForClub(matchDayBannerForClubNotifier, widget.clubId);
+  @override
+  void dispose() {
+    // Cancel the stream subscription when the widget is disposed
+    streamSubscription.cancel();
+    super.dispose();
+  }
+
+  Future<void> _fetchMatchDayBannerForClubNotifier(
+      MatchDayBannerForClubNotifier matchDayBannerForClubNotifier, ClubGlobalProvider clubGlobalProvider) async {
+    await getMatchDayBannerForClub(matchDayBannerForClubNotifier, clubGlobalProvider, widget.clubId);
 
     setState(() {}); // Refresh the UI if needed
   }
@@ -1026,6 +1091,26 @@ class MyClubAdminPageState extends State<MyClubAdminPage> {
   Future<void> _fetchSecondTeamClassAndUpdateNotifier(SecondTeamClassNotifier secondTeamNotifier) async {
     await getSecondTeamClass(secondTeamNotifier, widget.clubId);
 
+    setState(() {}); // Refresh the UI if needed
+  }
+
+  Future<void> _fetchThirdTeamClassAndUpdateNotifier(ThirdTeamClassNotifier thirdTeamNotifier) async {
+    await getThirdTeamClass(thirdTeamNotifier, widget.clubId);
+    setState(() {}); // Refresh the UI if needed
+  }
+
+  Future<void> _fetchFourthTeamClassAndUpdateNotifier(FourthTeamClassNotifier fourthTeamNotifier) async {
+    await getFourthTeamClass(fourthTeamNotifier, widget.clubId);
+    setState(() {}); // Refresh the UI if needed
+  }
+
+  Future<void> _fetchFifthTeamClassAndUpdateNotifier(FifthTeamClassNotifier fifthTeamNotifier) async {
+    await getFifthTeamClass(fifthTeamNotifier, widget.clubId);
+    setState(() {}); // Refresh the UI if needed
+  }
+
+  Future<void> _fetchSixthTeamClassAndUpdateNotifier(SixthTeamClassNotifier sixthTeamNotifier) async {
+    await getSixthTeamClass(sixthTeamNotifier, widget.clubId);
     setState(() {}); // Refresh the UI if needed
   }
 

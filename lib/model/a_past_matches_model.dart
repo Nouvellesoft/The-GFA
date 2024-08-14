@@ -10,6 +10,19 @@ class PastMatches {
   String? awayTeamIcon;
   dynamic id;
 
+  PastMatches({
+    this.assistsBy,
+    this.goalsScorers,
+    this.homeTeam,
+    this.awayTeam,
+    this.awayTeamScore,
+    this.homeTeamScore,
+    this.matchDate,
+    this.homeTeamIcon,
+    this.awayTeamIcon,
+    this.id,
+  });
+
   PastMatches.fromMap(Map<String?, dynamic> data) {
     id = data['id'];
     assistsBy = data['assists_by'];
@@ -21,5 +34,13 @@ class PastMatches {
     matchDate = data['match_date'];
     homeTeamIcon = data['home_team_icon'];
     awayTeamIcon = data['away_team_icon'];
+  }
+  void updateClubIcon(String clubName, String clubIcon) {
+    if (homeTeam == clubName) {
+      homeTeamIcon = clubIcon;
+    }
+    if (awayTeam == clubName) {
+      awayTeamIcon = clubIcon;
+    }
   }
 }
