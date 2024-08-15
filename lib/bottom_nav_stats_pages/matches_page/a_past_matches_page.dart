@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 
 import '../../api/a_past_matches_api.dart';
 import '../../notifier/a_past_matches_notifier.dart';
+import '../../notifier/c_match_day_banner_for_club_notifier.dart';
 import '../../notifier/club_global_notifier.dart';
 import './a_upcoming_matches_page.dart';
 
@@ -26,8 +27,12 @@ class PastMatchesPageState extends State<PastMatchesPage> with TickerProviderSta
 
   late Stream<DocumentSnapshot<Map<String, dynamic>>> firestoreStream;
 
-  Future<void> _fetchPastMatchesAndUpdateNotifier(PastMatchesNotifier pastMatchesNotifier, ClubGlobalProvider clubGlobalProvider) async {
-    await getPastMatches(pastMatchesNotifier, clubGlobalProvider, widget.clubId);
+  Future<void> _fetchPastMatchesAndUpdateNotifier(
+    PastMatchesNotifier pastMatchesNotifier,
+    MatchDayBannerForClubNotifier matchDayBannerForClubNotifier,
+    ClubGlobalProvider clubGlobalProvider,
+  ) async {
+    await getPastMatches(pastMatchesNotifier, matchDayBannerForClubNotifier, clubGlobalProvider, widget.clubId);
 
     setState(() {}); // Refresh the UI if needed
   }
@@ -36,7 +41,8 @@ class PastMatchesPageState extends State<PastMatchesPage> with TickerProviderSta
   void initState() {
     ClubGlobalProvider clubGlobalProvider = Provider.of<ClubGlobalProvider>(context, listen: false);
     PastMatchesNotifier pastMatchesNotifier = Provider.of<PastMatchesNotifier>(context, listen: false);
-    _fetchPastMatchesAndUpdateNotifier(pastMatchesNotifier, clubGlobalProvider);
+    MatchDayBannerForClubNotifier matchDayBannerForClubNotifier = Provider.of<MatchDayBannerForClubNotifier>(context, listen: false);
+    _fetchPastMatchesAndUpdateNotifier(pastMatchesNotifier, matchDayBannerForClubNotifier, clubGlobalProvider);
 
     super.initState();
     _controller = AnimationController(
