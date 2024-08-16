@@ -26,6 +26,7 @@ class MatchDayBannerForClubNotifier with ChangeNotifier {
   void updateClubIconsFromProvider(ClubGlobalProvider clubGlobalProvider) {
     for (var banner in _matchDayBannerForClubList) {
       banner.updateClubIcon(clubGlobalProvider.clubIcon);
+      banner.updateClubLogo(clubGlobalProvider.clubLogo);
     }
     notifyListeners();
   }

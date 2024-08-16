@@ -617,6 +617,13 @@ class PlayersTablePageState extends State<PlayersTablePage> {
                                       Padding(
                                         padding: EdgeInsets.all(8.0),
                                         child: Text(
+                                          'DM - Defensive Midfielder',
+                                          style: TextStyle(color: Colors.white70),
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: EdgeInsets.all(8.0),
+                                        child: Text(
                                           'CDM - Central Defensive Midfielder',
                                           style: TextStyle(color: Colors.white70),
                                         ),

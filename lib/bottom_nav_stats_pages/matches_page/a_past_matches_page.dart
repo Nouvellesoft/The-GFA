@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import '../../api/a_past_matches_api.dart';
 import '../../notifier/a_past_matches_notifier.dart';
 import '../../notifier/c_match_day_banner_for_club_notifier.dart';
+import '../../notifier/c_match_day_banner_for_club_opp_notifier.dart';
 import '../../notifier/club_global_notifier.dart';
 import './a_upcoming_matches_page.dart';
 
@@ -28,21 +29,30 @@ class PastMatchesPageState extends State<PastMatchesPage> with TickerProviderSta
   late Stream<DocumentSnapshot<Map<String, dynamic>>> firestoreStream;
 
   Future<void> _fetchPastMatchesAndUpdateNotifier(
-    PastMatchesNotifier pastMatchesNotifier,
-    MatchDayBannerForClubNotifier matchDayBannerForClubNotifier,
-    ClubGlobalProvider clubGlobalProvider,
-  ) async {
-    await getPastMatches(pastMatchesNotifier, matchDayBannerForClubNotifier, clubGlobalProvider, widget.clubId);
+      PastMatchesNotifier pastMatchesNotifier,
+      MatchDayBannerForClubNotifier matchDayBannerForClubNotifier,
+      MatchDayBannerForClubOppNotifier matchDayBannerForClubOppNotifier,
+      ClubGlobalProvider clubGlobalProvider,
+      ) async {
+    await getPastMatches(pastMatchesNotifier, matchDayBannerForClubNotifier, matchDayBannerForClubOppNotifier, clubGlobalProvider, widget.clubId);
 
     setState(() {}); // Refresh the UI if needed
   }
+
 
   @override
   void initState() {
     ClubGlobalProvider clubGlobalProvider = Provider.of<ClubGlobalProvider>(context, listen: false);
     PastMatchesNotifier pastMatchesNotifier = Provider.of<PastMatchesNotifier>(context, listen: false);
     MatchDayBannerForClubNotifier matchDayBannerForClubNotifier = Provider.of<MatchDayBannerForClubNotifier>(context, listen: false);
-    _fetchPastMatchesAndUpdateNotifier(pastMatchesNotifier, matchDayBannerForClubNotifier, clubGlobalProvider);
+    MatchDayBannerForClubOppNotifier matchDayBannerForClubOppNotifier = Provider.of<MatchDayBannerForClubOppNotifier>(context, listen: false);
+
+    _fetchPastMatchesAndUpdateNotifier(
+      pastMatchesNotifier,
+      matchDayBannerForClubNotifier,
+      matchDayBannerForClubOppNotifier,
+      clubGlobalProvider,
+    );
 
     super.initState();
     _controller = AnimationController(
@@ -180,9 +190,12 @@ class AnimCardState extends State<AnimCard> {
                                 height: 42.0,
                                 decoration: BoxDecoration(
                                     borderRadius: const BorderRadius.all(Radius.circular(5)),
-                                    image: DecorationImage(
-                                        image: CachedNetworkImageProvider(pastMatchesNotifier.pastMatchesList[widget.index].homeTeamIcon!),
-                                        fit: BoxFit.cover)),
+                                  image: DecorationImage(
+                                    image: pastMatchesNotifier.pastMatchesList[widget.index].homeTeamIcon!.startsWith('assets/')
+                                        ? AssetImage(pastMatchesNotifier.pastMatchesList[widget.index].homeTeamIcon!) as ImageProvider
+                                        : CachedNetworkImageProvider(pastMatchesNotifier.pastMatchesList[widget.index].homeTeamIcon!),
+                                    fit: BoxFit.cover,
+                                  )),
                               ),
                             ),
                           ),
@@ -253,9 +266,12 @@ class AnimCardState extends State<AnimCard> {
                                 height: 42.0,
                                 decoration: BoxDecoration(
                                     borderRadius: const BorderRadius.all(Radius.circular(5)),
-                                    image: DecorationImage(
-                                        image: CachedNetworkImageProvider(pastMatchesNotifier.pastMatchesList[widget.index].awayTeamIcon!),
-                                        fit: BoxFit.cover)),
+                                  image: DecorationImage(
+                                    image: pastMatchesNotifier.pastMatchesList[widget.index].awayTeamIcon!.startsWith('assets/')
+                                        ? AssetImage(pastMatchesNotifier.pastMatchesList[widget.index].awayTeamIcon!) as ImageProvider
+                                        : CachedNetworkImageProvider(pastMatchesNotifier.pastMatchesList[widget.index].awayTeamIcon!),
+                                    fit: BoxFit.cover,
+                                  ),),
                               ),
                             ),
                           ),

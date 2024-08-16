@@ -1,7 +1,5 @@
 import 'dart:collection';
-
 import 'package:flutter/cupertino.dart';
-
 import '../model/c_match_day_banner_for_club_opps_model.dart';
 
 class MatchDayBannerForClubOppNotifier with ChangeNotifier {

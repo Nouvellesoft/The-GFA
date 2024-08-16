@@ -12,7 +12,6 @@ import 'package:material_design_icons_flutter/material_design_icons_flutter.dart
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../notifier/c_match_day_banner_for_club_notifier.dart';
 import '/api/a_upcoming_matches_api.dart';
 import '/api/club_sponsors_api.dart';
 import '/api/second_team_class_api.dart';
@@ -55,6 +54,8 @@ import '../club_admin/club_admin_page.dart';
 import '../details_pages/first_team_details_page.dart';
 import '../home_page/home_page_deux.dart';
 import '../notifier/a_upcoming_matches_notifier.dart';
+import '../notifier/c_match_day_banner_for_club_notifier.dart';
+import '../notifier/c_match_day_banner_for_club_opp_notifier.dart';
 import '../notifier/club_global_notifier.dart';
 import '../notifier/club_sponsors_notifier.dart';
 import '../notifier/cum_motm_players_stats_info_notifier.dart';
@@ -937,7 +938,14 @@ class _MyFirstTeamClassPage extends State<MyFirstTeamClassPage> {
     ClubGlobalProvider clubGlobalProvider = Provider.of<ClubGlobalProvider>(context, listen: false);
     UpcomingMatchesNotifier upcomingMatchesNotifier = Provider.of<UpcomingMatchesNotifier>(context, listen: false);
     MatchDayBannerForClubNotifier matchDayBannerForClubNotifier = Provider.of<MatchDayBannerForClubNotifier>(context, listen: false);
-    _fetchUpcomingMatchesAndUpdateNotifier(upcomingMatchesNotifier, matchDayBannerForClubNotifier, clubGlobalProvider);
+    MatchDayBannerForClubOppNotifier matchDayBannerForClubOppNotifier = Provider.of<MatchDayBannerForClubOppNotifier>(context, listen: false);
+
+    _fetchUpcomingMatchesAndUpdateNotifier(
+      upcomingMatchesNotifier,
+      matchDayBannerForClubNotifier,
+      matchDayBannerForClubOppNotifier,
+      clubGlobalProvider,
+    );
 
     ClubSponsorsNotifier clubSponsorsNotifier = Provider.of<ClubSponsorsNotifier>(context, listen: false);
     _fetchClubSponsorsAndUpdateNotifier(clubSponsorsNotifier);
@@ -1084,8 +1092,8 @@ class _MyFirstTeamClassPage extends State<MyFirstTeamClassPage> {
     setState(() {});
   }
 
-  Future<void> _fetchUpcomingMatchesAndUpdateNotifier(UpcomingMatchesNotifier notifier, MatchDayBannerForClubNotifier matchDayBannerForClubNotifier, ClubGlobalProvider clubGlobalProvider) async {
-    await getUpcomingMatches(notifier, matchDayBannerForClubNotifier, clubGlobalProvider, widget.clubId);
+  Future<void> _fetchUpcomingMatchesAndUpdateNotifier(UpcomingMatchesNotifier notifier, MatchDayBannerForClubNotifier matchDayBannerForClubNotifier, MatchDayBannerForClubOppNotifier matchDayBannerForClubOppNotifier, ClubGlobalProvider clubGlobalProvider) async {
+    await getUpcomingMatches(notifier, matchDayBannerForClubNotifier, matchDayBannerForClubOppNotifier, clubGlobalProvider, widget.clubId);
 
     setState(() {});
   }

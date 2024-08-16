@@ -234,6 +234,21 @@ class _FourthTeamClassDetailsPage extends State<FourthTeamClassDetailsPage> {
     'Left Back',
     'Right Back'
   ];
+  final Map<String, String> positionAcronyms = {
+    'Goalkeeper': 'GK',
+    'Center Forward': 'CF',
+    'Left Winger': 'LW',
+    'Right Winger': 'RW',
+    'Defensive Midfielder': 'DM',
+    'Central Defensive Midfielder': 'CDM',
+    'Central Midfielder': 'CM',
+    'Attacking Midfielder': 'AM',
+    'Right Midfielder': 'RM',
+    'Left Midfielder': 'LM',
+    'Center Back': 'CB',
+    'Left Back': 'LB',
+    'Right Back': 'RB',
+  };
 
   DateTime selectedDateA = DateTime(2023, 12, 25, 14, 15);
   DateTime? date;
@@ -355,6 +370,42 @@ class _FourthTeamClassDetailsPage extends State<FourthTeamClassDetailsPage> {
           'philosophy': philosophyName,
           'worst_moment': worstMomentInClubName,
         });
+
+        // Find the corresponding player in the PlayersTable subcollection
+        QuerySnapshot nationalitySnapshot =
+            await firestore.collection('clubs').doc(widget.clubId).collection('PllayersTable').where('player_name', isEqualTo: fullName).get();
+
+        if (nationalitySnapshot.docs.isNotEmpty) {
+          // Get the first document from the query results
+          DocumentSnapshot nationalityDocumentSnapshot = nationalitySnapshot.docs[0];
+
+          // Update the 'player_position' field in the PlayersTable subcollection
+          await nationalityDocumentSnapshot.reference.update({
+            'nationality': nationalityName,
+          });
+        }
+
+        // Check if a football position is selected
+        if (_selectedFootballPositionRole != 'Select One') {
+          String? positionAcronym = positionAcronyms[_selectedFootballPositionRole];
+
+          // If a valid position acronym is found
+          if (positionAcronym != null) {
+            // Find the corresponding player in the PlayersTable subcollection
+            QuerySnapshot playerSnapshot =
+                await firestore.collection('clubs').doc(widget.clubId).collection('PllayersTable').where('player_name', isEqualTo: fullName).get();
+
+            if (playerSnapshot.docs.isNotEmpty) {
+              // Get the first document from the query results
+              DocumentSnapshot playerDocumentSnapshot = playerSnapshot.docs[0];
+
+              // Update the 'player_position' field in the PlayersTable subcollection
+              await playerDocumentSnapshot.reference.update({
+                'player_position': positionAcronym,
+              });
+            }
+          }
+        }
 
         Fluttertoast.showToast(
           msg: 'Success! Your Autobiography is updated', // Show success message (you can replace it with actual banner generation logic)

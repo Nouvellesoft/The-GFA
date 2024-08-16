@@ -3,16 +3,23 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../model/a_past_matches_model.dart';
 import '../notifier/a_past_matches_notifier.dart';
 import '../notifier/c_match_day_banner_for_club_notifier.dart';
+import '../notifier/c_match_day_banner_for_club_opp_notifier.dart';
 import '../notifier/club_global_notifier.dart';
 import 'c_match_day_banner_for_club_api.dart';
+import 'c_match_day_banner_for_club_opp_api.dart';
 
-Future<void> getPastMatches(PastMatchesNotifier pastMatchesNotifier,  MatchDayBannerForClubNotifier matchDayBannerForClubNotifier,
-    ClubGlobalProvider clubGlobalProvider,
-    String clubId,
-    ) async {
+Future<void> getPastMatches(
+  PastMatchesNotifier pastMatchesNotifier,
+  MatchDayBannerForClubNotifier matchDayBannerForClubNotifier,
+  MatchDayBannerForClubOppNotifier matchDayBannerForClubOppNotifier,
+  ClubGlobalProvider clubGlobalProvider,
+  String clubId,
+) async {
   // Fetch MatchDayBannerForClub data
   await getMatchDayBannerForClub(matchDayBannerForClubNotifier, clubGlobalProvider, clubId);
 
+  // Fetch MatchDayBannerForClubOpp data
+  await getMatchDayBannerForClubOpp(matchDayBannerForClubOppNotifier, clubId);
 
   QuerySnapshot snapshot =
       await FirebaseFirestore.instance.collection('clubs').doc(clubId).collection('PastMatches').orderBy('id', descending: true).limit(20).get();
@@ -29,17 +36,48 @@ Future<void> getPastMatches(PastMatchesNotifier pastMatchesNotifier,  MatchDayBa
   // Sort documents based on the custom comparison function
   // snapshot.docs.sort((a, b) => compareDate(a['match_date'], b['match_date']));
 
+  // Define the default image path
+  const String defaultImage = 'assets/images/no_club_icon_default.jpeg';
+
   for (var document in snapshot.docs) {
     PastMatches pastMatches = PastMatches.fromMap(document.data() as Map<String, dynamic>);
+
+    // Check if home team matches any banner team name
+    bool homeTeamMatched = false;
+    bool awayTeamMatched = false;
 
     // Match against the MatchDayBannerForClub team names
     for (var banner in matchDayBannerForClubNotifier.matchDayBannerForClubList) {
       if (pastMatches.homeTeam == banner.teamName) {
-        pastMatches.homeTeamIcon = banner.clubIcon;
+        pastMatches.homeTeamIcon = banner.clubLogo;
+        homeTeamMatched = true;
       }
       if (pastMatches.awayTeam == banner.teamName) {
-        pastMatches.awayTeamIcon = banner.clubIcon;
+        pastMatches.awayTeamIcon = banner.clubLogo;
+        awayTeamMatched = true;
       }
+    }
+
+    // Match against the MatchDayBannerForClubOpp team names (for opposition teams)
+    for (var oppBanner in matchDayBannerForClubOppNotifier.matchDayBannerForClubOppList) {
+      if (pastMatches.homeTeam == oppBanner.clubName) {
+        pastMatches.homeTeamIcon = oppBanner.clubIcon;
+        homeTeamMatched = true;
+      }
+      if (pastMatches.awayTeam == oppBanner.clubName) {
+        pastMatches.awayTeamIcon = oppBanner.clubIcon;
+        awayTeamMatched = true;
+      }
+    }
+
+    // If no match is found for the home team, use the default image
+    if (!homeTeamMatched) {
+      pastMatches.homeTeamIcon = defaultImage;
+    }
+
+    // If no match is found for the away team, use the default image
+    if (!awayTeamMatched) {
+      pastMatches.awayTeamIcon = defaultImage;
     }
 
     pastMatchesList.add(pastMatches);

@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import '../../api/a_upcoming_matches_api.dart';
 import '../../notifier/a_upcoming_matches_notifier.dart';
 import '../../notifier/c_match_day_banner_for_club_notifier.dart';
+import '../../notifier/c_match_day_banner_for_club_opp_notifier.dart';
 import '../../notifier/club_global_notifier.dart';
 import 'a_past_matches_page.dart';
 
@@ -32,9 +33,11 @@ class UpcomingMatchesPageState extends State<UpcomingMatchesPage> with TickerPro
   Future<void> _fetchUpcomingMatchesAndUpdateNotifier(
     UpcomingMatchesNotifier upcomingMatchesNotifier,
     MatchDayBannerForClubNotifier matchDayBannerForClubNotifier,
+    MatchDayBannerForClubOppNotifier matchDayBannerForClubOppNotifier,
     ClubGlobalProvider clubGlobalProvider,
   ) async {
-    await getUpcomingMatches(upcomingMatchesNotifier, matchDayBannerForClubNotifier, clubGlobalProvider, widget.clubId);
+    await getUpcomingMatches(
+        upcomingMatchesNotifier, matchDayBannerForClubNotifier, matchDayBannerForClubOppNotifier, clubGlobalProvider, widget.clubId);
 
     setState(() {}); // Refresh the UI if needed
   }
@@ -44,8 +47,14 @@ class UpcomingMatchesPageState extends State<UpcomingMatchesPage> with TickerPro
     ClubGlobalProvider clubGlobalProvider = Provider.of<ClubGlobalProvider>(context, listen: false);
     UpcomingMatchesNotifier upcomingMatchesNotifier = Provider.of<UpcomingMatchesNotifier>(context, listen: false);
     MatchDayBannerForClubNotifier matchDayBannerForClubNotifier = Provider.of<MatchDayBannerForClubNotifier>(context, listen: false);
+    MatchDayBannerForClubOppNotifier matchDayBannerForClubOppNotifier = Provider.of<MatchDayBannerForClubOppNotifier>(context, listen: false);
 
-    _fetchUpcomingMatchesAndUpdateNotifier(upcomingMatchesNotifier, matchDayBannerForClubNotifier, clubGlobalProvider);
+    _fetchUpcomingMatchesAndUpdateNotifier(
+      upcomingMatchesNotifier,
+      matchDayBannerForClubNotifier,
+      matchDayBannerForClubOppNotifier,
+      clubGlobalProvider,
+    );
 
     super.initState();
     _controller = AnimationController(
@@ -184,7 +193,9 @@ class AnimCardState extends State<AnimCard> {
                                     borderRadius: const BorderRadius.all(Radius.circular(5)),
                                     image: DecorationImage(
                                         // image: CachedNetworkImageProvider(upcomingMatchesNotifier.upcomingMatchesList[widget.index].homeTeamIcon!),
-                                        image: CachedNetworkImageProvider(homeTeamIcon),
+                                        image: homeTeamIcon.startsWith('assets/')
+                                            ? AssetImage(homeTeamIcon) as ImageProvider
+                                            : CachedNetworkImageProvider(homeTeamIcon),
                                         fit: BoxFit.cover)),
                               ),
                             ),
@@ -251,7 +262,9 @@ class AnimCardState extends State<AnimCard> {
                                     borderRadius: const BorderRadius.all(Radius.circular(5)),
                                     image: DecorationImage(
                                         // image: CachedNetworkImageProvider(upcomingMatchesNotifier.upcomingMatchesList[widget.index].awayTeamIcon!),
-                                        image: CachedNetworkImageProvider(awayTeamIcon),
+                                        image: awayTeamIcon.startsWith('assets/')
+                                            ? AssetImage(awayTeamIcon) as ImageProvider
+                                            : CachedNetworkImageProvider(awayTeamIcon),
                                         fit: BoxFit.cover)),
                               ),
                             ),

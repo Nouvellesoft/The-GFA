@@ -219,7 +219,15 @@ class _SubPageState extends State<SubPage> {
   final List<String> _adidasOrNikeOptions = ['Select One', 'Adidas', 'Nike'];
   final List<String> _ronaldoOrMessiOptions = ['Select One', 'Ronaldo', 'Messi'];
   final List<String> _captainOptions = ['Select One', 'Yes', 'No'];
-  final List<String> _captainTeamOptions = ['Select One', 'First Team', 'Reserve Team', 'Third Team', 'Under 18 Team', 'Over 35 Team'];
+  final List<String> _captainTeamOptions = [
+    'Select One',
+    'First Team',
+    'Reserve Team',
+    'Third Team',
+    'Under 18 Team',
+    'Under 14 Team',
+    'Over 35 Team'
+  ];
   final List<String> _footballPositionOptions = [
     'Select One',
     'Goalkeeper',
@@ -227,6 +235,7 @@ class _SubPageState extends State<SubPage> {
     'Left Winger',
     'Right Winger',
     'Defensive Midfielder',
+    'Central Defensive Midfielder',
     'Central Midfielder',
     'Attacking Midfielder',
     'Right Midfielder',
@@ -235,6 +244,21 @@ class _SubPageState extends State<SubPage> {
     'Left Back',
     'Right Back'
   ];
+  final Map<String, String> positionAcronyms = {
+    'Goalkeeper': 'GK',
+    'Center Forward': 'CF',
+    'Left Winger': 'LW',
+    'Right Winger': 'RW',
+    'Defensive Midfielder': 'DM',
+    'Central Defensive Midfielder': 'CDM',
+    'Central Midfielder': 'CM',
+    'Attacking Midfielder': 'AM',
+    'Right Midfielder': 'RM',
+    'Left Midfielder': 'LM',
+    'Center Back': 'CB',
+    'Left Back': 'LB',
+    'Right Back': 'RB',
+  };
 
   DateTime selectedDateA = DateTime(2023, 12, 25, 14, 15);
   DateTime? date;
@@ -356,6 +380,42 @@ class _SubPageState extends State<SubPage> {
           'philosophy': philosophyName,
           'worst_moment': worstMomentInClubName,
         });
+
+        // Find the corresponding player in the PlayersTable subcollection
+        QuerySnapshot nationalitySnapshot =
+            await firestore.collection('clubs').doc(widget.clubId).collection('PllayersTable').where('player_name', isEqualTo: fullName).get();
+
+        if (nationalitySnapshot.docs.isNotEmpty) {
+          // Get the first document from the query results
+          DocumentSnapshot nationalityDocumentSnapshot = nationalitySnapshot.docs[0];
+
+          // Update the 'player_position' field in the PlayersTable subcollection
+          await nationalityDocumentSnapshot.reference.update({
+            'nationality': nationalityName,
+          });
+        }
+
+        // Check if a football position is selected
+        if (_selectedFootballPositionRole != 'Select One') {
+          String? positionAcronym = positionAcronyms[_selectedFootballPositionRole];
+
+          // If a valid position acronym is found
+          if (positionAcronym != null) {
+            // Find the corresponding player in the PlayersTable subcollection
+            QuerySnapshot playerSnapshot =
+                await firestore.collection('clubs').doc(widget.clubId).collection('PllayersTable').where('player_name', isEqualTo: fullName).get();
+
+            if (playerSnapshot.docs.isNotEmpty) {
+              // Get the first document from the query results
+              DocumentSnapshot playerDocumentSnapshot = playerSnapshot.docs[0];
+
+              // Update the 'player_position' field in the PlayersTable subcollection
+              await playerDocumentSnapshot.reference.update({
+                'player_position': positionAcronym,
+              });
+            }
+          }
+        }
 
         Fluttertoast.showToast(
           msg: 'Success! Your Autobiography is updated', // Show success message (you can replace it with actual banner generation logic)

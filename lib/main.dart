@@ -67,9 +67,11 @@ void main() async {
   OneSignal.Debug.setLogLevel(OSLogLevel.verbose);
   OneSignal.Debug.setAlertLevel(OSLogLevel.none);
   OneSignal.initialize("6b1cda87-62bf-44d0-9243-9088805b7909");
+
   // OneSignal.shared.promptUserForPushNotificationPermission().then((accepted) {
   //   // print("Accepted permission: $accepted");
   // });
+
   OneSignal.Notifications.requestPermission(true);
 
   runZonedGuarded(() async {
@@ -193,6 +195,7 @@ void main() async {
     //     // Handle the initial message
     //   }
     // });
+
     RemoteMessage? initialMessage = await FirebaseMessaging.instance.getInitialMessage();
     if (initialMessage != null) {
       // App received a notification when it was killed

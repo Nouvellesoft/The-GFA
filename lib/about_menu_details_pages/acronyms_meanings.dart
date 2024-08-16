@@ -22,6 +22,7 @@ String lb = "LB - Left Back\n\n";
 String rb = "RB - Right Back\n\n";
 String gk = "GK - Goal Keeper\n\n";
 String cm = "CM - Central Midfielder\n\n";
+String dm = "DM - Defensive Midfielder\n\n";
 String cdm = "CDM - Central Defensive Midfielder\n\n";
 String lm = "LM - Left Midfielder\n\n";
 String rm = "RM - Right Midfielder\n\n";
@@ -279,6 +280,14 @@ class _AcronymsMeaningsState extends State<AcronymsMeanings> {
                               ),
                               TextSpan(
                                 text: cm,
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  color: cardTextColor,
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              ),
+                              TextSpan(
+                                text: dm,
                                 style: TextStyle(
                                   fontSize: 13,
                                   color: cardTextColor,

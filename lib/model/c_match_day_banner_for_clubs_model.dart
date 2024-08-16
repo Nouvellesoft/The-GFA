@@ -1,5 +1,6 @@
 class MatchDayBannerForClub {
   String? clubIcon;
+  String? clubLogo;
   String? clubName;
   String? teamName;
   dynamic id;
@@ -8,6 +9,7 @@ class MatchDayBannerForClub {
     this.clubName,
     this.teamName,
     this.clubIcon,
+    this.clubLogo,
     this.id,
   });
 
@@ -16,9 +18,14 @@ class MatchDayBannerForClub {
     clubName = data['team_name'];
     teamName = data['team_name'];
     clubIcon = data['club_icon'];
+    clubLogo = data['club_icon'];
   }
 
   void updateClubIcon(String icon) {
     clubIcon = icon;
+  }
+
+  void updateClubLogo(String icon) {
+    clubLogo = icon;
   }
 }

@@ -35,12 +35,4 @@ class PastMatches {
     homeTeamIcon = data['home_team_icon'];
     awayTeamIcon = data['away_team_icon'];
   }
-  void updateClubIcon(String clubName, String clubIcon) {
-    if (homeTeam == clubName) {
-      homeTeamIcon = clubIcon;
-    }
-    if (awayTeam == clubName) {
-      awayTeamIcon = clubIcon;
-    }
-  }
 }
