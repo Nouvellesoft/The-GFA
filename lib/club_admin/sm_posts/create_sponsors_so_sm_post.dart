@@ -17,7 +17,7 @@ import 'package:share_plus/share_plus.dart';
 
 import '/bloc_navigation_bloc/navigation_bloc.dart';
 import '../../api/club_sponsors_api.dart';
-import '../../notifier/club_global_notifier.dart';
+import '../../notifier/a_club_global_notifier.dart';
 import '../../notifier/club_sponsors_notifier.dart';
 
 Color modalBackgroundColor = const Color.fromRGBO(33, 37, 41, 1.0);

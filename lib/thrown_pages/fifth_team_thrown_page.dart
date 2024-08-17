@@ -21,7 +21,7 @@ import '../bottom_nav_stats_pages/players_table_page.dart';
 import '../club_admin/club_admin_page.dart';
 import '../details_pages/fifth_team_details_page.dart';
 import '../home_page/home_page_deux.dart';
-import '../notifier/club_global_notifier.dart';
+import '../notifier/a_club_global_notifier.dart';
 import '../notifier/fifth_team_class_notifier.dart';
 import '../thrown_searches/fifth_team_thrown_search.dart';
 

@@ -4,7 +4,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 
 import '../../../bloc_navigation_bloc/navigation_bloc.dart';
-import '../../../notifier/club_global_notifier.dart';
+import '../../../notifier/a_club_global_notifier.dart';
 
 class MyAddNewHomeTeamPage extends StatefulWidget implements NavigationStates {
   final String clubId;

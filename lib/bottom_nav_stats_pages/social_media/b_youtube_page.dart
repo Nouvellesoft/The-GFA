@@ -1,11 +1,14 @@
+import 'dart:convert';
+
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '/api/b_youtube_api.dart';
-import '/notifier/b_youtube_notifier.dart';
 import '../../bloc_navigation_bloc/navigation_bloc.dart';
+import '../../notifier/a_club_global_notifier.dart';
 
 Color splashColor = const Color.fromRGBO(98, 98, 213, 1.0);
 Color textColor = const Color.fromRGBO(222, 214, 214, 1.0);
@@ -34,12 +37,51 @@ class MyYouTubePage extends StatefulWidget implements NavigationStates {
 }
 
 class MyYouTubePageState extends State<MyYouTubePage> {
-  // YoutubePlayerController? _controller;
+  List<Map<String, dynamic>> _videos = [];
+  String clubYoutubeChannelIDName = '';
 
-  late double width;
-  late double height;
+  @override
+  void initState() {
+    super.initState();
+  }
 
-  Future launchURL(String url) async {
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    clubYoutubeChannelIDName = Provider.of<ClubGlobalProvider>(context).clubYID;
+
+    if (clubYoutubeChannelIDName.isNotEmpty) {
+      _fetchYoutubeVideos();
+    }
+  }
+
+  Future<void> _fetchYoutubeVideos() async {
+    final url = Uri.parse('http://localhost:5000/videos?channel_name=$clubYoutubeChannelIDName');
+
+    try {
+      final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        final List<dynamic> videoList = jsonDecode(response.body);
+        setState(() {
+          _videos = videoList
+              .map((video) => {
+                    'url': video['url'],
+                    'title': video['title'],
+                  })
+              .toList();
+        });
+      } else {
+        throw Exception('Failed to load videos');
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error: $e');
+      }
+    }
+  }
+
+  Future<void> launchURL(String url) async {
     final scaffoldMessenger = ScaffoldMessenger.of(context);
     if (await canLaunchUrl(Uri.parse(url))) {
       await launchUrl(Uri.parse(url));
@@ -50,59 +92,69 @@ class MyYouTubePageState extends State<MyYouTubePage> {
 
   @override
   Widget build(BuildContext context) {
-    YouTubeNotifier youTubeNotifier = Provider.of<YouTubeNotifier>(context);
     return Scaffold(
-        backgroundColor: backgroundColor,
-        body: SafeArea(
-            child: Stack(children: [
-          Padding(
-            padding: const EdgeInsets.only(top: 10),
-            child: ListView.builder(
-              itemCount: youTubeNotifier.youTubeList.length,
-              itemBuilder: (BuildContext context, int index) {
-                return InkWell(
-                  splashColor: splashColor,
-                  onTap: () {
-                    dynamic videoUrl = "https://www.youtube.com/watch?v=${youTubeNotifier.youTubeList[index].yid}";
-                    launchURL(videoUrl);
-                  },
-                  child: SingleChildScrollView(
-                    child: Center(
+      backgroundColor: backgroundColor,
+      body: SafeArea(
+        child: _videos.isEmpty
+            ? const Center(child: CircularProgressIndicator())
+            : Padding(
+                padding: const EdgeInsets.only(top: 10),
+                child: ListView.builder(
+                  itemCount: _videos.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    final video = _videos[index];
+                    final videoUrl = video['url']!;
+                    final title = video['title']!;
+                    return InkWell(
+                      splashColor: Colors.blue,
+                      onTap: () {
+                        launchURL(videoUrl);
+                      },
                       child: Column(
                         children: [
-                          Container(
-                            width: MediaQuery.of(context).size.width * 0.95,
-                            height: MediaQuery.of(context).size.height * 0.25,
-                            decoration: BoxDecoration(
-                                borderRadius: const BorderRadius.all(Radius.circular(10)),
-                                image: DecorationImage(
-                                    //alignment: const Alignment(0, -1),
-                                    image: CachedNetworkImageProvider('https://img.youtube.com/vi/${youTubeNotifier.youTubeList[index].yid!}/0.jpg'),
-                                    fit: BoxFit.cover)),
+                          Stack(
+                            children: [
+                              Container(
+                                width: MediaQuery.of(context).size.width * 0.95,
+                                height: MediaQuery.of(context).size.height * 0.25,
+                                decoration: BoxDecoration(
+                                  borderRadius: const BorderRadius.all(Radius.circular(10)),
+                                  image: DecorationImage(
+                                    image: CachedNetworkImageProvider(
+                                      'https://img.youtube.com/vi/${Uri.parse(videoUrl).queryParameters['v']}/0.jpg',
+                                    ),
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                              ),
+                              Positioned(
+                                right: 10,
+                                bottom: 10,
+                                child: Container(
+                                  width: MediaQuery.sizeOf(context).width * 0.6,
+                                  color: Colors.black54, // Optional background for text visibility
+                                  padding: const EdgeInsets.all(5),
+                                  child: Text(
+                                    title,
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 1,
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                           const SizedBox(height: 10),
                         ],
                       ),
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
-        ])));
-  }
-
-  Future<void> _fetchYoutubeVideosAndUpdateNotifier(YouTubeNotifier youTubeNotifier) async {
-    await getYouTube(youTubeNotifier, widget.clubId);
-
-    setState(() {}); // Refresh the UI if needed
-  }
-
-  @override
-  void initState() {
-    super.initState();
-
-    YouTubeNotifier youTubeNotifier = Provider.of<YouTubeNotifier>(context, listen: false);
-    _fetchYoutubeVideosAndUpdateNotifier(youTubeNotifier);
+                    );
+                  },
+                ),
+              ),
+      ),
+    );
   }
 }

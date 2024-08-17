@@ -19,7 +19,7 @@ import 'package:share_plus/share_plus.dart';
 import '../../api/c_match_day_banner_for_location_api.dart';
 import '../../bloc_navigation_bloc/navigation_bloc.dart';
 import '../../notifier/c_match_day_banner_for_location_notifier.dart';
-import '../../notifier/club_global_notifier.dart';
+import '../../notifier/a_club_global_notifier.dart';
 
 Color backgroundColor = const Color.fromRGBO(34, 36, 54, 1.0);
 Color appBarTextColor = const Color.fromRGBO(255, 107, 53, 1.0);

@@ -8,7 +8,7 @@ import '../../api/a_past_matches_api.dart';
 import '../../notifier/a_past_matches_notifier.dart';
 import '../../notifier/c_match_day_banner_for_club_notifier.dart';
 import '../../notifier/c_match_day_banner_for_club_opp_notifier.dart';
-import '../../notifier/club_global_notifier.dart';
+import '../../notifier/a_club_global_notifier.dart';
 import './a_upcoming_matches_page.dart';
 
 Color nabColor = const Color.fromRGBO(56, 56, 60, 1);

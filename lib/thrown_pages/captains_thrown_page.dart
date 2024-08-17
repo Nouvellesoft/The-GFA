@@ -22,7 +22,7 @@ import '../club_admin/club_admin_page.dart';
 import '../details_pages/club_captains_details_page.dart';
 import '../home_page/home_page_deux.dart';
 import '../notifier/club_captains_notifier.dart';
-import '../notifier/club_global_notifier.dart';
+import '../notifier/a_club_global_notifier.dart';
 import '../thrown_searches/captains_thrown_search.dart';
 
 String clubName = "";

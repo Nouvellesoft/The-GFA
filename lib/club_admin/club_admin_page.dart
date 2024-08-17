@@ -42,7 +42,7 @@ import '../notifier/c_match_day_banner_for_club_opp_notifier.dart';
 import '../notifier/c_match_day_banner_for_league_notifier.dart';
 import '../notifier/c_match_day_banner_for_location_notifier.dart';
 import '../notifier/club_captains_notifier.dart';
-import '../notifier/club_global_notifier.dart';
+import '../notifier/a_club_global_notifier.dart';
 import '../notifier/coaching_staff_notifier.dart';
 import '../notifier/fifth_team_class_notifier.dart';
 import '../notifier/first_team_class_notifier.dart';
@@ -959,6 +959,7 @@ class MyClubAdminPageState extends State<MyClubAdminPage> {
         clubGlobalProvider.setClubName(data['club_name']);
         clubGlobalProvider.setClubLogo(data['club_logo']);
         clubGlobalProvider.setClubIcon(data['club_icon']);
+        clubGlobalProvider.setClubYID(data['youtube_name']);
       }
     });
 

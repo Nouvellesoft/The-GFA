@@ -19,7 +19,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sms_autofill/sms_autofill.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../notifier/club_global_notifier.dart';
+import '../notifier/a_club_global_notifier.dart';
 import '../notifier/second_team_class_notifier.dart';
 
 String clubName = "";
@@ -372,16 +372,17 @@ class _SecondTeamClassDetailsPage extends State<SecondTeamClassDetailsPage> {
         });
 
         // Find the corresponding player in the PlayersTable subcollection
-        QuerySnapshot nationalitySnapshot =
+        QuerySnapshot generalSnapshot =
         await firestore.collection('clubs').doc(widget.clubId).collection('PllayersTable').where('player_name', isEqualTo: fullName).get();
 
-        if (nationalitySnapshot.docs.isNotEmpty) {
+        if (generalSnapshot.docs.isNotEmpty) {
           // Get the first document from the query results
-          DocumentSnapshot nationalityDocumentSnapshot = nationalitySnapshot.docs[0];
+          DocumentSnapshot generalDocumentSnapshot = generalSnapshot.docs[0];
 
-          // Update the 'player_position' field in the PlayersTable subcollection
-          await nationalityDocumentSnapshot.reference.update({
+          // Update the 'nationality' field in the PlayersTable subcollection
+          await generalDocumentSnapshot.reference.update({
             'nationality': nationalityName,
+            'left_or_right': _selectedLOrRFootedRole,
           });
         }
 
@@ -403,7 +404,7 @@ class _SecondTeamClassDetailsPage extends State<SecondTeamClassDetailsPage> {
               // Get the first document from the query results
               DocumentSnapshot playerDocumentSnapshot = playerSnapshot.docs[0];
 
-              // Update the 'player_position' field in the PlayersTable subcollection
+              // Update the 'nationality' field in the PlayersTable subcollection
               await playerDocumentSnapshot.reference.update({
                 'player_position': positionAcronym,
               });

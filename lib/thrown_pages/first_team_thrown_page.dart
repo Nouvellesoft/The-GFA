@@ -56,7 +56,7 @@ import '../home_page/home_page_deux.dart';
 import '../notifier/a_upcoming_matches_notifier.dart';
 import '../notifier/c_match_day_banner_for_club_notifier.dart';
 import '../notifier/c_match_day_banner_for_club_opp_notifier.dart';
-import '../notifier/club_global_notifier.dart';
+import '../notifier/a_club_global_notifier.dart';
 import '../notifier/club_sponsors_notifier.dart';
 import '../notifier/cum_motm_players_stats_info_notifier.dart';
 import '../notifier/fifth_team_class_notifier.dart';

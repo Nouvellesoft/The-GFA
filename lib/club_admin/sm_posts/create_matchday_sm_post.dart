@@ -34,7 +34,7 @@ import '/notifier/c_match_day_banner_for_location_notifier.dart';
 import '/notifier/club_sponsors_notifier.dart';
 import '../../api/club_sponsors_api.dart';
 import '../../notifier/all_fc_teams_notifier.dart';
-import '../../notifier/club_global_notifier.dart';
+import '../../notifier/a_club_global_notifier.dart';
 
 Color backgroundColor = const Color.fromRGBO(34, 36, 54, 1.0);
 Color appBarTextColor = const Color.fromRGBO(255, 107, 53, 1.0);

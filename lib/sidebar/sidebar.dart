@@ -21,7 +21,7 @@ import '../bloc_navigation_bloc/navigation_bloc.dart';
 import '../bottom_nav_stats_pages/bottom_navigator.dart';
 import '../bottom_nav_stats_pages/matches_page/a_tabview_matches_page.dart';
 import '../bottom_nav_stats_pages/social_media/b_tabview_social_media_page.dart';
-import '../notifier/club_global_notifier.dart';
+import '../notifier/a_club_global_notifier.dart';
 import '../notifier/sidebar_notifier.dart';
 import '../sidebar/menu_item.dart';
 
@@ -145,6 +145,7 @@ class _SideBarState extends State<SideBar> with SingleTickerProviderStateMixin<S
         clubGlobalProvider.setClubName(data['club_name']);
         clubGlobalProvider.setClubLogo(data['club_logo']);
         clubGlobalProvider.setClubIcon(data['club_icon']);
+        clubGlobalProvider.setClubYID(data['youtube_name']);
 
         clubName = data['club_name'];
         sidebarSubtitle = data['sidebar_subtitle'];

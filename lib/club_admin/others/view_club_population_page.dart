@@ -13,7 +13,7 @@ import '../../api/second_team_class_api.dart';
 import '../../api/sixth_team_class_api.dart';
 import '../../api/third_team_class_api.dart';
 import '../../notifier/all_club_members_notifier.dart';
-import '../../notifier/club_global_notifier.dart';
+import '../../notifier/a_club_global_notifier.dart';
 import '../../notifier/coaching_staff_notifier.dart';
 import '../../notifier/fifth_team_class_notifier.dart';
 import '../../notifier/first_team_class_notifier.dart';

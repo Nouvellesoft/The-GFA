@@ -14,7 +14,8 @@ def migrate_subcollections(client, old_club_id, new_club_id):
                 sub_collection_name).document(doc.id)
             new_doc_ref.set(doc_data)
             print(
-                f'Added document {doc.id} to subcollection {sub_collection_name} in club {new_club_id}')
+                f'Added document {doc.id} to subcollection '
+                f'{sub_collection_name} in club {new_club_id}')
 
     print(f'Migration of subcollections from club {old_club_id} to {new_club_id} complete!')
 

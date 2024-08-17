@@ -20,7 +20,7 @@ import 'package:sms_autofill/sms_autofill.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../notifier/first_team_class_notifier.dart';
-import '../notifier/club_global_notifier.dart';
+import '../notifier/a_club_global_notifier.dart';
 
 String clubName = "";
 
@@ -382,16 +382,17 @@ class _SubPageState extends State<SubPage> {
         });
 
         // Find the corresponding player in the PlayersTable subcollection
-        QuerySnapshot nationalitySnapshot =
+        QuerySnapshot generalSnapshot =
             await firestore.collection('clubs').doc(widget.clubId).collection('PllayersTable').where('player_name', isEqualTo: fullName).get();
 
-        if (nationalitySnapshot.docs.isNotEmpty) {
+        if (generalSnapshot.docs.isNotEmpty) {
           // Get the first document from the query results
-          DocumentSnapshot nationalityDocumentSnapshot = nationalitySnapshot.docs[0];
+          DocumentSnapshot generalDocumentSnapshot = generalSnapshot.docs[0];
 
-          // Update the 'player_position' field in the PlayersTable subcollection
-          await nationalityDocumentSnapshot.reference.update({
+          // Update the 'nationality' field in the PlayersTable subcollection
+          await generalDocumentSnapshot.reference.update({
             'nationality': nationalityName,
+            'left_or_right': _selectedLOrRFootedRole,
           });
         }
 

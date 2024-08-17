@@ -4,7 +4,7 @@ import '../model/a_past_matches_model.dart';
 import '../notifier/a_past_matches_notifier.dart';
 import '../notifier/c_match_day_banner_for_club_notifier.dart';
 import '../notifier/c_match_day_banner_for_club_opp_notifier.dart';
-import '../notifier/club_global_notifier.dart';
+import '../notifier/a_club_global_notifier.dart';
 import 'c_match_day_banner_for_club_api.dart';
 import 'c_match_day_banner_for_club_opp_api.dart';
 

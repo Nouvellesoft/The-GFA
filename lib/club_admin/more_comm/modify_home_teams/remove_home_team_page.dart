@@ -6,7 +6,7 @@ import '/api/c_match_day_banner_for_club_api.dart';
 import '../../../bloc_navigation_bloc/navigation_bloc.dart';
 import '../../../model/c_match_day_banner_for_clubs_model.dart';
 import '../../../notifier/c_match_day_banner_for_club_notifier.dart';
-import '../../../notifier/club_global_notifier.dart';
+import '../../../notifier/a_club_global_notifier.dart';
 
 late MatchDayBannerForClubNotifier matchDayBannerForClubNotifier;
 
