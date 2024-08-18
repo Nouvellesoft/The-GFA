@@ -34,7 +34,7 @@ def migrate_data():
 
     # Specify the old and new club IDs
     old_club_id = 'coventryphoenixfc'  # Existing club ID to migrate data from
-    new_club_id = 'josephfc'  # New club ID to migrate data to
+    new_club_id = 'josephfcdd'  # New club ID to migrate data to
 
     print(f'Creating new club document: {new_club_id}')
     create_club_document(client, new_club_id)
