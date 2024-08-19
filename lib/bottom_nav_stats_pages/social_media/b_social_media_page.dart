@@ -179,7 +179,7 @@ class MySocialMediaPageState extends State<MySocialMediaPage> {
                                               <br>
                                               <strong>Facebook<strong>
                                               <script async defer src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v3.2"></script>
-                                              <div class="fb-post" data-href="https://www.facebook.com/udoisohm/posts/${snapshot.data?.data()!['facebook_post_handle']}" ></div>
+                                              <div class="fb-post" data-href="https://www.facebook.com/${snapshot.data?.data()!['facebook_handle']}/posts/${snapshot.data?.data()!['facebook_post_handle']}"></div>
                                                <br>
                                                <br>
                                                <strong>Twitter<strong>
