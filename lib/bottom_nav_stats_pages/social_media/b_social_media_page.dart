@@ -65,7 +65,7 @@ class MySocialMediaPageState extends State<MySocialMediaPage> {
           if (!snapshot.hasData) {
             return const CircularProgressIndicator();
           }
-          // Extract Twitter, Instagram, and Facebook handles from the snapshot
+
           _twitter = snapshot.data?.data()?['twitter_handle'];
           _instagram = snapshot.data?.data()?['instagram_handle'];
           _facebook = snapshot.data?.data()?['facebook_handle'];
