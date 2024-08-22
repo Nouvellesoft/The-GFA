@@ -13,7 +13,7 @@ def fetch_latest_post():
     # Prepare the Actor input
     run_input = {
         "username": ["davidautobio"],
-        "resultsLimit": 4
+        "resultsLimit": 5
     }
 
     try:
