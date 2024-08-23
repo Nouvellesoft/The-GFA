@@ -1,7 +1,5 @@
-from flask import Flask, jsonify, request
+import json
 import requests
-
-app = Flask(__name__)
 
 # Configuration
 YOUTUBE_API_KEY = 'AIzaSyD5QDjHfD-7WIhmoMmhDAT_57NnbLc1rPk'
@@ -47,23 +45,24 @@ def get_latest_videos(api_key, channel_id, max_results=10):
         return []
 
 
-@app.route('/videos', methods=['GET'])
-def get_videos():
-    channel_name = request.args.get('channel_name')
+def get_videos(request):
+    """HTTP function to get YouTube videos based on channel name."""
+    request_json = request.get_json(silent=True)
+    request_args = request.args
 
-    if not channel_name:
-        return jsonify({"error": "Missing channel_name parameter"}), 400
+    if request_json and 'channel_name' in request_json:
+        channel_name = request_json['channel_name']
+    elif request_args and 'channel_name' in request_args:
+        channel_name = request_args['channel_name']
+    else:
+        return json.dumps({"error": "Missing channel_name parameter"}), 400
 
     # Convert channel name to channel ID
     channel_id = get_channel_id_from_name(channel_name)
 
     if not channel_id:
-        return jsonify({"error": "Channel not found"}), 404
+        return json.dumps({"error": "Channel not found"}), 404
 
     # Fetch and return the latest videos
     videos = get_latest_videos(YOUTUBE_API_KEY, channel_id)
-    return jsonify(videos)
-
-
-if __name__ == '__main__':
-    app.run(debug=True)
+    return json.dumps(videos), 200

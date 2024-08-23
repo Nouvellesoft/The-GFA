@@ -56,7 +56,7 @@ class MyYouTubePageState extends State<MyYouTubePage> {
   }
 
   Future<void> _fetchYoutubeVideos() async {
-    final url = Uri.parse('http://localhost:5000/videos?channel_name=$clubYoutubeChannelIDName');
+    final url = Uri.parse('https://us-central1-the-gfa.cloudfunctions.net/youtube-posts-function?channel_name=$clubYoutubeChannelIDName');
 
     try {
       final response = await http.get(url);
@@ -78,7 +78,32 @@ class MyYouTubePageState extends State<MyYouTubePage> {
       if (kDebugMode) {
         print('Error: $e');
       }
+      setState(() {
+        _videos = [];
+      });
+      _showNoInternetDialog();
     }
+  }
+
+  void _showNoInternetDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('No Internet Connection'),
+          content: const Text('Internet is required to fetch YouTube videos. Please check your connection and try again.'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   Future<void> launchURL(String url) async {
@@ -86,7 +111,7 @@ class MyYouTubePageState extends State<MyYouTubePage> {
     if (await canLaunchUrl(Uri.parse(url))) {
       await launchUrl(Uri.parse(url));
     } else {
-      scaffoldMessenger.showSnackBar(const SnackBar(content: Text("The required App not installed")));
+      scaffoldMessenger.showSnackBar(const SnackBar(content: Text("The required app is not installed")));
     }
   }
 
@@ -96,7 +121,11 @@ class MyYouTubePageState extends State<MyYouTubePage> {
       backgroundColor: backgroundColor,
       body: SafeArea(
         child: _videos.isEmpty
-            ? const Center(child: CircularProgressIndicator())
+            ? Center(
+                child: _videos.isEmpty
+                    ? const Text('Loading...') // You might want to show a loading indicator initially
+                    : const Text('Internet is required to fetch YouTube videos.'),
+              )
             : Padding(
                 padding: const EdgeInsets.only(top: 10),
                 child: ListView.builder(

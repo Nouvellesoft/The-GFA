@@ -95,6 +95,8 @@ dependencies:
   flutter_animate: ^4.5.0
   timelines: ^0.1.0
   timeline_tile: ^2.0.0
+  draggable_scrollbar: ^0.1.0
+  vs_scrollbar: ^1.0.0
 
 flutter_icons:
   android: true

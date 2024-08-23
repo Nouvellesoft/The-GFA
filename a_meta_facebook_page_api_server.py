@@ -33,7 +33,6 @@ def fetch_latest_post(username):
         print(f"Actor run started with ID: {run_id}")
 
         # Wait for the actor to complete
-        # (you might want to use a better method for waiting/checking completion)
         client.run(run_id).wait_for_finish()
 
         # Get dataset items from the run
@@ -115,10 +114,5 @@ def process_all_clubs():
         print(f"An error occurred while processing clubs: {e}")
 
 
-def main():
-    # Process all clubs and update Firestore
+def hello_pubsub_facebook():  # (event, context):
     process_all_clubs()
-
-
-if __name__ == '__main__':
-    main()

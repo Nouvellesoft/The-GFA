@@ -100,6 +100,5 @@ def process_all_clubs():
         print(f"An error occurred while processing clubs: {e}")
 
 
-def hello_pubsub_instagram(event, context):
-    # Entry point for Pub/Sub trigger
+def hello_pubsub_instagram():  # (event, context):
     process_all_clubs()
