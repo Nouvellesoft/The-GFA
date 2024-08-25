@@ -1,41 +1,68 @@
-import tweepy
+import json
+import requests
 
-# Replace these with your actual credentials
-bearer_token = 'AAAAAAAAAAAAAAAAAAAAABThkwEAAAAA8JXbM7qYxP%2BFnYGPsDyeK0A55XE%3DgtWhAaSHR4YVGZg0FOCSEPLLyVlwvrMSuHScloTaLJ4Czxm1Qu'
-consumer_key = 'Me3Wk1SYNsu0F4YnlxOwjDrpj'
-consumer_secret = '2shziqmbtTMDkP5qVOemQCoNhAkyOdxbFSHi1YC90MoE65WNJ3'
-access_token = '1019261607006883841-rVx4134bwatHvOsFhDIjr2OQUb9wb9'
-access_token_secret = 'PIO35OZ6L5eWAU1QAzFXX4xHAVV1G4cC2O5S6BRhaLnj7'
+# Configuration
+YOUTUBE_API_KEY = 'AIzaSyD5QDjHfD-7WIhmoMmhDAT_57NnbLc1rPk'
 
 
-# Authenticate to Twitter
-client = tweepy.Client(bearer_token=bearer_token,
-                       consumer_key=consumer_key,
-                       consumer_secret=consumer_secret,
-                       access_token=access_token,
-                       access_token_secret=access_token_secret)
-
-
-# Fetch recent tweets from the user using API v2
-def fetch_and_print_tweets(username, tweet_count=5):
+def get_channel_id_from_name(channel_name):
+    """Fetch the YouTube Channel ID from a given channel name."""
     try:
-        # Fetch user ID from username
-        user = client.get_user(username=username)
-        user_id = user.data.id
-
-        # Fetch recent tweets
-        response = client.get_users_tweets(user_id, max_results=tweet_count)
-
-        # Print tweet details
-        for tweet in response.data:
-            print(f"Tweet created at: {tweet.created_at}")
-            print(f"Tweet text: {tweet.text}")
-            print("-" * 40)
-
+        url = (
+            f"https://www.googleapis.com/youtube/v3/search?part=snippet"
+            f"&q={channel_name}&type=channel&key={YOUTUBE_API_KEY}"
+        )
+        response = requests.get(url)
+        data = response.json()
+        channels = data.get('items', [])
+        if channels:
+            return channels[0]['id']['channelId']  # Extract the channel ID
+        return None
     except Exception as e:
-        print(f"An error occurred: {e}")
+        print(f"Error fetching channel ID for name {channel_name}: {e}")
+        return None
 
 
-# Example usage
-if __name__ == "__main__":
-    fetch_and_print_tweets('zelenskyyua', tweet_count=5)
+def get_latest_videos(api_key, channel_id, max_results=10):
+    """Fetch the latest videos from a given YouTube channel ID."""
+    try:
+        url = (
+            f"https://www.googleapis.com/youtube/v3/search?key={api_key}"
+            f"&channelId={channel_id}&part=snippet,id&order=date&maxResults={max_results}"
+        )
+        response = requests.get(url)
+        videos = response.json().get('items', [])
+        video_data = []
+        for video in videos:
+            if video['id']['kind'] == 'youtube#video':
+                video_data.append({
+                    'url': f"https://www.youtube.com/watch?v={video['id']['videoId']}",
+                    'title': video['snippet']['title']
+                })
+        return video_data
+    except Exception as e:
+        print(f"Error fetching latest videos: {e}")
+        return []
+
+
+def get_videos(request):
+    """HTTP function to get YouTube videos based on channel name."""
+    request_json = request.get_json(silent=True)
+    request_args = request.args
+
+    if request_json and 'channel_name' in request_json:
+        channel_name = request_json['channel_name']
+    elif request_args and 'channel_name' in request_args:
+        channel_name = request_args['channel_name']
+    else:
+        return json.dumps({"error": "Missing channel_name parameter"}), 400
+
+    # Convert channel name to channel ID
+    channel_id = get_channel_id_from_name(channel_name)
+
+    if not channel_id:
+        return json.dumps({"error": "Channel not found"}), 404
+
+    # Fetch and return the latest videos
+    videos = get_latest_videos(YOUTUBE_API_KEY, channel_id)
+    return json.dumps(videos), 200

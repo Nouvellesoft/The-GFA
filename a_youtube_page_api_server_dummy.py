@@ -1,14 +1,12 @@
-from flask import Flask, jsonify
+import json
 import requests
 from google.cloud import firestore
 from datetime import datetime, timedelta
-import pytz
-
-app = Flask(__name__)
 
 # Configuration
 YOUTUBE_API_KEY = 'AIzaSyD5QDjHfD-7WIhmoMmhDAT_57NnbLc1rPk'
-FIRESTORE_PROJECT_ID = 'the-gfa'  # Replace with your Firestore project ID
+# Firestore Project ID
+FIRESTORE_PROJECT_ID = 'the-gfa'
 
 # Initialize Firestore
 db = firestore.Client(project=FIRESTORE_PROJECT_ID)
@@ -32,7 +30,7 @@ def get_channel_id_from_name(channel_name):
         return None
 
 
-def get_latest_videos(api_key, channel_id, max_results=10):
+def get_latest_videos_from_youtube(api_key, channel_id, max_results=10):
     """Fetch the latest videos from a given YouTube channel ID."""
     try:
         url = (
@@ -56,56 +54,59 @@ def get_latest_videos(api_key, channel_id, max_results=10):
 
 def get_cached_videos_from_firestore(club_id):
     """Fetch cached video data from Firestore if it's less than 7 days old."""
-    doc_ref = (db.collection('clubs').document(club_id)
-               .collection('Youtube').document('latest_videos'))
+    doc_path = get_firestore_document_path(club_id)
+    doc_ref = db.document(doc_path)
+
     doc = doc_ref.get()
     if doc.exists:
         data = doc.to_dict()
         last_updated = data.get('last_updated')
-
-        if isinstance(last_updated, datetime):
-            if last_updated.tzinfo is None:
-                last_updated = pytz.utc.localize(last_updated)
-        else:
-            last_updated = None
-
-        if (last_updated and datetime.utcnow()
-                .astimezone(pytz.utc) - last_updated < timedelta(days=7)):
+        if last_updated and datetime.utcnow() - last_updated < timedelta(days=7):
             return data.get('videos', [])
     return []
 
 
+def get_firestore_document_path(club_id):
+    """Generate the Firestore document path for cached videos."""
+    return f"clubs/{club_id}/about_club/youtube_data/cached_videos"
+
+
 def save_videos_to_firestore(club_id, videos):
     """Save the latest video data to Firestore."""
-    doc_ref = db.collection('clubs').document(club_id).collection('Youtube').document(
-        'latest_videos')
+    doc_path = get_firestore_document_path(club_id)
+    doc_ref = db.document(doc_path)
+
+    # Save videos with timestamp
     doc_ref.set({
         'videos': videos,
-        'last_updated': datetime.utcnow().astimezone(pytz.utc)
+        'last_updated': datetime.utcnow()
     })
 
 
-def get_videos(request):
-    """HTTP endpoint to get YouTube videos based on club_id and channel_name."""
-    request_json = request.get_json()
+def fetch_and_cache_youtube_videos(request):
+    """HTTP function to get YouTube videos based on channel name."""
+    request_json = request.get_json(silent=True)
 
     if not request_json or 'club_id' not in request_json or 'channel_name' not in request_json:
-        return jsonify({"error": "Missing club_id or channel_name parameter"}), 400
+        return json.dumps({"error": "Missing club_id or channel_name parameter"}), 400
 
     club_id = request_json['club_id']
     channel_name = request_json['channel_name']
 
+    # Check Firestore for cached videos
     cached_videos = get_cached_videos_from_firestore(club_id)
     if cached_videos:
-        return jsonify(cached_videos), 200
+        return json.dumps(cached_videos), 200
 
+    # Convert channel name to channel ID
     channel_id = get_channel_id_from_name(channel_name)
     if not channel_id:
-        return jsonify({"error": "Channel not found"}), 404
+        return json.dumps({"error": "Channel not found"}), 404
 
-    videos = get_latest_videos(YOUTUBE_API_KEY, channel_id)
+    # Fetch and return the latest videos
+    videos = get_latest_videos_from_youtube(YOUTUBE_API_KEY, channel_id)
     if videos:
         save_videos_to_firestore(club_id, videos)
-        return jsonify(videos), 200
+        return json.dumps(videos), 200
     else:
-        return jsonify({"error": "No videos found"}), 404
+        return json.dumps({"error": "No videos found"}), 404

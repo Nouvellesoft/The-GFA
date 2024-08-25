@@ -1,31 +1,20 @@
 import 'dart:convert';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../api/b_youtube_api.dart';
+import '../../api/get_club_aspect_visibility_api.dart';
 import '../../bloc_navigation_bloc/navigation_bloc.dart';
 import '../../notifier/a_club_global_notifier.dart';
+import '../../notifier/b_youtube_notifier.dart';
 
 Color splashColor = const Color.fromRGBO(98, 98, 213, 1.0);
-Color textColor = const Color.fromRGBO(222, 214, 214, 1.0);
-Color textColorTwo = const Color.fromRGBO(19, 20, 21, 1.0);
-Color dialogBackgroundColor = const Color.fromRGBO(238, 235, 235, 1.0);
-
-Color conColor = const Color.fromRGBO(194, 194, 220, 1.0);
-Color conColorTwo = const Color.fromRGBO(151, 147, 151, 1.0);
-Color whiteColor = const Color.fromRGBO(255, 253, 253, 1.0);
-Color twitterColor = const Color.fromRGBO(36, 81, 149, 1.0);
-Color instagramColor = const Color.fromRGBO(255, 255, 255, 1.0);
-Color facebookColor = const Color.fromRGBO(43, 103, 195, 1.0);
-Color snapchatColor = const Color.fromRGBO(222, 163, 36, 1.0);
-Color youtubeColor = const Color.fromRGBO(220, 45, 45, 1.0);
-Color websiteColor = const Color.fromRGBO(104, 79, 178, 1.0);
-Color emailColor = const Color.fromRGBO(230, 45, 45, 1.0);
-Color phoneColor = const Color.fromRGBO(20, 134, 46, 1.0);
 Color backgroundColor = const Color.fromRGBO(147, 165, 193, 1.0);
 
 class MyYouTubePage extends StatefulWidget implements NavigationStates {
@@ -37,73 +26,93 @@ class MyYouTubePage extends StatefulWidget implements NavigationStates {
 }
 
 class MyYouTubePageState extends State<MyYouTubePage> {
-  List<Map<String, dynamic>> _videos = [];
   String clubYoutubeChannelIDName = '';
+  bool _isLoading = true; // Track loading state
+  bool _isVideoTitleVisible = true; // Track visibility of video titles
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      YouTubeNotifier youTubeNotifier = Provider.of<YouTubeNotifier>(context, listen: false);
+
+      // Check if the data needs to be refreshed
+      await checkAndUpdateVideos(widget.clubId);
+
+      // Fetch YouTube data
+      await getYouTube(youTubeNotifier, widget.clubId);
+
+      // Fetch visibility data
+      await _fetchVisibilityData(widget.clubId);
+
+      // Update loading state
+      setState(() {
+        _isLoading = false;
+      });
+    });
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     clubYoutubeChannelIDName = Provider.of<ClubGlobalProvider>(context).clubYID;
-
-    if (clubYoutubeChannelIDName.isNotEmpty) {
-      _fetchYoutubeVideos();
-    }
   }
 
-  Future<void> _fetchYoutubeVideos() async {
-    final url = Uri.parse('https://us-central1-the-gfa.cloudfunctions.net/youtube-posts-function?channel_name=$clubYoutubeChannelIDName');
+  Future<void> checkAndUpdateVideos(String clubId) async {
+    final encodedChannelName = Uri.encodeComponent(clubYoutubeChannelIDName);
+    const url = 'https://us-central1-the-gfa.cloudfunctions.net/youtube-posts-function';
 
     try {
-      final response = await http.get(url);
+      // Check Firestore for cached videos
+      final firestore = FirebaseFirestore.instance;
+      final docRef = firestore.collection('clubs').doc(clubId).collection('Youtube').doc('latest_videos');
+      final doc = await docRef.get();
+
+      if (doc.exists) {
+        final data = doc.data();
+        final lastUpdated = (data?['last_updated'] as Timestamp?)?.toDate();
+        if (lastUpdated != null && DateTime.now().difference(lastUpdated).inDays < 7) {
+          // Use cached data
+          if (kDebugMode) {
+            print('Using cached data from Firestore');
+          }
+          // Update your UI or state based on cached data
+          return;
+        }
+      }
+
+      // Fetch new data if cache is outdated or does not exist
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          'club_id': clubId,
+          'channel_name': encodedChannelName,
+        }),
+      );
 
       if (response.statusCode == 200) {
-        final List<dynamic> videoList = jsonDecode(response.body);
-        setState(() {
-          _videos = videoList
-              .map((video) => {
-                    'url': video['url'],
-                    'title': video['title'],
-                  })
-              .toList();
+        // Successfully fetched and updated videos
+        if (kDebugMode) {
+          print('Videos updated: ${response.body}');
+        }
+        // Update Firestore with new data
+        await docRef.set({
+          'videos': json.decode(response.body),
+          'last_updated': DateTime.now().toUtc(),
         });
       } else {
-        throw Exception('Failed to load videos');
+        // Handle error status
+        if (kDebugMode) {
+          print('Failed to update videos: ${response.body}');
+        }
       }
     } catch (e) {
+      // Handle exceptions
       if (kDebugMode) {
-        print('Error: $e');
+        print('Error checking/updating videos: $e');
       }
-      setState(() {
-        _videos = [];
-      });
-      _showNoInternetDialog();
     }
-  }
-
-  void _showNoInternetDialog() {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('No Internet Connection'),
-          content: const Text('Internet is required to fetch YouTube videos. Please check your connection and try again.'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('OK'),
-            ),
-          ],
-        );
-      },
-    );
   }
 
   Future<void> launchURL(String url) async {
@@ -115,74 +124,93 @@ class MyYouTubePageState extends State<MyYouTubePage> {
     }
   }
 
+  Future<void> _fetchVisibilityData(String clubId) async {
+    try {
+      final visibilityData = await getClubAspectVisibilityAndTitles(clubId);
+      setState(() {
+        _isVideoTitleVisible = visibilityData['a_youtube_title']?['isVisible'] ?? true;
+      });
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error fetching visibility data: $e');
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    YouTubeNotifier youTubeNotifier = Provider.of<YouTubeNotifier>(context);
+
     return Scaffold(
       backgroundColor: backgroundColor,
       body: SafeArea(
-        child: _videos.isEmpty
-            ? Center(
-                child: _videos.isEmpty
-                    ? const Text('Loading...') // You might want to show a loading indicator initially
-                    : const Text('Internet is required to fetch YouTube videos.'),
+        child: _isLoading
+            ? const Center(
+                child: CircularProgressIndicator(),
               )
-            : Padding(
-                padding: const EdgeInsets.only(top: 10),
-                child: ListView.builder(
-                  itemCount: _videos.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    final video = _videos[index];
-                    final videoUrl = video['url']!;
-                    final title = video['title']!;
-                    return InkWell(
-                      splashColor: Colors.blue,
-                      onTap: () {
-                        launchURL(videoUrl);
-                      },
-                      child: Column(
-                        children: [
-                          Stack(
-                            children: [
-                              Container(
-                                width: MediaQuery.of(context).size.width * 0.95,
-                                height: MediaQuery.of(context).size.height * 0.25,
-                                decoration: BoxDecoration(
-                                  borderRadius: const BorderRadius.all(Radius.circular(10)),
-                                  image: DecorationImage(
-                                    image: CachedNetworkImageProvider(
-                                      'https://img.youtube.com/vi/${Uri.parse(videoUrl).queryParameters['v']}/0.jpg',
-                                    ),
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                              ),
-                              Positioned(
-                                right: 10,
-                                bottom: 10,
-                                child: Container(
-                                  width: MediaQuery.sizeOf(context).width * 0.6,
-                                  color: Colors.black54, // Optional background for text visibility
-                                  padding: const EdgeInsets.all(5),
-                                  child: Text(
-                                    title,
-                                    overflow: TextOverflow.ellipsis,
-                                    maxLines: 1,
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 14,
+            : youTubeNotifier.youTubeList.isEmpty
+                ? const Center(
+                    child: Text(
+                      'No videos available.',
+                      style: TextStyle(fontSize: 16, color: Colors.black54),
+                    ),
+                  )
+                : ListView.builder(
+                    padding: const EdgeInsets.only(top: 10),
+                    itemCount: youTubeNotifier.youTubeList.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      final video = youTubeNotifier.youTubeList[index];
+                      final url = video.toastURL;
+                      final title = video.title;
+
+                      // Extract video ID from URL if needed
+                      final videoId = Uri.parse(url ?? '').queryParameters['v'] ?? '';
+
+                      return InkWell(
+                        splashColor: splashColor,
+                        onTap: () => launchURL(url ?? ''),
+                        child: Column(
+                          children: [
+                            Stack(
+                              children: [
+                                Container(
+                                  width: MediaQuery.of(context).size.width * 0.95,
+                                  height: MediaQuery.of(context).size.height * 0.25,
+                                  decoration: BoxDecoration(
+                                    borderRadius: const BorderRadius.all(Radius.circular(10)),
+                                    image: DecorationImage(
+                                      image: CachedNetworkImageProvider('https://img.youtube.com/vi/$videoId/0.jpg'),
+                                      fit: BoxFit.cover,
                                     ),
                                   ),
                                 ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 10),
-                        ],
-                      ),
-                    );
-                  },
-                ),
-              ),
+                                if (_isVideoTitleVisible) // Conditionally render text
+                                  Positioned(
+                                    right: 10,
+                                    bottom: 10,
+                                    child: Container(
+                                      width: MediaQuery.sizeOf(context).width * 0.6,
+                                      color: Colors.black54, // Optional background for text visibility
+                                      padding: const EdgeInsets.all(5),
+                                      child: Text(
+                                        title ?? 'No Title',
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 1,
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                            const SizedBox(height: 10),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
       ),
     );
   }

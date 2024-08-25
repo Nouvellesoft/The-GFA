@@ -61,7 +61,7 @@ class MyYouTubePageState extends State<MyYouTubePage> {
                 return InkWell(
                   splashColor: splashColor,
                   onTap: () {
-                    dynamic videoUrl = "https://www.youtube.com/watch?v=${youTubeNotifier.youTubeList[index].yid}";
+                    dynamic videoUrl = "https://www.youtube.com/watch?v=${youTubeNotifier.youTubeList[index].title}";
                     launchURL(videoUrl);
                   },
                   child: SingleChildScrollView(
@@ -75,7 +75,8 @@ class MyYouTubePageState extends State<MyYouTubePage> {
                                 borderRadius: const BorderRadius.all(Radius.circular(10)),
                                 image: DecorationImage(
                                     //alignment: const Alignment(0, -1),
-                                    image: CachedNetworkImageProvider('https://img.youtube.com/vi/${youTubeNotifier.youTubeList[index].yid!}/0.jpg'),
+                                    image:
+                                        CachedNetworkImageProvider('https://img.youtube.com/vi/${youTubeNotifier.youTubeList[index].title!}/0.jpg'),
                                     fit: BoxFit.cover)),
                           ),
                           const SizedBox(height: 10),

@@ -6,7 +6,7 @@ import '../model/b_youtube_model.dart';
 
 class YouTubeNotifier with ChangeNotifier {
   List<YouTube> _youTubeList = [];
-  late YouTube _currentYouTube;
+  YouTube _currentYouTube = YouTube();
 
   UnmodifiableListView<YouTube> get youTubeList => UnmodifiableListView(_youTubeList);
 
