@@ -1,10 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../model/a_upcoming_matches_model.dart';
+import '../notifier/a_club_global_notifier.dart';
 import '../notifier/a_upcoming_matches_notifier.dart';
 import '../notifier/c_match_day_banner_for_club_notifier.dart';
 import '../notifier/c_match_day_banner_for_club_opp_notifier.dart';
-import '../notifier/a_club_global_notifier.dart';
 import 'c_match_day_banner_for_club_api.dart';
 import 'c_match_day_banner_for_club_opp_api.dart';
 

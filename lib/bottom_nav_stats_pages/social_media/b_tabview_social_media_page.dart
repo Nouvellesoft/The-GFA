@@ -6,14 +6,12 @@ import '../../main.dart';
 import 'b_social_media_page.dart';
 import 'b_youtube_page.dart';
 
-
 String smTitle = 'Social Media';
-String phoenixTitle = 'Phoenix';
+String phoenixTitle = 'Latest Posts';
 String ytTitle = 'Youtube';
 
 Color? backgroundColor = const Color.fromRGBO(34, 40, 49, 1);
 Color? selectedTabColor = Colors.indigo[200];
-
 
 class TabviewSocialMediaPage extends StatefulWidget {
   final String clubId;
@@ -37,7 +35,6 @@ class TabviewSocialMediaPageState extends State<TabviewSocialMediaPage> with Sin
     ]);
   }
 
-
   @override
   void dispose() {
     _tabController.dispose();
@@ -49,14 +46,7 @@ class TabviewSocialMediaPageState extends State<TabviewSocialMediaPage> with Sin
     return Scaffold(
       appBar: AppBar(
         backgroundColor: backgroundColor,
-        title: Text(
-            smTitle,
-            style: GoogleFonts.jura(
-                fontSize: 23,
-                fontWeight: FontWeight.w800,
-                color: Colors.white
-            )
-        ),
+        title: Text(smTitle, style: GoogleFonts.jura(fontSize: 23, fontWeight: FontWeight.w800, color: Colors.white)),
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios, color: appBarIconColor),
           onPressed: () {
@@ -84,7 +74,6 @@ class TabviewSocialMediaPageState extends State<TabviewSocialMediaPage> with Sin
     );
   }
 }
-
 
 Future navigateMyApp(context) async {
   Navigator.of(context).pop(false);
