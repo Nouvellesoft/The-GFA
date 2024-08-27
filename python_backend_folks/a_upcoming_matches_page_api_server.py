@@ -10,7 +10,7 @@ from google.cloud import firestore
 import sys
 
 # Setup Firestore client
-FIRESTORE_PROJECT_ID = 'the-gfa'  # Replace with your Firestore project ID
+FIRESTORE_PROJECT_ID = 'the-gfa'
 try:
     db = firestore.Client(project=FIRESTORE_PROJECT_ID)
 except Exception as e:

@@ -5,10 +5,10 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 import '../../api/a_past_matches_api.dart';
+import '../../notifier/a_club_global_notifier.dart';
 import '../../notifier/a_past_matches_notifier.dart';
 import '../../notifier/c_match_day_banner_for_club_notifier.dart';
 import '../../notifier/c_match_day_banner_for_club_opp_notifier.dart';
-import '../../notifier/a_club_global_notifier.dart';
 import './a_upcoming_matches_page.dart';
 
 Color nabColor = const Color.fromRGBO(56, 56, 60, 1);
@@ -29,16 +29,15 @@ class PastMatchesPageState extends State<PastMatchesPage> with TickerProviderSta
   late Stream<DocumentSnapshot<Map<String, dynamic>>> firestoreStream;
 
   Future<void> _fetchPastMatchesAndUpdateNotifier(
-      PastMatchesNotifier pastMatchesNotifier,
-      MatchDayBannerForClubNotifier matchDayBannerForClubNotifier,
-      MatchDayBannerForClubOppNotifier matchDayBannerForClubOppNotifier,
-      ClubGlobalProvider clubGlobalProvider,
-      ) async {
+    PastMatchesNotifier pastMatchesNotifier,
+    MatchDayBannerForClubNotifier matchDayBannerForClubNotifier,
+    MatchDayBannerForClubOppNotifier matchDayBannerForClubOppNotifier,
+    ClubGlobalProvider clubGlobalProvider,
+  ) async {
     await getPastMatches(pastMatchesNotifier, matchDayBannerForClubNotifier, matchDayBannerForClubOppNotifier, clubGlobalProvider, widget.clubId);
 
     setState(() {}); // Refresh the UI if needed
   }
-
 
   @override
   void initState() {
@@ -190,12 +189,12 @@ class AnimCardState extends State<AnimCard> {
                                 height: 42.0,
                                 decoration: BoxDecoration(
                                     borderRadius: const BorderRadius.all(Radius.circular(5)),
-                                  image: DecorationImage(
-                                    image: pastMatchesNotifier.pastMatchesList[widget.index].homeTeamIcon!.startsWith('assets/')
-                                        ? AssetImage(pastMatchesNotifier.pastMatchesList[widget.index].homeTeamIcon!) as ImageProvider
-                                        : CachedNetworkImageProvider(pastMatchesNotifier.pastMatchesList[widget.index].homeTeamIcon!),
-                                    fit: BoxFit.cover,
-                                  )),
+                                    image: DecorationImage(
+                                      image: pastMatchesNotifier.pastMatchesList[widget.index].homeTeamIcon!.startsWith('assets/')
+                                          ? AssetImage(pastMatchesNotifier.pastMatchesList[widget.index].homeTeamIcon!) as ImageProvider
+                                          : CachedNetworkImageProvider(pastMatchesNotifier.pastMatchesList[widget.index].homeTeamIcon!),
+                                      fit: BoxFit.cover,
+                                    )),
                               ),
                             ),
                           ),
@@ -216,12 +215,21 @@ class AnimCardState extends State<AnimCard> {
                         child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        Text(pastMatchesNotifier.pastMatchesList[widget.index].matchDate!,
-                            style: GoogleFonts.electrolize(
-                              fontSize: 10,
-                              fontWeight: FontWeight.w300,
-                              color: Colors.white54,
-                            )),
+                        SizedBox(
+                          width: 140,
+                          child: Center(
+                            child: Text(
+                              pastMatchesNotifier.pastMatchesList[widget.index].competition!,
+                              style: GoogleFonts.electrolize(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w900,
+                                color: Colors.white70,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                            ),
+                          ),
+                        ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -247,6 +255,12 @@ class AnimCardState extends State<AnimCard> {
                             ),
                           ],
                         ),
+                        Text(pastMatchesNotifier.pastMatchesList[widget.index].matchDate!,
+                            style: GoogleFonts.electrolize(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w300,
+                              color: Colors.white54,
+                            )),
                       ],
                     )),
                     SingleChildScrollView(
@@ -265,13 +279,14 @@ class AnimCardState extends State<AnimCard> {
                                 width: 42.0,
                                 height: 42.0,
                                 decoration: BoxDecoration(
-                                    borderRadius: const BorderRadius.all(Radius.circular(5)),
+                                  borderRadius: const BorderRadius.all(Radius.circular(5)),
                                   image: DecorationImage(
                                     image: pastMatchesNotifier.pastMatchesList[widget.index].awayTeamIcon!.startsWith('assets/')
                                         ? AssetImage(pastMatchesNotifier.pastMatchesList[widget.index].awayTeamIcon!) as ImageProvider
                                         : CachedNetworkImageProvider(pastMatchesNotifier.pastMatchesList[widget.index].awayTeamIcon!),
                                     fit: BoxFit.cover,
-                                  ),),
+                                  ),
+                                ),
                               ),
                             ),
                           ),

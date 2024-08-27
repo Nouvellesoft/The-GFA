@@ -1,60 +1,43 @@
 from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from bs4 import BeautifulSoup
 
-# Setup Selenium options
+# Configure Selenium with the desired options
 chrome_options = Options()
-chrome_options.add_argument("--headless")  # Run in headless mode (no GUI)
+chrome_options.add_argument("window-size=1400,1500")
+chrome_options.add_argument("disable-dev-shm-usage")
+chrome_options.add_argument("disable-gpu")
+chrome_options.add_argument("no-sandbox")
+chrome_options.add_argument("headless")  # Run in headless mode
+chrome_options.add_argument("user-agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36")
 
-# Path to chromedriver (not necessary to specify if chromedriver is in PATH)
-service = Service('/opt/homebrew/bin/chromedriver')
-driver = webdriver.Chrome(service=service, options=chrome_options)
+# Initialize the WebDriver
+driver = webdriver.Chrome(options=chrome_options)
 
-# Define the URL of the team's fixtures
-url = 'https://fulltime.thefa.com/displayTeam.html?id=701181330'
-
-# Open the URL
+# Load the page
+url = "https://fulltime.thefa.com/results.html?league=776003174&selectedSeason=548186171&selectedDivision=966526807&selectedTeam=&selectedFixtureGroupKey=1_372228853"
 driver.get(url)
 
-# Wait for the table to be present
-WebDriverWait(driver, 10).until(
-    EC.presence_of_element_located((By.TAG_NAME, "table"))
-)
+# Wait until the results table is loaded
+driver.implicitly_wait(10)
 
-# Get the page source after JavaScript has loaded
-html = driver.page_source
+# Extract the results table
+results = driver.find_elements(By.CSS_SELECTOR, ".results-table-2 .tbody .flex.middle")
 
-# Parse the HTML content of the page
-soup = BeautifulSoup(html, 'html.parser')
+# Loop through the results and extract the data
+for result in results:
+    date_time = result.find_element(By.CSS_SELECTOR, ".datetime-col").text
+    home_team = result.find_element(By.CSS_SELECTOR, ".home-team-col .team-name").text
+    score = result.find_element(By.CSS_SELECTOR, ".score-col").text
+    away_team = result.find_element(By.CSS_SELECTOR, ".road-team-col .team-name").text
+    competition = result.find_element(By.CSS_SELECTOR, ".fg-col").text
 
-# Print the entire HTML for debugging
-print(soup.prettify())
-
-# Find the table containing the fixtures
-fixtures_table = soup.find('table')  # Adjust based on inspected HTML
-
-if fixtures_table:
-    # Extract rows from the table
-    rows = fixtures_table.find_all('tr')[1:]  # Skip the header row
-
-    for row in rows:
-        columns = row.find_all('td')
-        if len(columns) >= 4:
-            match_date = columns[0].text.strip()
-            match_time = columns[1].text.strip()
-            home_team = columns[2].text.strip()
-            away_team = columns[3].text.strip()
-
-            print(f"Date: {match_date}, "
-                  f"Time: {match_time}, "
-                  f"Home: {home_team}, "
-                  f"Away: {away_team}")
-else:
-    print("No fixtures found on the page.")
+    print(f"Date/Time: {date_time}")
+    print(f"Home Team: {home_team}")
+    print(f"Score: {score}")
+    print(f"Away Team: {away_team}")
+    print(f"Competition: {competition}")
+    print("-" * 40)
 
 # Close the WebDriver
 driver.quit()

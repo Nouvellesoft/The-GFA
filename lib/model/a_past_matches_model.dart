@@ -8,6 +8,7 @@ class PastMatches {
   String? matchDate;
   String? homeTeamIcon;
   String? awayTeamIcon;
+  String? competition;
   dynamic id;
 
   PastMatches({
@@ -20,6 +21,7 @@ class PastMatches {
     this.matchDate,
     this.homeTeamIcon,
     this.awayTeamIcon,
+    this.competition,
     this.id,
   });
 
@@ -34,5 +36,6 @@ class PastMatches {
     matchDate = data['match_date'];
     homeTeamIcon = data['home_team_icon'];
     awayTeamIcon = data['away_team_icon'];
+    competition = data['competition'];
   }
 }
