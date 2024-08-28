@@ -3,11 +3,16 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../main.dart';
 import './a_upcoming_matches_page.dart';
+import 'a_past_matches_all_clubs_page.dart';
 import 'a_past_matches_page.dart';
+import 'a_upcoming_matches_all_clubs_page.dart';
 
-String fixturesTitle = 'Fixtures';
-String resultsTitle = 'Results';
-String matchesTitle = 'Matches';
+String resultsTitle = 'Club Results';
+String fixturesTitle = 'Club Fixtures';
+String allClubsResultsTitle = 'All Results';
+String allClubsFixturesTitle = 'All Fixtures';
+
+String footballMatchesSubjectTitle = 'Football Matches';
 
 Color? backgroundColor = const Color.fromRGBO(34, 40, 49, 1);
 Color? selectedTabColor = Colors.indigo[200];
@@ -28,7 +33,7 @@ class TabviewMatchesPageState extends State<TabviewMatchesPage> with SingleTicke
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this, initialIndex: widget.initialPage);
+    _tabController = TabController(length: 4, vsync: this, initialIndex: widget.initialPage);
   }
 
   @override
@@ -42,7 +47,7 @@ class TabviewMatchesPageState extends State<TabviewMatchesPage> with SingleTicke
     return Scaffold(
       appBar: AppBar(
         backgroundColor: backgroundColor,
-        title: Text(matchesTitle, style: GoogleFonts.jura(fontSize: 23, fontWeight: FontWeight.w800, color: Colors.white)),
+        title: Text(footballMatchesSubjectTitle, style: GoogleFonts.jura(fontSize: 23, fontWeight: FontWeight.w800, color: Colors.white)),
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios, color: appBarIconColor),
           onPressed: () {
@@ -54,17 +59,23 @@ class TabviewMatchesPageState extends State<TabviewMatchesPage> with SingleTicke
           unselectedLabelColor: Colors.orange,
           indicatorColor: Colors.white,
           controller: _tabController,
+          labelStyle: const TextStyle(fontSize: 14), // Set the size for selected tab
+          unselectedLabelStyle: const TextStyle(fontSize: 11), // Set the size for unselected tabs
           tabs: [
-            Tab(text: resultsTitle),
+            Tab(text: allClubsFixturesTitle),
+            Tab(text: allClubsResultsTitle),
             Tab(text: fixturesTitle),
+            Tab(text: resultsTitle),
           ],
         ),
       ),
       body: TabBarView(
         controller: _tabController,
         children: [
-          PastMatchesPage(clubId: widget.clubId),
+          UpcomingMatchesForAllClubsPage(clubId: widget.clubId),
+          PastMatchesForAllClubsPage(clubId: widget.clubId),
           UpcomingMatchesPage(clubId: widget.clubId),
+          PastMatchesPage(clubId: widget.clubId),
         ],
       ),
     );

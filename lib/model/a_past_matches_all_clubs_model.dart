@@ -1,4 +1,4 @@
-class PastMatches {
+class PastMatchesForAllClubs {
   String? assistsBy;
   String? goalsScorers;
   String? homeTeam;
@@ -12,7 +12,7 @@ class PastMatches {
   String? competition;
   dynamic id;
 
-  PastMatches({
+  PastMatchesForAllClubs({
     this.assistsBy,
     this.goalsScorers,
     this.homeTeam,
@@ -27,7 +27,7 @@ class PastMatches {
     this.id,
   });
 
-  PastMatches.fromMap(Map<String?, dynamic> data) {
+  PastMatchesForAllClubs.fromMap(Map<String?, dynamic> data) {
     id = data['id'];
     assistsBy = data['assists_by'];
     goalsScorers = data['goalscorers'];

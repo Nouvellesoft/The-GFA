@@ -1,15 +1,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-import '../model/a_past_matches_model.dart';
+import '../model/a_past_matches_all_clubs_model.dart';
 import '../notifier/a_club_global_notifier.dart';
-import '../notifier/a_past_matches_notifier.dart';
+import '../notifier/a_past_matches_all_clubs_notifier.dart';
 import '../notifier/c_match_day_banner_for_club_notifier.dart';
 import '../notifier/c_match_day_banner_for_club_opp_notifier.dart';
 import 'c_match_day_banner_for_club_api.dart';
 import 'c_match_day_banner_for_club_opp_api.dart';
 
-Future<void> getPastMatches(
-  PastMatchesNotifier pastMatchesNotifier,
+Future<void> getPastMatchesForAllClubs(
+  PastMatchesForAllClubsNotifier pastMatchesForAllClubsNotifier,
   MatchDayBannerForClubNotifier matchDayBannerForClubNotifier,
   MatchDayBannerForClubOppNotifier matchDayBannerForClubOppNotifier,
   ClubGlobalProvider clubGlobalProvider,
@@ -21,10 +21,15 @@ Future<void> getPastMatches(
   // Fetch MatchDayBannerForClubOpp data
   await getMatchDayBannerForClubOpp(matchDayBannerForClubOppNotifier, clubId);
 
-  QuerySnapshot snapshot =
-      await FirebaseFirestore.instance.collection('clubs').doc(clubId).collection('PastMatches').orderBy('id', descending: false).limit(30).get();
+  QuerySnapshot snapshot = await FirebaseFirestore.instance
+      .collection('clubs')
+      .doc(clubId)
+      .collection('PastMatchesForAllClubs')
+      .orderBy('id', descending: false)
+      .limit(30)
+      .get();
 
-  List<PastMatches> pastMatchesList = [];
+  List<PastMatchesForAllClubs> pastMatchesForAllClubsList = [];
 
   // Function to parse date strings and compare them
   // int compareDate(String dateString1, String dateString2) {
@@ -41,48 +46,48 @@ Future<void> getPastMatches(
   const String defaultImage = 'assets/images/no_club_icon_default.jpeg';
 
   for (var document in snapshot.docs) {
-    PastMatches pastMatches = PastMatches.fromMap(document.data() as Map<String, dynamic>);
+    PastMatchesForAllClubs pastMatchesForAllClubs = PastMatchesForAllClubs.fromMap(document.data() as Map<String, dynamic>);
 
-    // Check if home team matches any banner team name
+    // Check if home team matchesForAllClubs any banner team name
     bool homeTeamMatched = false;
     bool awayTeamMatched = false;
 
     // Match against the MatchDayBannerForClub team names
     for (var banner in matchDayBannerForClubNotifier.matchDayBannerForClubList) {
-      if (pastMatches.homeTeam == banner.teamName) {
-        pastMatches.homeTeamIcon = banner.clubLogo;
+      if (pastMatchesForAllClubs.homeTeam == banner.teamName) {
+        pastMatchesForAllClubs.homeTeamIcon = banner.clubLogo;
         homeTeamMatched = true;
       }
-      if (pastMatches.awayTeam == banner.teamName) {
-        pastMatches.awayTeamIcon = banner.clubLogo;
+      if (pastMatchesForAllClubs.awayTeam == banner.teamName) {
+        pastMatchesForAllClubs.awayTeamIcon = banner.clubLogo;
         awayTeamMatched = true;
       }
     }
 
     // Match against the MatchDayBannerForClubOpp team names (for opposition teams)
     for (var oppBanner in matchDayBannerForClubOppNotifier.matchDayBannerForClubOppList) {
-      if (pastMatches.homeTeam == oppBanner.clubName) {
-        pastMatches.homeTeamIcon = oppBanner.clubIcon;
+      if (pastMatchesForAllClubs.homeTeam == oppBanner.clubName) {
+        pastMatchesForAllClubs.homeTeamIcon = oppBanner.clubIcon;
         homeTeamMatched = true;
       }
-      if (pastMatches.awayTeam == oppBanner.clubName) {
-        pastMatches.awayTeamIcon = oppBanner.clubIcon;
+      if (pastMatchesForAllClubs.awayTeam == oppBanner.clubName) {
+        pastMatchesForAllClubs.awayTeamIcon = oppBanner.clubIcon;
         awayTeamMatched = true;
       }
     }
 
     // If no match is found for the home team, use the default image
     if (!homeTeamMatched) {
-      pastMatches.homeTeamIcon = defaultImage;
+      pastMatchesForAllClubs.homeTeamIcon = defaultImage;
     }
 
     // If no match is found for the away team, use the default image
     if (!awayTeamMatched) {
-      pastMatches.awayTeamIcon = defaultImage;
+      pastMatchesForAllClubs.awayTeamIcon = defaultImage;
     }
 
-    pastMatchesList.add(pastMatches);
+    pastMatchesForAllClubsList.add(pastMatchesForAllClubs);
   }
 
-  pastMatchesNotifier.pastMatchesList = pastMatchesList;
+  pastMatchesForAllClubsNotifier.pastMatchesForAllClubsList = pastMatchesForAllClubsList;
 }

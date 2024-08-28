@@ -3,38 +3,37 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-
-import '../../api/a_past_matches_api.dart';
+import '../../api/a_past_matches_all_clubs_api.dart';
 import '../../notifier/a_club_global_notifier.dart';
-import '../../notifier/a_past_matches_notifier.dart';
+import '../../notifier/a_past_matches_all_clubs_notifier.dart';
 import '../../notifier/c_match_day_banner_for_club_notifier.dart';
 import '../../notifier/c_match_day_banner_for_club_opp_notifier.dart';
-import './a_upcoming_matches_page.dart';
+import 'a_upcoming_matches_all_clubs_page.dart';
 
 Color nabColor = const Color.fromRGBO(56, 56, 60, 1);
 Color splashColorTwo = Colors.black87;
 
-class PastMatchesPage extends StatefulWidget {
+class PastMatchesForAllClubsPage extends StatefulWidget {
   final String clubId;
-  const PastMatchesPage({super.key, required this.clubId});
+  const PastMatchesForAllClubsPage({super.key, required this.clubId});
 
   @override
-  PastMatchesPageState createState() => PastMatchesPageState();
+  PastMatchesForAllClubsPageState createState() => PastMatchesForAllClubsPageState();
 }
 
-class PastMatchesPageState extends State<PastMatchesPage> with TickerProviderStateMixin {
+class PastMatchesForAllClubsPageState extends State<PastMatchesForAllClubsPage> with TickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<Color?> _color;
 
   late Stream<DocumentSnapshot<Map<String, dynamic>>> firestoreStream;
 
-  Future<void> _fetchPastMatchesAndUpdateNotifier(
-    PastMatchesNotifier pastMatchesNotifier,
+  Future<void> _fetchPastMatchesForAllClubsAndUpdateNotifier(
+    PastMatchesForAllClubsNotifier pastMatchesForAllClubsNotifier,
     MatchDayBannerForClubNotifier matchDayBannerForClubNotifier,
     MatchDayBannerForClubOppNotifier matchDayBannerForClubOppNotifier,
     ClubGlobalProvider clubGlobalProvider,
   ) async {
-    await getPastMatches(pastMatchesNotifier, matchDayBannerForClubNotifier, matchDayBannerForClubOppNotifier, clubGlobalProvider, widget.clubId);
+    await getPastMatchesForAllClubs(pastMatchesForAllClubsNotifier, matchDayBannerForClubNotifier, matchDayBannerForClubOppNotifier, clubGlobalProvider, widget.clubId);
 
     setState(() {}); // Refresh the UI if needed
   }
@@ -42,12 +41,12 @@ class PastMatchesPageState extends State<PastMatchesPage> with TickerProviderSta
   @override
   void initState() {
     ClubGlobalProvider clubGlobalProvider = Provider.of<ClubGlobalProvider>(context, listen: false);
-    PastMatchesNotifier pastMatchesNotifier = Provider.of<PastMatchesNotifier>(context, listen: false);
+    PastMatchesForAllClubsNotifier pastMatchesForAllClubsNotifier = Provider.of<PastMatchesForAllClubsNotifier>(context, listen: false);
     MatchDayBannerForClubNotifier matchDayBannerForClubNotifier = Provider.of<MatchDayBannerForClubNotifier>(context, listen: false);
     MatchDayBannerForClubOppNotifier matchDayBannerForClubOppNotifier = Provider.of<MatchDayBannerForClubOppNotifier>(context, listen: false);
 
-    _fetchPastMatchesAndUpdateNotifier(
-      pastMatchesNotifier,
+    _fetchPastMatchesForAllClubsAndUpdateNotifier(
+      pastMatchesForAllClubsNotifier,
       matchDayBannerForClubNotifier,
       matchDayBannerForClubOppNotifier,
       clubGlobalProvider,
@@ -71,14 +70,14 @@ class PastMatchesPageState extends State<PastMatchesPage> with TickerProviderSta
     Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (context) => UpcomingMatchesPage(
+            builder: (context) => UpcomingMatchesForAllClubsPage(
                   clubId: widget.clubId,
                 )));
   }
 
   @override
   Widget build(BuildContext context) {
-    PastMatchesNotifier pastMatchesNotifier = Provider.of<PastMatchesNotifier>(context);
+    PastMatchesForAllClubsNotifier pastMatchesForAllClubsNotifier = Provider.of<PastMatchesForAllClubsNotifier>(context);
 
     return Scaffold(
       body: AnimatedBuilder(
@@ -104,7 +103,7 @@ class PastMatchesPageState extends State<PastMatchesPage> with TickerProviderSta
                     index: index,
                   );
                 },
-                itemCount: pastMatchesNotifier.pastMatchesList.length,
+                itemCount: pastMatchesForAllClubsNotifier.pastMatchesForAllClubsList.length,
               ),
             ),
           );
@@ -133,7 +132,7 @@ class AnimCardState extends State<AnimCard> {
 
   @override
   Widget build(BuildContext context) {
-    PastMatchesNotifier pastMatchesNotifier = Provider.of<PastMatchesNotifier>(context);
+    PastMatchesForAllClubsNotifier pastMatchesForAllClubsNotifier = Provider.of<PastMatchesForAllClubsNotifier>(context);
 
     return Column(
       children: [
@@ -190,9 +189,9 @@ class AnimCardState extends State<AnimCard> {
                                 decoration: BoxDecoration(
                                     borderRadius: const BorderRadius.all(Radius.circular(5)),
                                     image: DecorationImage(
-                                      image: pastMatchesNotifier.pastMatchesList[widget.index].homeTeamIcon!.startsWith('assets/')
-                                          ? AssetImage(pastMatchesNotifier.pastMatchesList[widget.index].homeTeamIcon!) as ImageProvider
-                                          : CachedNetworkImageProvider(pastMatchesNotifier.pastMatchesList[widget.index].homeTeamIcon!),
+                                      image: pastMatchesForAllClubsNotifier.pastMatchesForAllClubsList[widget.index].homeTeamIcon!.startsWith('assets/')
+                                          ? AssetImage(pastMatchesForAllClubsNotifier.pastMatchesForAllClubsList[widget.index].homeTeamIcon!) as ImageProvider
+                                          : CachedNetworkImageProvider(pastMatchesForAllClubsNotifier.pastMatchesForAllClubsList[widget.index].homeTeamIcon!),
                                       fit: BoxFit.cover,
                                     )),
                               ),
@@ -202,7 +201,7 @@ class AnimCardState extends State<AnimCard> {
                             width: 120,
                             margin: const EdgeInsets.only(left: 7),
                             child: Text(
-                              pastMatchesNotifier.pastMatchesList[widget.index].homeTeam!,
+                              pastMatchesForAllClubsNotifier.pastMatchesForAllClubsList[widget.index].homeTeam!,
                               style: GoogleFonts.allertaStencil(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w300),
                               textAlign: TextAlign.start,
                               overflow: TextOverflow.clip,
@@ -219,7 +218,7 @@ class AnimCardState extends State<AnimCard> {
                           width: 140,
                           child: Center(
                             child: Text(
-                              pastMatchesNotifier.pastMatchesList[widget.index].competition!,
+                              pastMatchesForAllClubsNotifier.pastMatchesForAllClubsList[widget.index].competition!,
                               style: GoogleFonts.electrolize(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w900,
@@ -233,7 +232,7 @@ class AnimCardState extends State<AnimCard> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text(pastMatchesNotifier.pastMatchesList[widget.index].homeTeamScore!,
+                            Text(pastMatchesForAllClubsNotifier.pastMatchesForAllClubsList[widget.index].homeTeamScore!,
                                 style: GoogleFonts.jura(
                                   fontSize: 20,
                                   fontWeight: FontWeight.w800,
@@ -246,7 +245,7 @@ class AnimCardState extends State<AnimCard> {
                                   color: Colors.white,
                                 )),
                             Text(
-                              pastMatchesNotifier.pastMatchesList[widget.index].awayTeamScore!,
+                              pastMatchesForAllClubsNotifier.pastMatchesForAllClubsList[widget.index].awayTeamScore!,
                               style: GoogleFonts.jura(
                                 fontSize: 20,
                                 fontWeight: FontWeight.w800,
@@ -254,7 +253,7 @@ class AnimCardState extends State<AnimCard> {
                               ),
                             ),
                             Text(
-                              " ${pastMatchesNotifier.pastMatchesList[widget.index].ultimateScore!}",
+                              " ${pastMatchesForAllClubsNotifier.pastMatchesForAllClubsList[widget.index].ultimateScore!}",
                               style: GoogleFonts.jura(
                                 fontSize: 20,
                                 fontWeight: FontWeight.w800,
@@ -263,7 +262,7 @@ class AnimCardState extends State<AnimCard> {
                             ),
                           ],
                         ),
-                        Text(pastMatchesNotifier.pastMatchesList[widget.index].matchDate!,
+                        Text(pastMatchesForAllClubsNotifier.pastMatchesForAllClubsList[widget.index].matchDate!,
                             style: GoogleFonts.electrolize(
                               fontSize: 10,
                               fontWeight: FontWeight.w300,
@@ -289,9 +288,9 @@ class AnimCardState extends State<AnimCard> {
                                 decoration: BoxDecoration(
                                   borderRadius: const BorderRadius.all(Radius.circular(5)),
                                   image: DecorationImage(
-                                    image: pastMatchesNotifier.pastMatchesList[widget.index].awayTeamIcon!.startsWith('assets/')
-                                        ? AssetImage(pastMatchesNotifier.pastMatchesList[widget.index].awayTeamIcon!) as ImageProvider
-                                        : CachedNetworkImageProvider(pastMatchesNotifier.pastMatchesList[widget.index].awayTeamIcon!),
+                                    image: pastMatchesForAllClubsNotifier.pastMatchesForAllClubsList[widget.index].awayTeamIcon!.startsWith('assets/')
+                                        ? AssetImage(pastMatchesForAllClubsNotifier.pastMatchesForAllClubsList[widget.index].awayTeamIcon!) as ImageProvider
+                                        : CachedNetworkImageProvider(pastMatchesForAllClubsNotifier.pastMatchesForAllClubsList[widget.index].awayTeamIcon!),
                                     fit: BoxFit.cover,
                                   ),
                                 ),
@@ -302,7 +301,7 @@ class AnimCardState extends State<AnimCard> {
                             width: MediaQuery.of(context).size.width * 0.3,
                             padding: const EdgeInsets.only(right: 7),
                             child: Text(
-                              pastMatchesNotifier.pastMatchesList[widget.index].awayTeam!,
+                              pastMatchesForAllClubsNotifier.pastMatchesForAllClubsList[widget.index].awayTeam!,
                               overflow: TextOverflow.clip,
                               style: GoogleFonts.allertaStencil(
                                 fontSize: 11,
@@ -346,7 +345,7 @@ class CardItem extends StatefulWidget {
 class CardItemState extends State<CardItem> {
   @override
   Widget build(BuildContext context) {
-    PastMatchesNotifier pastMatchesNotifier = Provider.of<PastMatchesNotifier>(context);
+    PastMatchesForAllClubsNotifier pastMatchesForAllClubsNotifier = Provider.of<PastMatchesForAllClubsNotifier>(context);
 
     double width = MediaQuery.of(context).size.width;
     return GestureDetector(
@@ -387,7 +386,7 @@ class CardItemState extends State<CardItem> {
                       child: Padding(
                         padding: const EdgeInsets.all(2.0),
                         child: Text(
-                          'Goal Scorer(s): ${pastMatchesNotifier.pastMatchesList[widget.index].goalsScorers!}',
+                          'Goal Scorer(s): ${pastMatchesForAllClubsNotifier.pastMatchesForAllClubsList[widget.index].goalsScorers!}',
                           style: GoogleFonts.saira(
                             color: Colors.white,
                             fontSize: 10,
@@ -405,7 +404,7 @@ class CardItemState extends State<CardItem> {
                       child: Padding(
                         padding: const EdgeInsets.all(2.0),
                         child: Text(
-                          "Assists: ${pastMatchesNotifier.pastMatchesList[widget.index].assistsBy!}",
+                          "Assists: ${pastMatchesForAllClubsNotifier.pastMatchesForAllClubsList[widget.index].assistsBy!}",
                           style: GoogleFonts.saira(
                             color: Colors.white,
                             fontSize: 10,

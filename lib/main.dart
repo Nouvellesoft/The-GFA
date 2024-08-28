@@ -12,6 +12,7 @@ import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:the_gfa/home_page/club_lists.dart';
 import 'package:the_gfa/notifier/a_club_global_notifier.dart';
+import 'package:the_gfa/notifier/a_past_matches_all_clubs_notifier.dart';
 import 'package:the_gfa/notifier/fifth_team_class_notifier.dart';
 import 'package:the_gfa/notifier/fourth_team_class_notifier.dart';
 import 'package:the_gfa/notifier/sixth_team_class_notifier.dart';
@@ -29,6 +30,7 @@ import '/notifier/players_table_notifier.dart';
 import 'api/PushNotificationService.dart';
 import 'api/club_sponsors_api.dart';
 import 'notifier/a_past_matches_notifier.dart';
+import 'notifier/a_upcoming_matches_all_clubs_notifier.dart';
 import 'notifier/a_upcoming_matches_notifier.dart';
 import 'notifier/achievement_images_notifier.dart';
 import 'notifier/club_arial_notifier.dart';
@@ -152,7 +154,13 @@ void main() async {
         create: (context) => PastMatchesNotifier(),
       ),
       ChangeNotifierProvider(
+        create: (context) => PastMatchesForAllClubsNotifier(),
+      ),
+      ChangeNotifierProvider(
         create: (context) => UpcomingMatchesNotifier(),
+      ),
+      ChangeNotifierProvider(
+        create: (context) => UpcomingMatchesForAllClubsNotifier(),
       ),
       ChangeNotifierProvider(
         create: (context) => YouTubeNotifier(),
