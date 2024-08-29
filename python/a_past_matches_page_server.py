@@ -52,15 +52,80 @@ urls = [
 id_counter = 1
 max_matches = 250  # Set the limit to 250 matches
 
+# List of acronyms that should remain fully capitalized
+acronyms = ['FISSC', 'AFC', 'FC', 'OBS', 'ST', '1ST']  # Add more acronyms to this list as needed
+
+
+def format_text(text):
+    """
+    Capitalize acronyms, handle capitalization after parentheses, and ensure proper capitalization
+    for each segment split by slashes, while removing unnecessary spaces around slashes.
+
+    :param text: The text to format.
+    :return: Formatted text.
+    """
+    # Remove leading/trailing whitespaces and replace multiple spaces with a single space
+    text = text.strip()
+    text = re.sub(r'\s+', ' ', text)
+
+    # Capitalize text after parentheses
+    def capitalize_after_parentheses(match):
+        return match.group(1) + match.group(2).capitalize()
+
+    # Regex to find text after parentheses and capitalize it
+    text = re.sub(r'(\(.*?\))\s*(\w)', capitalize_after_parentheses, text)
+
+    # Capitalize first letter of each word unless it's an acronym
+    def capitalize_acronyms(word):
+        match = re.match(r'\b\w+\b', word)
+        if match:
+            word = match.group()
+            return word.upper() if word.upper() in acronyms else word.capitalize()
+        return word
+
+    # Split text by '/' and process each part separately
+    parts = [part.strip() for part in text.split('/')]
+    capitalized_parts = []
+
+    for part in parts:
+        # Capitalize each word or acronym
+        words = part.split()
+        capitalized_words = [capitalize_acronyms(word) for word in words]
+        capitalized_parts.append(' '.join(capitalized_words))
+
+    # Join the parts with '/' ensuring no extra spaces around slashes
+    formatted_text = '/'.join(capitalized_parts)
+
+    return formatted_text
+
+
+# Function to add a space between a closing parenthesis and a following letter
+def add_space_after_parenthesis(text):
+    return re.sub(r'\)([a-zA-Z])', r') \1', text)
+
+
+def check_parenthesis_balance(text):
+    """
+    Check if the text has an opening parenthesis without a closing one.
+    If a closing parenthesis is missing, append it at the end of the text.
+
+    :param text: The text to check.
+    :return: Corrected text with balanced parentheses.
+    """
+    # Count the number of opening and closing parentheses
+    opening_parenthesis_count = text.count('(')
+    closing_parenthesis_count = text.count(')')
+
+    # If there's an opening parenthesis without a closing one, add the closing parenthesis
+    if opening_parenthesis_count > closing_parenthesis_count:
+        text += ')'
+
+    return text
+
 
 def clean_whitespace(text):
     # Remove leading and trailing whitespace and replace multiple spaces with a single space
     return re.sub(r'\s+', ' ', text.strip())
-
-
-def capitalize_words(text):
-    # Capitalize the first letter of each word
-    return ' '.join(word.capitalize() for word in text.split())
 
 
 def get_teams_from_firestore():
@@ -71,9 +136,9 @@ def get_teams_from_firestore():
         teams_names = []
         for doc in docs:
             data = doc.to_dict()
-            team_name = clean_whitespace(data.get('team_name', '')).lower()
+            team_name = clean_whitespace(data.get('team_name', ''))
             teams_names.append({
-                'team_name': capitalize_words(team_name),
+                'team_name': format_text(team_name),
             })
         return teams_names
     except Exception as exc:
@@ -84,6 +149,7 @@ def get_teams_from_firestore():
 # Fetch team names from Firestore
 teams = get_teams_from_firestore()
 team_names = [team['team_name'].lower() for team in teams]  # List of team names for comparison
+
 
 # Loop through each URL
 for url in urls:
@@ -117,12 +183,14 @@ for url in urls:
             if len(columns) >= 8:  # Ensure there are enough columns
                 match_type = columns[1].text.strip()  # Match type (e.g., 'L', 'TCC')
                 date_time = clean_whitespace(columns[2].text.strip())
-                home_team = capitalize_words(clean_whitespace(
-                    columns[3].text)).lower()  # Convert to lowercase for comparison
+                home_team = format_text(columns[3].text)
                 score = clean_whitespace(columns[6].text.strip())
-                away_team = capitalize_words(clean_whitespace(
-                    columns[7].text)).lower()  # Convert to lowercase for comparison
-                competition = capitalize_words(clean_whitespace(columns[10].text))
+                away_team = format_text(columns[7].text)
+                competition = format_text(columns[10].text)
+
+                # Check and correct ")x" to ") x"
+                home_team = add_space_after_parenthesis(home_team)
+                away_team = add_space_after_parenthesis(away_team)
 
                 # Initialize variables for scores
                 ht_score = ""
@@ -178,11 +246,11 @@ for url in urls:
                     at_score = 'V'
 
                 # Check if either team is in the list of team names
-                if home_team in team_names or away_team in team_names:
+                if home_team.lower() in team_names or away_team.lower() in team_names:
                     # Prepare data to push to Firestore
                     match_data = {
-                        'away_team': capitalize_words(away_team),
-                        'home_team': capitalize_words(home_team),
+                        'away_team': away_team,
+                        'home_team': home_team,
                         'id': id_counter,
                         'match_date': date_time,
                         'ht_score': ht_score,

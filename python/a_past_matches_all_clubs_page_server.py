@@ -6,8 +6,8 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as ec
 from bs4 import BeautifulSoup
 from google.cloud import firestore
-import sys
 import re
+import sys
 
 # Setup Firestore client
 FIRESTORE_PROJECT_ID = 'the-gfa'
@@ -30,20 +30,90 @@ urls = [
     'https://fulltime.thefa.com/results/1/50.html'
     '?selectedSeason=548186171&selectedFixtureGroupAgeGroup=0'
     '&previousSelectedFixtureGroupAgeGroup=&selectedFixtureGroupKey=',
-
-
 ]
 
 # Auto-incrementing ID
 id_counter = 1
 max_matches = 50  # Set the limit to 50 matches
 
+# List of acronyms to capitalize
+acronyms = ["FISSC", "FC", "F.C", 'AFC', 'ST', 'OBS']
+
 
 def clean_whitespace(text):
-    # Remove leading and trailing whitespace
-    text = text.strip()
-    # Replace multiple whitespaces with a single space
-    return re.sub(r'\s+', ' ', text)
+    # Remove leading and trailing whitespace and replace multiple spaces with a single space
+    return re.sub(r'\s+', ' ', text.strip())
+
+
+def capitalize_word(word):
+    # Capitalize the word if it's an acronym; otherwise, capitalize normally
+    return word.upper() if word.upper() in acronyms else word.capitalize()
+
+
+def capitalize_after_parentheses(text):
+    """
+    Capitalize text outside parentheses, keeping the text inside parentheses unchanged.
+    :param text: The text to format.
+    :return: Formatted text.
+    """
+
+    def capitalize_text(texting):
+        return ' '.join([capitalize_word(word) for word in texting.split()])
+
+    # Split by parentheses and handle each part
+    parts = re.split(r'(\s*\(.*?\)\s*)', text)
+    formatted_parts = []
+
+    for i, part in enumerate(parts):
+        if i % 2 == 0:  # Even indexes are outside parentheses
+            formatted_parts.append(capitalize_text(part))
+        else:  # Odd indexes are inside parentheses
+            formatted_parts.append(part)  # Keep parentheses as they are
+
+    return ''.join(formatted_parts)
+
+
+def clean_and_capitalize(text):
+    """
+    Capitalize acronyms, handle special cases for slashes, and remove spaces around slashes.
+    :param text: The text to format.
+    :return: Formatted text.
+    """
+    text = clean_whitespace(text)  # Remove leading/trailing whitespace and extra spaces
+    text = re.sub(r'\s+', ' ', text)
+
+    # Split text by '/' and handle each part separately
+    parts = re.split(r'\s*/\s*', text)
+    capitalized_parts = []
+
+    for part in parts:
+        capitalized_parts.append(capitalize_after_parentheses(part))
+
+    return '/'.join(capitalized_parts)  # Join parts with '/' without spaces
+
+
+# Function to add a space between a closing parenthesis and a following letter
+def add_space_after_parenthesis(text):
+    return re.sub(r'\)([a-zA-Z])', r') \1', text)
+
+
+def check_parenthesis_balance(text):
+    """
+    Check if the text has an opening parenthesis without a closing one.
+    If a closing parenthesis is missing, append it at the end of the text.
+
+    :param text: The text to check.
+    :return: Corrected text with balanced parentheses.
+    """
+    # Count the number of opening and closing parentheses
+    opening_parenthesis_count = text.count('(')
+    closing_parenthesis_count = text.count(')')
+
+    # If there's an opening parenthesis without a closing one, add the closing parenthesis
+    if opening_parenthesis_count > closing_parenthesis_count:
+        text += ')'
+
+    return text
 
 
 # Loop through each URL
@@ -78,10 +148,14 @@ for url in urls:
             if len(columns) >= 8:  # Ensure there are enough columns
                 match_type = columns[1].text.strip()  # Match type (e.g., 'L', 'TCC')
                 date_time = columns[2].text.strip()
-                home_team = clean_whitespace(columns[3].text)
+                home_team = clean_and_capitalize(columns[3].text)
                 score = columns[6].text.strip()
-                away_team = clean_whitespace(columns[7].text)
-                competition = clean_whitespace(columns[10].text)
+                away_team = clean_and_capitalize(columns[7].text)
+                competition = clean_and_capitalize(columns[10].text)
+
+                # Check and correct ")x" to ") x"
+                home_team = add_space_after_parenthesis(home_team)
+                away_team = add_space_after_parenthesis(away_team)
 
                 # Replace newlines and extra whitespace
                 date_time = ' '.join(date_time.split())
@@ -91,40 +165,35 @@ for url in urls:
                 at_score = ""
                 ultimate_score = ""
 
-                # Handle special cases
+                # Handle special cases for scores
                 if 'Void' in score:
                     ultimate_score = "(Void)"
                     ht_score = "V" if "V" in score.split('-')[0] else ""
                     at_score = "V" if "V" in score.split('-')[1] else ""
                 elif 'Pens' in score:
-                    # Extract penalty score
                     penalty_match = re.search(r'(\(Pens \d+-\d+\))', score)
                     if penalty_match:
                         ultimate_score = penalty_match.group(1)  # Keep the brackets
-
-                    # Extract regular time score
                     regular_score = re.search(r'(\d+)\s*-\s*(\d+)', score)
                     if regular_score:
                         ht_score = regular_score.group(1)
                         at_score = regular_score.group(2)
                 elif 'AET' in score:
                     ultimate_score = "(AET)"  # Wrapped in brackets
-                    # Extract regular time score
                     regular_score = re.search(r'(\d+)\s*-\s*(\d+)', score)
                     if regular_score:
                         ht_score = regular_score.group(1)
                         at_score = regular_score.group(2)
                 else:
-                    # Handle normal score and HT score
                     score_parts = score.split(' - ')
                     if len(score_parts) == 2:
                         ht_score, at_score = score_parts
-                        # Check for HT score
                         ht_match = re.search(r'\(HT (\d+-\d+)\)', at_score)
                         if ht_match:
-                            ultimate_score = f"(HT {ht_match.group(1)})"  # Wrapped in brackets
-                            at_score = at_score.split('\n')[
-                                0].strip()  # Remove HT score from at_score
+                            # Wrapped in brackets
+                            ultimate_score = f"(HT {ht_match.group(1)})"
+                            # Remove HT score from at_score
+                            at_score = at_score.split('\n')[0].strip()
                     else:
                         print(f"Unexpected score format: {score}")
                         continue  # Skip this row and move to the next one

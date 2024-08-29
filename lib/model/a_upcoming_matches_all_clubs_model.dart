@@ -6,6 +6,7 @@ class UpcomingMatchesForAllClubs {
   String? matchDayKickOff;
   String? homeTeamIcon;
   String? awayTeamIcon;
+  String? competition;
   dynamic id;
 
   UpcomingMatchesForAllClubs({
@@ -16,6 +17,7 @@ class UpcomingMatchesForAllClubs {
     this.matchDayKickOff,
     this.homeTeamIcon,
     this.awayTeamIcon,
+    this.competition,
     this.id,
   });
 
@@ -28,5 +30,6 @@ class UpcomingMatchesForAllClubs {
     matchDayKickOff = data['match_day_ko'];
     homeTeamIcon = data['home_team_icon'];
     awayTeamIcon = data['away_team_icon'];
+    competition = data['competition'];
   }
 }

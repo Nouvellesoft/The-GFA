@@ -5,10 +5,10 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 import '../../api/a_upcoming_matches_api.dart';
+import '../../notifier/a_club_global_notifier.dart';
 import '../../notifier/a_upcoming_matches_notifier.dart';
 import '../../notifier/c_match_day_banner_for_club_notifier.dart';
 import '../../notifier/c_match_day_banner_for_club_opp_notifier.dart';
-import '../../notifier/a_club_global_notifier.dart';
 import 'a_past_matches_page.dart';
 
 Color nabColor = const Color.fromRGBO(56, 56, 60, 1);
@@ -360,7 +360,34 @@ class CardItemState extends State<CardItem> {
                           'Venue: ${upcomingMatchesNotifier.upcomingMatchesList[widget.index].venue!}',
                           style: GoogleFonts.saira(
                             color: Colors.white,
-                            fontSize: 15,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w400,
+                          ),
+                          textAlign: TextAlign.center,
+                          overflow: TextOverflow.fade,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(
+                height: 3,
+              ),
+              Container(
+                decoration: BoxDecoration(borderRadius: BorderRadius.circular(5), color: Colors.black.withAlpha(40)),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Flexible(
+                      child: Padding(
+                        padding: const EdgeInsets.all(2.0),
+                        child: Text(
+                          'Competition: ${upcomingMatchesNotifier.upcomingMatchesList[widget.index].competition!}',
+                          style: GoogleFonts.saira(
+                            color: Colors.white,
+                            fontSize: 11,
                             fontWeight: FontWeight.w400,
                           ),
                           textAlign: TextAlign.center,

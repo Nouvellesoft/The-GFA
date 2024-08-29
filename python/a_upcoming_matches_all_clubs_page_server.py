@@ -40,21 +40,101 @@ id_counter = 1
 max_fixtures = 50
 processed_fixtures = 0
 
+# List of acronyms to capitalize
+acronyms = ["FISSC", "FC", 'AFC', 'ST', 'OBS', '1ST']
 
-# Function to capitalize first letter of each word and ensure "FC" stays uppercase
-def format_text(text):
-    # Remove leading/trailing whitespaces and reduce multiple spaces to one
-    cleaned_text = re.sub(' +', ' ', text.strip())
-    # Capitalize the first letter of each word
-    formatted_text = cleaned_text.title()
-    # Ensure "FC" stays uppercase
-    formatted_text = re.sub(r'\bFc\b', 'FC', formatted_text)
+
+def format_text(input_text):
+    """
+    Capitalize acronyms, handle capitalization after parentheses, and ensure proper capitalization
+    for each segment split by slashes, while removing unnecessary spaces around slashes.
+    Special handling for terms like "F.C" to ensure they are not cut off.
+
+    :param input_text: The text to format.
+    :return: Formatted text.
+    """
+    # Remove leading/trailing whitespaces and replace multiple spaces with a single space
+    formatted_text = input_text.strip()
+    formatted_text = re.sub(r'\s+', ' ', formatted_text)
+
+    # List of special terms to preserve
+    special_terms = ["F.C", "A.C", "S.C", "C.F", "U.F"]
+
+    # Function to preserve special terms in the text
+    def preserve_special_terms(text):
+        for term in special_terms:
+            text = text.replace(term, f"{{{term}}}")
+        return text
+
+    # Function to revert special terms after formatting
+    def revert_special_terms(text):
+        for term in special_terms:
+            text = text.replace(f"{{{term}}}", term)
+        return text
+
+    # Preserve special terms before formatting
+    formatted_text = preserve_special_terms(formatted_text)
+
+    # Capitalize text after parentheses
+    def capitalize_after_parentheses(match):
+        return match.group(1) + match.group(2).capitalize()
+
+    # Regex to find text after parentheses and capitalize it
+    formatted_text = re.sub(r'(\(.*?\))\s*(\w)', capitalize_after_parentheses, formatted_text)
+
+    # Capitalize first letter of each word unless it's an acronym
+    def capitalize_acronyms(word):
+        match = re.match(r'\b\w+\b', word)
+        if match:
+            word = match.group()
+            return word.upper() if word.upper() in acronyms else word.capitalize()
+        return word
+
+    # Split text by '/' and process each part separately
+    parts = [part.strip() for part in formatted_text.split('/')]
+    capitalized_parts = []
+
+    for part in parts:
+        # Capitalize each word or acronym
+        words = part.split()
+        capitalized_words = [capitalize_acronyms(word) for word in words]
+        capitalized_parts.append(' '.join(capitalized_words))
+
+    # Join the parts with '/' ensuring no extra spaces around slashes
+    formatted_text = '/'.join(capitalized_parts)
+
+    # Revert special terms to their original formatting
+    formatted_text = revert_special_terms(formatted_text)
+
     return formatted_text
+
+
+# Function to add a space between a closing parenthesis and a following letter
+def add_space_after_parenthesis(text):
+    return re.sub(r'\)([a-zA-Z])', r') \1', text)
+
+
+def check_parenthesis_balance(text):
+    """
+    Check if the text has an opening parenthesis without a closing one.
+    If a closing parenthesis is missing, append it at the end of the text.
+
+    :param text: The text to check.
+    :return: Corrected text with balanced parentheses.
+    """
+    # Count the number of opening and closing parentheses
+    opening_parenthesis_count = text.count('(')
+    closing_parenthesis_count = text.count(')')
+
+    # If there's an opening parenthesis without a closing one, add the closing parenthesis
+    if opening_parenthesis_count > closing_parenthesis_count:
+        text += ')'
+
+    return text
 
 
 # Loop through each URL
 for url in urls:
-    # Open the URL
     driver.get(url)
 
     # Wait for the table to be present
@@ -97,6 +177,12 @@ for url in urls:
                 competition = format_text(competition)
                 match_type = format_text(match_type)
 
+                venue = check_parenthesis_balance(venue)  # Check and fix parentheses
+
+                # Check and correct ")x" to ") x"
+                home_team = add_space_after_parenthesis(home_team)
+                away_team = add_space_after_parenthesis(away_team)
+
                 # Replace newlines and extra whitespace in date_time
                 date_time = ' '.join(date_time.split())
 
@@ -112,12 +198,9 @@ for url in urls:
                     match_datetime = datetime.strptime(
                         f"{match_date_str} {match_time_str}", "%d/%m/%y %H:%M")
                 except ValueError:
-                    try:
-                        match_datetime = datetime.strptime(
-                            f"{match_date_str} {match_time_str}", "%d/%m/%y %H:%M")
-                    except Exception as e:
-                        print(f"Date parsing error: {e}")
-                        continue  # Skip this entry if date parsing fails
+                    print(
+                        f"Date parsing error for match: {home_team} vs {away_team} on {date_time}")
+                    continue  # Skip this entry if date parsing fails
 
                 # Format date and time
                 match_date = match_datetime.strftime("%d-%m-%Y %H:%M:%S")

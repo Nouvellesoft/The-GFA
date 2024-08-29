@@ -32,7 +32,7 @@ Future<void> getUpcomingMatchesForAllClubs(
       .doc(clubId)
       .collection('UpcomingMatchesForAllClubs')
       .orderBy('id', descending: false)
-      .limit(30)
+      .limit(50)
       .get();
 
   List<UpcomingMatchesForAllClubs> upcomingMatchesForAllClubsList = [];

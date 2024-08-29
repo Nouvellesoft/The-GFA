@@ -387,7 +387,7 @@ class CardItemState extends State<CardItem> {
                       child: Padding(
                         padding: const EdgeInsets.all(2.0),
                         child: Text(
-                          'Goal Scorer(s): ${pastMatchesNotifier.pastMatchesList[widget.index].goalsScorers!}',
+                          'Goal Scorer(s): Coming soon ${pastMatchesNotifier.pastMatchesList[widget.index].goalsScorers!}',
                           style: GoogleFonts.saira(
                             color: Colors.white,
                             fontSize: 10,
@@ -405,7 +405,7 @@ class CardItemState extends State<CardItem> {
                       child: Padding(
                         padding: const EdgeInsets.all(2.0),
                         child: Text(
-                          "Assists: ${pastMatchesNotifier.pastMatchesList[widget.index].assistsBy!}",
+                          "Assists: Coming soon ${pastMatchesNotifier.pastMatchesList[widget.index].assistsBy!}",
                           style: GoogleFonts.saira(
                             color: Colors.white,
                             fontSize: 10,

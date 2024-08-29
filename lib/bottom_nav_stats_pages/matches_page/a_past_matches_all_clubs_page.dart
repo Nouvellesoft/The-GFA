@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+
 import '../../api/a_past_matches_all_clubs_api.dart';
 import '../../notifier/a_club_global_notifier.dart';
 import '../../notifier/a_past_matches_all_clubs_notifier.dart';
@@ -33,7 +34,8 @@ class PastMatchesForAllClubsPageState extends State<PastMatchesForAllClubsPage> 
     MatchDayBannerForClubOppNotifier matchDayBannerForClubOppNotifier,
     ClubGlobalProvider clubGlobalProvider,
   ) async {
-    await getPastMatchesForAllClubs(pastMatchesForAllClubsNotifier, matchDayBannerForClubNotifier, matchDayBannerForClubOppNotifier, clubGlobalProvider, widget.clubId);
+    await getPastMatchesForAllClubs(
+        pastMatchesForAllClubsNotifier, matchDayBannerForClubNotifier, matchDayBannerForClubOppNotifier, clubGlobalProvider, widget.clubId);
 
     setState(() {}); // Refresh the UI if needed
   }
@@ -189,9 +191,12 @@ class AnimCardState extends State<AnimCard> {
                                 decoration: BoxDecoration(
                                     borderRadius: const BorderRadius.all(Radius.circular(5)),
                                     image: DecorationImage(
-                                      image: pastMatchesForAllClubsNotifier.pastMatchesForAllClubsList[widget.index].homeTeamIcon!.startsWith('assets/')
-                                          ? AssetImage(pastMatchesForAllClubsNotifier.pastMatchesForAllClubsList[widget.index].homeTeamIcon!) as ImageProvider
-                                          : CachedNetworkImageProvider(pastMatchesForAllClubsNotifier.pastMatchesForAllClubsList[widget.index].homeTeamIcon!),
+                                      image:
+                                          pastMatchesForAllClubsNotifier.pastMatchesForAllClubsList[widget.index].homeTeamIcon!.startsWith('assets/')
+                                              ? AssetImage(pastMatchesForAllClubsNotifier.pastMatchesForAllClubsList[widget.index].homeTeamIcon!)
+                                                  as ImageProvider
+                                              : CachedNetworkImageProvider(
+                                                  pastMatchesForAllClubsNotifier.pastMatchesForAllClubsList[widget.index].homeTeamIcon!),
                                       fit: BoxFit.cover,
                                     )),
                               ),
@@ -289,8 +294,10 @@ class AnimCardState extends State<AnimCard> {
                                   borderRadius: const BorderRadius.all(Radius.circular(5)),
                                   image: DecorationImage(
                                     image: pastMatchesForAllClubsNotifier.pastMatchesForAllClubsList[widget.index].awayTeamIcon!.startsWith('assets/')
-                                        ? AssetImage(pastMatchesForAllClubsNotifier.pastMatchesForAllClubsList[widget.index].awayTeamIcon!) as ImageProvider
-                                        : CachedNetworkImageProvider(pastMatchesForAllClubsNotifier.pastMatchesForAllClubsList[widget.index].awayTeamIcon!),
+                                        ? AssetImage(pastMatchesForAllClubsNotifier.pastMatchesForAllClubsList[widget.index].awayTeamIcon!)
+                                            as ImageProvider
+                                        : CachedNetworkImageProvider(
+                                            pastMatchesForAllClubsNotifier.pastMatchesForAllClubsList[widget.index].awayTeamIcon!),
                                     fit: BoxFit.cover,
                                   ),
                                 ),
@@ -386,7 +393,7 @@ class CardItemState extends State<CardItem> {
                       child: Padding(
                         padding: const EdgeInsets.all(2.0),
                         child: Text(
-                          'Goal Scorer(s): ${pastMatchesForAllClubsNotifier.pastMatchesForAllClubsList[widget.index].goalsScorers!}',
+                          'Goal Scorer(s): Coming soon ${pastMatchesForAllClubsNotifier.pastMatchesForAllClubsList[widget.index].goalsScorers!}',
                           style: GoogleFonts.saira(
                             color: Colors.white,
                             fontSize: 10,
@@ -404,7 +411,7 @@ class CardItemState extends State<CardItem> {
                       child: Padding(
                         padding: const EdgeInsets.all(2.0),
                         child: Text(
-                          "Assists: ${pastMatchesForAllClubsNotifier.pastMatchesForAllClubsList[widget.index].assistsBy!}",
+                          "Assists: Coming soon ${pastMatchesForAllClubsNotifier.pastMatchesForAllClubsList[widget.index].assistsBy!}",
                           style: GoogleFonts.saira(
                             color: Colors.white,
                             fontSize: 10,

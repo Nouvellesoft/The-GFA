@@ -168,7 +168,7 @@ class _BottomNavigatorState extends State<BottomNavigator> {
         clubId: widget.clubId,
       ),
       PlayersStatsAndInfoPage(clubId: widget.clubId),
-      TabviewMatchesPage(initialPage: 1, clubId: widget.clubId),
+      TabviewMatchesPage(initialPage: 2, clubId: widget.clubId),
       // const SeasonTimeline(),
       TabviewSocialMediaPage(clubId: widget.clubId),
       TrainingsAndGamesReelsPage(clubId: widget.clubId),
