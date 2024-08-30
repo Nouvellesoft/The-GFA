@@ -26,64 +26,78 @@ chrome_options.add_argument("--headless")  # Run in headless mode (no GUI)
 service = Service('/opt/homebrew/bin/chromedriver')
 driver = webdriver.Chrome(service=service, options=chrome_options)
 
-# List of URLs to process
-urls = [
-    'https://fulltime.thefa.com/fixtures/1/100.html'
-    '?selectedSeason=235213419&selectedFixtureGroupAgeGroup=0'
-    '&previousSelectedFixtureGroupAgeGroup=&selectedFixtureGroupKey=',
-
-    'https://fulltime.thefa.com/fixtures/2/100.html'
-    '?selectedSeason=235213419&selectedFixtureGroupAgeGroup=0'
-    '&previousSelectedFixtureGroupAgeGroup=&selectedFixtureGroupKey=',
+# Change this to the desired club identifier
+club_identifier = 'patriciafc'
 
 
-]
+def get_upcoming_match_links(club_id):
+    try:
+        upcoming_matches_doc_ref = db.collection('clubs').document(club_id).collection(
+            'ScrapedMatchesLinks').document('upcoming_matches_links')
+        upcoming_matches_doc = upcoming_matches_doc_ref.get()
+
+        if not upcoming_matches_doc.exists:
+            print(f"No upcoming matches document found for club_id: {club_id}")
+            return []
+
+        doc_data = upcoming_matches_doc.to_dict()
+
+        match_urls = []
+        for key, value in doc_data.items():
+            if key.startswith('sc_link_') and isinstance(value, str) and value.strip():
+                match_urls.append(value.strip())
+
+        return match_urls
+
+    except Exception as fetch_exc:
+        print(f"Error fetching upcoming match links: {fetch_exc}")
+        return []
+
+
+# Get URLs from Firestore
+upcoming_match_urls = get_upcoming_match_links(club_identifier)
+
+if not upcoming_match_urls:
+    print(f"No upcoming match links found for club_id: {club_identifier}")
+    sys.exit(1)
 
 # Auto-incrementing ID
 id_counter = 1
 max_fixtures = 150
 
-# Acronyms to be capitalized
-acronyms = ['FISSC', 'FC', 'AFC', 'ST', 'OBS', '1ST']
+# List of acronyms that should remain fully capitalized
+acronyms = ['FISSC', 'AFC', 'FC', 'OBS', 'ST', '1ST']  # Add more acronyms to this list as needed
 
 
-def format_text(input_text):
-    """
-    Capitalize acronyms, handle capitalization after parentheses, and ensure proper capitalization
-    for each segment split by slashes, while removing unnecessary spaces around slashes.
-    Special handling for terms like "F.C" to ensure they are not cut off.
-
-    :param input_text: The text to format.
-    :return: Formatted text.
-    """
+def format_text(text):
     # Remove leading/trailing whitespaces and replace multiple spaces with a single space
-    formatted_text = input_text.strip()
-    formatted_text = re.sub(r'\s+', ' ', formatted_text)
+    text = text.strip()
+    text = re.sub(r'\s+', ' ', text)
 
     # List of special terms to preserve
     special_terms = ["F.C", "A.C", "S.C", "C.F", "U.F"]
 
     # Function to preserve special terms in the text
-    def preserve_special_terms(text):
+    def preserve_special_terms(texting):
         for term in special_terms:
-            text = text.replace(term, f"{{{term}}}")
-        return text
+            texting = texting.replace(term, f"{{{term}}}")
+        return texting
 
     # Function to revert special terms after formatting
-    def revert_special_terms(text):
+    def revert_special_terms(texting):
         for term in special_terms:
-            text = text.replace(f"{{{term}}}", term)
-        return text
+            texting = texting.replace(f"{{{term}}}", term)
+        return texting
 
     # Preserve special terms before formatting
-    formatted_text = preserve_special_terms(formatted_text)
+    text = preserve_special_terms(text)
 
     # Capitalize text after parentheses
     def capitalize_after_parentheses(match):
         return match.group(1) + match.group(2).capitalize()
 
     # Regex to find text after parentheses and capitalize it
-    formatted_text = re.sub(r'(\(.*?\))\s*(\w)', capitalize_after_parentheses, formatted_text)
+    text = re.sub(r'(\(.*?\))\s*(\w)', capitalize_after_parentheses, text)
 
     # Capitalize first letter of each word unless it's an acronym
     def capitalize_acronyms(word):
@@ -94,7 +108,7 @@ def format_text(input_text):
         return word
 
     # Split text by '/' and process each part separately
-    parts = [part.strip() for part in formatted_text.split('/')]
+    parts = [part.strip() for part in text.split('/')]
     capitalized_parts = []
 
     for part in parts:
@@ -128,10 +142,10 @@ def clean_whitespace(text):
     return re.sub(r'\s+', ' ', text.strip())
 
 
-def get_teams_from_firestore():
+def get_teams_from_firestore(club_id):
     try:
         teams_collection = (db.collection('clubs')
-                            .document('patriciafc').collection('MatchDayBannerForClub'))
+                            .document(club_id).collection('MatchDayBannerForClub'))
         docs = teams_collection.stream()
         teams_names = []
         for doc in docs:
@@ -146,90 +160,101 @@ def get_teams_from_firestore():
         return []
 
 
-teams = get_teams_from_firestore()
+teams = get_teams_from_firestore(club_identifier)
 team_names = [team['team_name'].lower() for team in teams]  # List of team names for comparison
 
+for match_url in upcoming_match_urls:
+    try:
+        driver.get(match_url)
 
-for url in urls:
-    driver.get(url)
-    (WebDriverWait(driver, 10)
-     .until(ec.presence_of_element_located((By.TAG_NAME, "table"))))
-    html = driver.page_source
-    soup = BeautifulSoup(html, 'html.parser')
-    fixtures_table = soup.find('table')
+        WebDriverWait(driver, 10).until(ec.presence_of_element_located((By.TAG_NAME, "table")))
 
-    if fixtures_table:
-        rows = fixtures_table.find_all('tr')[1:]
+        html = driver.page_source
 
-        for row in rows:
-            if id_counter > max_fixtures:
-                break
+        soup = BeautifulSoup(html, 'html.parser')
 
-            columns = row.find_all('td')
-            if len(columns) >= 10:
-                match_type = columns[0].text.strip()
-                date_time = columns[1].text.strip()
-                home_team = format_text(columns[2].text)
-                away_team = format_text(columns[6].text)
-                venue = columns[7].text.strip()
-                competition = columns[8].text.strip()
+        fixtures_table = soup.find('table')
 
-                venue = format_text(venue)
-                competition = format_text(competition)
-                match_type = format_text(match_type)
+        if fixtures_table:
+            rows = fixtures_table.find_all('tr')[1:]
 
-                venue = check_parenthesis_balance(venue)
-                home_team = add_space_after_parenthesis(home_team)
-                away_team = add_space_after_parenthesis(away_team)
+            for row in rows:
+                if id_counter > max_fixtures:
+                    break
 
-                if home_team.lower() in team_names or away_team.lower() in team_names:
-                    date_time = ' '.join(date_time.split())
+                columns = row.find_all('td')
+                if len(columns) >= 10:
+                    match_type = columns[0].text.strip()
+                    date_time = columns[1].text.strip()
+                    home_team = format_text(columns[2].text)
+                    away_team = format_text(columns[6].text)
+                    venue = columns[7].text.strip()
+                    competition = columns[8].text.strip()
 
-                    if ' ' in date_time:
-                        match_date_str, match_time_str = date_time.split(' ', 1)
-                    else:
-                        match_date_str = date_time
-                        match_time_str = ""
+                    venue = format_text(venue)
+                    competition = format_text(competition)
+                    match_type = format_text(match_type)
 
-                    try:
-                        match_datetime = (
-                            datetime.strptime(f"{match_date_str} "
-                                              f"{match_time_str}", "%d/%m/%y %H:%M"))
-                    except ValueError:
-                        print(f"Date parsing error for match: "
-                              f"{home_team} vs {away_team} on {date_time}")
-                        continue
+                    venue = check_parenthesis_balance(venue)
+                    home_team = add_space_after_parenthesis(home_team)
+                    away_team = add_space_after_parenthesis(away_team)
 
-                    match_date = match_datetime.strftime("%d-%m-%Y %H:%M:%S")
-                    match_date_three = match_datetime.strftime("%j %H:%M")
-                    match_date_two = match_datetime.strftime("%d/%m/%Y %H:%M:%S")
-                    match_day_ko = match_datetime.strftime("%A, %I:%M%p")
+                    if home_team.lower() in team_names or away_team.lower() in team_names:
+                        date_time = ' '.join(date_time.split())
 
-                    match_data = {
-                        'away_team': away_team,
-                        'away_team_icon': 'https://example.com/away_team_icon.jpg',
-                        'home_team': home_team,
-                        'home_team_icon': 'https://example.com/home_team_icon.jpg',
-                        'id': id_counter,
-                        'match_date': match_date,
-                        'match_date_three': match_date_three,
-                        'match_date_two': match_date_two,
-                        'match_day_ko': match_day_ko,
-                        'venue': venue,
-                        'competition': competition,
-                    }
+                        if ' ' in date_time:
+                            match_date_str, match_time_str = date_time.split(' ', 1)
+                        else:
+                            match_date_str = date_time
+                            match_time_str = ""
 
-                    try:
-                        doc_ref = (db.collection('clubs').document('patriciafc')
-                                   .collection('UpcomingMatches').document(f"match_{id_counter}"))
-                        doc_ref.set(match_data)
-                        print(f"Data successfully written to Firestore: {match_data}")
-                    except Exception as e:
-                        print(f"Error writing data to Firestore: {e}")
+                        try:
+                            match_datetime = (
+                                datetime.strptime(f"{match_date_str} "
+                                                  f"{match_time_str}", "%d/%m/%y %H:%M"))
+                        except ValueError:
+                            print(f"Date parsing error for match: "
+                                  f"{home_team} vs {away_team} on {date_time}")
+                            continue
 
-                    id_counter += 1
+                        match_date = match_datetime.strftime("%d-%m-%Y %H:%M:%S")
+                        match_date_three = match_datetime.strftime("%j %H:%M")
+                        match_date_two = match_datetime.strftime("%d/%m/%Y %H:%M:%S")
+                        match_day_ko = match_datetime.strftime("%A, %I:%M%p")
 
-    else:
-        print(f"No fixtures found on the page for URL: {url}")
+                        match_data = {
+                            'away_team': away_team,
+                            'away_team_icon': 'https://example.com/away_team_icon.jpg',
+                            'home_team': home_team,
+                            'home_team_icon': 'https://example.com/home_team_icon.jpg',
+                            'id': id_counter,
+                            'match_date': match_date,
+                            'match_date_three': match_date_three,
+                            'match_date_two': match_date_two,
+                            'match_day_ko': match_day_ko,
+                            'venue': venue,
+                            'competition': competition,
+                        }
+
+                        try:
+                            doc_ref = (db.collection('clubs').document(club_identifier)
+                            .collection('UpcomingMatcheees').document(
+                                f"match_{id_counter}"))
+                            doc_ref.set(match_data)
+                            print(f"Data successfully written to Firestore: {match_data}")
+                        except Exception as e:
+                            print(f"Error writing data to Firestore: {e}")
+
+                        id_counter += 1
+
+        else:
+            print(f"No fixtures found on the page for URL: {match_url}")
+
+    except Exception as e:
+        print(f"Error processing URL {match_url}: {e}")
+        continue
+
+    if id_counter > max_fixtures:
+        break
 
 driver.quit()

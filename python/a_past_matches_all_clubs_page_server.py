@@ -25,12 +25,35 @@ chrome_options.add_argument("--headless")  # Run in headless mode (no GUI)
 service = Service('/opt/homebrew/bin/chromedriver')
 driver = webdriver.Chrome(service=service, options=chrome_options)
 
-# List of URLs to fetch data from
-urls = [
-    'https://fulltime.thefa.com/results/1/50.html'
-    '?selectedSeason=548186171&selectedFixtureGroupAgeGroup=0'
-    '&previousSelectedFixtureGroupAgeGroup=&selectedFixtureGroupKey=',
-]
+# Use the desired club identifier here
+club_identifier = 'patriciafc'
+
+
+def get_past_matches_all_clubs_links(club_id):
+    try:
+        past_matches_all_clubs_links_doc_ref = db.collection('clubs').document(club_id).collection(
+            'ScrapedMatchesLinks').document('past_matches_all_clubs_links')
+        past_matches_all_clubs_links_doc = past_matches_all_clubs_links_doc_ref.get()
+
+        if not past_matches_all_clubs_links_doc.exists:
+            print(f"No upcoming matches document found for club_id: {club_id}")
+            return []
+
+        doc_data = past_matches_all_clubs_links_doc.to_dict()
+        match_urls = [value.strip() for key, value in doc_data.items() if
+                      key.startswith('sc_link_') and isinstance(value, str) and value.strip()]
+        return match_urls
+
+    except Exception as fetch_exc:
+        print(f"Error fetching upcoming match links: {fetch_exc}")
+        return []
+
+
+past_matches_all_club_links_urls = get_past_matches_all_clubs_links(club_identifier)
+
+if not past_matches_all_club_links_urls:
+    print(f"No upcoming match links found for club_id: {club_identifier}")
+    sys.exit(1)
 
 # Auto-incrementing ID
 id_counter = 1
@@ -117,7 +140,7 @@ def check_parenthesis_balance(text):
 
 
 # Loop through each URL
-for url in urls:
+for url in past_matches_all_club_links_urls:
     driver.get(url)
 
     # Wait for the table to be present
