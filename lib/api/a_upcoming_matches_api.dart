@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-
 import '../model/a_upcoming_matches_model.dart';
 import '../notifier/a_club_global_notifier.dart';
 import '../notifier/a_upcoming_matches_notifier.dart';
@@ -34,9 +33,16 @@ Future<void> getUpcomingMatches(
 
   const String defaultImage = 'assets/images/no_club_icon_default.jpeg';
 
+  DateTime now = DateTime.now();
+
   // Loop through each upcoming match
   for (var document in snapshot.docs) {
     UpcomingMatches upcomingMatch = UpcomingMatches.fromMap(document.data() as Map<String, dynamic>);
+
+    // Filter out past matches
+    if (upcomingMatch.matchDate != null && upcomingMatch.matchDate!.isBefore(now)) {
+      continue; // Skip past matches
+    }
 
     // Check if home team matches any banner team name
     bool homeTeamMatched = false;

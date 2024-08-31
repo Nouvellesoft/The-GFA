@@ -1,8 +1,10 @@
+import 'package:intl/intl.dart';
+
 class UpcomingMatchesForAllClubs {
   String? homeTeam;
   String? awayTeam;
   String? venue;
-  String? matchDate;
+  DateTime? matchDate;
   String? matchDayKickOff;
   String? homeTeamIcon;
   String? awayTeamIcon;
@@ -26,7 +28,7 @@ class UpcomingMatchesForAllClubs {
     homeTeam = data['home_team'];
     awayTeam = data['away_team'];
     venue = data['venue'];
-    matchDate = data['match_date'];
+    matchDate = DateFormat('dd-MM-yyyy HH:mm:ss').parse(data['match_date']);
     matchDayKickOff = data['match_day_ko'];
     homeTeamIcon = data['home_team_icon'];
     awayTeamIcon = data['away_team_icon'];

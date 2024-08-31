@@ -218,12 +218,12 @@ class AnimCardState extends State<AnimCard> {
                           crossAxisAlignment: CrossAxisAlignment.center,
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
-                            Text(upcomingMatchesNotifier.upcomingMatchesList[widget.index].matchDate!,
-                                style: GoogleFonts.electrolize(
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w300,
-                                  color: Colors.white54,
-                                )),
+                            // Text(upcomingMatchesNotifier.upcomingMatchesList[widget.index].matchDate!,
+                            //     style: GoogleFonts.electrolize(
+                            //       fontSize: 10,
+                            //       fontWeight: FontWeight.w300,
+                            //       color: Colors.white54,
+                            //     )),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [

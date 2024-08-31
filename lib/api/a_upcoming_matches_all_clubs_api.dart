@@ -39,9 +39,16 @@ Future<void> getUpcomingMatchesForAllClubs(
 
   const String defaultImage = 'assets/images/no_club_icon_default.jpeg';
 
+  DateTime now = DateTime.now();
+
   // Loop through each upcoming match
   for (var document in snapshot.docs) {
     UpcomingMatchesForAllClubs upcomingMatchesForAllClubs = UpcomingMatchesForAllClubs.fromMap(document.data() as Map<String, dynamic>);
+
+    // Filter out past matches
+    if (upcomingMatchesForAllClubs.matchDate != null && upcomingMatchesForAllClubs.matchDate!.isBefore(now)) {
+      continue; // Skip past matches
+    }
 
     // Check if home team matchesForAllClubs any banner team name
     bool homeTeamMatched = false;

@@ -677,6 +677,27 @@ class PlayersTablePageState extends State<PlayersTablePage> {
                                           style: TextStyle(color: Colors.white70),
                                         ),
                                       ),
+                                      Padding(
+                                        padding: EdgeInsets.all(8.0),
+                                        child: Text(
+                                          'AFC - Association Football Club',
+                                          style: TextStyle(color: Colors.white70),
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: EdgeInsets.all(8.0),
+                                        child: Text(
+                                          'Res - Reserves',
+                                          style: TextStyle(color: Colors.white70),
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: EdgeInsets.all(8.0),
+                                        child: Text(
+                                          'ST - Saint',
+                                          style: TextStyle(color: Colors.white70),
+                                        ),
+                                      ),
                                     ],
                                   ),
                                 ),

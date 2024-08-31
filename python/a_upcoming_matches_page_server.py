@@ -26,8 +26,22 @@ chrome_options.add_argument("--headless")  # Run in headless mode (no GUI)
 service = Service('/opt/homebrew/bin/chromedriver')
 driver = webdriver.Chrome(service=service, options=chrome_options)
 
-# Change this to the desired club identifier
-club_identifier = 'patriciafc'
+# Constants
+MAX_FIXTURES = 150
+BATCH_SIZE = 500
+
+# List of acronyms that should remain fully capitalized
+ACRONYMS = ['FISSC', 'AFC', 'FC', 'OBS', 'ST', '1ST']
+SPECIAL_TERMS = ["F.C", "A.C", "S.C", "C.F", "U.F"]
+
+
+def get_all_club_ids():
+    try:
+        clubs = db.collection('clubs').stream()
+        return [club.id for club in clubs]
+    except Exception as ex:
+        print(f"Error fetching club IDs: {ex}")
+        return []
 
 
 def get_upcoming_match_links(club_id):
@@ -54,73 +68,43 @@ def get_upcoming_match_links(club_id):
         return []
 
 
-# Get URLs from Firestore
-upcoming_match_urls = get_upcoming_match_links(club_identifier)
-
-if not upcoming_match_urls:
-    print(f"No upcoming match links found for club_id: {club_identifier}")
-    sys.exit(1)
-
-# Auto-incrementing ID
-id_counter = 1
-max_fixtures = 150
-
-# List of acronyms that should remain fully capitalized
-acronyms = ['FISSC', 'AFC', 'FC', 'OBS', 'ST', '1ST']  # Add more acronyms to this list as needed
-
-
 def format_text(text):
-    # Remove leading/trailing whitespaces and replace multiple spaces with a single space
     text = text.strip()
     text = re.sub(r'\s+', ' ', text)
 
-    # List of special terms to preserve
-    special_terms = ["F.C", "A.C", "S.C", "C.F", "U.F"]
-
-    # Function to preserve special terms in the text
     def preserve_special_terms(texting):
-        for term in special_terms:
+        for term in SPECIAL_TERMS:
             texting = texting.replace(term, f"{{{term}}}")
         return texting
 
-    # Function to revert special terms after formatting
     def revert_special_terms(texting):
-        for term in special_terms:
+        for term in SPECIAL_TERMS:
             texting = texting.replace(f"{{{term}}}", term)
         return texting
 
-    # Preserve special terms before formatting
     text = preserve_special_terms(text)
 
-    # Capitalize text after parentheses
     def capitalize_after_parentheses(match):
         return match.group(1) + match.group(2).capitalize()
 
-    # Regex to find text after parentheses and capitalize it
     text = re.sub(r'(\(.*?\))\s*(\w)', capitalize_after_parentheses, text)
 
-    # Capitalize first letter of each word unless it's an acronym
     def capitalize_acronyms(word):
         match = re.match(r'\b\w+\b', word)
         if match:
             word = match.group()
-            return word.upper() if word.upper() in acronyms else word.capitalize()
+            return word.upper() if word.upper() in ACRONYMS else word.capitalize()
         return word
 
-    # Split text by '/' and process each part separately
     parts = [part.strip() for part in text.split('/')]
     capitalized_parts = []
 
     for part in parts:
-        # Capitalize each word or acronym
         words = part.split()
         capitalized_words = [capitalize_acronyms(word) for word in words]
         capitalized_parts.append(' '.join(capitalized_words))
 
-    # Join the parts with '/' ensuring no extra spaces around slashes
     formatted_text = '/'.join(capitalized_parts)
-
-    # Revert special terms to their original formatting
     formatted_text = revert_special_terms(formatted_text)
 
     return formatted_text
@@ -160,101 +144,127 @@ def get_teams_from_firestore(club_id):
         return []
 
 
-teams = get_teams_from_firestore(club_identifier)
-team_names = [team['team_name'].lower() for team in teams]  # List of team names for comparison
+def process_club(club_id):
+    upcoming_match_urls = get_upcoming_match_links(club_id)
+    if not upcoming_match_urls:
+        print(f"No upcoming match links found for club_id: {club_id}")
+        return
 
-for match_url in upcoming_match_urls:
-    try:
-        driver.get(match_url)
+    teams = get_teams_from_firestore(club_id)
+    team_names = [team['team_name'].lower() for team in teams]
 
-        WebDriverWait(driver, 10).until(ec.presence_of_element_located((By.TAG_NAME, "table")))
+    id_counter = 1
+    batch = db.batch()
+    fixtures_processed = 0
 
-        html = driver.page_source
+    for match_url in upcoming_match_urls:
+        try:
+            driver.get(match_url)
 
-        soup = BeautifulSoup(html, 'html.parser')
+            WebDriverWait(driver, 10).until(
+                ec.presence_of_element_located((By.TAG_NAME, "table")))
 
-        fixtures_table = soup.find('table')
+            html = driver.page_source
+            soup = BeautifulSoup(html, 'html.parser')
+            fixtures_table = soup.find('table')
 
-        if fixtures_table:
-            rows = fixtures_table.find_all('tr')[1:]
+            if fixtures_table:
+                rows = fixtures_table.find_all('tr')[1:]
 
-            for row in rows:
-                if id_counter > max_fixtures:
-                    break
+                for row in rows:
+                    if fixtures_processed >= MAX_FIXTURES:
+                        break
 
-                columns = row.find_all('td')
-                if len(columns) >= 10:
-                    match_type = columns[0].text.strip()
-                    date_time = columns[1].text.strip()
-                    home_team = format_text(columns[2].text)
-                    away_team = format_text(columns[6].text)
-                    venue = columns[7].text.strip()
-                    competition = columns[8].text.strip()
+                    columns = row.find_all('td')
+                    if len(columns) >= 10:
+                        # match_type = format_text(columns[0].text.strip())
+                        date_time = columns[1].text.strip()
+                        home_team = add_space_after_parenthesis(format_text(columns[2].text))
+                        away_team = add_space_after_parenthesis(format_text(columns[6].text))
+                        venue = check_parenthesis_balance(format_text(columns[7].text.strip()))
+                        competition = format_text(columns[8].text.strip())
 
-                    venue = format_text(venue)
-                    competition = format_text(competition)
-                    match_type = format_text(match_type)
+                        if home_team.lower() in team_names or away_team.lower() in team_names:
+                            date_time = ' '.join(date_time.split())
 
-                    venue = check_parenthesis_balance(venue)
-                    home_team = add_space_after_parenthesis(home_team)
-                    away_team = add_space_after_parenthesis(away_team)
+                            if ' ' in date_time:
+                                match_date_str, match_time_str = (
+                                    date_time.split(' ', 1))
+                            else:
+                                match_date_str = date_time
+                                match_time_str = ""
 
-                    if home_team.lower() in team_names or away_team.lower() in team_names:
-                        date_time = ' '.join(date_time.split())
+                            try:
+                                match_datetime = datetime.strptime(
+                                    f"{match_date_str} {match_time_str}",
+                                    "%d/%m/%y %H:%M")
+                            except ValueError:
+                                print(
+                                    f"Date parsing error for match: "
+                                    f"{home_team} vs {away_team} on {date_time}")
+                                continue
 
-                        if ' ' in date_time:
-                            match_date_str, match_time_str = date_time.split(' ', 1)
-                        else:
-                            match_date_str = date_time
-                            match_time_str = ""
+                            match_date = match_datetime.strftime("%d-%m-%Y %H:%M:%S")
+                            match_date_three = match_datetime.strftime("%j %H:%M")
+                            match_date_two = match_datetime.strftime("%d/%m/%Y %H:%M:%S")
+                            match_day_ko = match_datetime.strftime("%A, %I:%M%p")
 
-                        try:
-                            match_datetime = (
-                                datetime.strptime(f"{match_date_str} "
-                                                  f"{match_time_str}", "%d/%m/%y %H:%M"))
-                        except ValueError:
-                            print(f"Date parsing error for match: "
-                                  f"{home_team} vs {away_team} on {date_time}")
-                            continue
+                            match_data = {
+                                'away_team': away_team,
+                                'away_team_icon': 'https://example.com/away_team_icon.jpg',
+                                'home_team': home_team,
+                                'home_team_icon': 'https://example.com/home_team_icon.jpg',
+                                'id': id_counter,
+                                'match_date': match_date,
+                                'match_date_three': match_date_three,
+                                'match_date_two': match_date_two,
+                                'match_day_ko': match_day_ko,
+                                'venue': venue,
+                                'competition': competition,
+                            }
 
-                        match_date = match_datetime.strftime("%d-%m-%Y %H:%M:%S")
-                        match_date_three = match_datetime.strftime("%j %H:%M")
-                        match_date_two = match_datetime.strftime("%d/%m/%Y %H:%M:%S")
-                        match_day_ko = match_datetime.strftime("%A, %I:%M%p")
-
-                        match_data = {
-                            'away_team': away_team,
-                            'away_team_icon': 'https://example.com/away_team_icon.jpg',
-                            'home_team': home_team,
-                            'home_team_icon': 'https://example.com/home_team_icon.jpg',
-                            'id': id_counter,
-                            'match_date': match_date,
-                            'match_date_three': match_date_three,
-                            'match_date_two': match_date_two,
-                            'match_day_ko': match_day_ko,
-                            'venue': venue,
-                            'competition': competition,
-                        }
-
-                        try:
-                            doc_ref = (db.collection('clubs').document(club_identifier)
-                            .collection('UpcomingMatcheees').document(
+                            doc_ref = (db.collection('clubs').document(club_id)
+                                       .collection('UpcomingMatches').document(
                                 f"match_{id_counter}"))
-                            doc_ref.set(match_data)
-                            print(f"Data successfully written to Firestore: {match_data}")
-                        except Exception as e:
-                            print(f"Error writing data to Firestore: {e}")
+                            batch.set(doc_ref, match_data)
 
-                        id_counter += 1
+                            id_counter += 1
+                            fixtures_processed += 1
 
-        else:
-            print(f"No fixtures found on the page for URL: {match_url}")
+                            if fixtures_processed % BATCH_SIZE == 0:
+                                batch.commit()
+                                batch = db.batch()
+                                print(
+                                    f"Committed batch for {club_id}. "
+                                    f"Processed {fixtures_processed} fixtures.")
 
-    except Exception as e:
-        print(f"Error processing URL {match_url}: {e}")
-        continue
+                    if fixtures_processed >= MAX_FIXTURES:
+                        break
+            else:
+                print(f"No fixtures found on the page for URL: {match_url}")
 
-    if id_counter > max_fixtures:
-        break
+        except Exception as exc:
+            print(f"Error processing URL {match_url} for club {club_id}: {exc}")
+            continue
 
-driver.quit()
+        if fixtures_processed >= MAX_FIXTURES:
+            break
+
+    # Commit any remaining fixtures in the batch
+    if fixtures_processed % BATCH_SIZE != 0:
+        batch.commit()
+        print(f"Final batch commit for {club_id}. Total processed: {fixtures_processed} fixtures.")
+
+
+def main():
+    club_ids = get_all_club_ids()
+    for club_id in club_ids:
+        print(f"Processing club: {club_id}")
+        process_club(club_id)
+
+    # Close the WebDriver
+    driver.quit()
+
+
+if __name__ == "__main__":
+    main()
