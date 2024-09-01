@@ -2,6 +2,7 @@ import 'dart:collection';
 
 import 'package:flutter/cupertino.dart';
 
+import '../api/c_match_day_banner_for_location_api.dart';
 import '../model/c_match_day_banner_for_locations_model.dart';
 
 class MatchDayBannerForLocationNotifier with ChangeNotifier {
@@ -20,5 +21,16 @@ class MatchDayBannerForLocationNotifier with ChangeNotifier {
   set currentMatchDayBannerForLocation(MatchDayBannerForLocation matchDayBannerForLocation) {
     _currentMatchDayBannerForLocation = matchDayBannerForLocation;
     notifyListeners();
+  }
+
+  Future<void> refreshLocations(String clubId) async {
+    await getMatchDayBannerForLocation(this, clubId);
+    notifyListeners();
+  }
+
+  // Define the addMatchDayBannerForLocation method
+  void addMatchDayBannerForLocation(MatchDayBannerForLocation matchDayBannerForLocation) {
+    _matchDayBannerForLocationList.add(matchDayBannerForLocation);
+    notifyListeners(); // Notify listeners after adding a new location
   }
 }

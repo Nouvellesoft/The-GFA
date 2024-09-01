@@ -11,6 +11,8 @@ import 'package:material_design_icons_flutter/material_design_icons_flutter.dart
 import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_core/theme.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
+import 'package:the_gfa/api/b_training_days_api.dart';
+import 'package:the_gfa/notifier/b_training_days_notifier.dart';
 import 'package:toast/toast.dart';
 
 import '/details_pages/second_team_details_page.dart';
@@ -335,10 +337,18 @@ class PlayersTablePageState extends State<PlayersTablePage> {
       });
     });
 
+    TrainingDaysNotifier trainingDaysNotifier = Provider.of<TrainingDaysNotifier>(context, listen: false);
+    _fetchTrainingDaysNotifier(trainingDaysNotifier);
+
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
+  }
+
+  Future<void> _fetchTrainingDaysNotifier(TrainingDaysNotifier trainingDaysNotifier) async {
+    await getTrainingDays(trainingDaysNotifier, widget.clubId);
+    setState(() {}); // Refresh the UI if needed
   }
 
   Future<void> fetchVisibilitySettings() async {
@@ -390,6 +400,8 @@ class PlayersTablePageState extends State<PlayersTablePage> {
 
     // final useMaterial3 = Theme.of(context).useMaterial3;
     // final borderRadius = useMaterial3 ? const BorderRadius.all(Radius.circular(16)) : const BorderRadius.all(Radius.circular(4));
+
+    TrainingDaysNotifier trainingDaysNotifier = Provider.of<TrainingDaysNotifier>(context);
 
     return PopScope(
       onPopInvokedWithResult: (didPop, result) async {
@@ -750,35 +762,44 @@ class PlayersTablePageState extends State<PlayersTablePage> {
                                     borderRadius: BorderRadius.circular(14),
                                   ),
                                   child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Text.rich(
-                                      TextSpan(
-                                        children: <InlineSpan>[
-                                          TextSpan(
-                                            text: 'Thursdays\n',
-                                            style: GoogleFonts.aldrich(
-                                              color: Colors.white70,
-                                              fontSize: 17,
-                                              fontWeight: FontWeight.w700,
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: ListView.builder(
+                                        itemCount: trainingDaysNotifier.trainingDaysList.length,
+                                        itemBuilder: (context, index) {
+                                          final trainingDay = trainingDaysNotifier.trainingDaysList[index];
+                                          return Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Text.rich(
+                                              TextSpan(
+                                                children: <InlineSpan>[
+                                                  TextSpan(
+                                                    text: '${trainingDay.day}\n',
+                                                    style: GoogleFonts.aldrich(
+                                                      color: Colors.white70,
+                                                      fontSize: 17,
+                                                      fontWeight: FontWeight.w700,
+                                                    ),
+                                                  ),
+                                                  const WidgetSpan(
+                                                    alignment: PlaceholderAlignment.middle,
+                                                    child: Icon(Icons.loyalty, color: Colors.blueAccent, size: 14),
+                                                  ),
+                                                  TextSpan(
+                                                    text:
+                                                        ' At ${trainingDay.location}, ${trainingDay.postCode} [${formatTimeTo12Hour(trainingDay.fromTime ?? '')} - ${formatTimeTo12Hour(trainingDay.toTime ?? '')}].',
+                                                    style: GoogleFonts.aldrich(
+                                                      color: Colors.white70,
+                                                      fontSize: 14,
+                                                      fontWeight: FontWeight.w300,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                              textAlign: TextAlign.justify,
                                             ),
-                                          ),
-                                          const WidgetSpan(
-                                            alignment: PlaceholderAlignment.middle, // Aligns the icon with the text
-                                            child: Icon(Icons.loyalty, color: Colors.blueAccent, size: 14), // Your icon here
-                                          ),
-                                          TextSpan(
-                                            text: ' At The Alan Higgs Centre, Allard Way, Coventry CV3 1HW [8pm - 10pm].',
-                                            style: GoogleFonts.aldrich(
-                                              color: Colors.white70,
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w300,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      textAlign: TextAlign.justify,
-                                    ),
-                                  ),
+                                          );
+                                        },
+                                      )),
                                 ),
                               ),
                               TextButton(
@@ -1197,4 +1218,19 @@ Future navigateToFifthTeamClassDetailsPage(context, String clubId) async {
 
 Future navigateToSixthTeamClassDetailsPage(context, String clubId) async {
   Navigator.push(context, MaterialPageRoute(builder: (context) => SixthTeamClassDetailsPage(clubId: clubId)));
+}
+
+String formatTimeTo12Hour(String time24) {
+  if (time24.isEmpty) return 'N/A';
+
+  final parts = time24.split(':');
+  if (parts.length != 2) return 'Invalid time format'; // Handle unexpected format
+
+  final hour24 = int.tryParse(parts[0]) ?? 0;
+  final minute = parts[1];
+
+  final isPM = hour24 >= 12;
+  final hour12 = hour24 % 12 == 0 ? 12 : hour24 % 12;
+
+  return '$hour12:$minute ${isPM ? 'PM' : 'AM'}';
 }

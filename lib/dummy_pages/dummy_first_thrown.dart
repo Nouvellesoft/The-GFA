@@ -5,10 +5,10 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 import '../../api/a_upcoming_matches_api.dart';
+import '../../notifier/a_club_global_notifier.dart';
 import '../../notifier/a_upcoming_matches_notifier.dart';
 import '../../notifier/c_match_day_banner_for_club_notifier.dart';
 import '../../notifier/c_match_day_banner_for_club_opp_notifier.dart';
-import '../../notifier/a_club_global_notifier.dart';
 import '../bottom_nav_stats_pages/matches_page/a_past_matches_page.dart';
 
 Color nabColor = const Color.fromRGBO(56, 56, 60, 1);
@@ -31,11 +31,11 @@ class UpcomingMatchesPageState extends State<UpcomingMatchesPage> with TickerPro
   String results = 'Results';
 
   Future<void> _fetchUpcomingMatchesAndUpdateNotifier(
-      UpcomingMatchesNotifier upcomingMatchesNotifier,
-      MatchDayBannerForClubNotifier matchDayBannerForClubNotifier,
-      MatchDayBannerForClubOppNotifier matchDayBannerForClubOppNotifier,
-      ClubGlobalProvider clubGlobalProvider,
-      ) async {
+    UpcomingMatchesNotifier upcomingMatchesNotifier,
+    MatchDayBannerForClubNotifier matchDayBannerForClubNotifier,
+    MatchDayBannerForClubOppNotifier matchDayBannerForClubOppNotifier,
+    ClubGlobalProvider clubGlobalProvider,
+  ) async {
     await getUpcomingMatches(
         upcomingMatchesNotifier, matchDayBannerForClubNotifier, matchDayBannerForClubOppNotifier, clubGlobalProvider, widget.clubId);
 
@@ -150,7 +150,7 @@ class AnimCardState extends State<AnimCard> {
                 widget.num,
                 widget.numEng,
                 widget.content,
-                    () {
+                () {
                   setState(() {
                     padding = padding == 10 ? 120.0 : 0.0;
                     bottomPadding = bottomPadding == 0 ? 120 : 0.0;
@@ -192,7 +192,7 @@ class AnimCardState extends State<AnimCard> {
                                 decoration: BoxDecoration(
                                     borderRadius: const BorderRadius.all(Radius.circular(5)),
                                     image: DecorationImage(
-                                      // image: CachedNetworkImageProvider(upcomingMatchesNotifier.upcomingMatchesList[widget.index].homeTeamIcon!),
+                                        // image: CachedNetworkImageProvider(upcomingMatchesNotifier.upcomingMatchesList[widget.index].homeTeamIcon!),
                                         image: homeTeamIcon.startsWith('assets/')
                                             ? AssetImage(homeTeamIcon) as ImageProvider
                                             : CachedNetworkImageProvider(homeTeamIcon),
@@ -215,34 +215,34 @@ class AnimCardState extends State<AnimCard> {
                     ),
                     Center(
                         child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        // Text(upcomingMatchesNotifier.upcomingMatchesList[widget.index].matchDate!,
+                        //     style: GoogleFonts.electrolize(
+                        //       fontSize: 10,
+                        //       fontWeight: FontWeight.w300,
+                        //       color: Colors.white54,
+                        //     )),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            // Text(upcomingMatchesNotifier.upcomingMatchesList[widget.index].matchDate!,
-                            //     style: GoogleFonts.electrolize(
-                            //       fontSize: 10,
-                            //       fontWeight: FontWeight.w300,
-                            //       color: Colors.white54,
-                            //     )),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                SizedBox(
-                                  width: MediaQuery.of(context).size.width * 0.3,
-                                  child: Text(
-                                    upcomingMatchesNotifier.upcomingMatchesList[widget.index].matchDayKickOff!,
-                                    style: GoogleFonts.jura(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w800,
-                                      color: Colors.white,
-                                    ),
-                                    textAlign: TextAlign.center,
-                                  ),
+                            SizedBox(
+                              width: MediaQuery.of(context).size.width * 0.3,
+                              child: Text(
+                                upcomingMatchesNotifier.upcomingMatchesList[widget.index].matchDayKickOff!,
+                                style: GoogleFonts.jura(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w800,
+                                  color: Colors.white,
                                 ),
-                              ],
+                                textAlign: TextAlign.center,
+                              ),
                             ),
                           ],
-                        )),
+                        ),
+                      ],
+                    )),
                     SingleChildScrollView(
                       child: Column(
                         mainAxisSize: MainAxisSize.max,
@@ -261,7 +261,7 @@ class AnimCardState extends State<AnimCard> {
                                 decoration: BoxDecoration(
                                     borderRadius: const BorderRadius.all(Radius.circular(5)),
                                     image: DecorationImage(
-                                      // image: CachedNetworkImageProvider(upcomingMatchesNotifier.upcomingMatchesList[widget.index].awayTeamIcon!),
+                                        // image: CachedNetworkImageProvider(upcomingMatchesNotifier.upcomingMatchesList[widget.index].awayTeamIcon!),
                                         image: awayTeamIcon.startsWith('assets/')
                                             ? AssetImage(awayTeamIcon) as ImageProvider
                                             : CachedNetworkImageProvider(awayTeamIcon),

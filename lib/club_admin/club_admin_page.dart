@@ -8,6 +8,8 @@ import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:the_gfa/club_admin/others/change_training_days_page.dart';
+import 'package:the_gfa/club_admin/others/change_trial_dates_page.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '/api/club_sponsors_api.dart';
@@ -35,6 +37,7 @@ import '../api/management_body_api.dart';
 import '../api/second_team_class_api.dart';
 import '../api/sixth_team_class_api.dart';
 import '../api/third_team_class_api.dart';
+import '../notifier/a_club_global_notifier.dart';
 import '../notifier/all_club_members_notifier.dart';
 import '../notifier/all_fc_teams_notifier.dart';
 import '../notifier/c_match_day_banner_for_club_notifier.dart';
@@ -42,7 +45,6 @@ import '../notifier/c_match_day_banner_for_club_opp_notifier.dart';
 import '../notifier/c_match_day_banner_for_league_notifier.dart';
 import '../notifier/c_match_day_banner_for_location_notifier.dart';
 import '../notifier/club_captains_notifier.dart';
-import '../notifier/a_club_global_notifier.dart';
 import '../notifier/coaching_staff_notifier.dart';
 import '../notifier/fifth_team_class_notifier.dart';
 import '../notifier/first_team_class_notifier.dart';
@@ -799,7 +801,7 @@ class MyClubAdminPageState extends State<MyClubAdminPage> {
                                       onTap: () {
                                         Navigator.pop(context); // Close the dialog
                                         // Show the confirmation dialog
-                                        showConfirmationDialog(context);
+                                        showConfirmationDialogForStatementGeneration(context);
                                       },
                                     ),
                                     ListTile(
@@ -810,6 +812,26 @@ class MyClubAdminPageState extends State<MyClubAdminPage> {
                                       onTap: () {
                                         Navigator.pop(context); // Close the dialog
                                         fetchAndNavigateToViewClubPopulation(context);
+                                      },
+                                    ),
+                                    ListTile(
+                                      title: const Text(
+                                        "Record Training Days",
+                                        style: TextStyle(color: Colors.blue, fontSize: 13),
+                                      ),
+                                      onTap: () {
+                                        Navigator.pop(context); // Close the dialog
+                                        fetchAndNavigateToRecordTrainingDays(context);
+                                      },
+                                    ),
+                                    ListTile(
+                                      title: const Text(
+                                        "Record Trial Dates",
+                                        style: TextStyle(color: Colors.blue, fontSize: 13),
+                                      ),
+                                      onTap: () {
+                                        Navigator.pop(context); // Close the dialog
+                                        fetchAndNavigateToRecordTrialDates(context);
                                       },
                                     ),
                                     ListTile(
@@ -1263,9 +1285,19 @@ class MyClubAdminPageState extends State<MyClubAdminPage> {
     navigateToViewClubPopulation(context, widget.clubId);
     setState(() {});
   }
+
+  Future<void> fetchAndNavigateToRecordTrainingDays(BuildContext context) async {
+    navigateToRecordTrainingDays(context, widget.clubId);
+    setState(() {});
+  }
+
+  Future<void> fetchAndNavigateToRecordTrialDates(BuildContext context) async {
+    navigateToRecordTrialDates(context, widget.clubId);
+    setState(() {});
+  }
 }
 
-void showConfirmationDialog(BuildContext context) {
+void showConfirmationDialogForStatementGeneration(BuildContext context) {
   showDialog(
     context: context,
     builder: (BuildContext context) {
@@ -1418,6 +1450,14 @@ Future navigateToRecordClubAchievement(BuildContext context, String clubId) asyn
 
 Future navigateToViewClubPopulation(BuildContext context, String clubId) async {
   Navigator.push(context, MaterialPageRoute(builder: (context) => MyViewClubPopulationPage(clubId: clubId)));
+}
+
+Future navigateToRecordTrainingDays(BuildContext context, String clubId) async {
+  Navigator.push(context, MaterialPageRoute(builder: (context) => MyChangeTrainingDaysPage(clubId: clubId)));
+}
+
+Future navigateToRecordTrialDates(BuildContext context, String clubId) async {
+  Navigator.push(context, MaterialPageRoute(builder: (context) => MyChangeTrialDatesPage(clubId: clubId)));
 }
 
 Future navigateMyApp(context) async {

@@ -13,6 +13,7 @@ import 'package:provider/provider.dart';
 import 'package:the_gfa/home_page/club_lists.dart';
 import 'package:the_gfa/notifier/a_club_global_notifier.dart';
 import 'package:the_gfa/notifier/a_past_matches_all_clubs_notifier.dart';
+import 'package:the_gfa/notifier/b_training_days_notifier.dart';
 import 'package:the_gfa/notifier/fifth_team_class_notifier.dart';
 import 'package:the_gfa/notifier/fourth_team_class_notifier.dart';
 import 'package:the_gfa/notifier/sixth_team_class_notifier.dart';
@@ -191,6 +192,9 @@ void main() async {
       ),
       ChangeNotifierProvider(
         create: (context) => PlayersTableNotifier(),
+      ),
+      ChangeNotifierProvider(
+        create: (context) => TrainingDaysNotifier(),
       ),
       ChangeNotifierProvider(
         create: (context) => ClubGlobalProvider(),
