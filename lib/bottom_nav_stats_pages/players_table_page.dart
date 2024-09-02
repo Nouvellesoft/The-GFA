@@ -12,6 +12,7 @@ import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_core/theme.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import 'package:the_gfa/api/b_training_days_api.dart';
+import 'package:the_gfa/api/b_trial_dates_api.dart';
 import 'package:the_gfa/notifier/b_training_days_notifier.dart';
 import 'package:toast/toast.dart';
 
@@ -26,6 +27,7 @@ import '../details_pages/fourth_team_details_page.dart';
 import '../details_pages/sixth_team_details_page.dart';
 import '../details_pages/third_team_details_page.dart';
 import '../model/players_table_model.dart';
+import '../notifier/b_trial_dates_notifier.dart';
 import '../notifier/fifth_team_class_notifier.dart';
 import '../notifier/first_team_class_notifier.dart';
 import '../notifier/fourth_team_class_notifier.dart';
@@ -340,6 +342,9 @@ class PlayersTablePageState extends State<PlayersTablePage> {
     TrainingDaysNotifier trainingDaysNotifier = Provider.of<TrainingDaysNotifier>(context, listen: false);
     _fetchTrainingDaysNotifier(trainingDaysNotifier);
 
+    TrialDatesNotifier trialDatesNotifier = Provider.of<TrialDatesNotifier>(context, listen: false);
+    _fetchTrialDatesNotifier(trialDatesNotifier);
+
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
@@ -348,6 +353,11 @@ class PlayersTablePageState extends State<PlayersTablePage> {
 
   Future<void> _fetchTrainingDaysNotifier(TrainingDaysNotifier trainingDaysNotifier) async {
     await getTrainingDays(trainingDaysNotifier, widget.clubId);
+    setState(() {}); // Refresh the UI if needed
+  }
+
+  Future<void> _fetchTrialDatesNotifier(TrialDatesNotifier trialDatesNotifier) async {
+    await getTrialDates(trialDatesNotifier, widget.clubId);
     setState(() {}); // Refresh the UI if needed
   }
 
@@ -402,6 +412,7 @@ class PlayersTablePageState extends State<PlayersTablePage> {
     // final borderRadius = useMaterial3 ? const BorderRadius.all(Radius.circular(16)) : const BorderRadius.all(Radius.circular(4));
 
     TrainingDaysNotifier trainingDaysNotifier = Provider.of<TrainingDaysNotifier>(context);
+    TrialDatesNotifier trialDatesNotifier = Provider.of<TrialDatesNotifier>(context);
 
     return PopScope(
       onPopInvokedWithResult: (didPop, result) async {
@@ -851,67 +862,77 @@ class PlayersTablePageState extends State<PlayersTablePage> {
                                   ),
                                   child: Padding(
                                     padding: const EdgeInsets.all(8.0),
-                                    child: Text.rich(
-                                      textAlign: TextAlign.justify,
-                                      TextSpan(
-                                        children: <InlineSpan>[
-                                          TextSpan(
-                                              text: 'Monthly\n',
-                                              style: GoogleFonts.aldrich(
-                                                color: Colors.white70,
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.w700,
-                                              )),
-                                          WidgetSpan(
-                                            alignment: PlaceholderAlignment.middle, // Aligns the icon with the text
-                                            child: Icon(MdiIcons.starFourPoints, color: Colors.blueAccent, size: 14), // Your icon here
-                                          ),
-                                          TextSpan(
-                                              text: ' Every month we hold trials on Thursdays between 8pm-10pm.\n\n',
-                                              style: GoogleFonts.aldrich(
-                                                color: Colors.white70,
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.w300,
-                                              )),
-                                          TextSpan(
-                                              text: 'Location\n',
-                                              style: GoogleFonts.aldrich(
-                                                color: Colors.white70,
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.w700,
-                                              )),
-                                          WidgetSpan(
-                                            alignment: PlaceholderAlignment.middle, // Aligns the icon with the text
-                                            child: Icon(MdiIcons.starFourPoints, color: Colors.blueAccent, size: 14), // Your icon here
-                                          ),
-                                          TextSpan(
-                                              text: ' At The Alan Higgs Centre, Allard Way, Coventry CV3 1HW.\n\n',
-                                              style: GoogleFonts.aldrich(
-                                                color: Colors.white70,
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.w300,
-                                              )),
-                                          TextSpan(
-                                              text: 'Please Note\n',
-                                              style: GoogleFonts.aldrich(
-                                                color: Colors.white70,
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.w700,
-                                              )),
-                                          WidgetSpan(
-                                            alignment: PlaceholderAlignment.middle, // Aligns the icon with the text
-                                            child: Icon(MdiIcons.starFourPoints, color: Colors.blueAccent, size: 14), // Your icon here
-                                          ),
-                                          TextSpan(
-                                              text: ' Come on time, prepare to be tested and we wish you good luck.\n\n',
-                                              style: GoogleFonts.aldrich(
-                                                color: Colors.white70,
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.w300,
-                                              )),
-                                        ],
-                                      ),
-                                    ),
+                                    child: ListView.builder(
+                                        itemCount: trialDatesNotifier.trialDatesList.length,
+                                        itemBuilder: (context, index) {
+                                          final trialDates = trialDatesNotifier.trialDatesList[index];
+                                          return Text.rich(
+                                            textAlign: TextAlign.justify,
+                                            TextSpan(
+                                              children: <InlineSpan>[
+                                                TextSpan(
+                                                    text: 'Time\n',
+                                                    style: GoogleFonts.aldrich(
+                                                      color: Colors.white70,
+                                                      fontSize: 14,
+                                                      fontWeight: FontWeight.w700,
+                                                    )),
+                                                WidgetSpan(
+                                                  alignment: PlaceholderAlignment.middle, // Aligns the icon with the text
+                                                  child: Icon(MdiIcons.starFourPoints, color: Colors.blueAccent, size: 14), // Your icon here
+                                                ),
+                                                TextSpan(
+                                                    text:
+                                                        ' The upcoming trial session will be on ${trialDates.date}, between [${formatTimeTo12Hour(trialDates.fromTime ?? '')} - ${formatTimeTo12Hour(trialDates.toTime ?? '')}].\n\n',
+                                                    style: GoogleFonts.aldrich(
+                                                      color: Colors.white70,
+                                                      fontSize: 12,
+                                                      fontWeight: FontWeight.w300,
+                                                    )),
+                                                TextSpan(
+                                                    text: 'Location\n',
+                                                    style: GoogleFonts.aldrich(
+                                                      color: Colors.white70,
+                                                      fontSize: 14,
+                                                      fontWeight: FontWeight.w700,
+                                                    )),
+                                                WidgetSpan(
+                                                  alignment: PlaceholderAlignment.middle, // Aligns the icon with the text
+                                                  child: Icon(MdiIcons.starFourPoints, color: Colors.blueAccent, size: 14), // Your icon here
+                                                ),
+                                                TextSpan(
+                                                    text: ' At ${trialDates.location}\n\n',
+                                                    style: GoogleFonts.aldrich(
+                                                      color: Colors.white70,
+                                                      fontSize: 12,
+                                                      fontWeight: FontWeight.w300,
+                                                    )),
+                                                if (trialDates.pleaseNote != null && trialDates.pleaseNote!.isNotEmpty) ...[
+                                                  TextSpan(
+                                                    text: 'Please Note\n',
+                                                    style: GoogleFonts.aldrich(
+                                                      color: Colors.white70,
+                                                      fontSize: 14,
+                                                      fontWeight: FontWeight.w700,
+                                                    ),
+                                                  ),
+                                                  WidgetSpan(
+                                                    alignment: PlaceholderAlignment.middle,
+                                                    child: Icon(MdiIcons.starFourPoints, color: Colors.blueAccent, size: 14),
+                                                  ),
+                                                  TextSpan(
+                                                    text: ' ${trialDates.pleaseNote}',
+                                                    style: GoogleFonts.aldrich(
+                                                      color: Colors.white70,
+                                                      fontSize: 12,
+                                                      fontWeight: FontWeight.w300,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ],
+                                            ),
+                                          );
+                                        }),
                                   ),
                                 ),
                               ),

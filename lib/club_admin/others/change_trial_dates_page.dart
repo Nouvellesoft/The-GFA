@@ -8,19 +8,19 @@ import '../../notifier/c_match_day_banner_for_location_notifier.dart';
 
 class MyChangeTrialDatesPage extends StatefulWidget {
   final String clubId;
+
   const MyChangeTrialDatesPage({super.key, required this.clubId});
 
   @override
-  State<MyChangeTrialDatesPage> createState() => MyChangeTrialDatesPageState();
+  State createState() => MyChangeTrialDatesPageState();
 }
 
 class MyChangeTrialDatesPageState extends State<MyChangeTrialDatesPage> {
   MatchDayBannerForLocation? selectedLocation;
   TimeOfDay? selectedFromTime;
   TimeOfDay? selectedToTime;
-  String? selectedDate;
+  DateTime? selectedDate;
   String? pleaseNote;
-  final List<String> daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
   @override
   Widget build(BuildContext context) {
@@ -75,7 +75,6 @@ class MyChangeTrialDatesPageState extends State<MyChangeTrialDatesPage> {
                       );
                     },
                   );
-
                   if (location != null) {
                     setState(() {
                       selectedLocation = location;
@@ -86,29 +85,18 @@ class MyChangeTrialDatesPageState extends State<MyChangeTrialDatesPage> {
 
               // Button for selecting a date
               ListTile(
-                title: Text(selectedDate != null ? selectedDate! : 'Select Date'),
-                trailing: const Icon(Icons.arrow_drop_down),
+                title: Text(selectedDate != null ? _formatDate(selectedDate!) : 'Select Date'),
+                trailing: const Icon(Icons.calendar_today),
                 onTap: () async {
-                  String? date = await showDialog(
+                  DateTime? picked = await showDatePicker(
                     context: context,
-                    builder: (context) {
-                      return SimpleDialog(
-                        title: const Text('Select Date'),
-                        children: daysOfWeek.map((date) {
-                          return SimpleDialogOption(
-                            onPressed: () {
-                              Navigator.pop(context, date);
-                            },
-                            child: Text(date),
-                          );
-                        }).toList(),
-                      );
-                    },
+                    initialDate: selectedDate ?? DateTime.now(),
+                    firstDate: DateTime.now(),
+                    lastDate: DateTime.now().add(const Duration(days: 365)),
                   );
-
-                  if (date != null) {
+                  if (picked != null) {
                     setState(() {
-                      selectedDate = date;
+                      selectedDate = picked;
                     });
                   }
                 },
@@ -155,6 +143,8 @@ class MyChangeTrialDatesPageState extends State<MyChangeTrialDatesPage> {
                 ],
               ),
 
+              const SizedBox(height: 20),
+
               TextFormField(
                 textCapitalization: TextCapitalization.sentences,
                 decoration: const InputDecoration(
@@ -167,11 +157,13 @@ class MyChangeTrialDatesPageState extends State<MyChangeTrialDatesPage> {
                 },
               ),
 
+              const SizedBox(height: 40),
+
               // Button to add the trial date
               ElevatedButton(
                 onPressed: () {
                   if (selectedLocation != null && selectedFromTime != null && selectedToTime != null && selectedDate != null) {
-                    addTrialDate(selectedLocation!, selectedDate!, selectedFromTime!, selectedToTime!);
+                    addTrialDate(selectedLocation!, selectedDate!, selectedFromTime!, selectedToTime!, pleaseNote!);
 
                     // Show toast notification
                     Fluttertoast.showToast(
@@ -189,7 +181,7 @@ class MyChangeTrialDatesPageState extends State<MyChangeTrialDatesPage> {
                       toastLength: Toast.LENGTH_LONG,
                       gravity: ToastGravity.BOTTOM,
                       timeInSecForIosWeb: 1,
-                      backgroundColor: Colors.green,
+                      backgroundColor: Colors.red,
                       textColor: Colors.white,
                       fontSize: 16.0,
                     );
@@ -207,20 +199,18 @@ class MyChangeTrialDatesPageState extends State<MyChangeTrialDatesPage> {
               Expanded(
                 child: StreamBuilder(
                   stream: FirebaseFirestore.instance.collection('clubs').doc(widget.clubId).collection('TrialDates').snapshots(),
-                  builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                  builder: (context, AsyncSnapshot snapshot) {
                     if (!snapshot.hasData) {
                       return const Center(child: CircularProgressIndicator());
                     }
 
                     var trialDates = snapshot.data!.docs;
-
                     return ListView.builder(
                       itemCount: trialDates.length,
                       itemBuilder: (context, index) {
                         var trialDate = trialDates[index];
                         final fromTime = trialDate['from_time'] ?? '';
                         final toTime = trialDate['to_time'] ?? '';
-
                         return ListTile(
                           title: Text('${trialDate['location']} (${trialDate['post_code']})'),
                           subtitle: Text('${trialDate['date']} [${formatTime(fromTime)} - ${formatTime(toTime)}]'),
@@ -267,7 +257,6 @@ class MyChangeTrialDatesPageState extends State<MyChangeTrialDatesPage> {
   void _showAddNewLocationDialog(BuildContext context) {
     String newLocation = '';
     String newPostCode = '';
-
     var matchDayBannerForLocationNotifier = Provider.of<MatchDayBannerForLocationNotifier>(context, listen: false);
 
     showDialog(
@@ -289,12 +278,6 @@ class MyChangeTrialDatesPageState extends State<MyChangeTrialDatesPage> {
                 onChanged: (value) {
                   newLocation = value;
                 },
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter a location';
-                  }
-                  return null;
-                },
               ),
               TextFormField(
                 textCapitalization: TextCapitalization.characters,
@@ -306,12 +289,6 @@ class MyChangeTrialDatesPageState extends State<MyChangeTrialDatesPage> {
                 ),
                 onChanged: (value) {
                   newPostCode = value;
-                },
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter a post code';
-                  }
-                  return null;
                 },
               ),
             ],
@@ -352,17 +329,21 @@ class MyChangeTrialDatesPageState extends State<MyChangeTrialDatesPage> {
     });
   }
 
-  void addTrialDate(MatchDayBannerForLocation location, String date, TimeOfDay fromTime, TimeOfDay toTime) {
-    // Generate a numeric ID based on the current timestamp
+  void addTrialDate(MatchDayBannerForLocation location, DateTime date, TimeOfDay fromTime, TimeOfDay toTime, String? pleaseNote) {
     String numericId = DateTime.now().millisecondsSinceEpoch.toString();
 
-    FirebaseFirestore.instance.collection('clubs').doc(widget.clubId).collection('TrialDates').doc(numericId).set({
+    // Create the data map with please_note always included
+    Map<String, dynamic> trialDateData = {
       'location': location.location,
       'post_code': location.postCode,
-      'date': date,
+      'date': _formatDate(date),
       'from_time': '${fromTime.hour.toString().padLeft(2, '0')}:${fromTime.minute.toString().padLeft(2, '0')}',
       'to_time': '${toTime.hour.toString().padLeft(2, '0')}:${toTime.minute.toString().padLeft(2, '0')}',
-    });
+      'please_note': pleaseNote ?? '',
+    };
+
+    // Upload the data to Firestore
+    FirebaseFirestore.instance.collection('clubs').doc(widget.clubId).collection('TrialDates').doc(numericId).set(trialDateData);
   }
 
   void deleteTrialDate(String id) {
@@ -371,16 +352,42 @@ class MyChangeTrialDatesPageState extends State<MyChangeTrialDatesPage> {
 
   String formatTime(String time24) {
     if (time24.isEmpty) return 'N/A';
-
     final parts = time24.split(':');
     if (parts.length != 2) return 'Invalid time format';
-
     final hour24 = int.tryParse(parts[0]) ?? 0;
     final minute = parts[1];
-
     final isPM = hour24 >= 12;
     final hour12 = hour24 % 12 == 0 ? 12 : hour24 % 12;
-
     return '$hour12:$minute ${isPM ? 'PM' : 'AM'}';
+  }
+
+  String _formatDate(DateTime date) {
+    return "${_getDayOfWeek(date)}, ${_getOrdinalDay(date.day)} ${_getMonth(date.month)}, ${date.year}";
+  }
+
+  String _getDayOfWeek(DateTime date) {
+    List<String> daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    return daysOfWeek[date.weekday - 1];
+  }
+
+  String _getOrdinalDay(int day) {
+    if (day >= 11 && day <= 13) {
+      return "${day}th";
+    }
+    switch (day % 10) {
+      case 1:
+        return "${day}st";
+      case 2:
+        return "${day}nd";
+      case 3:
+        return "${day}rd";
+      default:
+        return "${day}th";
+    }
+  }
+
+  String _getMonth(int month) {
+    List<String> months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    return months[month - 1];
   }
 }

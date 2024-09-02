@@ -1,17 +1,17 @@
 class TrialDates {
-  String? day;
+  String? date;
   String? fromTime;
   String? toTime;
   String? location;
   String? postCode;
   String? pleaseNote;
 
-  TrialDates({this.day, this.fromTime, this.toTime, this.location, this.postCode, this.pleaseNote});
+  TrialDates({this.date, this.fromTime, this.toTime, this.location, this.postCode, this.pleaseNote});
 
   // Factory constructor to create a TrialDates instance from a map entry
   factory TrialDates.fromMap(Map<String, dynamic> data) {
     return TrialDates(
-      day: data['day'] as String?,
+      date: data['date'] as String?,
       fromTime: data['from_time'] as String?,
       toTime: data['to_time'] as String?,
       location: data['location'] as String?,
@@ -22,7 +22,7 @@ class TrialDates {
 
   Map<String, dynamic> toMap() {
     return {
-      'day': day,
+      'date': date,
       'from_Time': fromTime,
       'to_time': toTime,
       'location': location,
