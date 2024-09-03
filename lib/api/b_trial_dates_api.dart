@@ -4,7 +4,7 @@ import '../model/b_trial_dates_model.dart';
 import '../notifier/b_trial_dates_notifier.dart';
 
 Future<void> getTrialDates(TrialDatesNotifier trialDatesNotifier, String clubId) async {
-  QuerySnapshot snapshot = await FirebaseFirestore.instance.collection('clubs').doc(clubId).collection('TrialDates').orderBy('day').get();
+  QuerySnapshot snapshot = await FirebaseFirestore.instance.collection('clubs').doc(clubId).collection('TrialDates').orderBy('date').get();
 
   List<TrialDates> trialDatesList = [];
 

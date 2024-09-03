@@ -867,7 +867,7 @@ class PlayersTablePageState extends State<PlayersTablePage> {
                                         itemBuilder: (context, index) {
                                           final trialDates = trialDatesNotifier.trialDatesList[index];
                                           return Text.rich(
-                                            textAlign: TextAlign.justify,
+                                            textAlign: TextAlign.start,
                                             TextSpan(
                                               children: <InlineSpan>[
                                                 TextSpan(
@@ -901,7 +901,7 @@ class PlayersTablePageState extends State<PlayersTablePage> {
                                                   child: Icon(MdiIcons.starFourPoints, color: Colors.blueAccent, size: 14), // Your icon here
                                                 ),
                                                 TextSpan(
-                                                    text: ' At ${trialDates.location}\n\n',
+                                                    text: ' At ${trialDates.location}, ${trialDates.postCode}',
                                                     style: GoogleFonts.aldrich(
                                                       color: Colors.white70,
                                                       fontSize: 12,
@@ -909,7 +909,7 @@ class PlayersTablePageState extends State<PlayersTablePage> {
                                                     )),
                                                 if (trialDates.pleaseNote != null && trialDates.pleaseNote!.isNotEmpty) ...[
                                                   TextSpan(
-                                                    text: 'Please Note\n',
+                                                    text: '\n\nPlease Note\n',
                                                     style: GoogleFonts.aldrich(
                                                       color: Colors.white70,
                                                       fontSize: 14,
@@ -929,6 +929,15 @@ class PlayersTablePageState extends State<PlayersTablePage> {
                                                     ),
                                                   ),
                                                 ],
+                                                const WidgetSpan(
+                                                  child: Padding(
+                                                    padding: EdgeInsets.symmetric(vertical: 8.0),
+                                                    child: Divider(
+                                                      color: Colors.white54,
+                                                      thickness: 1.0,
+                                                    ),
+                                                  ),
+                                                ),
                                               ],
                                             ),
                                           );
