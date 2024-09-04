@@ -1308,7 +1308,7 @@ void showConfirmationDialogForStatementGeneration(BuildContext context) {
           style: TextStyle(color: Colors.white70, fontSize: 16, fontWeight: FontWeight.w700),
         ),
         content: const Text(
-          'This will generate a statement about the club\'s activities so far this month. \n\nClick Yes to proceed.',
+          'This will generate a statement about the club\'s activities so far this month. \n\nClick \'Yes\' to proceed.',
           style: TextStyle(color: Colors.white70, fontSize: 14),
         ),
         actions: [
