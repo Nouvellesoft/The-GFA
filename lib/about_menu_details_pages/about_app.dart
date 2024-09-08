@@ -6,6 +6,12 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+String clubNameSnapshotID = "club_name";
+String aboutAppPageImageSnapshotID = "about_app_page";
+String collectionSnapshotID = "clubs";
+String subCollectionSnapshotID = "AboutClub";
+String subDocumentSnapshotID = "about_club_page";
+
 String clubName = "";
 String title = "About Developer";
 String clubAlmanac = "$clubName App, 2024";
@@ -20,8 +26,29 @@ String instagramPolicyWebsite = "https://help.instagram.com/";
 String linkedInPolicyWebsite = "https://www.linkedin.com/legal/privacy-policy";
 String gmailPolicyWebsite = "https://firebase.google.com/support/privacy/";
 
+String launchURLMessage = "The required app is not installed.";
+
+const _email = "david.oludepo@gmail.com";
+const _emailTwo = "david@nouvellesoft.io";
+const _instagram = "nouvellesoft";
+const _twitter = "novelsoftinc";
+const _facebook = "novelsoft";
+const _linkedIn = "nouvellesoft";
+const _calendly = "david-oludepo";
+
+String followInstagram = "Follow us on Instagram";
+String followTwitter = "Follow us on Twitter";
+String followFacebook = "Follow us on Facebook";
+String followLinkedIn = "Follow us on LinkedIn";
+String sendAnEmail = "Send us an Email";
+
 String mailFIRST = "mailto:";
 String mailSECOND = "?subject=Hello ";
+String urlTwitter = "https://twitter.com/";
+String urlFacebook = "https://facebook.com/";
+String urlLinkedIn = "https://linkedin.com/company/";
+String urlInstagram = "https://instagram.com/";
+String urlCalendly = "https://calendly.com/david-oludepo";
 
 String aboutApp = " was engineered and developed by ";
 String theGFA = "The GFA (Grassroot Football App)";
@@ -90,6 +117,7 @@ String contactUs = "Contact Us";
 String contactUs1 =
     "If you have any questions or suggestions about our Terms and Conditions, Disclaimer, Privacy Policy, Software do not hesitate to send an email by clicking here.";
 String termsEtConditionsMore = "For more information about our terms and conditions, please click me.";
+String rcTitle = "PLEASE READ CAREFULLY.\n\n";
 
 Color backgroundColor = const Color.fromRGBO(40, 38, 38, 1.0);
 Color appBarTextColor = Colors.white.withAlpha(250);
@@ -106,27 +134,11 @@ class AboutAppDetails extends StatefulWidget {
   final String? title;
 
   @override
-  State<AboutAppDetails> createState() => _AboutAppDetailsState();
+  State<AboutAppDetails> createState() => AboutAppDetailsState();
 }
 
 // This class represents the stateful widget that displays the details about the app.
-class _AboutAppDetailsState extends State<AboutAppDetails> {
-  final _email = "david.oludepo@gmail.com";
-  final _emailTwo = "david@nouvellesoft.io";
-  final _instagram = "nouvellesoft";
-  final _twitter = "novelsoftinc";
-  final _facebook = "novelsoft";
-  final _linkedIn = "nouvellesoft";
-  final _calendly = "david-oludepo";
-
-  String mailFIRST = "mailto:";
-  String mailSECOND = "?subject=Hello ";
-  String urlTwitter = "https://twitter.com/";
-  String urlFacebook = "https://facebook.com/";
-  String urlLinkedIn = "https://linkedin.com/company/";
-  String urlInstagram = "https://instagram.com/";
-  String urlCalendly = "https://calendly.com/david-oludepo";
-
+class AboutAppDetailsState extends State<AboutAppDetails> {
   late Stream<DocumentSnapshot<Map<String, dynamic>>> firestoreStream;
 
   @override
@@ -141,7 +153,7 @@ class _AboutAppDetailsState extends State<AboutAppDetails> {
             // If the snapshot doesn't have data, return a circular progress indicator to indicate that the data is loading.
             return const CircularProgressIndicator();
           }
-          clubName = snapshot.data!.data()!['club_name'];
+          clubName = snapshot.data!.data()![clubNameSnapshotID];
 
           // If the snapshot has data, return a container with an image background.
           return Scaffold(
@@ -178,39 +190,39 @@ class _AboutAppDetailsState extends State<AboutAppDetails> {
                     color: Colors.white,
                   ),
                   itemBuilder: (context) => [
-                    const PopupMenuItem<int>(
+                    PopupMenuItem<int>(
                       value: 0,
                       child: Text(
-                        "Follow us on Instagram",
-                        style: TextStyle(color: Colors.black),
+                        followInstagram,
+                        style: const TextStyle(color: Colors.black),
                       ),
                     ),
-                    const PopupMenuItem<int>(
+                    PopupMenuItem<int>(
                       value: 1,
                       child: Text(
-                        "Follow us on Twitter",
-                        style: TextStyle(color: Colors.black),
+                        followTwitter,
+                        style: const TextStyle(color: Colors.black),
                       ),
                     ),
-                    const PopupMenuItem<int>(
+                    PopupMenuItem<int>(
                       value: 2,
                       child: Text(
-                        "Follow us on Facebook",
-                        style: TextStyle(color: Colors.black),
+                        followFacebook,
+                        style: const TextStyle(color: Colors.black),
                       ),
                     ),
-                    const PopupMenuItem<int>(
+                    PopupMenuItem<int>(
                       value: 3,
                       child: Text(
-                        "Follow us on LinkedIn",
-                        style: TextStyle(color: Colors.black),
+                        followLinkedIn,
+                        style: const TextStyle(color: Colors.black),
                       ),
                     ),
-                    const PopupMenuItem<int>(
+                    PopupMenuItem<int>(
                       value: 4,
                       child: Text(
-                        "Send us an Email",
-                        style: TextStyle(color: Colors.black),
+                        sendAnEmail,
+                        style: const TextStyle(color: Colors.black),
                       ),
                     ),
                   ],
@@ -259,7 +271,7 @@ class _AboutAppDetailsState extends State<AboutAppDetails> {
                         image: DecorationImage(
                           // Cached network image provider that loads the image from the network and caches it.
                           image: CachedNetworkImageProvider(
-                            snapshot.data?.data()!['about_app_page'],
+                            snapshot.data?.data()![aboutAppPageImageSnapshotID],
                           ),
                           // Fit of the image within the container.
                           fit: BoxFit.cover,
@@ -364,7 +376,7 @@ class _AboutAppDetailsState extends State<AboutAppDetails> {
                                 // Displays the app description text
                                 // Displays the "PLEASE READ CAREFULLY." part in white
                                 TextSpan(
-                                  text: 'PLEASE READ CAREFULLY.\n\n',
+                                  text: rcTitle,
                                   style: TextStyle(
                                     fontSize: 15,
                                     color: cardTextColor, // Change this to the desired color for the text
@@ -822,10 +834,10 @@ class _AboutAppDetailsState extends State<AboutAppDetails> {
     super.initState();
 
     firestoreStream = FirebaseFirestore.instance
-        .collection('clubs')
+        .collection(collectionSnapshotID)
         .doc(widget.clubId)
-        .collection('AboutClub')
-        .doc('about_club_page')
+        .collection(subCollectionSnapshotID)
+        .doc(subDocumentSnapshotID)
         .snapshots()
         .distinct(); // Ensure distinct events
   }
@@ -841,7 +853,7 @@ class _AboutAppDetailsState extends State<AboutAppDetails> {
       await launchUrl(Uri.parse(url));
     } else {
       scaffoldMessenger.showSnackBar(
-        const SnackBar(content: Text("The required app is not installed.")),
+        SnackBar(content: Text(launchURLMessage)),
       );
     }
   }
