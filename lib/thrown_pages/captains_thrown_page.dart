@@ -21,8 +21,8 @@ import '../bottom_nav_stats_pages/bottom_navigator.dart';
 import '../club_admin/club_admin_page.dart';
 import '../details_pages/club_captains_details_page.dart';
 import '../home_page/home_page_deux.dart';
-import '../notifier/club_captains_notifier.dart';
 import '../notifier/a_club_global_notifier.dart';
+import '../notifier/club_captains_notifier.dart';
 import '../thrown_searches/captains_thrown_search.dart';
 
 String clubName = "";
@@ -219,7 +219,7 @@ class _MyCaptainsPage extends State<MyCaptainsPage> {
   }
 
   Future navigateToWhoWeArePage(context) async {
-    Navigator.push(context, MaterialPageRoute(builder: (context) => const WhoWeAre()));
+    Navigator.push(context, MaterialPageRoute(builder: (context) => WhoWeAre(clubId: widget.clubId)));
   }
 
   void navigateToAppStore(context) async {

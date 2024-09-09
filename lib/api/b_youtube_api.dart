@@ -4,9 +4,23 @@ import 'package:flutter/foundation.dart';
 import '../model/b_youtube_model.dart';
 import '../notifier/b_youtube_notifier.dart';
 
+String collectionSnapshotID = "clubs";
+String subCollectionSnapshotID = "Youtube";
+String fieldsAnchorSnapshotID = "latest_videos";
+String videosAccessSnapshotID = "videos";
+String videoURLAccessSnapshotID = "url";
+String videoTitleAccessSnapshotID = "title";
+
+String fetchErrorMessage = "Error fetching YouTube data:";
+
 Future<void> getYouTube(YouTubeNotifier youTubeNotifier, String clubId) async {
   try {
-    DocumentSnapshot snapshot = await FirebaseFirestore.instance.collection('clubs').doc(clubId).collection('Youtube').doc('latest_videos').get();
+    DocumentSnapshot snapshot = await FirebaseFirestore.instance
+        .collection(collectionSnapshotID)
+        .doc(clubId)
+        .collection(subCollectionSnapshotID)
+        .doc(fieldsAnchorSnapshotID)
+        .get();
 
     // Check if the document exists and has data
     if (snapshot.exists && snapshot.data() != null) {
@@ -14,7 +28,7 @@ Future<void> getYouTube(YouTubeNotifier youTubeNotifier, String clubId) async {
       var data = snapshot.data() as Map<String, dynamic>?;
 
       // Safely access the 'videos' field
-      var videosList = data?['videos'] as List<dynamic>?;
+      var videosList = data?[videosAccessSnapshotID] as List<dynamic>?;
 
       if (videosList != null) {
         List<YouTube> youTubeList = [];
@@ -22,8 +36,8 @@ Future<void> getYouTube(YouTubeNotifier youTubeNotifier, String clubId) async {
         for (var videoData in videosList) {
           var videoMap = videoData as Map<String, dynamic>;
 
-          String? url = videoMap['url'] as String?;
-          String? title = videoMap['title'] as String?;
+          String? url = videoMap[videoURLAccessSnapshotID] as String?;
+          String? title = videoMap[videoTitleAccessSnapshotID] as String?;
 
           YouTube youTube = YouTube(toastURL: url, title: title);
           youTubeList.add(youTube);
@@ -41,7 +55,7 @@ Future<void> getYouTube(YouTubeNotifier youTubeNotifier, String clubId) async {
   } catch (e) {
     // Handle any errors during the Firestore call
     if (kDebugMode) {
-      print('Error fetching YouTube data: $e');
+      print('$fetchErrorMessage $e');
     }
     youTubeNotifier.youTubeList = [];
   }

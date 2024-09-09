@@ -8,6 +8,12 @@ import '../notifier/c_match_day_banner_for_club_opp_notifier.dart';
 import 'c_match_day_banner_for_club_api.dart';
 import 'c_match_day_banner_for_club_opp_api.dart';
 
+String collectionSnapshotID = "clubs";
+String subCollectionSnapshotID = "PastMatchesForAllClubs";
+String fieldsAnchorSnapshotID = "id";
+
+const String defaultImage = 'assets/images/no_club_icon_default.jpeg';
+
 Future<void> getPastMatchesForAllClubs(
   PastMatchesForAllClubsNotifier pastMatchesForAllClubsNotifier,
   MatchDayBannerForClubNotifier matchDayBannerForClubNotifier,
@@ -22,10 +28,10 @@ Future<void> getPastMatchesForAllClubs(
   await getMatchDayBannerForClubOpp(matchDayBannerForClubOppNotifier, clubId);
 
   QuerySnapshot snapshot = await FirebaseFirestore.instance
-      .collection('clubs')
+      .collection(collectionSnapshotID)
       .doc(clubId)
-      .collection('PastMatchesForAllClubs')
-      .orderBy('id', descending: false)
+      .collection(subCollectionSnapshotID)
+      .orderBy(fieldsAnchorSnapshotID, descending: false)
       .limit(30)
       .get();
 
@@ -42,8 +48,6 @@ Future<void> getPastMatchesForAllClubs(
   // snapshot.docs.sort((a, b) => compareDate(a['match_date'], b['match_date']));
 
   // Define the default image path
-
-  const String defaultImage = 'assets/images/no_club_icon_default.jpeg';
 
   for (var document in snapshot.docs) {
     PastMatchesForAllClubs pastMatchesForAllClubs = PastMatchesForAllClubs.fromMap(document.data() as Map<String, dynamic>);

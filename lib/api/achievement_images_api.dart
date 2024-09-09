@@ -3,8 +3,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../model/achievements_model.dart';
 import '../notifier/achievement_images_notifier.dart';
 
+String collectionSnapshotID = "clubs";
+String subCollectionSnapshotID = "AchievementImages";
+
 Future<void> getAchievements(AchievementsNotifier achievementsNotifier, String clubId) async {
-  QuerySnapshot snapshot = await FirebaseFirestore.instance.collection('clubs').doc(clubId).collection('AchievementImages').get();
+  QuerySnapshot snapshot = await FirebaseFirestore.instance.collection(collectionSnapshotID).doc(clubId).collection(subCollectionSnapshotID).get();
 
   List<Achievements> achievementsList = [];
 

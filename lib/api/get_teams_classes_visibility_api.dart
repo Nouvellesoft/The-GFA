@@ -1,7 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+String collectionSnapshotID = "clubs";
+String subCollectionSnapshotID = "TeamClassVisibility";
+
+String visibilityCheckTitle = 'isVisible';
+String titleTitle = 'title';
+
 Future<Map<String, Map<String, dynamic>>> getTeamClassVisibilityAndTitles(String clubId) async {
-  CollectionReference visibilityRef = FirebaseFirestore.instance.collection('clubs').doc(clubId).collection('TeamClassVisibility');
+  CollectionReference visibilityRef = FirebaseFirestore.instance.collection(collectionSnapshotID).doc(clubId).collection(subCollectionSnapshotID);
 
   QuerySnapshot snapshot = await visibilityRef.get();
 
@@ -9,8 +15,8 @@ Future<Map<String, Map<String, dynamic>>> getTeamClassVisibilityAndTitles(String
 
   for (var doc in snapshot.docs) {
     teamData[doc.id] = {
-      'isVisible': doc['isVisible'] as bool,
-      'title': doc['title'] as String? ?? '', // Get the title, default to empty string if not found
+      visibilityCheckTitle: doc[visibilityCheckTitle] as bool,
+      titleTitle: doc[titleTitle] as String? ?? '', // Get the title, default to empty string if not found
     };
   }
 

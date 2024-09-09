@@ -8,6 +8,12 @@ import '../notifier/c_match_day_banner_for_club_opp_notifier.dart';
 import 'c_match_day_banner_for_club_api.dart';
 import 'c_match_day_banner_for_club_opp_api.dart';
 
+String collectionSnapshotID = "clubs";
+String subCollectionSnapshotID = "UpcomingMatchesForAllClubs";
+String fieldsAnchorSnapshotID = "id";
+
+const String defaultImage = 'assets/images/no_club_icon_default.jpeg';
+
 Future<void> getUpcomingMatchesForAllClubs(
   UpcomingMatchesForAllClubsNotifier upcomingMatchesForAllClubsNotifier,
   MatchDayBannerForClubNotifier matchDayBannerForClubNotifier,
@@ -28,16 +34,14 @@ Future<void> getUpcomingMatchesForAllClubs(
   // print('Current Fractional Days: $currentDate');
 
   QuerySnapshot snapshot = await FirebaseFirestore.instance
-      .collection('clubs')
+      .collection(collectionSnapshotID)
       .doc(clubId)
-      .collection('UpcomingMatchesForAllClubs')
-      .orderBy('id', descending: false)
+      .collection(subCollectionSnapshotID)
+      .orderBy(fieldsAnchorSnapshotID, descending: false)
       .limit(50)
       .get();
 
   List<UpcomingMatchesForAllClubs> upcomingMatchesForAllClubsList = [];
-
-  const String defaultImage = 'assets/images/no_club_icon_default.jpeg';
 
   DateTime now = DateTime.now();
 

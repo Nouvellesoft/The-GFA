@@ -10,6 +10,22 @@ import '../model/third_team_class_model.dart';
 import '../notifier/players_table_notifier.dart';
 import 'get_teams_classes_visibility_api.dart';
 
+String collectionSnapshotID = "clubs";
+String fieldsAnchorSnapshotID = "name";
+
+String subCollectionSnapshotIDTwo = "PllayersTable";
+String fieldsAnchorSnapshotIDTwo = "goals_scored";
+String fieldsAnchorSnapshotIDThree = "player_name";
+
+String firstTeamClassPlayersTitle = 'FirstTeamClassPlayers';
+String secondTeamClassPlayersTitle = 'SecondTeamClassPlayers';
+String thirdTeamClassPlayersTitle = 'ThirdTeamClassPlayers';
+String fourthTeamClassPlayersTitle = 'FourthTeamClassPlayers';
+String fifthTeamClassPlayersTitle = 'FifthTeamClassPlayers';
+String sixthTeamClassPlayersTitle = 'SixthTeamClassPlayers';
+
+String teamClassModelVisibilityCheckTitle = 'isVisible';
+
 Future<void> getPlayersTable(PlayersTableNotifier playersTableNotifier, String clubId, {bool orderByGoalsScored = true}) async {
   // Get visibility data
   Map<String, Map<String, dynamic>> visibilityData = await getTeamClassVisibilityAndTitles(clubId);
@@ -19,12 +35,12 @@ Future<void> getPlayersTable(PlayersTableNotifier playersTableNotifier, String c
 
   // List of team collections and their corresponding models
   Map<String, Function(Map<String, dynamic>)> teamModels = {
-    'FirstTeamClassPlayers': (data) => FirstTeamClass.fromMap(data),
-    'SecondTeamClassPlayers': (data) => SecondTeamClass.fromMap(data),
-    'ThirdTeamClassPlayers': (data) => ThirdTeamClass.fromMap(data),
-    'FourthTeamClassPlayers': (data) => FourthTeamClass.fromMap(data),
-    'FifthTeamClassPlayers': (data) => FifthTeamClass.fromMap(data),
-    'SixthTeamClassPlayers': (data) => SixthTeamClass.fromMap(data),
+    firstTeamClassPlayersTitle: (data) => FirstTeamClass.fromMap(data),
+    secondTeamClassPlayersTitle: (data) => SecondTeamClass.fromMap(data),
+    thirdTeamClassPlayersTitle: (data) => ThirdTeamClass.fromMap(data),
+    fourthTeamClassPlayersTitle: (data) => FourthTeamClass.fromMap(data),
+    fifthTeamClassPlayersTitle: (data) => FifthTeamClass.fromMap(data),
+    sixthTeamClassPlayersTitle: (data) => SixthTeamClass.fromMap(data),
   };
 
   // Fetch valid player names from visible teams
@@ -34,11 +50,16 @@ Future<void> getPlayersTable(PlayersTableNotifier playersTableNotifier, String c
 
     // Check visibility using the extracted team name
     Map<String, dynamic>? teamVisibility = visibilityData[teamName];
-    bool isTeamVisible = teamVisibility != null && (teamVisibility['isVisible'] as bool? ?? false);
+    bool isTeamVisible = teamVisibility != null && (teamVisibility[teamClassModelVisibilityCheckTitle] as bool? ?? false);
 
     if (isTeamVisible) {
       // Fetch players from the visible team
-      QuerySnapshot teamSnapshot = await FirebaseFirestore.instance.collection('clubs').doc(clubId).collection(teamCollection).orderBy('name').get();
+      QuerySnapshot teamSnapshot = await FirebaseFirestore.instance
+          .collection(collectionSnapshotID)
+          .doc(clubId)
+          .collection(teamCollection)
+          .orderBy(fieldsAnchorSnapshotID)
+          .get();
 
       // Add player names to the set based on the corresponding model
       validPlayerNames.addAll(teamSnapshot.docs.map((doc) {
@@ -53,12 +74,12 @@ Future<void> getPlayersTable(PlayersTableNotifier playersTableNotifier, String c
   }
 
   // Fetch PlayersTable and filter by the valid player names
-  Query playersQuery = FirebaseFirestore.instance.collection('clubs').doc(clubId).collection('PllayersTable');
+  Query playersQuery = FirebaseFirestore.instance.collection(collectionSnapshotID).doc(clubId).collection(subCollectionSnapshotIDTwo);
 
   if (orderByGoalsScored) {
-    playersQuery = playersQuery.orderBy('goals_scored', descending: true);
+    playersQuery = playersQuery.orderBy(fieldsAnchorSnapshotIDTwo, descending: true);
   } else {
-    playersQuery = playersQuery.orderBy('player_name', descending: false);
+    playersQuery = playersQuery.orderBy(fieldsAnchorSnapshotIDThree, descending: false);
   }
 
   QuerySnapshot playersTableSnapshot = await playersQuery.get();

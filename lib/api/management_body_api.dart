@@ -3,8 +3,17 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../model/management_body_model.dart';
 import '../notifier/management_body_notifier.dart';
 
+String collectionSnapshotID = "clubs";
+String subCollectionSnapshotID = "ManagementBody";
+String fieldsAnchorSnapshotID = "id";
+
 Future<void> getManagementBody(ManagementBodyNotifier managementBodyNotifier, String clubId) async {
-  QuerySnapshot snapshot = await FirebaseFirestore.instance.collection('clubs').doc(clubId).collection('ManagementBody').orderBy('id').get();
+  QuerySnapshot snapshot = await FirebaseFirestore.instance
+      .collection(collectionSnapshotID)
+      .doc(clubId)
+      .collection(subCollectionSnapshotID)
+      .orderBy(fieldsAnchorSnapshotID)
+      .get();
 
   List<ManagementBody> managementBodyList = [];
 

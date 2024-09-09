@@ -32,9 +32,24 @@ import '../notifier/second_team_class_notifier.dart';
 import '../notifier/sixth_team_class_notifier.dart';
 import '../notifier/third_team_class_notifier.dart';
 
+String onlineHandleSnapshotID = "online_handle";
+String visionStatementSnapshotID = "vision_statement";
+String missionStatementSnapshotID = "mission_statement";
+String coreValuesSnapshotID = "core_values";
+String whyClubSnapshotID = "why_club";
+String trainingTypesSnapshotID = "training_types";
+String extracurricularActivitiesSnapshotID = "ext_activities";
+String collectionSnapshotID = "clubs";
+String subCollectionSnapshotID = "AboutClub";
+String subDocumentSnapshotID = "about_club_page";
+
 String clubName = '';
-String aboutClub = "About $clubName";
-String whyClub = "WHY $clubName?".toUpperCase();
+String aboutClub = '';
+String whyClub = '';
+
+String playersText = "Players";
+String coachesText = "Coaches";
+String managersText = "Managers";
 
 String visionSwipe = "Swipe left on 'OUR VISION STATEMENT'  >>>";
 String visionTitle = "OUR VISION STATEMENT";
@@ -42,7 +57,8 @@ String missionTitle = "OUR MISSION STATEMENT";
 
 String coreValues = "OUR CORE VALUES";
 
-String populationChart = "$clubName Population Chart **";
+String populationChartText = 'Population Chart';
+String populationChartTitle = '';
 String playerBody = "Player Body\n\n";
 
 String playerPopulationChart = "$clubName Players Population Chart";
@@ -55,8 +71,26 @@ String clubArialViewsSwipe = "Swipe left or right for more photos";
 String clubArialViews = "Some Arial views of $clubName";
 String clubAchievementsSwipe = "Swipe left or right for more photos";
 String clubAchievements = "Some of our Past Achievements";
+String clubAchievementsNotFound = "No Past Achievements Found";
+String moreInfoAboutClubText = 'More info about the club: ';
 String moreInfoAboutClubURL = "https://twitter.com/"; //Maybe something else, Use DB instead
 String clubOnlineMediaField = ''; //Maybe something else, Use DB instead
+
+String firstTeamClassModelTitle = 'FirstTeamClass';
+String secondTeamClassModelTitle = 'SecondTeamClass';
+String thirdTeamClassModelTitle = 'ThirdTeamClass';
+String fourthTeamClassModelTitle = 'FourthTeamClass';
+String fifthTeamClassModelTitle = 'FifthTeamClass';
+String sixthTeamClassModelTitle = 'SixthTeamClass';
+
+String teamClassModelVisibilityCheckTitle = 'isVisible';
+
+String futureBuilderErrorMessage = "Error loading visibility data";
+String futureBuilderNoDataMessage = "No visibility data available";
+
+String launchURLMessage = "The required app is not installed.";
+
+String lottieAssetSearching = 'assets/json/searching.json';
 
 Color backgroundColor = const Color.fromRGBO(207, 118, 90, 1.0);
 Color cardBackgroundColor = const Color.fromRGBO(207, 116, 87, 1.0);
@@ -77,6 +111,7 @@ Color firstPlayerChartColor = const Color.fromRGBO(164, 82, 56, 1.0);
 Color secondPlayerChartColor = const Color.fromRGBO(207, 116, 87, 1.0);
 Color thirdPlayerChartColor = const Color.fromRGBO(153, 90, 61, 1.0);
 Color fourthPlayerChartColor = const Color.fromRGBO(195, 81, 44, 1.0);
+Color pieChartTextColor = Colors.white;
 Color firstRowColor = const Color.fromRGBO(63, 66, 97, 1.0);
 Color firstRowColorTwo = const Color.fromRGBO(237, 104, 72, 1.0);
 Color secondRowColor = const Color.fromRGBO(40, 142, 133, 1.0);
@@ -168,10 +203,10 @@ class _AboutClubDetailsState extends State<AboutClubDetails> {
     _teamVisibilityFuture = getTeamClassVisibilityAndTitles(widget.clubId);
 
     firestoreStreamOne = FirebaseFirestore.instance
-        .collection('clubs')
+        .collection(collectionSnapshotID)
         .doc(widget.clubId)
-        .collection('AboutClub')
-        .doc('about_club_page')
+        .collection(subCollectionSnapshotID)
+        .doc(subDocumentSnapshotID)
         .snapshots()
         .distinct(); // Ensure distinct events
 
@@ -241,12 +276,12 @@ class _AboutClubDetailsState extends State<AboutClubDetails> {
             return Container();
           } else {
             // Access the 'onlineSM' field from the document
-            clubOnlineMediaField = snapshot.data!.data()!['online_handle'];
+            clubOnlineMediaField = snapshot.data!.data()![onlineHandleSnapshotID];
 
             // Update whyClub after fetching clubName
             whyClub = "WHY $clubName?".toUpperCase();
             aboutClub = "About $clubName";
-            populationChart = "$clubName Population Chart";
+            populationChartTitle = "$clubName $populationChartText";
           }
           return Scaffold(
             backgroundColor: backgroundColor,
@@ -323,7 +358,7 @@ class _AboutClubDetailsState extends State<AboutClubDetails> {
                                 Padding(
                                   padding: const EdgeInsets.only(top: 30, left: 8, right: 8, bottom: 8),
                                   child: Text(
-                                    snapshot.data?.data()!['vision_statement'],
+                                    snapshot.data?.data()![visionStatementSnapshotID],
                                     textAlign: TextAlign.justify,
                                     style: TextStyle(color: cardTextColor, fontSize: 18),
                                   ),
@@ -358,7 +393,7 @@ class _AboutClubDetailsState extends State<AboutClubDetails> {
                                 Padding(
                                   padding: const EdgeInsets.only(top: 30, left: 8, right: 8, bottom: 8),
                                   child: Text(
-                                    snapshot.data?.data()!['mission_statement'],
+                                    snapshot.data?.data()![missionStatementSnapshotID],
                                     textAlign: TextAlign.justify,
                                     style: TextStyle(color: cardTextColor, fontWeight: FontWeight.w400, fontSize: 18),
                                   ),
@@ -393,7 +428,7 @@ class _AboutClubDetailsState extends State<AboutClubDetails> {
                                 Padding(
                                   padding: const EdgeInsets.only(top: 30, left: 8, right: 8, bottom: 8),
                                   child: Text(
-                                    (snapshot.data?.data()!['core_values'] as String?)?.replaceAll(r'\n', '\n') ?? '',
+                                    (snapshot.data?.data()![coreValuesSnapshotID] as String?)?.replaceAll(r'\n', '\n') ?? '',
                                     // textAlign: TextAlign.center,
                                     style: TextStyle(
                                       color: cardTextColor,
@@ -432,7 +467,7 @@ class _AboutClubDetailsState extends State<AboutClubDetails> {
                                 Padding(
                                   padding: const EdgeInsets.only(top: 30, left: 8, right: 8, bottom: 8),
                                   child: Text(
-                                    (snapshot.data?.data()!['why_club'] as String?)?.replaceAll(r'\n', '\n') ?? '',
+                                    (snapshot.data?.data()![whyClubSnapshotID] as String?)?.replaceAll(r'\n', '\n') ?? '',
                                     textAlign: TextAlign.justify,
                                     style: TextStyle(color: cardTextColor, fontWeight: FontWeight.w400, fontSize: 16),
                                   ),
@@ -466,9 +501,9 @@ class _AboutClubDetailsState extends State<AboutClubDetails> {
                                   if (visibilitySnapshot.connectionState == ConnectionState.waiting) {
                                     return const Center(child: CircularProgressIndicator());
                                   } else if (visibilitySnapshot.hasError) {
-                                    return const Center(child: Text("Error loading visibility data"));
+                                    return Center(child: Text(futureBuilderErrorMessage));
                                   } else if (!visibilitySnapshot.hasData) {
-                                    return const Center(child: Text("No visibility data available"));
+                                    return Center(child: Text(futureBuilderNoDataMessage));
                                   } else {
                                     final teamVisibility = visibilitySnapshot.data!;
 
@@ -484,7 +519,7 @@ class _AboutClubDetailsState extends State<AboutClubDetails> {
                                         Padding(
                                           padding: const EdgeInsets.only(top: 15, bottom: 30, left: 10),
                                           child: Text(
-                                            populationChart,
+                                            populationChartTitle,
                                             textAlign: TextAlign.left,
                                             style: TextStyle(
                                               color: cardTextColor,
@@ -537,15 +572,15 @@ class _AboutClubDetailsState extends State<AboutClubDetails> {
                                           crossAxisAlignment: CrossAxisAlignment.center,
                                           children: [
                                             Text(
-                                              'Players: $playersCount',
+                                              '$playersText: $playersCount',
                                               style: const TextStyle(color: Colors.white70, fontWeight: FontWeight.bold),
                                             ),
                                             Text(
-                                              'Coaches: $coachesCount',
+                                              '$coachesText: $coachesCount',
                                               style: const TextStyle(color: Colors.white70, fontWeight: FontWeight.bold),
                                             ),
                                             Text(
-                                              'Managers: $managersCount',
+                                              '$managersText: $managersCount',
                                               style: const TextStyle(color: Colors.white70, fontWeight: FontWeight.bold),
                                             ),
                                           ],
@@ -595,7 +630,7 @@ class _AboutClubDetailsState extends State<AboutClubDetails> {
                           child: Padding(
                             padding: const EdgeInsets.only(bottom: 15, top: 15, left: 10, right: 10),
                             child: SingleChildScrollView(
-                                child: Text((snapshot.data?.data()!['training_types'] as String?)?.replaceAll(r'\n', '\n') ?? '',
+                                child: Text((snapshot.data?.data()![trainingTypesSnapshotID] as String?)?.replaceAll(r'\n', '\n') ?? '',
                                     style: TextStyle(
                                       color: cardTextColor,
                                       fontSize: 19,
@@ -631,7 +666,7 @@ class _AboutClubDetailsState extends State<AboutClubDetails> {
                                           fontWeight: FontWeight.bold,
                                         )),
                                     TextSpan(
-                                        text: (snapshot.data?.data()!['ext_activities'] as String?)?.replaceAll(r'\n', '\n') ?? '',
+                                        text: (snapshot.data?.data()![extracurricularActivitiesSnapshotID] as String?)?.replaceAll(r'\n', '\n') ?? '',
                                         style: TextStyle(
                                           color: cardTextColor,
                                           fontSize: 19,
@@ -774,13 +809,13 @@ class _AboutClubDetailsState extends State<AboutClubDetails> {
                           SizedBox(
                               width: MediaQuery.of(context).size.width * 0.85,
                               child: Lottie.asset(
-                                'assets/json/searching.json',
+                                lottieAssetSearching,
                                 // width: MediaQuery.of(context).size.width * 0.80,
                                 height: 150,
                                 fit: BoxFit.contain,
                               )),
                           Text(
-                            "No Past Achievements Found",
+                            clubAchievementsNotFound,
                             style: TextStyle(
                               color: cardTextColor,
                             ),
@@ -845,7 +880,7 @@ class _AboutClubDetailsState extends State<AboutClubDetails> {
                       text: TextSpan(
                         children: [
                           TextSpan(
-                            text: 'More info about the club: ',
+                            text: moreInfoAboutClubText,
                             style: TextStyle(
                               fontSize: 15,
                               color: cardTextColor, // Change color as needed
@@ -883,17 +918,23 @@ class _AboutClubDetailsState extends State<AboutClubDetails> {
     // Calculate counts for Players based on visibility
     List<dynamic> filteredPlayers = [];
 
-    filteredPlayers.addAll(notifier.firstTeamClassList.where((player) => teamVisibility['FirstTeamClass']?['isVisible'] == true));
+    filteredPlayers
+        .addAll(notifier.firstTeamClassList.where((player) => teamVisibility[firstTeamClassModelTitle]?[teamClassModelVisibilityCheckTitle] == true));
 
-    filteredPlayers.addAll(notifier.secondTeamClassList.where((player) => teamVisibility['SecondTeamClass']?['isVisible'] == true));
+    filteredPlayers.addAll(
+        notifier.secondTeamClassList.where((player) => teamVisibility[secondTeamClassModelTitle]?[teamClassModelVisibilityCheckTitle] == true));
 
-    filteredPlayers.addAll(notifier.thirdTeamClassList.where((player) => teamVisibility['ThirdTeamClass']?['isVisible'] == true));
+    filteredPlayers
+        .addAll(notifier.thirdTeamClassList.where((player) => teamVisibility[thirdTeamClassModelTitle]?[teamClassModelVisibilityCheckTitle] == true));
 
-    filteredPlayers.addAll(notifier.fourthTeamClassList.where((player) => teamVisibility['FourthTeamClass']?['isVisible'] == true));
+    filteredPlayers.addAll(
+        notifier.fourthTeamClassList.where((player) => teamVisibility[fourthTeamClassModelTitle]?[teamClassModelVisibilityCheckTitle] == true));
 
-    filteredPlayers.addAll(notifier.fifthTeamClassList.where((player) => teamVisibility['FifthTeamClass']?['isVisible'] == true));
+    filteredPlayers
+        .addAll(notifier.fifthTeamClassList.where((player) => teamVisibility[fifthTeamClassModelTitle]?[teamClassModelVisibilityCheckTitle] == true));
 
-    filteredPlayers.addAll(notifier.sixthTeamClassList.where((player) => teamVisibility['SixthTeamClass']?['isVisible'] == true));
+    filteredPlayers
+        .addAll(notifier.sixthTeamClassList.where((player) => teamVisibility[sixthTeamClassModelTitle]?[teamClassModelVisibilityCheckTitle] == true));
 
     return filteredPlayers.length;
   }
@@ -904,7 +945,7 @@ class _AboutClubDetailsState extends State<AboutClubDetails> {
       await launchUrl(Uri.parse(url));
     } else {
       scaffoldMessenger.showSnackBar(
-        const SnackBar(content: Text("The required app is not installed.")),
+        SnackBar(content: Text(launchURLMessage)),
       );
     }
   }
@@ -922,12 +963,12 @@ class _AboutClubDetailsState extends State<AboutClubDetails> {
           return PieChartSectionData(
             color: Colors.deepOrangeAccent,
             value: playersCount.toDouble(),
-            title: 'Players',
+            title: playersText,
             radius: radius,
             titleStyle: TextStyle(
               fontSize: fontSize,
               fontWeight: FontWeight.bold,
-              color: const Color(0xffffffff),
+              color: pieChartTextColor,
               shadows: shadows,
             ),
           );
@@ -935,12 +976,12 @@ class _AboutClubDetailsState extends State<AboutClubDetails> {
           return PieChartSectionData(
             color: Colors.red,
             value: coachesCount.toDouble(),
-            title: 'Coaches',
+            title: coachesText,
             radius: radius,
             titleStyle: TextStyle(
               fontSize: fontSize,
               fontWeight: FontWeight.bold,
-              color: const Color(0xffffffff),
+              color: pieChartTextColor,
               shadows: shadows,
             ),
           );
@@ -948,17 +989,17 @@ class _AboutClubDetailsState extends State<AboutClubDetails> {
           return PieChartSectionData(
             color: Colors.teal,
             value: managersCount.toDouble(),
-            title: 'Managers',
+            title: managersText,
             radius: radius,
             titleStyle: TextStyle(
               fontSize: fontSize,
               fontWeight: FontWeight.bold,
-              color: const Color(0xffffffff),
+              color: pieChartTextColor,
               shadows: shadows,
             ),
           );
         default:
-          throw Exception('Oh no');
+          throw Exception('Null');
       }
     });
   }

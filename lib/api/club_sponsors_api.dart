@@ -3,9 +3,17 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../model/club_sponsors_model.dart';
 import '../notifier/club_sponsors_notifier.dart';
 
+String collectionSnapshotID = "clubs";
+String subCollectionSnapshotID = "ClubSponsors";
+String fieldsAnchorSnapshotID = "id";
+
 Future<void> getClubSponsors(ClubSponsorsNotifier clubSponsorsNotifier, String clubId) async {
-  QuerySnapshot snapshot =
-      await FirebaseFirestore.instance.collection('clubs').doc(clubId).collection('ClubSponsors').orderBy('id', descending: false).get();
+  QuerySnapshot snapshot = await FirebaseFirestore.instance
+      .collection(collectionSnapshotID)
+      .doc(clubId)
+      .collection(subCollectionSnapshotID)
+      .orderBy(fieldsAnchorSnapshotID, descending: false)
+      .get();
 
   List<ClubSponsors> clubSponsorsList = [];
 

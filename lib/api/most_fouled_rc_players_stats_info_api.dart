@@ -10,6 +10,21 @@ import '../model/third_team_class_model.dart';
 import '../notifier/most_fouled_rc_players_stats_info_notifier.dart';
 import 'get_teams_classes_visibility_api.dart';
 
+String collectionSnapshotID = "clubs";
+String fieldsAnchorSnapshotID = "name";
+
+String subCollectionSnapshotIDTwo = "PllayersTable";
+String fieldsAnchorSnapshotIDTwo = "red_card";
+
+String firstTeamClassPlayersTitle = 'FirstTeamClassPlayers';
+String secondTeamClassPlayersTitle = 'SecondTeamClassPlayers';
+String thirdTeamClassPlayersTitle = 'ThirdTeamClassPlayers';
+String fourthTeamClassPlayersTitle = 'FourthTeamClassPlayers';
+String fifthTeamClassPlayersTitle = 'FifthTeamClassPlayers';
+String sixthTeamClassPlayersTitle = 'SixthTeamClassPlayers';
+
+String teamClassModelVisibilityCheckTitle = 'isVisible';
+
 Future<void> getMostFouledRCPlayersStatsAndInfo(
     MostFouledRCPlayersStatsAndInfoNotifier mostFouledRCPlayersStatsAndInfoNotifier, String clubId) async {
   // Get visibility data
@@ -20,12 +35,12 @@ Future<void> getMostFouledRCPlayersStatsAndInfo(
 
   // List of team collections and their corresponding models
   Map<String, Function(Map<String, dynamic>)> teamModels = {
-    'FirstTeamClassPlayers': (data) => FirstTeamClass.fromMap(data),
-    'SecondTeamClassPlayers': (data) => SecondTeamClass.fromMap(data),
-    'ThirdTeamClassPlayers': (data) => ThirdTeamClass.fromMap(data),
-    'FourthTeamClassPlayers': (data) => FourthTeamClass.fromMap(data),
-    'FifthTeamClassPlayers': (data) => FifthTeamClass.fromMap(data),
-    'SixthTeamClassPlayers': (data) => SixthTeamClass.fromMap(data),
+    firstTeamClassPlayersTitle: (data) => FirstTeamClass.fromMap(data),
+    secondTeamClassPlayersTitle: (data) => SecondTeamClass.fromMap(data),
+    thirdTeamClassPlayersTitle: (data) => ThirdTeamClass.fromMap(data),
+    fourthTeamClassPlayersTitle: (data) => FourthTeamClass.fromMap(data),
+    fifthTeamClassPlayersTitle: (data) => FifthTeamClass.fromMap(data),
+    sixthTeamClassPlayersTitle: (data) => SixthTeamClass.fromMap(data),
   };
 
   for (String teamCollection in teamModels.keys) {
@@ -34,11 +49,16 @@ Future<void> getMostFouledRCPlayersStatsAndInfo(
 
     // Check visibility using the extracted team name
     Map<String, dynamic>? teamVisibility = visibilityData[teamName];
-    bool isTeamVisible = teamVisibility != null && (teamVisibility['isVisible'] as bool? ?? false);
+    bool isTeamVisible = teamVisibility != null && (teamVisibility[teamClassModelVisibilityCheckTitle] as bool? ?? false);
 
     if (isTeamVisible) {
       // Fetch player names from the visible team collection
-      QuerySnapshot teamSnapshot = await FirebaseFirestore.instance.collection('clubs').doc(clubId).collection(teamCollection).orderBy('name').get();
+      QuerySnapshot teamSnapshot = await FirebaseFirestore.instance
+          .collection(collectionSnapshotID)
+          .doc(clubId)
+          .collection(teamCollection)
+          .orderBy(fieldsAnchorSnapshotID)
+          .get();
 
       // Add player names to the set based on the corresponding model
       validPlayerNames.addAll(teamSnapshot.docs.map((doc) {
@@ -55,11 +75,11 @@ Future<void> getMostFouledRCPlayersStatsAndInfo(
   // Fetch data from 'PllayersTable' and filter by valid player names
 
   QuerySnapshot playersTableSnapshot = await FirebaseFirestore.instance
-      .collection('clubs')
+      .collection(collectionSnapshotID)
       .doc(clubId)
-      .collection('PllayersTable')
-      .where('red_card', isGreaterThan: 0)
-      .orderBy('red_card', descending: true)
+      .collection(subCollectionSnapshotIDTwo)
+      .where(fieldsAnchorSnapshotIDTwo, isGreaterThan: 0)
+      .orderBy(fieldsAnchorSnapshotIDTwo, descending: true)
       .limit(8)
       .get();
 

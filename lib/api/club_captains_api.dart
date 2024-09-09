@@ -3,10 +3,17 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../model/captains_model.dart';
 import '../notifier/club_captains_notifier.dart';
 
-//Dependency in version [global use API]
+String collectionSnapshotID = "clubs";
+String subCollectionSnapshotID = "Captains";
+String fieldsAnchorSnapshotID = "name";
 
 Future<void> getCaptains(CaptainsNotifier captainsNotifier, String clubId) async {
-  QuerySnapshot snapshot = await FirebaseFirestore.instance.collection('clubs').doc(clubId).collection('Captains').orderBy('name').get();
+  QuerySnapshot snapshot = await FirebaseFirestore.instance
+      .collection(collectionSnapshotID)
+      .doc(clubId)
+      .collection(subCollectionSnapshotID)
+      .orderBy(fieldsAnchorSnapshotID)
+      .get();
 
   List<Captains> captainsList = [];
 

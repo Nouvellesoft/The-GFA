@@ -1,16 +1,20 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../model/c_match_day_banner_for_clubs_model.dart';
-import '../notifier/c_match_day_banner_for_club_notifier.dart';
 import '../notifier/a_club_global_notifier.dart';
+import '../notifier/c_match_day_banner_for_club_notifier.dart';
+
+String collectionSnapshotID = "clubs";
+String subCollectionSnapshotID = "MatchDayBannerForClub";
+String fieldsAnchorSnapshotID = "team_name";
 
 Future<void> getMatchDayBannerForClub(
     MatchDayBannerForClubNotifier matchDayBannerForClubNotifier, ClubGlobalProvider clubGlobalProvider, String clubId) async {
   QuerySnapshot snapshot = await FirebaseFirestore.instance
-      .collection('clubs')
+      .collection(collectionSnapshotID)
       .doc(clubId)
-      .collection('MatchDayBannerForClub')
-      .orderBy('team_name', descending: false)
+      .collection(subCollectionSnapshotID)
+      .orderBy(fieldsAnchorSnapshotID, descending: false)
       .get();
 
   List<MatchDayBannerForClub> matchDayBannerForClubList = [];

@@ -24,6 +24,11 @@ String coreThree =
 String bottomLine =
     "It was C. Wright Mills (1956), an American sociologist who stated in his work titled 'The Power Elite' the need for a breed of Leaders that are value driven.";
 
+String whoWeAreSnapshotID = "who_we_are_page";
+String collectionSnapshotID = "clubs";
+String subCollectionSnapshotID = "AboutClub";
+String subDocumentSnapshotID = "about_club_page";
+
 Color backgroundColor = const Color.fromRGBO(15, 65, 79, 1);
 Color appBarTextColor = Colors.white;
 Color appBarBackgroundColor = const Color.fromRGBO(52, 18, 30, 1);
@@ -35,7 +40,9 @@ Color cardTextColor = Colors.greenAccent;
 Color cardTextColorTwo = Colors.white;
 
 class WhoWeAre extends StatefulWidget {
-  const WhoWeAre({super.key, this.title});
+  final String clubId;
+
+  const WhoWeAre({super.key, this.title, required this.clubId});
 
   final String? title;
 
@@ -73,7 +80,12 @@ class _WhoWeAreState extends State<WhoWeAre> {
                 elevation: 10,
                 margin: const EdgeInsets.all(20),
                 child: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-                  stream: FirebaseFirestore.instance.collection('AboutClub').doc('about_club_page').snapshots(),
+                  stream: FirebaseFirestore.instance
+                      .collection(collectionSnapshotID)
+                      .doc(widget.clubId)
+                      .collection(subCollectionSnapshotID)
+                      .doc(subDocumentSnapshotID)
+                      .snapshots(),
                   builder: (context, snapshot) {
                     if (!snapshot.hasData) {
                       return const SizedBox(height: 300, child: CircularProgressIndicator());
@@ -83,7 +95,7 @@ class _WhoWeAreState extends State<WhoWeAre> {
                       decoration: BoxDecoration(
                           image: DecorationImage(
                               image: CachedNetworkImageProvider(
-                                snapshot.data?.data()!['who_we_are_page'],
+                                snapshot.data?.data()![whoWeAreSnapshotID],
                               ),
                               fit: BoxFit.cover)),
                     );

@@ -33,6 +33,11 @@ String cf = "CF - Center Forward\n\n";
 String goalsConceded = "Goals Con. - Goals Conceded\n\n";
 String stars = "** - Flawed or Not Accurate Info\n\n";
 
+String acronymsPageSnapshotID = "acronyms_page";
+String collectionSnapshotID = "clubs";
+String subCollectionSnapshotID = "AboutClub";
+String subDocumentSnapshotID = "about_club_page";
+
 Color backgroundColor = const Color.fromRGBO(58, 31, 41, 1);
 Color appBarTextColor = Colors.white;
 Color appBarBackgroundColor = const Color.fromRGBO(52, 18, 30, 1);
@@ -96,7 +101,7 @@ class _AcronymsMeaningsState extends State<AcronymsMeanings> {
                       decoration: BoxDecoration(
                           image: DecorationImage(
                               image: CachedNetworkImageProvider(
-                                snapshot.data?.data()!['acronyms_page'],
+                                snapshot.data?.data()![acronymsPageSnapshotID],
                               ),
                               fit: BoxFit.cover)),
                     );
@@ -378,10 +383,10 @@ class _AcronymsMeaningsState extends State<AcronymsMeanings> {
     super.initState();
 
     firestoreStream = FirebaseFirestore.instance
-        .collection('clubs')
+        .collection(collectionSnapshotID)
         .doc(widget.clubId)
-        .collection('AboutClub')
-        .doc('about_club_page')
+        .collection(subCollectionSnapshotID)
+        .doc(subDocumentSnapshotID)
         .snapshots()
         .distinct(); // Ensure distinct events
   }

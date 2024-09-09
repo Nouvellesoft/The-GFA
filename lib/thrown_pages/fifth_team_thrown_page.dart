@@ -245,7 +245,7 @@ class _MyFifthTeamClassPage extends State<MyFifthTeamClassPage> {
   }
 
   Future navigateToWhoWeArePage(context) async {
-    Navigator.push(context, MaterialPageRoute(builder: (context) => const WhoWeAre()));
+    Navigator.push(context, MaterialPageRoute(builder: (context) => WhoWeAre(clubId: widget.clubId)));
   }
 
   void navigateToAppStore(context) async {

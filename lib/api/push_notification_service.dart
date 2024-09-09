@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 // ignore: slash_for_doc_comments
@@ -7,7 +8,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
  * Documents added by Alaa, enjoy ^-^:
  * There are 3 major things to consider when dealing with push notification :
  * - Creating the notification
- * - Hanldle notification click
+ * - Handle notification click
  * - App status (foreground/background and killed(Terminated))
  *
  * Creating the notification:
@@ -26,10 +27,12 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
  *   is called when user clicks on the notification.
  *
  * */
+
 class PushNotificationService {
   // It is assumed that all messages contain a data field with the key 'type'
   Future<void> setupInteractedMessage() async {
     await Firebase.initializeApp();
+
 // Get any messages which caused the application to open from a terminated state.
     // If you want to handle a notification click when the app is terminated, you can use `getInitialMessage`
     // to get the initial message, and depending in the remoteMessage, you can decide to handle the click
@@ -45,8 +48,9 @@ class PushNotificationService {
 // Also handle any interaction when the app is in the background via a
     // Stream listener
     // This function is called when the app is in the background and user clicks on the notification
+
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      // Get.toNamed(NOTIFICATIOINS_ROUTE);
+      // Get.toNamed(NOTIFICATIONS_ROUTE);
       if (message.data['type'] == 'chat') {
         // Navigator.pushNamed(context, '/chat',
         //     arguments: ChatArguments(message));
@@ -58,30 +62,27 @@ class PushNotificationService {
 
   registerNotificationListeners() async {
     AndroidNotificationChannel channel = androidNotificationChannel();
-    final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-        FlutterLocalNotificationsPlugin();
+    final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
     await flutterLocalNotificationsPlugin
-        .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>()
+        .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
         ?.createNotificationChannel(channel);
-    var androidSettings =
-        const AndroidInitializationSettings('@mipmap/ic_launcher');
+    var androidSettings = const AndroidInitializationSettings('@mipmap/ic_launcher');
     var iOSSettings = const DarwinInitializationSettings(
       requestSoundPermission: false,
       requestBadgePermission: false,
       requestAlertPermission: false,
     );
-    var initSetttings =
-        InitializationSettings(android: androidSettings, iOS: iOSSettings);
-    flutterLocalNotificationsPlugin.initialize(initSetttings,
-        onDidReceiveNotificationResponse: (message) async {
+    var initSettings = InitializationSettings(android: androidSettings, iOS: iOSSettings);
+    flutterLocalNotificationsPlugin.initialize(initSettings, onDidReceiveNotificationResponse: (message) async {
       // This function handles the click in the notification when the app is in foreground
-      // Get.toNamed(NOTIFICATIOINS_ROUTE);
+      // Get.toNamed(NOTIFICATIONS_ROUTE);
     });
 // onMessage is called when the app is in foreground and a notification is received
     FirebaseMessaging.onMessage.listen((RemoteMessage? message) {
       // Get.find<HomeController>().getNotificationsNumber();
-      print(message);
+      if (kDebugMode) {
+        print(message);
+      }
       RemoteNotification? notification = message!.notification;
       AndroidNotification? android = message.notification?.android;
 // If `onMessage` is triggered with a notification, construct our own
@@ -106,8 +107,7 @@ class PushNotificationService {
   }
 
   enableIOSNotifications() async {
-    await FirebaseMessaging.instance
-        .setForegroundNotificationPresentationOptions(
+    await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
       alert: true, // Required to display a heads up notification
       badge: true,
       sound: true,

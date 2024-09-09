@@ -1,7 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:the_gfa/sidebar/sidebar_layout.dart';
+import 'package:the_gfa/thrown_pages/chatgfa_thrown_page.dart';
 
 import '../api/all_clubs_api.dart';
 
@@ -39,8 +39,8 @@ class _ClubSelectionPageState extends State<ClubSelectionPage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        // builder: (context) => ClubDetailPage(clubId: clubId),
-                        builder: (context) => SideBarLayout(clubId: clubId),
+                        builder: (context) => MyChatGFAPage(clubId: clubId),
+                        // builder: (context) => SideBarLayout(clubId: clubId),
                       ),
                     );
                   },

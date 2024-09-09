@@ -53,10 +53,10 @@ import '../bottom_nav_stats_pages/players_table_page.dart';
 import '../club_admin/club_admin_page.dart';
 import '../details_pages/first_team_details_page.dart';
 import '../home_page/home_page_deux.dart';
+import '../notifier/a_club_global_notifier.dart';
 import '../notifier/a_upcoming_matches_notifier.dart';
 import '../notifier/c_match_day_banner_for_club_notifier.dart';
 import '../notifier/c_match_day_banner_for_club_opp_notifier.dart';
-import '../notifier/a_club_global_notifier.dart';
 import '../notifier/club_sponsors_notifier.dart';
 import '../notifier/cum_motm_players_stats_info_notifier.dart';
 import '../notifier/fifth_team_class_notifier.dart';
@@ -548,7 +548,7 @@ class _MyFirstTeamClassPage extends State<MyFirstTeamClassPage> {
   }
 
   Future navigateToWhoWeArePage(context) async {
-    Navigator.push(context, MaterialPageRoute(builder: (context) => const WhoWeAre()));
+    Navigator.push(context, MaterialPageRoute(builder: (context) => WhoWeAre(clubId: widget.clubId)));
   }
 
   void navigateToAppStore(context) async {
@@ -1092,7 +1092,8 @@ class _MyFirstTeamClassPage extends State<MyFirstTeamClassPage> {
     setState(() {});
   }
 
-  Future<void> _fetchUpcomingMatchesAndUpdateNotifier(UpcomingMatchesNotifier notifier, MatchDayBannerForClubNotifier matchDayBannerForClubNotifier, MatchDayBannerForClubOppNotifier matchDayBannerForClubOppNotifier, ClubGlobalProvider clubGlobalProvider) async {
+  Future<void> _fetchUpcomingMatchesAndUpdateNotifier(UpcomingMatchesNotifier notifier, MatchDayBannerForClubNotifier matchDayBannerForClubNotifier,
+      MatchDayBannerForClubOppNotifier matchDayBannerForClubOppNotifier, ClubGlobalProvider clubGlobalProvider) async {
     await getUpcomingMatches(notifier, matchDayBannerForClubNotifier, matchDayBannerForClubOppNotifier, clubGlobalProvider, widget.clubId);
 
     setState(() {});

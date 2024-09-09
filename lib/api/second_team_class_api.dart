@@ -3,9 +3,17 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../model/second_team_class_model.dart';
 import '../notifier/second_team_class_notifier.dart';
 
+String collectionSnapshotID = "clubs";
+String subCollectionSnapshotID = "SecondTeamClassPlayers";
+String fieldsAnchorSnapshotID = "name";
+
 Future<void> getSecondTeamClass(SecondTeamClassNotifier secondTeamClassNotifier, String clubId) async {
-  QuerySnapshot snapshot =
-      await FirebaseFirestore.instance.collection('clubs').doc(clubId).collection('SecondTeamClassPlayers').orderBy('name').get();
+  QuerySnapshot snapshot = await FirebaseFirestore.instance
+      .collection(collectionSnapshotID)
+      .doc(clubId)
+      .collection(subCollectionSnapshotID)
+      .orderBy(fieldsAnchorSnapshotID)
+      .get();
 
   List<SecondTeamClass> secondTeamClassList = [];
 
