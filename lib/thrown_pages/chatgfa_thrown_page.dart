@@ -14,14 +14,14 @@ class MyChatGFAPage extends StatefulWidget {
 }
 
 class MyChatGFAPageState extends State<MyChatGFAPage> {
-  List<String> messages = [];
+  List<Map<String, String>> messages = [];
   TextEditingController messageController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.clubId),
+        title: Text('Club ID: ${widget.clubId}'),
       ),
       body: Column(
         children: <Widget>[
@@ -31,15 +31,15 @@ class MyChatGFAPageState extends State<MyChatGFAPage> {
               itemBuilder: (context, index) {
                 return ListTile(
                   title: Align(
-                    alignment: Alignment.centerLeft,
+                    alignment: messages[index]['type'] == 'user' ? Alignment.centerRight : Alignment.centerLeft,
                     child: Container(
                       padding: const EdgeInsets.all(10.0),
                       decoration: BoxDecoration(
-                        color: Colors.blueAccent,
+                        color: messages[index]['type'] == 'user' ? Colors.green : Colors.blueAccent,
                         borderRadius: BorderRadius.circular(12.0),
                       ),
                       child: Text(
-                        messages[index],
+                        messages[index]['text']!,
                         style: const TextStyle(color: Colors.white),
                       ),
                     ),
@@ -78,8 +78,10 @@ class MyChatGFAPageState extends State<MyChatGFAPage> {
   Future<void> sendMessage() async {
     if (messageController.text.isEmpty) return;
 
+    final userMessage = messageController.text;
     setState(() {
-      messages.add(messageController.text);
+      messages.add({'text': userMessage, 'type': 'user'});
+      messages.add({'text': 'Processing...', 'type': 'system'});
     });
 
     try {
@@ -87,30 +89,29 @@ class MyChatGFAPageState extends State<MyChatGFAPage> {
       var response = await http.post(
         url,
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'text': messageController.text}),
+        body: jsonEncode({'text': userMessage, 'club_id': widget.clubId}),
       );
 
       if (response.statusCode == 200) {
         var data = jsonDecode(response.body);
         var goalScorer = data['goal_scorer'];
         var assistProvider = data['assist_provider'];
+        var message = data['message'];
 
-        if (goalScorer != null && assistProvider != null) {
-          // Update Firestore
-          await updateFirestore(goalScorer, assistProvider);
+        setState(() {
+          messages.removeLast(); // Remove 'Processing...' message
+          messages.add({'text': message, 'type': 'system'});
+        });
 
-          // Display parsed data
-          setState(() {
-            messages.add('Goal by $goalScorer, assist by $assistProvider');
-          });
+        if (message.contains("Multiple players found") || message.contains("Who scored the goal?")) {
+          // Don't update Firestore, wait for user clarification
         } else {
-          setState(() {
-            messages.add('Failed to parse goal and assist information');
-          });
+          await updateFirestore(goalScorer, assistProvider);
         }
       } else {
         setState(() {
-          messages.add('Failed to parse message. Status code: ${response.statusCode}');
+          messages.removeLast(); // Remove 'Processing...' message
+          messages.add({'text': 'Failed to parse message. Status code: ${response.statusCode}', 'type': 'system'});
         });
         if (kDebugMode) {
           print('Failed to parse message. Status code: ${response.statusCode}');
@@ -119,7 +120,8 @@ class MyChatGFAPageState extends State<MyChatGFAPage> {
       }
     } catch (e) {
       setState(() {
-        messages.add('Error: $e');
+        messages.removeLast(); // Remove 'Processing...' message
+        messages.add({'text': 'Error: $e', 'type': 'system'});
       });
       if (kDebugMode) {
         print('Error sending message: $e');
@@ -129,34 +131,63 @@ class MyChatGFAPageState extends State<MyChatGFAPage> {
     messageController.clear();
   }
 
-  Future<void> updateFirestore(String goalScorer, String assistProvider) async {
+  Future<void> updateFirestore(String? goalScorer, String? assistProvider) async {
+    if (goalScorer == null && assistProvider == null) return;
+
     try {
       final clubsRef = FirebaseFirestore.instance.collection('clubs');
       final clubDoc = clubsRef.doc(widget.clubId);
-      final playersRef = clubDoc.collection('PlayersTable');
+      final playersRef = clubDoc.collection('PllayersTable');
 
-      // Update goal scorer
-      var goalDoc = await playersRef.where('player_name', isEqualTo: goalScorer).get();
-      if (goalDoc.docs.isNotEmpty) {
-        await playersRef.doc(goalDoc.docs[0].id).update({'goals_scored': FieldValue.increment(1)});
+      Future<List<QueryDocumentSnapshot>> findPlayers(String name) async {
+        var nameParts = name.toLowerCase().split(' ');
+        var querySnapshot = await playersRef.get();
+        return querySnapshot.docs.where((doc) {
+          var playerName = doc['player_name'].toString().toLowerCase();
+          return nameParts.every((part) => playerName.contains(part));
+        }).toList();
       }
 
-      // Update assist provider
-      var assistDoc = await playersRef.where('player_name', isEqualTo: assistProvider).get();
-      if (assistDoc.docs.isNotEmpty) {
-        await playersRef.doc(assistDoc.docs[0].id).update({'assists': FieldValue.increment(1)});
+      if (goalScorer != null) {
+        var goalDocs = await findPlayers(goalScorer);
+        if (goalDocs.isEmpty) {
+          setState(() {
+            messages.add({'text': 'No player found matching "$goalScorer"', 'type': 'system'});
+          });
+        } else if (goalDocs.length > 1) {
+          setState(() {
+            messages.add({'text': 'Multiple players found matching "$goalScorer". Please specify.', 'type': 'system'});
+          });
+        } else {
+          await playersRef.doc(goalDocs[0].id).update({'goals_scored': FieldValue.increment(1)});
+        }
       }
 
-      setState(() {
-        messages.add('Firestore updated successfully');
-      });
+      if (assistProvider != null) {
+        var assistDocs = await findPlayers(assistProvider);
+        if (assistDocs.isEmpty) {
+          setState(() {
+            messages.add({'text': 'No player found matching "$assistProvider"', 'type': 'system'});
+          });
+        } else if (assistDocs.length > 1) {
+          setState(() {
+            messages.add({'text': 'Multiple players found matching "$assistProvider". Please specify.', 'type': 'system'});
+          });
+        } else {
+          await playersRef.doc(assistDocs[0].id).update({'assists': FieldValue.increment(1)});
+        }
+      }
+
+      if (kDebugMode) {
+        print('Firestore updated successfully');
+      }
     } catch (e) {
-      setState(() {
-        messages.add('Error updating Firestore: $e');
-      });
       if (kDebugMode) {
         print('Error updating Firestore: $e');
       }
+      setState(() {
+        messages.add({'text': 'Error updating player statistics: $e', 'type': 'system'});
+      });
     }
   }
 }
