@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -94,8 +93,6 @@ class MyChatGFAPageState extends State<MyChatGFAPage> {
 
       if (response.statusCode == 200) {
         var data = jsonDecode(response.body);
-        var goalScorer = data['goal_scorer'];
-        var assistProvider = data['assist_provider'];
         var message = data['message'];
 
         setState(() {
@@ -106,7 +103,7 @@ class MyChatGFAPageState extends State<MyChatGFAPage> {
         if (message.contains("Multiple players found") || message.contains("Who scored the goal?")) {
           // Don't update Firestore, wait for user clarification
         } else {
-          await updateFirestore(goalScorer, assistProvider);
+          // Backend Flask handles Firestore update, no need to update in Flutter
         }
       } else {
         setState(() {
@@ -129,65 +126,5 @@ class MyChatGFAPageState extends State<MyChatGFAPage> {
     }
 
     messageController.clear();
-  }
-
-  Future<void> updateFirestore(String? goalScorer, String? assistProvider) async {
-    if (goalScorer == null && assistProvider == null) return;
-
-    try {
-      final clubsRef = FirebaseFirestore.instance.collection('clubs');
-      final clubDoc = clubsRef.doc(widget.clubId);
-      final playersRef = clubDoc.collection('PllayersTable');
-
-      Future<List<QueryDocumentSnapshot>> findPlayers(String name) async {
-        var nameParts = name.toLowerCase().split(' ');
-        var querySnapshot = await playersRef.get();
-        return querySnapshot.docs.where((doc) {
-          var playerName = doc['player_name'].toString().toLowerCase();
-          return nameParts.every((part) => playerName.contains(part));
-        }).toList();
-      }
-
-      if (goalScorer != null) {
-        var goalDocs = await findPlayers(goalScorer);
-        if (goalDocs.isEmpty) {
-          setState(() {
-            messages.add({'text': 'No player found matching "$goalScorer"', 'type': 'system'});
-          });
-        } else if (goalDocs.length > 1) {
-          setState(() {
-            messages.add({'text': 'Multiple players found matching "$goalScorer". Please specify.', 'type': 'system'});
-          });
-        } else {
-          await playersRef.doc(goalDocs[0].id).update({'goals_scored': FieldValue.increment(1)});
-        }
-      }
-
-      if (assistProvider != null) {
-        var assistDocs = await findPlayers(assistProvider);
-        if (assistDocs.isEmpty) {
-          setState(() {
-            messages.add({'text': 'No player found matching "$assistProvider"', 'type': 'system'});
-          });
-        } else if (assistDocs.length > 1) {
-          setState(() {
-            messages.add({'text': 'Multiple players found matching "$assistProvider". Please specify.', 'type': 'system'});
-          });
-        } else {
-          await playersRef.doc(assistDocs[0].id).update({'assists': FieldValue.increment(1)});
-        }
-      }
-
-      if (kDebugMode) {
-        print('Firestore updated successfully');
-      }
-    } catch (e) {
-      if (kDebugMode) {
-        print('Error updating Firestore: $e');
-      }
-      setState(() {
-        messages.add({'text': 'Error updating player statistics: $e', 'type': 'system'});
-      });
-    }
   }
 }
