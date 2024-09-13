@@ -1,9 +1,9 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:the_gfa/thrown_pages/chatgfa_thrown_page.dart';
 
 import '../api/all_clubs_api.dart';
+import '../thrown_pages/chatgfa_thrown_page.dart';
 
 class ClubSelectionPage extends StatefulWidget {
   const ClubSelectionPage({super.key});

@@ -47,10 +47,10 @@ class WhoWeAre extends StatefulWidget {
   final String? title;
 
   @override
-  State<WhoWeAre> createState() => _WhoWeAreState();
+  State<WhoWeAre> createState() => WhoWeAreState();
 }
 
-class _WhoWeAreState extends State<WhoWeAre> {
+class WhoWeAreState extends State<WhoWeAre> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(

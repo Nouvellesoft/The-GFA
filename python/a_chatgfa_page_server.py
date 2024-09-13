@@ -5,6 +5,7 @@ from openai import OpenAI
 from dotenv import load_dotenv
 from google.cloud import firestore
 from fuzzywuzzy import fuzz
+from datetime import datetime, timedelta
 
 # Load environment variables
 load_dotenv()
@@ -21,19 +22,8 @@ client = OpenAI(api_key='sk-GFTuZzkvMOyU6oJCvDAl5b-V4wx_gJP7nlPJGJZTIyT3BlbkFJCb
 FIRESTORE_PROJECT_ID = 'the-gfa'
 db = firestore.Client(project=FIRESTORE_PROJECT_ID)
 
-# Memory for assist and goal data
-assist_memory = {}
-goal_memory = {}
-
-
-def clean_input(input_text):
-    confirmation_words = ['yes', 'no', 'yup', 'yeah', 'yep', 'nope']
-    parts = input_text.split(',')
-    for part in parts:
-        part_cleaned = part.strip().lower()
-        if part_cleaned not in confirmation_words:
-            return part.strip()  # Return cleaned player name
-    return input_text.strip()
+# Global variable to store recent goals
+recent_goals = {}
 
 
 @app.route('/parse', methods=['POST'])
@@ -46,6 +36,10 @@ def parse_message():
         return jsonify({"error": "club_id is required"}), 400
 
     try:
+        # Check if this is a correction to a recent goal
+        if is_correction(input_text):
+            return handle_correction(club_id, input_text)
+
         # Use OpenAI to extract goal and assist
         response = client.chat.completions.create(
             model="gpt-3.5-turbo",
@@ -66,6 +60,13 @@ def parse_message():
         # Update Firestore and get result messages
         update_result = update_firestore(club_id, goal_scorer, assist_provider)
 
+        # Store the recent goal
+        recent_goals[club_id] = {
+            'goal_scorer': goal_scorer,
+            'assist_provider': assist_provider,
+            'timestamp': datetime.now()
+        }
+
         # Check if there are any issues (multiple matches or no matches)
         if "Multiple players found" in update_result or "No player found" in update_result:
             return jsonify({"message": update_result})
@@ -80,10 +81,50 @@ def parse_message():
         return jsonify({"error": str(e)}), 500
 
 
-def update_firestore(club_id, goal_scorer, assist_provider):
+def is_correction(input_text):
+    correction_keywords = ['actually', 'correction', 'i meant', 'sorry']
+    return any(keyword in input_text.lower() for keyword in correction_keywords)
+
+
+def handle_correction(club_id, input_text):
+    if club_id not in recent_goals or (
+            datetime.now() - recent_goals[club_id]['timestamp']) > timedelta(minutes=5):
+        return jsonify(
+            {"message": "No recent goal to correct. Please provide full goal information."})
+
+    # Parse the correction
+    response = client.chat.completions.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {"role": "system",
+             "content": "You are a sports assistant specialized in parsing goal and assist corrections."},
+            {"role": "user",
+             "content": f"Extract any corrections to the goal scorer or assist provider from this text: '{input_text}'. Format the result as JSON with 'goal_scorer' and 'assist_provider' fields. If either is not mentioned or not being corrected, use null."}
+        ],
+        max_tokens=150
+    )
+
+    parsed_correction = json.loads(response.choices[0].message.content.strip())
+
+    # Update the recent goal with corrections
+    if parsed_correction.get('goal_scorer'):
+        recent_goals[club_id]['goal_scorer'] = parsed_correction['goal_scorer']
+    if parsed_correction.get('assist_provider'):
+        recent_goals[club_id]['assist_provider'] = parsed_correction['assist_provider']
+
+    # Update Firestore with the corrected information
+    update_result = update_firestore(club_id, recent_goals[club_id]['goal_scorer'],
+                                     recent_goals[club_id]['assist_provider'], is_correction=True)
+
+    return jsonify({"message": f"Correction recorded. {update_result}"})
+
+
+def update_firestore(club_id, goal_scorer, assist_provider, is_correction=False):
     players_ref = db.collection('clubs').document(club_id).collection('PllayersTable')
 
     def find_matching_players(name):
+        if not name:
+            return []
         name = name.lower()
         name_parts = name.split()
         matching_players = []
@@ -133,10 +174,6 @@ def update_firestore(club_id, goal_scorer, assist_provider):
 
     if assist_provider:
         result_messages.append(update_player_stats(assist_provider, 'assist'))
-
-    # Clear memory after update
-    goal_memory.pop(club_id, None)
-    assist_memory.pop(club_id, None)
 
     return '. '.join(result_messages)
 
