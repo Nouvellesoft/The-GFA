@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../api/all_clubs_api.dart';
-import '../thrown_pages/chatgfa_thrown_page.dart';
+import '../thrown_pages/chatgfa/chatgfa_thrown_page.dart';
 
 class ClubSelectionPage extends StatefulWidget {
   const ClubSelectionPage({super.key});

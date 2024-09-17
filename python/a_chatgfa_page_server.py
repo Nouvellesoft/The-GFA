@@ -22,8 +22,15 @@ client = OpenAI(api_key='sk-GFTuZzkvMOyU6oJCvDAl5b-V4wx_gJP7nlPJGJZTIyT3BlbkFJCb
 FIRESTORE_PROJECT_ID = 'the-gfa'
 db = firestore.Client(project=FIRESTORE_PROJECT_ID)
 
-# Global variable to store recent goals
+# Global variables to store recent goals, assists, and partial information
+pending_info = {}
 recent_goals = {}
+
+
+def is_greeting(input_text):
+    greetings = ['hello', 'hi', 'hey', 'greetings', 'good morning', 'good afternoon',
+                 'good evening']
+    return input_text.lower().strip() in greetings
 
 
 @app.route('/parse', methods=['POST'])
@@ -36,11 +43,19 @@ def parse_message():
         return jsonify({"error": "club_id is required"}), 400
 
     try:
+        # Check if the input is a greeting
+        if is_greeting(input_text):
+            return handle_greeting(input_text)
+
         # Check if this is a correction to a recent goal
         if is_correction(input_text):
             return handle_correction(club_id, input_text)
 
-        # Use OpenAI to extract goal and assist
+        # Check if this is a single name response
+        if is_single_name(input_text):
+            return handle_single_name_response(club_id, input_text)
+
+        # Use OpenAI to extract goal and assist information
         response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
@@ -57,22 +72,7 @@ def parse_message():
         goal_scorer = parsed_data.get('goal_scorer')
         assist_provider = parsed_data.get('assist_provider')
 
-        # Update Firestore and get result messages
-        update_result = update_firestore(club_id, goal_scorer, assist_provider)
-
-        # Store the recent goal
-        recent_goals[club_id] = {
-            'goal_scorer': goal_scorer,
-            'assist_provider': assist_provider,
-            'timestamp': datetime.now()
-        }
-
-        # Check if there are any issues (multiple matches or no matches)
-        if "Multiple players found" in update_result or "No player found" in update_result:
-            return jsonify({"message": update_result})
-
-        return jsonify({
-                           "message": f"Goal by {goal_scorer}, assist by {assist_provider} recorded. {update_result}"})
+        return process_goal_info(club_id, goal_scorer, assist_provider, input_text)
 
     except json.JSONDecodeError:
         return jsonify({"error": "Failed to parse OpenAI response"}), 500
@@ -81,8 +81,110 @@ def parse_message():
         return jsonify({"error": str(e)}), 500
 
 
+def is_single_name(input_text):
+    # Check if the input is a single word (name) without any additional context
+    return len(input_text.split()) == 1
+
+
+def handle_single_name_response(club_id, name):
+    players_ref = db.collection('clubs').document(club_id).collection('PllayersTable')
+
+    # Check if the name exists in the database
+    matching_players = find_matching_players(players_ref, name)
+
+    if not matching_players:
+        return jsonify(
+            {"message": f"No player found matching '{name}'. Please provide more information."})
+
+    if len(matching_players) > 1:
+        player_names = [player.to_dict()['player_name'] for player in matching_players]
+        return jsonify({
+            "message": f"Multiple players found matching '{name}': {', '.join(player_names)}. Please specify."})
+
+    # If we have a pending goal or assist, update accordingly
+    if club_id in pending_info:
+        if 'goal_scorer' in pending_info[club_id]:
+            return process_goal_info(club_id, pending_info[club_id]['goal_scorer'], name,
+                                     f"{name} assisted")
+        elif 'assist_provider' in pending_info[club_id]:
+            return process_goal_info(club_id, name, pending_info[club_id]['assist_provider'],
+                                     f"Goal by {name}")
+
+    # If no pending info, ask for more context
+    return jsonify({"message": f"Player {name} noted. Did they score a goal or provide an assist?"})
+
+
+def process_goal_info(club_id, goal_scorer, assist_provider, input_text):
+    # Check if we have pending information for this club
+    if club_id in pending_info:
+        if goal_scorer and not assist_provider:
+            assist_provider = pending_info[club_id].get('assist_provider')
+        elif assist_provider and not goal_scorer:
+            goal_scorer = pending_info[club_id].get('goal_scorer')
+
+    # If we have both goal scorer and assist provider, update Firestore
+    if goal_scorer and assist_provider:
+        update_result = update_firestore(club_id, goal_scorer, assist_provider)
+        # Clear pending info
+        if club_id in pending_info:
+            del pending_info[club_id]
+        return jsonify(
+            {"message": f"Goal by {goal_scorer}, assisted by {assist_provider}. {update_result}"})
+
+    # If we only have goal scorer
+    if goal_scorer and not assist_provider:
+        pending_info[club_id] = {'goal_scorer': goal_scorer, 'timestamp': datetime.now()}
+        return jsonify({"message": f"Goal by {goal_scorer} noted. Who provided the assist?"})
+
+    # If we only have assist provider
+    if assist_provider and not goal_scorer:
+        pending_info[club_id] = {'assist_provider': assist_provider, 'timestamp': datetime.now()}
+        return jsonify({"message": f"Assist by {assist_provider} noted. Who scored the goal?"})
+
+    # If we don't have either, it might be a general query or unrelated input
+    return handle_general_query(input_text)
+
+
+def find_matching_players(players_ref, name):
+    if not name:
+        return []
+    name = name.lower()
+    matching_players = []
+
+    all_players = players_ref.get()
+    for player in all_players:
+        player_data = player.to_dict()
+        player_name = player_data['player_name'].lower()
+
+        # Check for exact match
+        if name == player_name:
+            return [player]
+
+        # Check for partial matches
+        if name in player_name:
+            matching_players.append(player)
+
+        # Fuzzy matching
+        if fuzz.partial_ratio(name, player_name) > 80:
+            matching_players.append(player)
+
+    return list({player.id: player for player in matching_players}.values())
+
+
+def handle_general_query(input_text):
+    fallback_response = client.chat.completions.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {"role": "system", "content": "You are a friendly sports assistant."},
+            {"role": "user", "content": input_text}
+        ],
+        max_tokens=150
+    )
+    return jsonify({"message": fallback_response.choices[0].message.content.strip()})
+
+
 def is_correction(input_text):
-    correction_keywords = ['actually', 'correction', 'i meant', 'sorry']
+    correction_keywords = ['actually', 'correction', 'i meant', 'sorry', 'my bad']
     return any(keyword in input_text.lower() for keyword in correction_keywords)
 
 
@@ -117,6 +219,20 @@ def handle_correction(club_id, input_text):
                                      recent_goals[club_id]['assist_provider'], is_correction=True)
 
     return jsonify({"message": f"Correction recorded. {update_result}"})
+
+
+def handle_greeting(greeting):
+    responses = {
+        'hello': "Hello! How can I assist you with tracking goals and assists today?",
+        'hi': "Hi there! Ready to record some football action?",
+        'hey': "Hey! What's the latest on the pitch?",
+        'greetings': "Greetings! How's the game going?",
+        'good morning': "Good morning! Ready for some football talk?",
+        'good afternoon': "Good afternoon! Any exciting matches happening?",
+        'good evening': "Good evening! How can I help with your football stats?"
+    }
+    return jsonify({"message": responses.get(greeting.lower().strip(),
+                                             "Hello! How can I help you with football today?")})
 
 
 def update_firestore(club_id, goal_scorer, assist_provider, is_correction=False):
