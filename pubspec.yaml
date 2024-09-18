@@ -97,6 +97,9 @@ dependencies:
   timeline_tile: ^2.0.0
   draggable_scrollbar: ^0.1.0
   vs_scrollbar: ^1.0.0
+  grouped_list: ^6.0.0
+  sticky_grouped_list: ^3.1.0
+  animated_text_kit: ^4.2.2
 
 flutter_icons:
   android: true

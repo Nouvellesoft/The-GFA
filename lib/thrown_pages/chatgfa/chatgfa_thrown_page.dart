@@ -1,32 +1,15 @@
 import 'dart:convert';
 
+import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:giffy_dialog/giffy_dialog.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 
-String reachDetails = "Contacts";
-String autoBioDetails = "AutoBiography";
-
-Map<int, Widget>? userBIO;
-
-Color backgroundColor = const Color.fromRGBO(180, 43, 81, 1);
-Color appBarTextColor = Colors.white;
-Color appBarBackgroundColor = const Color.fromRGBO(180, 43, 81, 1);
-Color appBarIconColor = Colors.white;
-Color materialBackgroundColor = Colors.transparent;
-Color shapeDecorationColor = const Color.fromRGBO(180, 43, 81, 1);
-Color shapeDecorationTextColor = const Color.fromRGBO(180, 43, 81, 1);
-Color cardBackgroundColor = Colors.white;
-Color cardThumbColor = Colors.white;
-Color cardThumbBackgroundColor = const Color.fromRGBO(180, 43, 81, 1);
-Color splashColor = const Color.fromRGBO(180, 43, 81, 1);
-Color splashColorTwo = Colors.white;
-Color iconTextColor = const Color.fromRGBO(180, 43, 81, 1);
-Color iconTextColorTwo = Colors.white;
-Color buttonColor = const Color.fromRGBO(180, 43, 81, 1);
-Color textColor = const Color.fromRGBO(180, 43, 81, 1);
+String adminMatchDayChat = "MatchDay";
+String generalChat = "General Chat";
 
 class MyChatGFAPage extends StatefulWidget {
   final String clubId;
@@ -37,62 +20,228 @@ class MyChatGFAPage extends StatefulWidget {
 }
 
 class MyChatGFAPageState extends State<MyChatGFAPage> {
-  List<Map<String, String>> messages = [];
-  TextEditingController messageController = TextEditingController();
+  TextEditingController adminMatchDayChatMessageController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
+  List<Map<String, dynamic>> adminMatchDayChatMessages = [];
+  DateTime? adminMatchDayChatLastMessageDate;
   int sharedValue = 0;
+  bool isRecording = true;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: backgroundColor,
-      appBar: AppBar(
-        title: Text('Club ID: ${widget.clubId}'),
-      ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: <Widget>[
-          Card(
-            elevation: 5,
-            color: cardBackgroundColor,
-            margin: const EdgeInsets.all(10),
-            semanticContainer: true,
-            clipBehavior: Clip.antiAliasWithSaveLayer,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10.0),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.only(top: 20, bottom: 20, left: 8.0, right: 8.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 35),
-                    child: CupertinoSlidingSegmentedControl<int>(
-                      padding: const EdgeInsets.fromLTRB(5, 10, 5, 10),
-                      thumbColor: cardThumbColor,
-                      backgroundColor: cardThumbBackgroundColor.withAlpha(50),
-                      children: {
-                        0: Text(
-                          reachDetails,
-                          style: GoogleFonts.sacramento(color: shapeDecorationTextColor, fontSize: 25, fontWeight: FontWeight.w400),
-                        ),
-                        1: Text(
-                          autoBioDetails,
-                          style: GoogleFonts.sacramento(color: shapeDecorationTextColor, fontSize: 25, fontWeight: FontWeight.w400),
-                        ),
-                      },
-                      onValueChanged: (int? value) {
-                        setState(() {
-                          sharedValue = value!;
-                        });
-                      },
-                      groupValue: sharedValue,
+      backgroundColor: Colors.white,
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(MediaQuery.of(context).size.height * 0.13),
+        child: AppBar(
+          backgroundColor: Colors.white,
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back, color: Colors.black),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+          title: Text(
+            'Club ID: ${widget.clubId}',
+            style: const TextStyle(color: Colors.black),
+          ),
+          centerTitle: true,
+          bottom: PreferredSize(
+            preferredSize: Size.fromHeight(MediaQuery.of(context).size.height * 0.08),
+            child: Container(
+              width: double.infinity,
+              color: const Color.fromRGBO(240, 240, 240, 1.0),
+              margin: EdgeInsets.symmetric(
+                horizontal: MediaQuery.of(context).size.width * 0.05,
+                vertical: MediaQuery.of(context).size.height * 0.01,
+              ),
+              child: CupertinoSlidingSegmentedControl<int>(
+                padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.02),
+                thumbColor: Colors.white,
+                backgroundColor: Colors.transparent,
+                children: {
+                  0: Padding(
+                    padding: EdgeInsets.symmetric(
+                      vertical: MediaQuery.of(context).size.width * 0.01,
+                    ), // Adjust this to control inner spacing
+                    child: Text(
+                      adminMatchDayChat,
+                      style: GoogleFonts.agbalumo(
+                        color: const Color.fromRGBO(38, 34, 35, 1.0),
+                        fontSize: MediaQuery.of(context).size.width * 0.055,
+                        fontWeight: FontWeight.w400,
+                      ),
                     ),
                   ),
-
-                  userBIO![sharedValue]!, // Use safe access with null check
-                ],
+                  1: Padding(
+                    padding: EdgeInsets.symmetric(
+                      vertical: MediaQuery.of(context).size.width * 0.01,
+                    ), // Adjust this to control inner spacing
+                    child: Text(
+                      generalChat,
+                      style: GoogleFonts.andadaPro(
+                        color: const Color.fromRGBO(38, 34, 35, 1.0),
+                        fontSize: MediaQuery.of(context).size.width * 0.055,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                },
+                onValueChanged: (int? value) {
+                  setState(() {
+                    sharedValue = value!;
+                  });
+                },
+                groupValue: sharedValue,
               ),
+            ),
+          ),
+        ),
+      ),
+      body: sharedValue == 0 ? _buildAdminMatchDayChatView() : _buildAutobiographyView(),
+    );
+  }
+
+  Widget _buildAdminMatchDayChatView() {
+    return Stack(
+      children: <Widget>[
+        if (adminMatchDayChatMessages.isEmpty)
+          Positioned.fill(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Align(
+                  alignment: Alignment.topCenter,
+                  child: Lottie.asset('assets/json/chat_gfa_admin_before_chat.json'), // Show when page is empty
+                ),
+                const SizedBox(height: 20), // Add some space between the Lottie and the text
+                Align(
+                  alignment: Alignment.center,
+                  child: AnimatedTextKit(
+                    animatedTexts: [
+                      TypewriterAnimatedText(
+                        'Goal by Dexter, Adebayo gave the assist', // Your animated text here
+                        textStyle: const TextStyle(
+                          fontSize: 17.0,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.black, // Change this based on your theme
+                        ),
+                        speed: const Duration(milliseconds: 100), // Set the speed for each character
+                      ),
+                    ],
+                    isRepeatingAnimation: true,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        if (adminMatchDayChatMessages.isNotEmpty)
+          Positioned.fill(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                // Top Lottie Animation
+                Align(
+                  alignment: Alignment.topCenter,
+                  child: Lottie.asset(
+                    'assets/json/cc.json', // Top Lottie animation file
+                    height: MediaQuery.of(context).size.width * 0.5, // Adjust the height as needed
+                    fit: BoxFit.contain,
+                    repeat: true,
+                  ),
+                ),
+
+                const SizedBox(height: 50), // Space between top and center Lottie
+
+                // Center Lottie Animation
+                Align(
+                  alignment: Alignment.center,
+                  child: Lottie.asset(
+                    'assets/json/chat_gfa_admin_during_chat.json',
+                    fit: BoxFit.cover,
+                    repeat: true,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        Positioned.fill(
+          child: Column(
+            children: <Widget>[
+              Expanded(
+                child: ListView.builder(
+                  reverse: true,
+                  controller: _scrollController,
+                  itemCount: adminMatchDayChatMessages.length,
+                  itemBuilder: (context, index) {
+                    final message = adminMatchDayChatMessages[adminMatchDayChatMessages.length - 1 - index];
+                    final messageDate = DateTime(
+                      message['time'].year,
+                      message['time'].month,
+                      message['time'].day,
+                    );
+
+                    final showDateSeparator = index == adminMatchDayChatMessages.length - 1 ||
+                        messageDate !=
+                            DateTime(
+                              adminMatchDayChatMessages[adminMatchDayChatMessages.length - 2 - index]['time'].year,
+                              adminMatchDayChatMessages[adminMatchDayChatMessages.length - 2 - index]['time'].month,
+                              adminMatchDayChatMessages[adminMatchDayChatMessages.length - 2 - index]['time'].day,
+                            );
+
+                    return Column(
+                      children: [
+                        if (showDateSeparator) _buildAdminMatchDayDateSeparator(messageDate),
+                        _buildAdminMatchDayMessageItem(context, message),
+                      ],
+                    );
+                  },
+                  padding: const EdgeInsets.all(8),
+                ),
+              ),
+              _buildAdminMatchDayChatMessageInput(),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildAdminMatchDayMessageItem(BuildContext context, Map<String, dynamic> message) {
+    final isUser = message['type'] == 'user';
+    final isProcessing = message['text'] == 'Processing...';
+
+    return Align(
+      alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
+      child: Column(
+        crossAxisAlignment: isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+        children: [
+          Container(
+            margin: const EdgeInsets.symmetric(vertical: 4),
+            constraints: BoxConstraints(
+              maxWidth: MediaQuery.of(context).size.width * 0.75,
+            ),
+            decoration: BoxDecoration(
+              color: isUser ? Colors.blue[100] : Colors.grey[200],
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              child: isProcessing
+                  ? _buildAdminMatchDayLoadingIndicator()
+                  : Text(
+                      message['text']!,
+                      style: TextStyle(
+                        color: isUser ? Colors.blue[800] : Colors.black87,
+                        fontSize: 16,
+                      ),
+                    ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: 4, bottom: 8),
+            child: Text(
+              DateFormat.jm().format(message['time']),
+              style: const TextStyle(fontSize: 12, color: Colors.grey),
             ),
           ),
         ],
@@ -100,72 +249,77 @@ class MyChatGFAPageState extends State<MyChatGFAPage> {
     );
   }
 
-  int sharedValue = 0;
-
-  initState() {
-    userBIO = <int, Widget>{
-      0: Column(
-        children: <Widget>[
-          Expanded(
-            child: ListView.builder(
-              itemCount: messages.length,
-              itemBuilder: (context, index) {
-                return ListTile(
-                  title: Align(
-                    alignment: messages[index]['type'] == 'user' ? Alignment.centerRight : Alignment.centerLeft,
-                    child: Container(
-                      padding: const EdgeInsets.all(10.0),
-                      decoration: BoxDecoration(
-                        color: messages[index]['type'] == 'user' ? Colors.green : Colors.blueAccent,
-                        borderRadius: BorderRadius.circular(12.0),
-                      ),
-                      child: Text(
-                        messages[index]['text']!,
-                        style: const TextStyle(color: Colors.white),
-                      ),
+  Widget _buildAdminMatchDayChatMessageInput() {
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        child: Row(
+          children: <Widget>[
+            Expanded(
+              child: TextField(
+                controller: adminMatchDayChatMessageController,
+                decoration: InputDecoration(
+                  hintText: "Enter your message or tap the mic...",
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(20.0),
+                    borderSide: BorderSide.none, // No border
+                  ),
+                  filled: true,
+                  fillColor: Colors.transparent,
+                ),
+                style: const TextStyle(color: Colors.black),
+                onChanged: (text) {
+                  if (text.isNotEmpty) {
+                    setState(() {
+                      isRecording = false; // Switch to send button when typing
+                    });
+                  }
+                },
+              ),
+            ),
+            const SizedBox(width: 8),
+            // FloatingActionButton.extended with rectangular shape
+            isRecording
+                ? FloatingActionButton.extended(
+                    backgroundColor: Colors.grey[600],
+                    onPressed: startVoiceInput,
+                    label: const Text(
+                      "Voice",
+                      style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w500),
+                    ),
+                    icon: const Icon(Icons.mic, color: Colors.white),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  )
+                : FloatingActionButton.extended(
+                    backgroundColor: Colors.blue[800],
+                    onPressed: sendAdminMatchDayItemMessage,
+                    label: const Text(
+                      "Send",
+                      style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w500),
+                    ),
+                    icon: const Icon(Icons.send, color: Colors.white),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                );
-              },
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              children: <Widget>[
-                Expanded(
-                  child: TextField(
-                    controller: messageController,
-                    decoration: InputDecoration(
-                      hintText: "Enter your message...",
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12.0),
-                      ),
-                    ),
-                  ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.send),
-                  onPressed: sendMessage,
-                ),
-              ],
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
-      1: Container(),
-    };
-
-    super.initState();
+    );
   }
 
-  Future<void> sendMessage() async {
-    if (messageController.text.isEmpty) return;
+  Future<void> sendAdminMatchDayItemMessage() async {
+    if (adminMatchDayChatMessageController.text.isEmpty) return;
 
-    final userMessage = messageController.text;
+    final userMessage = adminMatchDayChatMessageController.text;
+    final currentTime = DateTime.now(); // Capture the current time
+
     setState(() {
-      messages.add({'text': userMessage, 'type': 'user'});
-      messages.add({'text': 'Processing...', 'type': 'system'});
+      adminMatchDayChatMessages.add({'text': userMessage, 'type': 'user', 'time': currentTime});
+      adminMatchDayChatMessages.add({'text': 'Processing...', 'type': 'system', 'time': currentTime});
+      adminMatchDayChatLastMessageDate = currentTime;
     });
 
     try {
@@ -179,10 +333,20 @@ class MyChatGFAPageState extends State<MyChatGFAPage> {
       if (response.statusCode == 200) {
         var data = jsonDecode(response.body);
         var message = data['message'];
+        final systemTime = DateTime.now(); // Timestamp for the system response
 
         setState(() {
-          messages.removeLast(); // Remove 'Processing...' message
-          messages.add({'text': message, 'type': 'system'});
+          adminMatchDayChatMessages.removeLast(); // Remove 'Processing...' message
+          adminMatchDayChatMessages.add({'text': message, 'type': 'system', 'time': systemTime});
+        });
+
+        // Scroll to the bottom after adding new messages
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          _scrollController.animateTo(
+            _scrollController.position.minScrollExtent,
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeOut,
+          );
         });
 
         if (message.contains("Multiple players found") || message.contains("Who scored the goal?")) {
@@ -192,24 +356,106 @@ class MyChatGFAPageState extends State<MyChatGFAPage> {
         }
       } else {
         setState(() {
-          messages.removeLast(); // Remove 'Processing...' message
-          messages.add({'text': 'Failed to parse message. Status code: ${response.statusCode}', 'type': 'system'});
+          adminMatchDayChatMessages.removeLast(); // Remove 'Processing...' message
+          adminMatchDayChatMessages
+              .add({'text': 'Failed to parse message. Status code: ${response.statusCode}', 'type': 'system', 'time': currentTime});
         });
-        if (kDebugMode) {
-          print('Failed to parse message. Status code: ${response.statusCode}');
-          print('Response body: ${response.body}');
-        }
       }
     } catch (e) {
       setState(() {
-        messages.removeLast(); // Remove 'Processing...' message
-        messages.add({'text': 'Error: $e', 'type': 'system'});
+        adminMatchDayChatMessages.removeLast(); // Remove 'Processing...' message
+        adminMatchDayChatMessages.add({'text': 'Error: $e', 'type': 'system', 'time': currentTime});
       });
-      if (kDebugMode) {
-        print('Error sending message: $e');
-      }
     }
 
-    messageController.clear();
+    adminMatchDayChatMessageController.clear();
+    setState(() {
+      isRecording = true; // Switch back to the mic button
+    });
+  }
+
+  Widget _buildAdminMatchDayLoadingIndicator() {
+    return Center(child: Lottie.asset('assets/json/chat_gfa_admin_ai_texting_chat.json', width: 250, height: 250, fit: BoxFit.cover));
+  }
+
+  Widget _buildAdminMatchDayDateSeparator(DateTime date) {
+    return Container(
+      color: Colors.transparent,
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      alignment: Alignment.center,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+        decoration: BoxDecoration(
+          color: Colors.grey[300],
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Text(
+          _getDateString(date),
+          style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+        ),
+      ),
+    );
+  }
+
+  // This method will be called whenever the user types or the text field changes
+  void _handleTextChange() {
+    setState(() {
+      isRecording = adminMatchDayChatMessageController.text.isEmpty;
+    });
+  }
+
+  // Call this when the voice input finishes and converts speech to text
+  void _updateWithVoiceInput(String voiceText) {
+    setState(() {
+      adminMatchDayChatMessageController.text = voiceText;
+      isRecording = false; // Switch to the send button
+    });
+  }
+
+  // Placeholder method to start voice input and handle its result
+  void startVoiceInput() async {
+    // Here you will call a voice recognition package
+    // For demo purposes, we're simulating voice input
+    Future.delayed(const Duration(seconds: 3), () {
+      _updateWithVoiceInput("David scored, assist by Daniel");
+    });
+  }
+
+  ///
+
+  Widget _buildAutobiographyView() {
+    return Container(); // Empty container for now
+  }
+
+  String _getDateString(DateTime date) {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final yesterday = today.subtract(const Duration(days: 1));
+
+    if (date == today) {
+      return 'Today';
+    } else if (date == yesterday) {
+      return 'Yesterday';
+    } else {
+      return DateFormat('d MMMM y').format(date);
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Scroll to the bottom after the widget is built
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+    });
+
+    adminMatchDayChatMessageController.addListener(_handleTextChange);
+  }
+
+  @override
+  void dispose() {
+    adminMatchDayChatMessageController.dispose();
+    super.dispose();
   }
 }

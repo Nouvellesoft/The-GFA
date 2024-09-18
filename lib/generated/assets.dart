@@ -24,6 +24,7 @@ class Assets {
   static const String imagesMVPBlooded3 = 'assets/images/MVP_Blooded_3.png';
   static const String imagesMgmtPageSliver = 'assets/images/mgmt_page_sliver.gif';
   static const String imagesMonthlyPhotos = 'assets/images/monthly_photos.gif';
+  static const String imagesNoClubIconDefault = 'assets/images/no_club_icon_default.jpeg';
   static const String imagesNoClubImage = 'assets/images/no_club_image.jpeg';
   static const String imagesNoOppClubImage = 'assets/images/no_opp_club_image.jpg';
   static const String imagesNouvellesoftFrontPage = 'assets/images/nouvellesoft_front_page.jpg';
@@ -32,6 +33,10 @@ class Assets {
   static const String imagesTimelineBack = 'assets/images/timeline_back.jpeg';
   static const String jsonAssistsGif = 'assets/json/assists_gif.json';
   static const String jsonBallsBounce = 'assets/json/balls_bounce.json';
+  static const String jsonCc = 'assets/json/cc.json';
+  static const String jsonChatGfaAdminAiTextingChat = 'assets/json/chat_gfa_admin_ai_texting_chat.json';
+  static const String jsonChatGfaAdminBeforeChat = 'assets/json/chat_gfa_admin_before_chat.json';
+  static const String jsonChatGfaAdminDuringChat = 'assets/json/chat_gfa_admin_during_chat.json';
   static const String jsonCoachesCommentGif = 'assets/json/coaches_comment_gif.json';
   static const String jsonCumMotmAward = 'assets/json/cum_motm_award.json';
   static const String jsonFoundersCommentGif = 'assets/json/founders_comment_gif.json';
@@ -44,4 +49,5 @@ class Assets {
   static const String jsonTrainingSoccer = 'assets/json/training_soccer.json';
   static const String jsonTrialSoccer = 'assets/json/trial_soccer.json';
   static const String jsonYellowcardGif = 'assets/json/yellowcard_gif.json';
+
 }
