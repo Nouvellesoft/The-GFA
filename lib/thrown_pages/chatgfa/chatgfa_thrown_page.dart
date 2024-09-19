@@ -26,6 +26,34 @@ class MyChatGFAPageState extends State<MyChatGFAPage> {
   DateTime? adminMatchDayChatLastMessageDate;
   int sharedValue = 0;
   bool isRecording = true;
+  double appBarElevation = 0.0;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Scroll controller listener to adjust AppBar elevation
+    _scrollController.addListener(() {
+      final scrollOffset = _scrollController.offset;
+      setState(() {
+        appBarElevation = scrollOffset > 0 ? 4.0 : 0.0; // Change elevation based on scroll
+      });
+    });
+
+    // Scroll to the bottom after the widget is built
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+    });
+
+    adminMatchDayChatMessageController.addListener(_handleTextChange);
+  }
+
+  @override
+  void dispose() {
+    adminMatchDayChatMessageController.dispose();
+    _scrollController.dispose(); // Dispose the scroll controller
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +63,7 @@ class MyChatGFAPageState extends State<MyChatGFAPage> {
         preferredSize: Size.fromHeight(MediaQuery.of(context).size.height * 0.13),
         child: AppBar(
           backgroundColor: Colors.white,
-          elevation: 0,
+          elevation: appBarElevation,
           leading: IconButton(
             icon: const Icon(Icons.arrow_back, color: Colors.black),
             onPressed: () => Navigator.of(context).pop(),
@@ -49,7 +77,7 @@ class MyChatGFAPageState extends State<MyChatGFAPage> {
             preferredSize: Size.fromHeight(MediaQuery.of(context).size.height * 0.08),
             child: Container(
               width: double.infinity,
-              color: const Color.fromRGBO(240, 240, 240, 1.0),
+              color: const Color.fromRGBO(255, 255, 255, 1.0),
               margin: EdgeInsets.symmetric(
                 horizontal: MediaQuery.of(context).size.width * 0.05,
                 vertical: MediaQuery.of(context).size.height * 0.01,
@@ -397,14 +425,12 @@ class MyChatGFAPageState extends State<MyChatGFAPage> {
     );
   }
 
-  // This method will be called whenever the user types or the text field changes
   void _handleTextChange() {
     setState(() {
       isRecording = adminMatchDayChatMessageController.text.isEmpty;
     });
   }
 
-  // Call this when the voice input finishes and converts speech to text
   void _updateWithVoiceInput(String voiceText) {
     setState(() {
       adminMatchDayChatMessageController.text = voiceText;
@@ -412,7 +438,6 @@ class MyChatGFAPageState extends State<MyChatGFAPage> {
     });
   }
 
-  // Placeholder method to start voice input and handle its result
   void startVoiceInput() async {
     // Here you will call a voice recognition package
     // For demo purposes, we're simulating voice input
@@ -439,23 +464,5 @@ class MyChatGFAPageState extends State<MyChatGFAPage> {
     } else {
       return DateFormat('d MMMM y').format(date);
     }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-
-    // Scroll to the bottom after the widget is built
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
-    });
-
-    adminMatchDayChatMessageController.addListener(_handleTextChange);
-  }
-
-  @override
-  void dispose() {
-    adminMatchDayChatMessageController.dispose();
-    super.dispose();
   }
 }
