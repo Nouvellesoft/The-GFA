@@ -11,57 +11,76 @@ import UserNotifications
     
     override func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         UIApplication.shared.isStatusBarHidden = false
-
-        // Remove this method to stop OneSignal Debugging
+        
+        // OneSignal setup
         OneSignal.Debug.setLogLevel(.LL_VERBOSE)
-
-        // OneSignal initialization
         OneSignal.initialize("6b1cda87-62bf-44d0-9243-9088805b7909", withLaunchOptions: launchOptions)
 
-        // No need to request permission here
-
-        flutterEngine.run()
+        // Configure Firebase
         FirebaseApp.configure()
         Messaging.messaging().delegate = self
+        flutterEngine.run()
         GeneratedPluginRegistrant.register(with: self.flutterEngine)
 
-        // No need to request permission here
-
+        // Set notification center delegate
+        UNUserNotificationCenter.current().delegate = self
         application.registerForRemoteNotifications()
         
         return super.application(application, didFinishLaunchingWithOptions: launchOptions)
     }
     
-    // MARK: - MessagingDelegate
+    // MARK: - Firebase MessagingDelegate
+    
+    func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String?) {
+        print("Firebase registration token: \(String(describing: fcmToken))")
+        // If necessary, send the token to your app server or OneSignal
+    }
 
     override func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable: Any],
                          fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
-        // Check if FIRAuth can handle the notification
         if Auth.auth().canHandleNotification(userInfo) {
-            completionHandler(UIBackgroundFetchResult.noData)
+            completionHandler(.noData)
             return
         }
-        // Continue with your notification handling code
         Messaging.messaging().appDidReceiveMessage(userInfo)
-        // Handle the notification
-        completionHandler(UIBackgroundFetchResult.newData)
+        completionHandler(.newData)
+    }
+    
+    // MARK: - OneSignal Notification Handling
+    
+    func serviceExtensionTimeWillExpire() {
+        // Handle time expiring
+        if let contentHandler = self.contentHandler, let bestAttemptContent = self.bestAttemptContent {
+            contentHandler(bestAttemptContent)
+        }
+    }
+    
+    // MARK: - UNUserNotificationCenterDelegate Methods
+    
+    override func userNotificationCenter(_ center: UNUserNotificationCenter,
+                                      willPresent notification: UNNotification,
+                                      withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+        completionHandler([.alert, .badge, .sound])
     }
 
-    // Continue with the rest of your MessagingDelegate methods if needed...
-    // ...
+    override func userNotificationCenter(_ center: UNUserNotificationCenter,
+                                      didReceive response: UNNotificationResponse,
+                                      withCompletionHandler completionHandler: @escaping () -> Void) {
+        completionHandler()
+    }
 
-    // MARK: - OneSignal Notification Handling (if using Notification Service Extension)
-
-    func didReceiveNotificationExtensionRequest(_ request: UNNotificationRequest, with notificationContent: UNMutableNotificationContent, withContentHandler contentHandler: @escaping (UNNotificationContent) -> Void) {
-        OneSignal.didReceiveNotificationExtensionRequest(request, with: notificationContent, withContentHandler: { newContent in
+    // Properties for notification service extension
+    private var contentHandler: ((UNNotificationContent) -> Void)?
+    private var bestAttemptContent: UNMutableNotificationContent?
+    
+    func didReceiveNotificationExtensionRequest(_ request: UNNotificationRequest,
+                                              with content: UNMutableNotificationContent,
+                                              withContentHandler contentHandler: @escaping (UNNotificationContent) -> Void) {
+        self.contentHandler = contentHandler
+        self.bestAttemptContent = content
+        
+        OneSignal.didReceiveNotificationExtensionRequest(request, with: content) { newContent in
             contentHandler(newContent)
-        })
+        }
     }
-
-    // MARK: - UNUserNotificationCenterDelegate (if using Notification Service Extension)
-
-    // Add UNUserNotificationCenterDelegate methods if needed
-
-    // Continue with the rest of your AppDelegate methods...
-    // ...
 }

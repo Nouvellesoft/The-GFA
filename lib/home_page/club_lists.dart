@@ -9,10 +9,10 @@ class ClubSelectionPage extends StatefulWidget {
   const ClubSelectionPage({super.key});
 
   @override
-  State<ClubSelectionPage> createState() => _ClubSelectionPageState();
+  State<ClubSelectionPage> createState() => ClubSelectionPageState();
 }
 
-class _ClubSelectionPageState extends State<ClubSelectionPage> {
+class ClubSelectionPageState extends State<ClubSelectionPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
