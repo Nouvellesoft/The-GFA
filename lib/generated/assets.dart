@@ -5,6 +5,7 @@ class Assets {
   static const String assetsImagesBaller = 'assets/images/baller.png';
   static const String assetsImagesCpfcLogoAndroidIos = 'assets/images/cpfc_logo_android_ios.jpeg';
   static const String assetsImagesCpfcSmBanner = 'assets/images/cpfc_sm_banner.jpeg';
+  static const String gifCc = 'assets/gif/cc.gif';
   static const String imagesAboutAppSp = 'assets/images/about_app_sp.png';
   static const String imagesBackField = 'assets/images/back_field.png';
   static const String imagesBaller = 'assets/images/baller.gif';
@@ -24,6 +25,7 @@ class Assets {
   static const String imagesMVPBlooded3 = 'assets/images/MVP_Blooded_3.png';
   static const String imagesMgmtPageSliver = 'assets/images/mgmt_page_sliver.gif';
   static const String imagesMonthlyPhotos = 'assets/images/monthly_photos.gif';
+  static const String imagesMonthlyReportImage1 = 'assets/images/monthly_report_image_1.png';
   static const String imagesNoClubIconDefault = 'assets/images/no_club_icon_default.jpeg';
   static const String imagesNoClubImage = 'assets/images/no_club_image.jpeg';
   static const String imagesNoOppClubImage = 'assets/images/no_opp_club_image.jpg';
@@ -37,6 +39,7 @@ class Assets {
   static const String jsonChatGfaAdminAiTextingChat = 'assets/json/chat_gfa_admin_ai_texting_chat.json';
   static const String jsonChatGfaAdminBeforeChat = 'assets/json/chat_gfa_admin_before_chat.json';
   static const String jsonChatGfaAdminDuringChat = 'assets/json/chat_gfa_admin_during_chat.json';
+  static const String jsonChatGfaGeneralBeforeChat = 'assets/json/chat_gfa_general_before_chat.json';
   static const String jsonCoachesCommentGif = 'assets/json/coaches_comment_gif.json';
   static const String jsonCumMotmAward = 'assets/json/cum_motm_award.json';
   static const String jsonFoundersCommentGif = 'assets/json/founders_comment_gif.json';
@@ -49,5 +52,4 @@ class Assets {
   static const String jsonTrainingSoccer = 'assets/json/training_soccer.json';
   static const String jsonTrialSoccer = 'assets/json/trial_soccer.json';
   static const String jsonYellowcardGif = 'assets/json/yellowcard_gif.json';
-
 }

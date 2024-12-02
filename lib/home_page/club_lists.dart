@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../api/all_clubs_api.dart';
-import '../thrown_pages/chatgfa/chatgfa_thrown_page.dart';
+import '../sidebar/sidebar_layout.dart';
 
 class ClubSelectionPage extends StatefulWidget {
   const ClubSelectionPage({super.key});
@@ -39,8 +39,8 @@ class ClubSelectionPageState extends State<ClubSelectionPage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => MyChatGFAPage(clubId: clubId),
-                        // builder: (context) => SideBarLayout(clubId: clubId),
+                        // builder: (context) => MyChatGFAPage(clubId: clubId),
+                        builder: (context) => SideBarLayout(clubId: clubId),
                       ),
                     );
                   },

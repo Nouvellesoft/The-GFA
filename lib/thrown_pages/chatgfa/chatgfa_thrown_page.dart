@@ -143,32 +143,37 @@ class MyChatGFAPageState extends State<MyChatGFAPage> {
       children: <Widget>[
         if (adminMatchDayChatMessages.isEmpty)
           Positioned.fill(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Align(
-                  alignment: Alignment.topCenter,
-                  child: Lottie.asset('assets/json/chat_gfa_admin_before_chat.json'), // Show when page is empty
-                ),
-                const SizedBox(height: 20), // Add some space between the Lottie and the text
-                Align(
-                  alignment: Alignment.center,
-                  child: AnimatedTextKit(
-                    animatedTexts: [
-                      TypewriterAnimatedText(
-                        'Goal by Dexter, Adebayo gave the assist', // Your animated text here
-                        textStyle: const TextStyle(
-                          fontSize: 17.0,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.black, // Change this based on your theme
-                        ),
-                        speed: const Duration(milliseconds: 100), // Set the speed for each character
-                      ),
-                    ],
-                    isRepeatingAnimation: true,
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  SizedBox(
+                    height: 50,
                   ),
-                ),
-              ],
+                  Align(
+                    alignment: Alignment.topCenter,
+                    child: Lottie.asset('assets/json/chat_gfa_admin_before_chat.json'), // Show when page is empty
+                  ),
+                  const SizedBox(height: 40), // Add some space between the Lottie and the text
+                  Align(
+                    alignment: Alignment.center,
+                    child: AnimatedTextKit(
+                      animatedTexts: [
+                        TypewriterAnimatedText(
+                          'Goal by Dexter, Adebayo gave the assist', // Your animated text here
+                          textStyle: const TextStyle(
+                            fontSize: 17.0,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.black, // Change this based on your theme
+                          ),
+                          speed: const Duration(milliseconds: 100), // Set the speed for each character
+                        ),
+                      ],
+                      isRepeatingAnimation: true,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         if (adminMatchDayChatMessages.isNotEmpty)
@@ -244,6 +249,17 @@ class MyChatGFAPageState extends State<MyChatGFAPage> {
   }
 
   Widget _buildGeneralChatView() {
+    // Define hints for users
+    final hints = [
+      'Ask about upcoming matches!',
+      'Who scored the most goals?',
+      'What are the club training days?',
+      'Show me past matches!',
+      'Who are the team captains?',
+      'Tell me about the club history.',
+      'What’s the latest comment from the coach?',
+    ];
+
     return Stack(
       children: <Widget>[
         if (generalChatMessages.isEmpty)
@@ -253,26 +269,31 @@ class MyChatGFAPageState extends State<MyChatGFAPage> {
               children: [
                 Align(
                   alignment: Alignment.topCenter,
-                  child: Lottie.asset('assets/json/chat_gfa_admin_before_chat.json'), // Animation for General Chat
+                  child: Lottie.asset('assets/json/chat_gfa_general_before_chat.json'), // Animation for General Chat
                 ),
                 const SizedBox(height: 20),
                 Align(
                   alignment: Alignment.center,
                   child: AnimatedTextKit(
-                    animatedTexts: [
-                      TypewriterAnimatedText(
-                        'When did Blake Kasser join this football club', // Intro text for general chat
-                        textStyle: const TextStyle(
-                          fontSize: 17.0,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.black,
-                        ),
-                        speed: const Duration(milliseconds: 100),
-                      ),
-                    ],
+                    animatedTexts: hints
+                        .map(
+                          (hint) => TypewriterAnimatedText(
+                            hint,
+                            textStyle: const TextStyle(
+                              fontSize: 17.0,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.black, // Adjust color for your theme
+                            ),
+                            speed: const Duration(milliseconds: 100),
+                          ),
+                        )
+                        .toList(),
                     isRepeatingAnimation: true,
+                    pause: const Duration(seconds: 2), // Pause between each hint
+                    displayFullTextOnTap: true, // Optionally let users see the full hint if they tap
+                    stopPauseOnTap: true,
                   ),
-                ),
+                )
               ],
             ),
           ),

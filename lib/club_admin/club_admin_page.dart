@@ -66,6 +66,7 @@ import 'more_comm/modify_opp_teams/a_tabview_modify_opp_team_page.dart';
 import 'others/add_monthly_photos_page.dart';
 import 'others/change_pages_cover_photo_page.dart';
 import 'others/change_vision_statement_and_more_page.dart';
+import 'others/generate_monthly_statement.dart';
 import 'others/modify_red_card/a_tabview_modify_red_card_page.dart';
 import 'others/modify_yellow_card/a_tabview_modify_yellow_card_page.dart';
 import 'others/record_club_achievement_page.dart';
@@ -801,7 +802,7 @@ class MyClubAdminPageState extends State<MyClubAdminPage> {
                                       onTap: () {
                                         Navigator.pop(context); // Close the dialog
                                         // Show the confirmation dialog
-                                        showConfirmationDialogForStatementGeneration(context);
+                                        showConfirmationDialogForStatementGeneration(context, widget.clubId);
                                       },
                                     ),
                                     ListTile(
@@ -1297,7 +1298,7 @@ class MyClubAdminPageState extends State<MyClubAdminPage> {
   }
 }
 
-void showConfirmationDialogForStatementGeneration(BuildContext context) {
+void showConfirmationDialogForStatementGeneration(BuildContext context, String clubId) {
   showDialog(
     context: context,
     builder: (BuildContext context) {
@@ -1308,7 +1309,7 @@ void showConfirmationDialogForStatementGeneration(BuildContext context) {
           style: TextStyle(color: Colors.white70, fontSize: 16, fontWeight: FontWeight.w700),
         ),
         content: const Text(
-          'This will generate a statement about the club\'s activities so far this month. \n\nClick \'Yes\' to proceed.',
+          'This will generate a PDF statement about the club\'s activities so far this month. \n\nClick \'Yes\' to proceed.',
           style: TextStyle(color: Colors.white70, fontSize: 14),
         ),
         actions: [
@@ -1323,17 +1324,9 @@ void showConfirmationDialogForStatementGeneration(BuildContext context) {
           ),
           TextButton(
             onPressed: () {
-              // Implement the logic to proceed with generating the statement
               Navigator.of(context).pop(); // Close the dialog
-              // Add your logic to generate the statement here
-              // navigateToGenerateStatement(context);
-              Fluttertoast.showToast(
-                msg: 'Statement generated!',
-                gravity: ToastGravity.BOTTOM,
-                backgroundColor: Colors.green,
-                textColor: Colors.white,
-                fontSize: 16.0,
-              );
+              // Navigate to A4 layout
+              navigateToGenerateStatement(context, clubId);
             },
             child: const Text(
               'Yes',
@@ -1344,6 +1337,12 @@ void showConfirmationDialogForStatementGeneration(BuildContext context) {
       );
     },
   );
+}
+
+void navigateToGenerateStatement(BuildContext context, String clubId) {
+  Navigator.of(context).push(MaterialPageRoute(
+    builder: (context) => GenerateMonthlyStatementA4LayoutScreen(clubId: clubId),
+  ));
 }
 
 Future navigateToCreateSMPost(BuildContext context, String clubId) async {

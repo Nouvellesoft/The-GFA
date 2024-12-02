@@ -95,7 +95,7 @@ class MyChatGFAPageState extends State<MyChatGFAPage> {
       children: <Widget>[
         if (adminMatchDayChatMessages.isEmpty)
           Center(
-            child: Lottie.asset('assets/json/chat_gfa_admin_before_chat.json'), // Show when page is empty
+            child: Lottie.asset('assets/json/chat_gfa_general_before_chat.json'), // Show when page is empty
           ),
         Positioned.fill(
           child: Column(
