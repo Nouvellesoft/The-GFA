@@ -5,6 +5,14 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+
+import '../../notifier/coaches_reviews_comment_notifier.dart';
+import '../../notifier/founders_reviews_comment_notifier.dart';
+import '../../notifier/most_fouled_rc_players_stats_info_notifier.dart';
+import '../../notifier/most_fouled_yc_players_stats_info_notifier.dart';
+import '../../notifier/player_of_the_month_stats_info_notifier.dart';
 
 String clubName = "";
 String rawClubName = "";
@@ -23,8 +31,22 @@ class GenerateMonthlyStatementA4LayoutScreenState extends State<GenerateMonthlyS
   late Stream<DocumentSnapshot<Map<String, dynamic>>> firestoreStreamTwo;
   late StreamSubscription<DocumentSnapshot<Map<String, dynamic>>> streamSubscription;
 
+  late PlayerOfTheMonthStatsAndInfoNotifier playerOfTheMonthStatsAndInfoNotifier;
+
   @override
   Widget build(BuildContext context) {
+    MostFouledYCPlayersStatsAndInfoNotifier mostFouledYCPlayersStatsAndInfoNotifier =
+        Provider.of<MostFouledYCPlayersStatsAndInfoNotifier>(context, listen: true);
+
+    MostFouledRCPlayersStatsAndInfoNotifier mostFouledRCPlayersStatsAndInfoNotifier =
+        Provider.of<MostFouledRCPlayersStatsAndInfoNotifier>(context, listen: true);
+
+    playerOfTheMonthStatsAndInfoNotifier = Provider.of<PlayerOfTheMonthStatsAndInfoNotifier>(context);
+
+    CoachesReviewsCommentNotifier coachesReviewsCommentNotifier = Provider.of<CoachesReviewsCommentNotifier>(context);
+
+    FoundersReviewsCommentNotifier foundersReviewsCommentNotifier = Provider.of<FoundersReviewsCommentNotifier>(context);
+
     return Scaffold(
       backgroundColor: Colors.blueGrey.withOpacity(0.8),
       appBar: AppBar(
@@ -210,7 +232,7 @@ class GenerateMonthlyStatementA4LayoutScreenState extends State<GenerateMonthlyS
                                   ),
                                   children: [
                                     TextSpan(
-                                      text: 'March 2024', // The first part
+                                      text: '${DateFormat('MMMM').format(DateTime.now())} 2024', // The first part
                                       style: TextStyle(
                                         fontSize: 25, // First part size
                                         fontWeight: FontWeight.w500,
@@ -220,8 +242,7 @@ class GenerateMonthlyStatementA4LayoutScreenState extends State<GenerateMonthlyS
                                       text: '\nClub Report', // The second part
                                       style: TextStyle(
                                         fontSize: 40, // Bigger size for 'Club Report'
-                                        fontWeight: FontWeight.w800, // Bold weight for 'Club Report'
-
+                                        fontWeight: FontWeight.w800,
                                         letterSpacing: 4,
                                       ),
                                     ),
@@ -360,6 +381,15 @@ class GenerateMonthlyStatementA4LayoutScreenState extends State<GenerateMonthlyS
                                       ),
                                       textAlign: TextAlign.center,
                                     ),
+                                    // Text(
+                                    //   'position', // Regular text
+                                    //   style: TextStyle(
+                                    //     color: Colors.white, // Text color
+                                    //     fontSize: 11, // Smaller font for the label
+                                    //     fontWeight: FontWeight.w700,
+                                    //   ),
+                                    //   textAlign: TextAlign.center,
+                                    // ),
                                   ],
                                 ),
                               ),
@@ -474,122 +504,123 @@ class GenerateMonthlyStatementA4LayoutScreenState extends State<GenerateMonthlyS
                               ),
                             ),
                             // Top 5 Goal Scorers Section
-                            Positioned(
-                              left: 30,
-                              top: 30, // Space from the top
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  // Heading for top 5 goal scorers
-                                  const Text(
-                                    'Top 5 Goal Scorers:',
-                                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                                  ),
-                                  SizedBox(height: 10),
-                                  // No. 1 player with circular image
-                                  Row(
+                            StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                              stream: FirebaseFirestore.instance
+                                  .collection('clubs')
+                                  .doc(widget.clubId)
+                                  .collection('PllayersTable')
+                                  .orderBy('goals_scored', descending: true)
+                                  .snapshots(),
+                              builder: (context, snapshot) {
+                                if (!snapshot.hasData) {
+                                  return Center(child: CircularProgressIndicator());
+                                }
+
+                                var players = snapshot.data!.docs;
+                                return Positioned(
+                                  left: 30,
+                                  top: 30, // Space from the top
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      CircleAvatar(
-                                        radius: 30,
-                                        backgroundImage: AssetImage('assets/images/no_opp_club_image.jpg'),
+                                      // Heading for top 5 goal scorers
+                                      const Text(
+                                        'Top 5 Goal Scorers:',
+                                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                                       ),
-                                      SizedBox(width: 10),
+                                      SizedBox(height: 10),
+                                      // No. 1 player with circular image
+                                      Row(
+                                        children: [
+                                          CircleAvatar(
+                                            radius: 30,
+                                            backgroundImage: CachedNetworkImageProvider(players[0]['image']), // Fetch player 1 image
+                                          ),
+                                          SizedBox(width: 10),
+                                          Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                '1. ${players[0]['player_name']}',
+                                                style: TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                              Text(
+                                                'Matches Played: ${players[0]['matches_played']}',
+                                                style: TextStyle(fontSize: 12),
+                                              ),
+                                              Text(
+                                                'Goals: ${players[0]['goals_scored']}',
+                                                style: TextStyle(fontSize: 12),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                      SizedBox(height: 20),
+                                      // Remaining players
                                       Column(
                                         crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: const [
-                                          Text(
-                                            'Ayo Bamidele',
-                                            style: TextStyle(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.bold,
+                                        children: [
+                                          for (int i = 1; i < players.length && i < 5; i++) ...[
+                                            Text(
+                                              '${i + 1}. ${players[i]['player_name']} - Goals: ${players[i]['goals_scored']}, Matches Played: ${players[i]['matches_played']}',
+                                              style: TextStyle(fontSize: 12),
                                             ),
-                                          ),
-                                          Text(
-                                            'Matches Played: 13',
-                                            style: TextStyle(fontSize: 12),
-                                          ),
-                                          Text(
-                                            'Goals: 12',
-                                            style: TextStyle(fontSize: 12),
-                                          ),
+                                            SizedBox(height: 5),
+                                          ]
+                                        ],
+                                      ),
+                                      SizedBox(height: 30), // Add spacing before the next section
+                                    ],
+                                  ),
+                                );
+                              },
+                            ),
+                            StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                              stream: FirebaseFirestore.instance
+                                  .collection('clubs')
+                                  .doc(widget.clubId)
+                                  .collection('PastMatches')
+                                  .orderBy('id', descending: false) // Sort matches by most recent date
+                                  .snapshots(),
+                              builder: (context, snapshot) {
+                                if (!snapshot.hasData) {
+                                  return Center(child: CircularProgressIndicator());
+                                }
+
+                                var matches = snapshot.data!.docs;
+                                return Positioned(
+                                  left: 30,
+                                  bottom: 30, // Position near the bottom
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      // Heading for Past 5 Matches
+                                      const Text(
+                                        'Past 5 Matches:',
+                                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                                      ),
+                                      SizedBox(height: 10),
+                                      // List of past matches
+                                      Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          for (int i = 0; i < matches.length && i < 5; i++) ...[
+                                            Text(
+                                              '${i + 1}. ${matches[i]['home_team']} ${matches[i]['ht_score']} - ${matches[i]['at_score']} ${matches[i]['away_team']} - (${matches[i]['match_date']})',
+                                              style: TextStyle(fontSize: 9),
+                                            ),
+                                            SizedBox(height: 5),
+                                          ],
                                         ],
                                       ),
                                     ],
                                   ),
-                                  SizedBox(height: 20),
-                                  // Remaining players
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: const [
-                                      Text(
-                                        '2. Olu Sowunmi: Goals: 11, Matches Played: 11',
-                                        style: TextStyle(fontSize: 12),
-                                      ),
-                                      SizedBox(height: 5),
-                                      Text(
-                                        '3. Mark Black: Goals: 10, Matches Played: 12',
-                                        style: TextStyle(fontSize: 12),
-                                      ),
-                                      SizedBox(height: 5),
-                                      Text(
-                                        '4. Alice White: Goals: 9, Matches Played: 14',
-                                        style: TextStyle(fontSize: 12),
-                                      ),
-                                      SizedBox(height: 5),
-                                      Text(
-                                        '5. Jane Smith: Goals: 8, Matches Played: 15',
-                                        style: TextStyle(fontSize: 12),
-                                      ),
-                                    ],
-                                  ),
-                                  SizedBox(height: 30), // Add spacing before the next section
-                                ],
-                              ),
-                            ),
-                            Positioned(
-                              left: 30,
-                              bottom: 30, // Space from the top
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  // Past 5 Matches Section
-                                  const Text(
-                                    'Past 5 Matches:',
-                                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                                  ),
-                                  SizedBox(height: 10),
-                                  // Match 1
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: const [
-                                      Text(
-                                        '1. Coventry Phoenix FC 2 - 1 Copswood FC - (11-03-2024)',
-                                        style: TextStyle(fontSize: 12),
-                                      ),
-                                      SizedBox(height: 5),
-                                      Text(
-                                        '2. AFC Binley 3 - 2 Coventry Phoenix FC Thirds - (11-03-2024)',
-                                        style: TextStyle(fontSize: 12),
-                                      ),
-                                      SizedBox(height: 5),
-                                      Text(
-                                        '3. Coventry Phoenix FC 1 - 0 Leamington FC - (11-03-2024)',
-                                        style: TextStyle(fontSize: 12),
-                                      ),
-                                      SizedBox(height: 5),
-                                      Text(
-                                        '4. Coventry Phoenix FC 0 - 3 Southam United FC - (11-03-2024)',
-                                        style: TextStyle(fontSize: 12),
-                                      ),
-                                      SizedBox(height: 5),
-                                      Text(
-                                        '5. Copswood FC 2 - 2 Coventry Phoenix FC - (11-03-2024)',
-                                        style: TextStyle(fontSize: 12),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
+                                );
+                              },
                             ),
                           ],
                         ),
@@ -726,166 +757,133 @@ class GenerateMonthlyStatementA4LayoutScreenState extends State<GenerateMonthlyS
                               ),
                             ),
                             // Top 5 Goal Assists Section
-                            Positioned(
-                              left: 30,
-                              top: 30, // Space from the top
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  // Heading for Top 5 Assist Players
-                                  const Text(
-                                    'Top 5 Assist Players:',
-                                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                                  ),
-                                  SizedBox(height: 10),
-                                  // No. 1 player with circular image
-                                  Row(
+                            StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                              stream: FirebaseFirestore.instance
+                                  .collection('clubs')
+                                  .doc(widget.clubId)
+                                  .collection('PllayersTable')
+                                  .orderBy('assists', descending: true)
+                                  .snapshots(),
+                              builder: (context, snapshot) {
+                                if (!snapshot.hasData) {
+                                  return Center(child: CircularProgressIndicator());
+                                }
+
+                                var players = snapshot.data!.docs;
+                                return Positioned(
+                                  left: 30,
+                                  top: 30, // Space from the top
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      CircleAvatar(
-                                        radius: 30,
-                                        backgroundImage: AssetImage('assets/images/no_opp_club_image.jpg'),
+                                      // Heading for Top 5 Assist Players
+                                      const Text(
+                                        'Top 5 Assist Players:',
+                                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                                       ),
-                                      SizedBox(width: 10),
+                                      SizedBox(height: 10),
+                                      // No. 1 player with circular image
+                                      Row(
+                                        children: [
+                                          CircleAvatar(
+                                            radius: 30,
+                                            backgroundImage: CachedNetworkImageProvider(players[0]['image']), // Fetch player 1 image
+                                          ),
+                                          SizedBox(width: 10),
+                                          Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                '1. ${players[0]['player_name']}',
+                                                style: TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                              Text(
+                                                'Matches Played: ${players[0]['matches_played']}',
+                                                style: TextStyle(fontSize: 12),
+                                              ),
+                                              Text(
+                                                'Assists: ${players[0]['assists']}',
+                                                style: TextStyle(fontSize: 12),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                      SizedBox(height: 20),
+                                      // Remaining assist players
                                       Column(
                                         crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: const [
-                                          Text(
-                                            'David Ogundepo',
-                                            style: TextStyle(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.bold,
+                                        children: [
+                                          for (int i = 1; i < players.length && i < 5; i++) ...[
+                                            Text(
+                                              '${i + 1}. ${players[i]['player_name']} - Assists: ${players[i]['assists']}, Matches Played: ${players[i]['matches_played']}',
+                                              style: TextStyle(fontSize: 12),
                                             ),
-                                          ),
-                                          Text(
-                                            'Matches Played: 13',
-                                            style: TextStyle(fontSize: 12),
-                                          ),
-                                          Text(
-                                            'Assists: 15',
-                                            style: TextStyle(fontSize: 12),
-                                          ),
+                                            SizedBox(height: 5),
+                                          ]
                                         ],
                                       ),
                                     ],
                                   ),
-                                  SizedBox(height: 20),
-                                  // Remaining assist players
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: const [
-                                      Text(
-                                        '2. Joseph Shalipopi: Assists: 13, Matches Played: 11',
-                                        style: TextStyle(fontSize: 12),
-                                      ),
-                                      SizedBox(height: 5),
-                                      Text(
-                                        '3. Mark Black: Assists: 11, Matches Played: 12',
-                                        style: TextStyle(fontSize: 12),
-                                      ),
-                                      SizedBox(height: 5),
-                                      Text(
-                                        '4. Alice White: Assists: 10, Matches Played: 14',
-                                        style: TextStyle(fontSize: 12),
-                                      ),
-                                      SizedBox(height: 5),
-                                      Text(
-                                        '5. Jane Smith: Assists: 9, Matches Played: 15',
-                                        style: TextStyle(fontSize: 12),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
+                                );
+                              },
                             ),
-                            Positioned(
-                              left: 30,
-                              bottom: 30, // Space from the top
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  // Heading for Upcoming Matches
-                                  const Text(
-                                    'Upcoming Matches:',
-                                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                                  ),
-                                  SizedBox(height: 10),
-                                  // Matches list
-                                  Column(
+                            StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                              stream: FirebaseFirestore.instance
+                                  .collection('clubs')
+                                  .doc(widget.clubId)
+                                  .collection('UpcomingMatches')
+                                  .orderBy('id', descending: false)
+                                  .snapshots(),
+                              builder: (context, snapshot) {
+                                if (!snapshot.hasData) {
+                                  return Center(child: CircularProgressIndicator());
+                                }
+
+                                var matches = snapshot.data!.docs;
+                                return Positioned(
+                                  left: 30,
+                                  bottom: 30, // Position near the bottom
+                                  child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      Row(
-                                        children: [
-                                          Text(
-                                            '1. Coventry Phoenix FC vs Copswood FC:',
-                                            style: TextStyle(fontSize: 12),
-                                          ),
-                                          SizedBox(width: 10),
-                                          Text(
-                                            '(12-03-2024)',
-                                            style: TextStyle(fontSize: 12),
-                                          ),
-                                        ],
+                                      // Heading for Upcoming Matches
+                                      const Text(
+                                        'Upcoming Matches:',
+                                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                                       ),
-                                      SizedBox(height: 5),
-                                      Row(
+                                      SizedBox(height: 10),
+                                      // List of upcoming matches
+                                      Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
-                                          Text(
-                                            '2. AFC Binley vs Coventry Phoenix FC:',
-                                            style: TextStyle(fontSize: 12),
-                                          ),
-                                          SizedBox(width: 10),
-                                          Text(
-                                            '(19-03-2024)',
-                                            style: TextStyle(fontSize: 12),
-                                          ),
-                                        ],
-                                      ),
-                                      SizedBox(height: 5),
-                                      Row(
-                                        children: [
-                                          Text(
-                                            '3. Leamington FC vs Coventry Phoenix FC:',
-                                            style: TextStyle(fontSize: 12),
-                                          ),
-                                          SizedBox(width: 10),
-                                          Text(
-                                            '(26-03-2024)',
-                                            style: TextStyle(fontSize: 12),
-                                          ),
-                                        ],
-                                      ),
-                                      SizedBox(height: 5),
-                                      Row(
-                                        children: [
-                                          Text(
-                                            '4. Coventry Phoenix FC vs Southam United FC:',
-                                            style: TextStyle(fontSize: 12),
-                                          ),
-                                          SizedBox(width: 10),
-                                          Text(
-                                            '(02-04-2024)',
-                                            style: TextStyle(fontSize: 12),
-                                          ),
-                                        ],
-                                      ),
-                                      SizedBox(height: 5),
-                                      Row(
-                                        children: [
-                                          Text(
-                                            '5. Copswood FC vs Coventry Phoenix FC:',
-                                            style: TextStyle(fontSize: 12),
-                                          ),
-                                          SizedBox(width: 10),
-                                          Text(
-                                            '(09-04-2024)',
-                                            style: TextStyle(fontSize: 12),
-                                          ),
+                                          for (int i = 0; i < matches.length && i < 5; i++) ...[
+                                            Row(
+                                              children: [
+                                                Text(
+                                                  '${i + 1}. ${matches[i]['home_team']} vs ${matches[i]['away_team']}:',
+                                                  style: TextStyle(fontSize: 9),
+                                                ),
+                                                SizedBox(width: 3),
+                                                Text(
+                                                  '(${DateFormat('dd-MM-yyyy HH:mm').format(
+                                                    DateFormat('dd-MM-yyyy HH:mm:ss').parse(matches[i]['match_date']),
+                                                  )})',
+                                                  style: TextStyle(fontSize: 9),
+                                                ),
+                                              ],
+                                            ),
+                                            SizedBox(height: 5),
+                                          ],
                                         ],
                                       ),
                                     ],
                                   ),
-                                ],
-                              ),
+                                );
+                              },
                             ),
                           ],
                         ),
@@ -937,247 +935,461 @@ class GenerateMonthlyStatementA4LayoutScreenState extends State<GenerateMonthlyS
                 child: Container(
                   color: Colors.white,
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
+                      // The main content of the page
                       Expanded(
-                        flex: 44, // 44% of the page height
+                        flex: 1, // This takes most of the page space
                         child: Stack(
                           children: [
-                            // Background Image with dynamic color filter
-                            Container(
-                              decoration: BoxDecoration(
-                                image: DecorationImage(
-                                  image: AssetImage('assets/images/monthly_report_image_1.png'), // Replace with your image asset
-                                  fit: BoxFit.cover,
-                                  colorFilter: ColorFilter.mode(
-                                    Colors.black.withOpacity(0.5), // Dim the background to make the main character stand out more
-                                    BlendMode.darken, // Darkens the background
-                                  ),
+                            Positioned.fill(
+                              child: Container(color: Colors.white), // Background
+                            ),
+                            // Draw ruler lines
+                            CustomPaint(
+                              size: Size(double.infinity, double.infinity),
+                              painter: RulerPainter(),
+                            ),
+                            // Rectangle at the top-right corner
+                            Positioned(
+                              right: 0, // Aligns to the right edge
+                              bottom: 40,
+                              child: Container(
+                                width: 60, // Adjust the width of the rectangle
+                                height: 100, // Adjust the height to be longer than the width
+                                color: Colors.brown.withOpacity(0.7), // Choose a color for the rectangle
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      'Table:', // Regular text
+                                      style: TextStyle(
+                                        color: Colors.white, // Text color
+                                        fontSize: 12, // Smaller font for the label
+                                        fontWeight: FontWeight.normal,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                    Text(
+                                      '5th', // Big text
+                                      style: TextStyle(
+                                        color: Colors.white, // Text color
+                                        fontSize: 26, // Large font size
+                                        fontWeight: FontWeight.w800, // Bold for emphasis
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ],
                                 ),
                               ),
                             ),
-                            // Profile Picture Segment
                             Positioned(
-                              bottom: -20, // Align with the bottom of the parent
-                              right: 20, // Slight offset from the right
-                              child: Transform(
-                                alignment: Alignment.bottomCenter, // Rotate around the bottom center
-                                transform: Matrix4.identity()..rotateZ(-0.1), // Rotate counterclockwise (-ve for left tilt, +ve for right tilt)
-                                child: Container(
-                                  width: 100, // Width of the profile picture
-                                  height: 140, // Height of the profile picture
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(14), // Rounded corners
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black.withOpacity(0.2), // Subtle shadow
-                                        blurRadius: 6,
-                                        offset: Offset(0, 4),
+                              left: 30,
+                              bottom: 40,
+                              child: Container(
+                                width: 300, // Adjust the width as needed
+                                height: 100, // Adjust the width as needed
+                                padding: EdgeInsets.all(8), // Add padding around the text
+                                color: Colors.blueGrey.withOpacity(0.8), // Set the container color with opacity
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Upcoming Matches Suggestions:', // Updated title for the suggestions section
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w800,
                                       ),
-                                    ],
-                                    border: Border.all(
-                                      color: Colors.red.withOpacity(0.7), // White border around the image
-                                      width: 9, // Border thickness
+                                      textAlign: TextAlign.start,
+                                    ),
+                                    SizedBox(height: 10),
+                                    AutoSizeText(
+                                      'To improve our chances in upcoming games, the following strategies are recommended: Focus on building team cohesion during training sessions, especially in midfield transitions. Encourage players to maintain possession and minimize turnovers. For the next game, consider rotating the squad to keep key players rested while giving younger players more experience. Target key opposition weaknesses, such as their lack of pace in defense, by emphasizing counterattacks. Lastly, reinforce discipline to avoid unnecessary cards, which have cost the team valuable points this season.',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                      textAlign: TextAlign.justify,
+                                      maxLines: 5, // Allow text to wrap into 5 lines if needed
+                                      minFontSize: 8, // Minimum font size to ensure readability
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            Positioned(
+                              left: 0, // To center the content horizontally
+                              right: 0,
+                              top: 30, // Space from the top
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  // Heading for "Other Club Summary"
+                                  Center(
+                                    child: const Text(
+                                      'Other Club Summary',
+                                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                                     ),
                                   ),
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.vertical(
-                                      top: Radius.circular(10), // Match the top corners
-                                    ),
-                                    child: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-                                      stream: firestoreStreamTwo,
-                                      builder: (context, snapshot) {
-                                        if (snapshot.connectionState == ConnectionState.waiting) {
-                                          return Center(child: CircularProgressIndicator());
-                                        }
-                                        if (!snapshot.hasData || snapshot.data?.data() == null) {
-                                          return Image.asset(
-                                            'assets/images/no_opp_club_image.jpg', // Fallback image if data is missing
-                                            fit: BoxFit.cover,
-                                          );
-                                        }
-                                        // Use the fetched image URL from Firestore
-                                        String imageUrl = snapshot.data!.data()!['slivers_page_7'] ?? '';
-                                        if (imageUrl.isEmpty) {
-                                          return Image.asset(
-                                            'assets/images/no_opp_club_image.jpg', // Fallback if URL is empty
-                                            fit: BoxFit.cover,
-                                          );
-                                        }
+                                  const SizedBox(height: 10),
+                                  // Horizontal row for the cards
+                                  StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                                    stream: FirebaseFirestore.instance.collection('clubs').doc(widget.clubId).collection('PllayersTable').snapshots(),
+                                    builder: (context, snapshot) {
+                                      if (!snapshot.hasData) {
+                                        return Center(child: CircularProgressIndicator());
+                                      }
 
-                                        // Wrap the image with ColorFiltered to reduce brightness
-                                        return ColorFiltered(
-                                          colorFilter: ColorFilter.mode(
-                                            Colors.black.withOpacity(0.3), // Apply dark overlay to reduce brightness
-                                            BlendMode.darken, // Darkens the image
-                                          ),
-                                          child: Transform.scale(
-                                            scale: 2.1, // Adjust this value to zoom out (less than 1 will zoom out)
-                                            child: CachedNetworkImage(
-                                              imageUrl: imageUrl,
-                                              fit: BoxFit.cover, // Keep the image coverage as before
-                                              placeholder: (context, url) => CircularProgressIndicator(),
-                                              errorWidget: (context, url, error) => Icon(Icons.error),
+                                      // Filter for MVP player
+                                      final mvpPlayers = snapshot.data!.docs.where(
+                                        (doc) => (doc.data()['player_of_the_month'] ?? '').toString().toLowerCase() == 'yes',
+                                      );
+
+                                      if (mvpPlayers.isEmpty) {
+                                        return Padding(
+                                          padding: const EdgeInsets.symmetric(horizontal: 30),
+                                          child: Text(
+                                            'No MVP selected for this month.',
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.grey,
                                             ),
                                           ),
                                         );
-                                      },
-                                    ),
+                                      }
+
+                                      // Get the first matching MVP player
+                                      var mvpPlayer = mvpPlayers.first;
+                                      var mvpData = mvpPlayer.data();
+
+                                      // Display MVP data
+                                      return Padding(
+                                        padding: const EdgeInsets.symmetric(horizontal: 30),
+                                        child: Container(
+                                          padding: const EdgeInsets.all(7),
+                                          decoration: BoxDecoration(
+                                            color: Colors.yellow.withOpacity(0.3),
+                                            border: Border.all(
+                                              color: Colors.grey,
+                                              width: 1.5,
+                                            ),
+                                            borderRadius: BorderRadius.circular(8),
+                                          ),
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                'Month of ${DateFormat('MMMM').format(DateTime.now())} MVP',
+                                                style: TextStyle(
+                                                  fontSize: 15,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                              SizedBox(height: 8),
+                                              Row(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  Container(
+                                                    width: 70,
+                                                    height: 70,
+                                                    decoration: BoxDecoration(
+                                                      shape: BoxShape.circle,
+                                                      color: Colors.white30,
+                                                      image: DecorationImage(
+                                                        image: NetworkImage(mvpData['image'] ?? ''),
+                                                        fit: BoxFit.cover,
+                                                      ),
+                                                      border: Border.all(
+                                                        color: Colors.black,
+                                                        width: 2,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  Expanded(
+                                                    child: Row(
+                                                      mainAxisAlignment: MainAxisAlignment.end,
+                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                      children: [
+                                                        Padding(
+                                                          padding: const EdgeInsets.only(right: 20),
+                                                          child: Column(
+                                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                                            children: [
+                                                              Text(
+                                                                mvpData['player_name'] ?? 'Unknown Player',
+                                                                style: TextStyle(
+                                                                  fontWeight: FontWeight.bold,
+                                                                  fontSize: 11,
+                                                                ),
+                                                              ),
+                                                              SizedBox(height: 4),
+                                                              Column(
+                                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                                children: [
+                                                                  Text(
+                                                                    'Matches Played: ${mvpData['matches_played'] ?? 0}',
+                                                                    style: TextStyle(
+                                                                      color: Colors.grey[600],
+                                                                      fontSize: 9,
+                                                                      fontWeight: FontWeight.bold,
+                                                                    ),
+                                                                  ),
+                                                                  SizedBox(height: 2),
+                                                                  Text(
+                                                                    'Goals Scored: ${mvpData['goals_scored'] ?? 0}',
+                                                                    style: TextStyle(
+                                                                      color: Colors.grey[600],
+                                                                      fontSize: 9,
+                                                                      fontWeight: FontWeight.bold,
+                                                                    ),
+                                                                  ),
+                                                                  SizedBox(height: 2),
+                                                                  Text(
+                                                                    'Assists Made: ${mvpData['assists'] ?? 0}',
+                                                                    style: TextStyle(
+                                                                      color: Colors.grey[600],
+                                                                      fontSize: 9,
+                                                                      fontWeight: FontWeight.bold,
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      );
+                                    },
                                   ),
-                                ),
+                                  SizedBox(height: 10),
+                                  StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                                    stream: FirebaseFirestore.instance
+                                        .collection('clubs')
+                                        .doc(widget.clubId)
+                                        .collection('PllayersTable') // Fixed typo: 'PllayersTable' to 'PlayersTable'
+                                        .snapshots(),
+                                    builder: (context, snapshot) {
+                                      if (!snapshot.hasData) {
+                                        return Center(child: CircularProgressIndicator());
+                                      }
+
+                                      // Loop through the players and sum up the yellow and red cards
+                                      int totalYellowCards = 0;
+                                      int totalRedCards = 0;
+
+                                      for (var doc in snapshot.data!.docs) {
+                                        totalYellowCards += (doc['yellow_card'] as num?)?.toInt() ?? 0;
+                                        totalRedCards += (doc['red_card'] as num?)?.toInt() ?? 0;
+                                      }
+
+                                      // Now totalYellowCards and totalRedCards should have the correct summed values
+
+                                      return Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                        children: [
+                                          // Yellow Card Display
+                                          Container(
+                                            padding: const EdgeInsets.all(6),
+                                            decoration: BoxDecoration(
+                                              color: Colors.yellow.withOpacity(0.3),
+                                              border: Border.all(
+                                                color: Colors.grey, // Border color
+                                                width: 1.5, // Border width
+                                              ),
+                                              borderRadius: BorderRadius.circular(2), // Optional: Add rounded corners
+                                            ),
+                                            child: Row(
+                                              children: [
+                                                Container(
+                                                  width: 30,
+                                                  height: 50,
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.yellow,
+                                                    border: Border.all(
+                                                      color: Colors.black, // Border color
+                                                      width: 1.5, // Border width
+                                                    ),
+                                                    borderRadius: BorderRadius.circular(5),
+                                                  ),
+                                                ),
+                                                const SizedBox(width: 8),
+                                                Column(
+                                                  mainAxisAlignment: MainAxisAlignment.center,
+                                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                                  children: [
+                                                    const Text('Yellow Cards So Far',
+                                                        style: TextStyle(color: Colors.black, fontSize: 10, fontWeight: FontWeight.w800)),
+                                                    Text(
+                                                      '$totalYellowCards', // Display dynamic yellow card total
+                                                      style: TextStyle(fontSize: 24, color: Colors.black54, fontWeight: FontWeight.w800),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+
+                                          // Red Card Display
+                                          Container(
+                                            padding: const EdgeInsets.all(6),
+                                            decoration: BoxDecoration(
+                                              color: Colors.red.withOpacity(0.3),
+                                              border: Border.all(
+                                                color: Colors.grey, // Border color
+                                                width: 1.5, // Border width
+                                              ),
+                                              borderRadius: BorderRadius.circular(2), // Optional: Add rounded corners
+                                            ),
+                                            child: Row(
+                                              children: [
+                                                Container(
+                                                  width: 30,
+                                                  height: 50,
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.red,
+                                                    border: Border.all(
+                                                      color: Colors.black, // Border color
+                                                      width: 1.5, // Border width
+                                                    ),
+                                                    borderRadius: BorderRadius.circular(5),
+                                                  ),
+                                                ),
+                                                const SizedBox(width: 8),
+                                                Column(
+                                                  mainAxisAlignment: MainAxisAlignment.center,
+                                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                                  children: [
+                                                    const Text('Red Cards So Far',
+                                                        style: TextStyle(color: Colors.black, fontSize: 10, fontWeight: FontWeight.w800)),
+                                                    Text(
+                                                      '$totalRedCards', // Display dynamic red card total
+                                                      style: TextStyle(fontSize: 24, color: Colors.black54, fontWeight: FontWeight.w800),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  ),
+                                  SizedBox(height: 20),
+                                  StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                                    stream: FirebaseFirestore.instance
+                                        .collection('clubs')
+                                        .doc(widget.clubId)
+                                        .collection('CoachesMonthlyComments')
+                                        .orderBy('date', descending: true) // Order by date, with the most recent ones first
+                                        .limit(3) // Limit to the most recent 2 comments
+                                        .snapshots(),
+                                    builder: (context, snapshot) {
+                                      if (!snapshot.hasData) {
+                                        return Center(child: CircularProgressIndicator());
+                                      }
+
+                                      // Loop through the fetched documents and display the comments
+                                      return SizedBox(
+                                        height: 140,
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(horizontal: 30),
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            mainAxisAlignment: MainAxisAlignment.start,
+                                            children: [
+                                              // Coaches comments section header
+                                              const Text(
+                                                'Coaches Comments',
+                                                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                                              ),
+                                              SizedBox(height: 2),
+
+                                              // Loop through the documents and display the coach comments dynamically
+                                              Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: snapshot.data!.docs.map((doc) {
+                                                  return Padding(
+                                                    padding: const EdgeInsets.only(bottom: 7),
+                                                    child: Column(
+                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                      children: [
+                                                        // Coach's name and comment
+                                                        Text.rich(
+                                                          TextSpan(
+                                                            text: '${doc['name']}: ', // Coach's name
+                                                            style: TextStyle(
+                                                              fontWeight: FontWeight.bold,
+                                                              fontSize: 10,
+                                                            ),
+                                                            children: [
+                                                              TextSpan(
+                                                                text: doc['comment'], // Coach's comment
+                                                                style: TextStyle(fontSize: 9, fontWeight: FontWeight.w500),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                          textAlign: TextAlign.justify, // Justify the text
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  );
+                                                }).toList(),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  )
+                                ],
                               ),
                             ),
                           ],
                         ),
                       ),
-
-                      // Content Section taking 50% of the page
-                      Expanded(
-                        flex: 52,
-                        child: Padding(
-                          padding: const EdgeInsets.only(left: 40, bottom: 16, top: 16, right: 16),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              // Header Section
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(Icons.eco, color: Colors.red, size: 66),
-                                  const SizedBox(width: 5),
-                                  // const
-                                  RichText(
-                                    textAlign: TextAlign.start,
-                                    text: TextSpan(
-                                      children: [
-                                        // First part of the club name
-                                        TextSpan(
-                                          text: clubName.split('\n')[0], // The first line (e.g., 'Coventry Phoenix')
-                                          style: TextStyle(
-                                            fontSize: 14, // Smaller size for the first part
-                                            fontWeight: FontWeight.w700,
-                                            color: Colors.black,
-                                          ),
-                                        ),
-                                        TextSpan(
-                                          text: '\n${clubName.split('\n')[1]}', // The second line ('Football Club')
-                                          style: TextStyle(
-                                            fontSize: 26, // Bigger size for 'Football Club'
-                                            fontWeight: FontWeight.w900,
-                                            color: Colors.black,
-                                            letterSpacing: 1.5,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  )
-                                ],
-                              ),
-                              const SizedBox(height: 34),
-                              // Statement Title
-                              RichText(
-                                text: TextSpan(
-                                  style: TextStyle(
-                                    fontSize: 30, // Default font size for the first part
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black, // Default text color
-                                  ),
-                                  children: [
-                                    TextSpan(
-                                      text: 'March 2024', // The first part
-                                      style: TextStyle(
-                                        fontSize: 25, // First part size
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                    TextSpan(
-                                      text: '\nClub Report', // The second part
-                                      style: TextStyle(
-                                        fontSize: 40, // Bigger size for 'Club Report'
-                                        fontWeight: FontWeight.w800, // Bold weight for 'Club Report'
-
-                                        letterSpacing: 4,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              const SizedBox(height: 44),
-                              // Details Section
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      const Text(
-                                        'Prepared by',
-                                        style: TextStyle(fontSize: 14, fontStyle: FontStyle.italic, fontWeight: FontWeight.w800),
-                                      ),
-                                      const Text(
-                                        'The GFA App',
-                                        style: TextStyle(fontSize: 10),
-                                      ),
-                                      const Text(
-                                        'Nouvellesoft Inc.',
-                                        style: TextStyle(fontSize: 10),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(width: 70),
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      const Text(
-                                        'Prepared for',
-                                        style: TextStyle(fontSize: 14, fontStyle: FontStyle.italic, fontWeight: FontWeight.w800),
-                                      ),
-                                      const Text(
-                                        'Club Admin Team',
-                                        style: TextStyle(fontSize: 10),
-                                      ),
-                                      Text(
-                                        rawClubName,
-                                        style: TextStyle(fontSize: 10),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
+                      // Footer
+                      Container(
+                        height: 14, // Fixed height for the footer
+                        color: Colors.brown, // Dark background
+                        padding: const EdgeInsets.symmetric(horizontal: 11),
+                        alignment: Alignment.center,
                       ),
-                      // Bottom Section with dark background
-                      Expanded(
-                        flex: 4,
-                        child: Container(
-                          color: Colors.black, // Dark background
-                          padding: const EdgeInsets.symmetric(horizontal: 11),
-                          alignment: Alignment.center,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              const Text(
-                                'The GFA App',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                      // Another footer container
+                      Container(
+                        height: 25, // Fixed height for the footer
+                        color: Colors.black, // Dark background
+                        padding: const EdgeInsets.symmetric(horizontal: 11),
+                        alignment: Alignment.center,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: const [
+                            Text(
+                              'The GFA App',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 13,
+                                fontWeight: FontWeight.bold,
                               ),
-                              const Text(
-                                'Monthly Performance Report',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                            ),
+                            Text(
+                              'Monthly Performance Report',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 13,
+                                fontWeight: FontWeight.bold,
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
                       ),
                     ],
@@ -1185,219 +1397,6 @@ class GenerateMonthlyStatementA4LayoutScreenState extends State<GenerateMonthlyS
                 ),
               ),
             ),
-
-            /////
-            // Padding(
-            //   padding: const EdgeInsets.all(8.0),
-            //   child: AspectRatio(
-            //     aspectRatio: 210 / 297, // A4 aspect ratio
-            //     child: Container(
-            //       color: Colors.white,
-            //       child: Column(
-            //         children: [
-            //           // Header with club information
-            //           Container(
-            //             padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
-            //             child: Row(
-            //               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            //               children: [
-            //                 // Club logo placeholder
-            //                 CircleAvatar(
-            //                   radius: 30,
-            //                   backgroundColor: Colors.blue,
-            //                   child: Icon(
-            //                     Icons.sports_soccer,
-            //                     color: Colors.white,
-            //                     size: 40,
-            //                   ),
-            //                 ),
-            //                 // Club name placeholder
-            //                 Column(
-            //                   crossAxisAlignment: CrossAxisAlignment.end,
-            //                   children: const [
-            //                     Text(
-            //                       'Coventry Phoenix',
-            //                       style: TextStyle(
-            //                         fontSize: 18,
-            //                         fontWeight: FontWeight.bold,
-            //                       ),
-            //                     ),
-            //                     Text(
-            //                       'Football Club',
-            //                       style: TextStyle(
-            //                         fontSize: 14,
-            //                         fontWeight: FontWeight.w600,
-            //                       ),
-            //                     ),
-            //                   ],
-            //                 ),
-            //               ],
-            //             ),
-            //           ),
-            //           // The main content of the page
-            //           Expanded(
-            //             flex: 1,
-            //             child: Stack(
-            //               children: [
-            //                 Positioned.fill(
-            //                   child: Container(color: Colors.white), // Background
-            //                 ),
-            //                 // Pie chart section for club population
-            //                 Positioned(
-            //                   left: 20,
-            //                   top: 80,
-            //                   child: SizedBox(
-            //                     width: 120,
-            //                     height: 120,
-            //                     child: PieChart(
-            //                       dataMap: {
-            //                         "Players": 70,
-            //                         "Coaches": 20,
-            //                         "Managers": 10,
-            //                       },
-            //                       chartType: ChartType.ring,
-            //                       ringStrokeWidth: 20,
-            //                       centerText: "Club Population",
-            //                       chartValuesOptions: ChartValuesOptions(showChartValues: false),
-            //                       colorList: [Colors.blue, Colors.red, Colors.green],
-            //                     ),
-            //                   ),
-            //                 ),
-            //                 // Club position in the table (top-right)
-            //                 Positioned(
-            //                   right: 20,
-            //                   top: 80,
-            //                   child: Container(
-            //                     padding: const EdgeInsets.all(8),
-            //                     decoration: BoxDecoration(
-            //                       color: Colors.blue,
-            //                       borderRadius: BorderRadius.circular(8),
-            //                     ),
-            //                     child: Column(
-            //                       children: const [
-            //                         Text(
-            //                           'Position: 5th',
-            //                           style: TextStyle(
-            //                             color: Colors.white,
-            //                             fontSize: 16,
-            //                             fontWeight: FontWeight.bold,
-            //                           ),
-            //                         ),
-            //                         Text(
-            //                           'Goals: 45',
-            //                           style: TextStyle(color: Colors.white),
-            //                         ),
-            //                         Text(
-            //                           'Goals Conceded: 22',
-            //                           style: TextStyle(color: Colors.white),
-            //                         ),
-            //                         Text(
-            //                           'Matches Played: 12',
-            //                           style: TextStyle(color: Colors.white),
-            //                         ),
-            //                       ],
-            //                     ),
-            //                   ),
-            //                 ),
-            //                 // Top 5 Goal Scorers
-            //                 Positioned(
-            //                   left: 20,
-            //                   top: 220,
-            //                   child: Container(
-            //                     width: 150,
-            //                     padding: const EdgeInsets.all(10),
-            //                     color: Colors.grey[200],
-            //                     child: Column(
-            //                       crossAxisAlignment: CrossAxisAlignment.start,
-            //                       children: const [
-            //                         Text('Top 5 Goal Scorers', style: TextStyle(fontWeight: FontWeight.bold)),
-            //                         ListTile(
-            //                           contentPadding: EdgeInsets.all(0),
-            //                           leading: Icon(Icons.person),
-            //                           title: Text('John Doe - 12 goals'),
-            //                         ),
-            //                         ListTile(
-            //                           contentPadding: EdgeInsets.all(0),
-            //                           leading: Icon(Icons.person),
-            //                           title: Text('Jane Smith - 9 goals'),
-            //                         ),
-            //                         ListTile(
-            //                           contentPadding: EdgeInsets.all(0),
-            //                           leading: Icon(Icons.person),
-            //                           title: Text('James Brown - 7 goals'),
-            //                         ),
-            //                         ListTile(
-            //                           contentPadding: EdgeInsets.all(0),
-            //                           leading: Icon(Icons.person),
-            //                           title: Text('Mark Black - 6 goals'),
-            //                         ),
-            //                         ListTile(
-            //                           contentPadding: EdgeInsets.all(0),
-            //                           leading: Icon(Icons.person),
-            //                           title: Text('Alice White - 5 goals'),
-            //                         ),
-            //                       ],
-            //                     ),
-            //                   ),
-            //                 ),
-            //                 // Top 3 Assist Players
-            //                 Positioned(
-            //                   right: 20,
-            //                   top: 220,
-            //                   child: Container(
-            //                     width: 150,
-            //                     padding: const EdgeInsets.all(10),
-            //                     color: Colors.grey[200],
-            //                     child: Column(
-            //                       crossAxisAlignment: CrossAxisAlignment.start,
-            //                       children: const [
-            //                         Text('Top 3 Assist Players', style: TextStyle(fontWeight: FontWeight.bold)),
-            //                         ListTile(
-            //                           contentPadding: EdgeInsets.all(0),
-            //                           leading: Icon(Icons.person),
-            //                           title: Text('John Doe - 7 assists'),
-            //                         ),
-            //                         ListTile(
-            //                           contentPadding: EdgeInsets.all(0),
-            //                           leading: Icon(Icons.person),
-            //                           title: Text('Jane Smith - 6 assists'),
-            //                         ),
-            //                         ListTile(
-            //                           contentPadding: EdgeInsets.all(0),
-            //                           leading: Icon(Icons.person),
-            //                           title: Text('James Brown - 5 assists'),
-            //                         ),
-            //                       ],
-            //                     ),
-            //                   ),
-            //                 ),
-            //               ],
-            //             ),
-            //           ),
-            //           // Footer
-            //           Container(
-            //             height: 14,
-            //             color: Colors.brown,
-            //             padding: const EdgeInsets.symmetric(horizontal: 11),
-            //             alignment: Alignment.center,
-            //           ),
-            //           // AI Summary footer container
-            //           Container(
-            //             height: 25,
-            //             color: Colors.black,
-            //             padding: const EdgeInsets.symmetric(horizontal: 11),
-            //             alignment: Alignment.center,
-            //             child: const Text(
-            //               'AI-Generated Summary: Strong performance this month, key players include John Doe and Jane Smith. The club is looking to improve defense.',
-            //               style: TextStyle(color: Colors.white, fontSize: 12),
-            //               textAlign: TextAlign.center,
-            //             ),
-            //           ),
-            //         ],
-            //       ),
-            //     ),
-            //   ),
-            // ),
           ],
         ),
       ),
