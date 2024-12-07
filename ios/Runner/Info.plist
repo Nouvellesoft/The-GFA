@@ -71,6 +71,10 @@
     <string>Main</string>
     <key>NSPhotoLibraryUsageDescription</key>
     <string>App needs access to the photo library</string>
+    <key>NSCameraUsageDescription</key>
+    <string>We need access to the camera for scanning.</string>
+    <key>NSContactsUsageDescription</key>
+    <string>We need access to your contacts</string>
     <key>UISupportedInterfaceOrientations</key>
     <array>
         <string>UIInterfaceOrientationPortrait</string>

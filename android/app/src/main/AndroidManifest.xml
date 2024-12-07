@@ -13,6 +13,11 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
 
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
+    <uses-permission android:name="android.permission.SEND_EMAIL"/>
+
     <!-- Mandatory permissions for Android 12 and above.-->
     <!-- Also, they should be asked in runtime. -->
     <uses-permission
