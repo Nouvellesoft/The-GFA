@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -9,6 +11,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:launch_review/launch_review.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../about_menu_details_pages/about_app.dart';
 import '../about_menu_details_pages/about_club.dart';
@@ -20,13 +23,15 @@ import '../bottom_nav_stats_pages/bottom_navigator.dart';
 import '../bottom_nav_stats_pages/players_table_page.dart';
 import '../club_admin/club_admin_page.dart';
 import '../details_pages/second_team_details_page.dart';
+import '../home_page/club_lists.dart';
 import '../home_page/home_page_deux.dart';
 import '../notifier/a_club_global_notifier.dart';
 import '../notifier/second_team_class_notifier.dart';
 import '../thrown_searches/second_team_thrown_search.dart';
 
 String clubName = "";
-String thrownName = "All Players List - B";
+// String thrownName = "All Players List - B";
+String thrownName = "Second Team Players";
 
 String exitAppStatement = "Exit from App";
 String exitAppTitle = "Come on!";
@@ -43,21 +48,21 @@ String aboutApp = "About Developer";
 
 String fabStats = "Stats";
 
-Color backgroundColor = const Color.fromRGBO(186, 90, 49, 1.0);
+Color backgroundColor = const Color.fromRGBO(36, 31, 37, 1.0);
 Color appBarTextColor = Colors.white;
-Color appBarBackgroundColor = const Color.fromRGBO(186, 90, 49, 1);
+Color appBarBackgroundColor = const Color.fromRGBO(36, 31, 37, 1.0);
 Color appBarIconColor = Colors.white;
 Color modalColor = Colors.transparent;
-Color modalBackgroundColor = const Color.fromRGBO(186, 90, 49, 1);
+Color modalBackgroundColor = const Color.fromRGBO(36, 31, 37, 1.0);
 Color materialBackgroundColor = Colors.transparent;
-Color splashColor = const Color.fromRGBO(186, 90, 49, 1);
+Color splashColor = const Color.fromRGBO(36, 31, 37, 1.0);
 Color splashColorTwo = Colors.white;
 Color iconColor = Colors.white;
 Color iconColorTwo = Colors.white;
 Color textColor = Colors.white;
 Color textColorTwo = Colors.white;
 Color textColorThree = Colors.white70;
-Color dialogBackgroundColor = const Color.fromRGBO(186, 90, 49, 1);
+Color dialogBackgroundColor = const Color.fromRGBO(36, 31, 37, 1.0);
 Color borderColor = Colors.black;
 Color nabColor = const Color.fromRGBO(24, 26, 36, 1.0);
 Color paintColor = Colors.indigo;
@@ -347,10 +352,10 @@ class _MySecondTeamClassPage extends State<MySecondTeamClassPage> {
         ),
         backgroundColor: const Color.fromRGBO(57, 62, 70, 1),
         title: const Text(
-          'Enter the passcode',
+          'This is for club coaches and admins',
           style: TextStyle(
             color: Colors.white,
-            fontSize: 20,
+            fontSize: 14,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -373,35 +378,78 @@ class _MySecondTeamClassPage extends State<MySecondTeamClassPage> {
               cursorColor: Colors.white, // Set cursor color here
             ),
             const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () async {
-                String enteredPasscode = passcodeController.text.trim();
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: const Text(
+                    'Cancel',
+                    style: TextStyle(color: Colors.indigoAccent),
+                  ),
+                ),
+                ElevatedButton(
+                  onPressed: () async {
+                    String enteredPasscode = passcodeController.text.trim();
 
-                // Retrieve the stored passcode from Firestore
-                DocumentSnapshot<Map<String, dynamic>> snapshot =
-                    await FirebaseFirestore.instance.collection('clubs').doc(widget.clubId).collection('AboutClub').doc('about_club_page').get();
+                    // Retrieve the stored passcode from Firestore
+                    DocumentSnapshot<Map<String, dynamic>> snapshot =
+                        await FirebaseFirestore.instance.collection('clubs').doc(widget.clubId).collection('AboutClub').doc('about_club_page').get();
 
-                String storedPasscode = snapshot.data()!['admin_passcode'] ?? '';
+                    String storedPasscode = snapshot.data()!['admin_passcode'] ?? '';
 
-                // Check if the entered passcode matches the stored passcode
-                if (enteredPasscode == storedPasscode && context.mounted) {
-                  Navigator.pop(context);
-                  _showAdminWelcomeToast();
-                  Navigator.push(context, SlideTransition1(MyClubAdminPage(clubId: widget.clubId)));
-                } else {
-                  // Show a toast for incorrect passcode
-                  Fluttertoast.showToast(
-                    msg: 'Incorrect passcode',
-                    backgroundColor: Colors.red,
-                    textColor: Colors.white,
-                  );
-                }
-              },
-              child: const Text(
-                'Submit',
-                style: TextStyle(color: Colors.black),
-              ),
+                    // Check if the entered passcode matches the stored passcode
+                    if (enteredPasscode == storedPasscode && context.mounted) {
+                      Navigator.pop(context);
+                      _showAdminWelcomeToast();
+                      Navigator.push(context, SlideTransition1(MyClubAdminPage(clubId: widget.clubId)));
+                    } else {
+                      // Show a toast for incorrect passcode
+                      Fluttertoast.showToast(
+                        msg: 'Incorrect passcode',
+                        backgroundColor: Colors.red,
+                        textColor: Colors.white,
+                      );
+                    }
+                  },
+                  child: const Text(
+                    'Submit',
+                    style: TextStyle(color: Colors.black),
+                  ),
+                ),
+              ],
             ),
+            // const SizedBox(height: 20),
+            // SizedBox(
+            //   width: double.infinity,
+            //   child: ElevatedButton(
+            //     style: ElevatedButton.styleFrom(
+            //       // backgroundColor: Colors.grey.shade800,
+            //       backgroundColor: Colors.indigo,
+            //       padding: const EdgeInsets.symmetric(vertical: 15),
+            //       shape: RoundedRectangleBorder(
+            //         borderRadius: BorderRadius.circular(10),
+            //       ),
+            //     ),
+            //     onPressed: () {
+            //       Fluttertoast.showToast(
+            //         msg: 'Coming Soon!',
+            //         backgroundColor: Colors.indigoAccent,
+            //         textColor: Colors.white,
+            //       );
+            //     },
+            //     child: const Text(
+            //       "I'm Just Touring",
+            //       style: TextStyle(
+            //         color: Colors.white,
+            //         fontSize: 16,
+            //         fontWeight: FontWeight.bold,
+            //       ),
+            //     ),
+            //   ),
+            // ),
           ],
         ),
       ),
@@ -451,14 +499,12 @@ class _MySecondTeamClassPage extends State<MySecondTeamClassPage> {
     SecondTeamClassNotifier secondTeamClassNotifier = Provider.of<SecondTeamClassNotifier>(context);
 
     return PopScope(
-      onPopInvokedWithResult: (didPop, result) async {
+      canPop: false, // Prevent default pop behavior
+      onPopInvokedWithResult: (bool didPop, result) async {
         if (!didPop) {
-          // return false;
-          Navigator.of(context).pop();
+          await _onWillPop();
         }
-        await _onWillPop();
       },
-      canPop: true, // Allow the pop action
       child: Scaffold(
         body: Container(
           color: backgroundColor,
@@ -547,6 +593,75 @@ class _MySecondTeamClassPage extends State<MySecondTeamClassPage> {
                                                 navigateToAboutAppDetailsPage(context);
                                               },
                                             ),
+                                            ListTile(
+                                              leading: Icon(
+                                                MdiIcons.accountArrowLeft,
+                                                color: iconColor,
+                                              ),
+                                              title: Text(
+                                                "Switch to another club",
+                                                style: GoogleFonts.zillaSlab(color: textColor),
+                                              ),
+                                              onTap: () async {
+                                                // First, request permissions on iOS if needed
+                                                if (defaultTargetPlatform == TargetPlatform.iOS) {
+                                                  FirebaseMessaging messaging = FirebaseMessaging.instance;
+
+                                                  // Request notification permissions
+                                                  NotificationSettings settings = await messaging.requestPermission(
+                                                    alert: true,
+                                                    badge: true,
+                                                    sound: true,
+                                                    provisional: true, // Important for simulators
+                                                  );
+
+                                                  // Add a short delay to allow token generation
+                                                  await Future.delayed(const Duration(seconds: 2));
+
+                                                  // Get the APNS token
+                                                  String? apnsToken = await messaging.getAPNSToken();
+                                                  if (kDebugMode) {
+                                                    print('APNS Token after delay: $apnsToken');
+                                                  }
+
+                                                  if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+                                                    if (kDebugMode) {
+                                                      print('User granted notification permissions');
+                                                    }
+                                                  } else {
+                                                    if (kDebugMode) {
+                                                      print('User declined or not determined notification permissions');
+                                                    }
+                                                  }
+                                                }
+
+                                                SharedPreferences prefs = await SharedPreferences.getInstance();
+
+                                                // Unsubscribe from the previous club topic
+                                                String? previousClubId = prefs.getString('selectedClub');
+                                                if (previousClubId != null) {
+                                                  try {
+                                                    await FirebaseMessaging.instance.unsubscribeFromTopic(previousClubId);
+                                                  } catch (e) {
+                                                    if (kDebugMode) {
+                                                      print('Error unsubscribing from topic: $e');
+                                                    }
+                                                  }
+                                                }
+
+                                                // Clear the selected club from preferences
+                                                await prefs.remove('selectedClub');
+
+                                                // Navigate to the ClubSelectionPage
+                                                Navigator.of(context).pop(false);
+                                                Navigator.pushReplacement(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) => const ClubSelectionPage(),
+                                                  ),
+                                                );
+                                              },
+                                            ),
                                             Row(
                                               mainAxisAlignment: MainAxisAlignment.spaceAround,
                                               children: [
@@ -562,7 +677,7 @@ class _MySecondTeamClassPage extends State<MySecondTeamClassPage> {
                                                         fontSize: 15,
                                                         fontStyle: FontStyle.italic,
                                                         fontWeight: FontWeight.w700,
-                                                        color: Colors.black87, // Change the color as needed
+                                                        color: Colors.white70, // Change the color as needed
                                                         // decoration: TextDecoration.underline,
                                                         //   decorationColor: Colors.blueAccent,
                                                         //   decorationThickness: 2.0
@@ -583,7 +698,7 @@ class _MySecondTeamClassPage extends State<MySecondTeamClassPage> {
                                                         fontSize: 15,
                                                         fontStyle: FontStyle.italic,
                                                         fontWeight: FontWeight.w700,
-                                                        color: Colors.black87, // Change the color as needed
+                                                        color: Colors.white70, // Change the color as needed
                                                         // decoration: TextDecoration.underline,
                                                         // decorationColor: textColor,
                                                         // decorationThickness: 2.0
@@ -618,7 +733,7 @@ class _MySecondTeamClassPage extends State<MySecondTeamClassPage> {
                   pinned: true,
                   flexibleSpace: FlexibleSpaceBar(
                       title: Align(
-                        alignment: Alignment.bottomLeft,
+                        alignment: Alignment.bottomCenter,
                         child: Text(thrownName,
                             textAlign: TextAlign.start, style: GoogleFonts.abel(color: appBarTextColor, fontSize: 26.0, fontWeight: FontWeight.bold)),
                       ),

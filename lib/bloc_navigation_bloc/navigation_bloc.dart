@@ -2,7 +2,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '/bottom_nav_stats_pages/social_media/b_youtube_page.dart';
 import '../thrown_pages/captains_thrown_page.dart';
-import '../thrown_pages/club_sponsors_thrown_page.dart';
+import '../thrown_pages/chatgfa/chatgfa_thrown_page.dart';
+import '../thrown_pages/club_sponsors/club_sponsors_thrown_page.dart';
 import '../thrown_pages/coaches_thrown_page.dart';
 import '../thrown_pages/fifth_team_thrown_page.dart';
 import '../thrown_pages/first_team_thrown_page.dart';
@@ -22,6 +23,7 @@ enum NavigationEvents {
   myCoachesPageClickedEvent,
   myManagementBodyPageClickedEvent,
   myCaptainsPageClickedEvent,
+  myChatGFAPageClickedEvent,
   myClubSponsorsPageClickedEvent,
   myYouTubePageClickedEvent,
 }
@@ -62,6 +64,9 @@ class NavigationBloc extends Bloc<NavigationEvents, NavigationStates> {
         break;
       case NavigationEvents.myCaptainsPageClickedEvent:
         yield MyCaptainsPage(clubId: clubId);
+        break;
+      case NavigationEvents.myChatGFAPageClickedEvent:
+        yield MyChatGFAPage(clubId: clubId);
         break;
       case NavigationEvents.myClubSponsorsPageClickedEvent:
         yield MyClubSponsorsPage(fromPage1: false, clubId: clubId);

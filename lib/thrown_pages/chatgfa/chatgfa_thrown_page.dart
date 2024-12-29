@@ -1,18 +1,23 @@
 import 'dart:convert';
 
 import 'package:animated_text_kit/animated_text_kit.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 // import 'package:giffy_dialog/giffy_dialog.dart';
 import 'package:lottie/lottie.dart';
 
+import '../../bloc_navigation_bloc/navigation_bloc.dart';
+import '../../sidebar/sidebar_layout.dart';
+
 String adminMatchDayChat = "MatchDay";
 String generalChat = "General Chat";
 
-class MyChatGFAPage extends StatefulWidget {
+class MyChatGFAPage extends StatefulWidget implements NavigationStates {
   final String clubId;
   const MyChatGFAPage({super.key, required this.clubId});
 
@@ -32,12 +37,36 @@ class MyChatGFAPageState extends State<MyChatGFAPage> {
   DateTime? generalChatLastMessageDate;
 
   int sharedValue = 0;
-  bool isRecording = true;
+  // bool isRecording = true;
   double appBarElevation = 0.0;
+
+  bool _isAdminAuthenticated = false; // Tracks admin authentication
+
+  String? _clubName; // Holds the fetched club name
+  bool _isLoading = true; // Tracks loading state
+
+  Future<void> _fetchClubName() async {
+    try {
+      var doc = await FirebaseFirestore.instance.collection('clubs').doc(widget.clubId).collection('AboutClub').doc('about_club_page').get();
+
+      setState(() {
+        _clubName = doc.data()?['club_name'] as String?;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _clubName = null;
+        _isLoading = false;
+      });
+      debugPrint("Error fetching club_name: $e");
+    }
+  }
 
   @override
   void initState() {
     super.initState();
+
+    _fetchClubName();
 
     // Scroll controller listener to adjust AppBar elevation
     _scrollController.addListener(() {
@@ -66,75 +95,108 @@ class MyChatGFAPageState extends State<MyChatGFAPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(MediaQuery.of(context).size.height * 0.13),
-        child: AppBar(
-          backgroundColor: Colors.white,
-          elevation: appBarElevation,
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.black),
-            onPressed: () => Navigator.of(context).pop(),
-          ),
-          title: Text(
-            'Club ID: ${widget.clubId}',
-            style: const TextStyle(color: Colors.black),
-          ),
-          centerTitle: true,
-          bottom: PreferredSize(
-            preferredSize: Size.fromHeight(MediaQuery.of(context).size.height * 0.08),
-            child: Container(
-              width: double.infinity,
-              color: const Color.fromRGBO(255, 255, 255, 1.0),
-              margin: EdgeInsets.symmetric(
-                horizontal: MediaQuery.of(context).size.width * 0.05,
-                vertical: MediaQuery.of(context).size.height * 0.01,
+    return PopScope(
+      canPop: false, // Prevent default pop behavior
+      onPopInvokedWithResult: (bool didPop, result) {
+        if (!didPop) {
+          // This block runs when the user tries to pop (go back)
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => SideBarLayout(
+                clubId: widget.clubId, // Pass actual clubId here
               ),
-              child: CupertinoSlidingSegmentedControl<int>(
-                padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.02),
-                thumbColor: Colors.white,
-                backgroundColor: Colors.transparent,
-                children: {
-                  0: Padding(
-                    padding: EdgeInsets.symmetric(
-                      vertical: MediaQuery.of(context).size.width * 0.01,
-                    ), // Adjust this to control inner spacing
-                    child: Text(
-                      adminMatchDayChat,
-                      style: GoogleFonts.agbalumo(
-                        color: const Color.fromRGBO(38, 34, 35, 1.0),
-                        fontSize: MediaQuery.of(context).size.width * 0.055,
-                        fontWeight: FontWeight.w400,
+            ),
+          );
+        }
+      },
+      child: SafeArea(
+        child: Scaffold(
+          backgroundColor: Colors.white70,
+          appBar: PreferredSize(
+            preferredSize: Size.fromHeight(MediaQuery.of(context).size.height * 0.13),
+            child: AppBar(
+              backgroundColor: Colors.white70,
+              elevation: appBarElevation,
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back, color: Colors.black),
+                onPressed: () {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => SideBarLayout(
+                        clubId: widget.clubId,
                       ),
                     ),
-                  ),
-                  1: Padding(
-                    padding: EdgeInsets.symmetric(
-                      vertical: MediaQuery.of(context).size.width * 0.01,
-                    ), // Adjust this to control inner spacing
-                    child: Text(
-                      generalChat,
-                      style: GoogleFonts.andadaPro(
-                        color: const Color.fromRGBO(38, 34, 35, 1.0),
-                        fontSize: MediaQuery.of(context).size.width * 0.055,
-                        fontWeight: FontWeight.w600,
-                      ),
+                  );
+                },
+              ),
+              title: _isLoading
+                  ? const CircularProgressIndicator(color: Colors.black) // Show loading spinner
+                  : Text(
+                      _clubName ?? 'Unknown Club',
+                      style: const TextStyle(color: Colors.black),
                     ),
+              centerTitle: true,
+              bottom: PreferredSize(
+                preferredSize: Size.fromHeight(MediaQuery.of(context).size.height * 0.08),
+                child: Container(
+                  width: double.infinity,
+                  color: const Color.fromRGBO(255, 255, 255, 1.0),
+                  margin: EdgeInsets.symmetric(
+                    horizontal: MediaQuery.of(context).size.width * 0.05,
+                    vertical: MediaQuery.of(context).size.height * 0.01,
                   ),
-                },
-                onValueChanged: (int? value) {
-                  setState(() {
-                    sharedValue = value!;
-                  });
-                },
-                groupValue: sharedValue,
+                  child: CupertinoSlidingSegmentedControl<int>(
+                    padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.02),
+                    thumbColor: Colors.white70,
+                    backgroundColor: Colors.transparent,
+                    children: {
+                      0: Padding(
+                        padding: EdgeInsets.symmetric(
+                          vertical: MediaQuery.of(context).size.width * 0.01,
+                        ),
+                        child: Text(
+                          generalChat,
+                          style: GoogleFonts.andadaPro(
+                            color: const Color.fromRGBO(38, 34, 35, 1.0),
+                            fontSize: MediaQuery.of(context).size.width * 0.055,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      1: Padding(
+                        padding: EdgeInsets.symmetric(
+                          vertical: MediaQuery.of(context).size.width * 0.01,
+                        ),
+                        child: Text(
+                          adminMatchDayChat,
+                          style: GoogleFonts.agbalumo(
+                            color: const Color.fromRGBO(38, 34, 35, 1.0),
+                            fontSize: MediaQuery.of(context).size.width * 0.055,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                      ),
+                    },
+                    onValueChanged: (int? value) {
+                      setState(() {
+                        sharedValue = value!;
+                      });
+
+                      if (sharedValue == 1 && !_isAdminAuthenticated) {
+                        _showAdminDialog(context);
+                      }
+                    },
+                    groupValue: sharedValue,
+                  ),
+                ),
               ),
             ),
           ),
+          body: sharedValue == 0 ? _buildGeneralChatView() : _buildAdminMatchDayChatView(),
         ),
       ),
-      body: sharedValue == 0 ? _buildAdminMatchDayChatView() : _buildGeneralChatView(),
     );
   }
 
@@ -264,37 +326,39 @@ class MyChatGFAPageState extends State<MyChatGFAPage> {
       children: <Widget>[
         if (generalChatMessages.isEmpty)
           Positioned.fill(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Align(
-                  alignment: Alignment.topCenter,
-                  child: Lottie.asset('assets/json/chat_gfa_general_before_chat.json'), // Animation for General Chat
-                ),
-                const SizedBox(height: 20),
-                Align(
-                  alignment: Alignment.center,
-                  child: AnimatedTextKit(
-                    animatedTexts: hints
-                        .map(
-                          (hint) => TypewriterAnimatedText(
-                            hint,
-                            textStyle: const TextStyle(
-                              fontSize: 17.0,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.black, // Adjust color for your theme
-                            ),
-                            speed: const Duration(milliseconds: 100),
-                          ),
-                        )
-                        .toList(),
-                    isRepeatingAnimation: true,
-                    pause: const Duration(seconds: 2), // Pause between each hint
-                    displayFullTextOnTap: true, // Optionally let users see the full hint if they tap
-                    stopPauseOnTap: true,
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Align(
+                    alignment: Alignment.topCenter,
+                    child: Lottie.asset('assets/json/chat_gfa_general_before_chat.json'), // Animation for General Chat
                   ),
-                )
-              ],
+                  const SizedBox(height: 20),
+                  Align(
+                    alignment: Alignment.center,
+                    child: AnimatedTextKit(
+                      animatedTexts: hints
+                          .map(
+                            (hint) => TypewriterAnimatedText(
+                              hint,
+                              textStyle: const TextStyle(
+                                fontSize: 17.0,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.black, // Adjust color for your theme
+                              ),
+                              speed: const Duration(milliseconds: 100),
+                            ),
+                          )
+                          .toList(),
+                      isRepeatingAnimation: true,
+                      pause: const Duration(seconds: 2), // Pause between each hint
+                      displayFullTextOnTap: true, // Optionally let users see the full hint if they tap
+                      stopPauseOnTap: true,
+                    ),
+                  )
+                ],
+              ),
             ),
           ),
         if (generalChatMessages.isNotEmpty)
@@ -461,7 +525,8 @@ class MyChatGFAPageState extends State<MyChatGFAPage> {
               child: TextField(
                 controller: adminMatchDayChatMessageController,
                 decoration: InputDecoration(
-                  hintText: "Enter your message or tap the mic...",
+                  hintText: "Enter your message",
+                  // "or tap the mic...",
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(20.0),
                     borderSide: BorderSide.none, // No border
@@ -473,7 +538,7 @@ class MyChatGFAPageState extends State<MyChatGFAPage> {
                 onChanged: (text) {
                   if (text.isNotEmpty) {
                     setState(() {
-                      isRecording = false; // Switch to send button when typing
+                      // isRecording = false; // Switch to send button when typing
                     });
                   }
                 },
@@ -481,31 +546,32 @@ class MyChatGFAPageState extends State<MyChatGFAPage> {
             ),
             const SizedBox(width: 8),
             // FloatingActionButton.extended with rectangular shape
-            isRecording
-                ? FloatingActionButton.extended(
-                    backgroundColor: Colors.grey[600],
-                    onPressed: startAdminChatVoiceInput,
-                    label: const Text(
-                      "Voice",
-                      style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w500),
-                    ),
-                    icon: const Icon(Icons.mic, color: Colors.white),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  )
-                : FloatingActionButton.extended(
-                    backgroundColor: Colors.blue[800],
-                    onPressed: sendAdminMatchDayItemMessage,
-                    label: const Text(
-                      "Send",
-                      style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w500),
-                    ),
-                    icon: const Icon(Icons.send, color: Colors.white),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
+            // isRecording
+            //     ? FloatingActionButton.extended(
+            //         backgroundColor: Colors.grey[600],
+            //         onPressed: startAdminChatVoiceInput,
+            //         label: const Text(
+            //           "Voice",
+            //           style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w500),
+            //         ),
+            //         icon: const Icon(Icons.mic, color: Colors.white),
+            //         shape: RoundedRectangleBorder(
+            //           borderRadius: BorderRadius.circular(12),
+            //         ),
+            //       )
+            //     :
+            FloatingActionButton.extended(
+              backgroundColor: Colors.blue[800],
+              onPressed: sendAdminMatchDayItemMessage,
+              label: const Text(
+                "Send",
+                style: TextStyle(color: Colors.white70, fontSize: 17, fontWeight: FontWeight.w500),
+              ),
+              icon: const Icon(Icons.send, color: Colors.white70),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
           ],
         ),
       ),
@@ -522,7 +588,8 @@ class MyChatGFAPageState extends State<MyChatGFAPage> {
               child: TextField(
                 controller: generalChatMessageController,
                 decoration: InputDecoration(
-                  hintText: "Enter your message or tap the mic...",
+                  hintText: "Enter your message",
+                  // " or tap the mic...",
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(20.0),
                     borderSide: BorderSide.none, // No border
@@ -534,7 +601,7 @@ class MyChatGFAPageState extends State<MyChatGFAPage> {
                 onChanged: (text) {
                   if (text.isNotEmpty) {
                     setState(() {
-                      isRecording = false; // Switch to send button when typing
+                      // isRecording = false; // Switch to send button when typing
                     });
                   }
                 },
@@ -542,31 +609,32 @@ class MyChatGFAPageState extends State<MyChatGFAPage> {
             ),
             const SizedBox(width: 8),
             // FloatingActionButton.extended with rectangular shape
-            isRecording
-                ? FloatingActionButton.extended(
-                    backgroundColor: Colors.grey[600],
-                    onPressed: startGeneralChatVoiceInput,
-                    label: const Text(
-                      "Voice",
-                      style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w500),
-                    ),
-                    icon: const Icon(Icons.mic, color: Colors.white),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  )
-                : FloatingActionButton.extended(
-                    backgroundColor: Colors.blue[800],
-                    onPressed: sendGeneralChatMessage,
-                    label: const Text(
-                      "Send",
-                      style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w500),
-                    ),
-                    icon: const Icon(Icons.send, color: Colors.white),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
+            // isRecording
+            //     ? FloatingActionButton.extended(
+            //         backgroundColor: Colors.grey[600],
+            //         onPressed: startGeneralChatVoiceInput,
+            //         label: const Text(
+            //           "Voice",
+            //           style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w500),
+            //         ),
+            //         icon: const Icon(Icons.mic, color: Colors.white),
+            //         shape: RoundedRectangleBorder(
+            //           borderRadius: BorderRadius.circular(12),
+            //         ),
+            //       )
+            //     :
+            FloatingActionButton.extended(
+              backgroundColor: Colors.blue[800],
+              onPressed: sendGeneralChatMessage,
+              label: const Text(
+                "Send",
+                style: TextStyle(color: Colors.white70, fontSize: 17, fontWeight: FontWeight.w500),
+              ),
+              icon: const Icon(Icons.send, color: Colors.white70),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
           ],
         ),
       ),
@@ -586,11 +654,15 @@ class MyChatGFAPageState extends State<MyChatGFAPage> {
     });
 
     try {
-      var url = Uri.parse('http://127.0.0.1:5000/parse');
+      // Update the URL to your Google Cloud Function endpoint
+      var url = Uri.parse('https://us-central1-the-gfa.cloudfunctions.net/chatgfa-admin-function');
       var response = await http.post(
         url,
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'text': userMessage, 'club_id': widget.clubId}),
+        body: jsonEncode({
+          'text': userMessage,
+          'club_id': widget.clubId // Make sure this is the correct way you're passing club ID
+        }),
       );
 
       if (response.statusCode == 200) {
@@ -615,7 +687,7 @@ class MyChatGFAPageState extends State<MyChatGFAPage> {
         if (message.contains("Multiple players found") || message.contains("Who scored the goal?")) {
           // Don't update Firestore, wait for user clarification
         } else {
-          // Backend Flask handles Firestore update, no need to update in Flutter
+          // Backend Cloud Function handles Firestore update, no need to update in Flutter
         }
       } else {
         setState(() {
@@ -633,7 +705,7 @@ class MyChatGFAPageState extends State<MyChatGFAPage> {
 
     adminMatchDayChatMessageController.clear();
     setState(() {
-      isRecording = true; // Switch back to the mic button
+      // isRecording = true; // Switch back to the mic button
     });
   }
 
@@ -650,7 +722,8 @@ class MyChatGFAPageState extends State<MyChatGFAPage> {
     });
 
     try {
-      var url = Uri.parse('http://127.0.0.1:5000/general_chat');
+      // Update the URL to your Google Cloud Function endpoint
+      var url = Uri.parse('https://us-central1-the-gfa.cloudfunctions.net/chatgfa-general-function');
       var response = await http.post(
         url,
         headers: {'Content-Type': 'application/json'},
@@ -696,7 +769,7 @@ class MyChatGFAPageState extends State<MyChatGFAPage> {
 
     generalChatMessageController.clear();
     setState(() {
-      isRecording = true; // Switch back to the mic button
+      // isRecording = true; // Switch back to the mic button
     });
   }
 
@@ -748,27 +821,27 @@ class MyChatGFAPageState extends State<MyChatGFAPage> {
 
   void _handleAdminChatTextChange() {
     setState(() {
-      isRecording = adminMatchDayChatMessageController.text.isEmpty;
+      // isRecording = adminMatchDayChatMessageController.text.isEmpty;
     });
   }
 
   void _handleGeneralChatTextChange() {
     setState(() {
-      isRecording = generalChatMessageController.text.isEmpty;
+      // isRecording = generalChatMessageController.text.isEmpty;
     });
   }
 
   void _updateWithAdminChatVoiceInput(String voiceText) {
     setState(() {
       adminMatchDayChatMessageController.text = voiceText;
-      isRecording = false; // Switch to the send button
+      // isRecording = false; // Switch to the send button
     });
   }
 
   void _updateWithGeneralChatVoiceInput(String voiceText) {
     setState(() {
       generalChatMessageController.text = voiceText;
-      isRecording = false; // Switch to the send button
+      // isRecording = false; // Switch to the send button
     });
   }
 
@@ -785,6 +858,122 @@ class MyChatGFAPageState extends State<MyChatGFAPage> {
     // For demo purposes, we're simulating voice input
     Future.delayed(const Duration(seconds: 3), () {
       _updateWithGeneralChatVoiceInput("When did Coach Edwin this club");
+    });
+  }
+
+  void _showAdminDialog(BuildContext context) {
+    TextEditingController passcodeController = TextEditingController();
+
+    showDialog<String>(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) => AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20.0),
+        ),
+        backgroundColor: const Color.fromRGBO(57, 62, 70, 1),
+        title: const Text(
+          'This is for club coaches and admins',
+          style: TextStyle(
+            color: Colors.white70,
+            fontSize: 15,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: passcodeController,
+              obscureText: true,
+              decoration: const InputDecoration(
+                hintText: 'Passcode',
+                hintStyle: TextStyle(color: Colors.white70),
+                focusedBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: Colors.white70),
+                ),
+              ),
+              style: const TextStyle(color: Colors.white70),
+              cursorColor: Colors.white70,
+            ),
+            const SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    setState(() {
+                      _isAdminAuthenticated = false;
+                      sharedValue = 0; // Switch to general chat
+                    });
+                  },
+                  child: const Text(
+                    'Cancel',
+                    style: TextStyle(color: Colors.indigoAccent),
+                  ),
+                ),
+                ElevatedButton(
+                  onPressed: () async {
+                    String enteredPasscode = passcodeController.text.trim();
+
+                    DocumentSnapshot<Map<String, dynamic>> snapshot =
+                        await FirebaseFirestore.instance.collection('clubs').doc(widget.clubId).collection('AboutClub').doc('about_club_page').get();
+
+                    String storedPasscode = snapshot.data()?['admin_passcode'] ?? '';
+
+                    if (enteredPasscode == storedPasscode && context.mounted) {
+                      setState(() => _isAdminAuthenticated = true);
+                      Navigator.pop(context);
+                    } else {
+                      Fluttertoast.showToast(
+                        msg: 'Incorrect passcode',
+                        backgroundColor: Colors.indigoAccent,
+                        textColor: Colors.white70,
+                      );
+                    }
+                  },
+                  child: const Text('Submit', style: TextStyle(color: Colors.black)),
+                ),
+              ],
+            ),
+            // const SizedBox(height: 20),
+            // SizedBox(
+            //   width: double.infinity,
+            //   child: ElevatedButton(
+            //     style: ElevatedButton.styleFrom(
+            //       // backgroundColor: Colors.grey.shade800,
+            //       backgroundColor: Colors.indigo,
+            //       padding: const EdgeInsets.symmetric(vertical: 15),
+            //       shape: RoundedRectangleBorder(
+            //         borderRadius: BorderRadius.circular(10),
+            //       ),
+            //     ),
+            //     onPressed: () {
+            //       Fluttertoast.showToast(
+            //         msg: 'Coming Soon!',
+            //         backgroundColor: Colors.indigoAccent,
+            //         textColor: Colors.white70,
+            //       );
+            //     },
+            //     child: const Text(
+            //       "I'm Just Touring",
+            //       style: TextStyle(
+            //         color: Colors.white70,
+            //         fontSize: 16,
+            //         fontWeight: FontWeight.bold,
+            //       ),
+            //     ),
+            //   ),
+            // ),
+          ],
+        ),
+      ),
+    ).then((_) {
+      setState(() {
+        _isAdminAuthenticated = false;
+        sharedValue = 0; // Switch back to general chat
+      });
     });
   }
 

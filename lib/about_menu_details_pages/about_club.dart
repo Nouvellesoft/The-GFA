@@ -92,14 +92,14 @@ String launchURLMessage = "The required app is not installed.";
 
 String lottieAssetSearching = 'assets/json/searching.json';
 
-Color backgroundColor = const Color.fromRGBO(207, 118, 90, 1.0);
-Color cardBackgroundColor = const Color.fromRGBO(207, 116, 87, 1.0);
+Color backgroundColor = const Color.fromRGBO(32, 33, 33, 1.0);
+Color cardBackgroundColor = const Color.fromRGBO(22, 24, 24, 1.0);
 Color appBarIconColor = Colors.white;
 Color appBarTextColor = Colors.white;
-Color appBarBackgroundColor = const Color.fromRGBO(207, 118, 90, 1.0);
+Color appBarBackgroundColor = const Color.fromRGBO(32, 33, 33, 1.0);
 Color cardTextColor = Colors.white;
-Color cardColor = const Color.fromRGBO(234, 156, 130, 1.0);
-Color boxDecorationColor = const Color.fromRGBO(236, 189, 174, 1.0);
+Color cardColor = const Color.fromRGBO(49, 51, 51, 1.0);
+Color boxDecorationColor = const Color.fromRGBO(51, 49, 49, 1.0);
 Color chartBackgroundColor = const Color.fromRGBO(28, 26, 26, 1.0);
 Color materialColor = Colors.transparent;
 Color textColor = Colors.white;
@@ -961,7 +961,7 @@ class _AboutClubDetailsState extends State<AboutClubDetails> {
       switch (i) {
         case 0:
           return PieChartSectionData(
-            color: Colors.deepOrangeAccent,
+            color: Colors.white12,
             value: playersCount.toDouble(),
             title: playersText,
             radius: radius,
@@ -974,7 +974,7 @@ class _AboutClubDetailsState extends State<AboutClubDetails> {
           );
         case 1:
           return PieChartSectionData(
-            color: Colors.red,
+            color: Colors.red[700],
             value: coachesCount.toDouble(),
             title: coachesText,
             radius: radius,
@@ -987,7 +987,7 @@ class _AboutClubDetailsState extends State<AboutClubDetails> {
           );
         case 2:
           return PieChartSectionData(
-            color: Colors.teal,
+            color: Colors.teal[700],
             value: managersCount.toDouble(),
             title: managersText,
             radius: radius,

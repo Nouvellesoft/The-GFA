@@ -7,22 +7,22 @@ import 'package:provider/provider.dart';
 import '../details_pages/coaching_staff_details_page.dart';
 import '../notifier/coaching_staff_notifier.dart';
 
-Color backgroundColor = const Color.fromRGBO(255, 145, 104, 1);
-Color appBarTextColor = const Color.fromRGBO(138, 55, 24, 1.0);
-Color appBarBackgroundColor = const Color.fromRGBO(255, 145, 104, 1);
-Color appBarIconColor = const Color.fromRGBO(138, 55, 24, 1.0);
+Color backgroundColor = const Color.fromRGBO(22, 37, 47, 1.0);
+Color appBarTextColor = Colors.white70;
+Color appBarBackgroundColor = const Color.fromRGBO(22, 37, 47, 1.0);
+Color appBarIconColor = Colors.white70;
 Color modalColor = Colors.transparent;
-Color modalBackgroundColor = const Color.fromRGBO(255, 145, 104, 1);
+Color modalBackgroundColor = const Color.fromRGBO(22, 37, 47, 1.0);
 Color materialBackgroundColor = Colors.transparent;
-Color cardBackgroundColor = const Color.fromRGBO(138, 55, 24, 1.0);
-Color splashColor = const Color.fromRGBO(255, 145, 104, 1);
+Color cardBackgroundColor = const Color.fromRGBO(22, 37, 47, 1.0);
+Color splashColor = const Color.fromRGBO(22, 37, 47, 1.0);
 Color splashColorTwo = Colors.black87;
-Color iconColor = const Color.fromRGBO(255, 188, 163, 1);
-Color textColor = const Color.fromRGBO(255, 188, 163, 1);
+Color iconColor = Colors.white70;
+Color textColor = Colors.white70;
 Color textColorTwo = Colors.white70;
-Color dialogBackgroundColor = const Color.fromRGBO(255, 145, 104, 1);
+Color dialogBackgroundColor = const Color.fromRGBO(22, 37, 47, 1.0);
 Color borderColor = Colors.black;
-Color textHighlightColor = const Color.fromRGBO(255, 188, 163, 1);
+Color textHighlightColor = Colors.white70;
 
 dynamic queryTech;
 
@@ -39,7 +39,7 @@ class MyCoachesSearch extends SearchDelegate {
         primarySwatch: Colors.deepOrange,
         appBarTheme: AppBarTheme(backgroundColor: modalBackgroundColor),
         primaryIconTheme: IconThemeData(color: appBarIconColor),
-        textTheme: TextTheme(titleMedium: TextStyle(color: appBarTextColor, fontSize: 25)),
+        textTheme: TextTheme(titleMedium: TextStyle(color: appBarTextColor, fontSize: 25), titleLarge: TextStyle(color: appBarTextColor)),
         inputDecorationTheme: InputDecorationTheme(
           hintStyle: TextStyle(color: appBarTextColor.withAlpha(60)),
         ),
@@ -58,7 +58,12 @@ class MyCoachesSearch extends SearchDelegate {
         Visibility(
           visible: true,
           child: IconButton(
-            icon: Visibility(visible: true, child: Icon(MdiIcons.closeCircleOutline)),
+            icon: Visibility(
+                visible: true,
+                child: Icon(
+                  MdiIcons.closeCircleOutline,
+                  color: appBarIconColor,
+                )),
             onPressed: () {
               query = '';
             },
@@ -70,7 +75,7 @@ class MyCoachesSearch extends SearchDelegate {
         Visibility(
           visible: false,
           child: IconButton(
-            icon: Visibility(visible: false, child: Icon(MdiIcons.closeCircleOutline)),
+            icon: Visibility(visible: false, child: Icon(MdiIcons.closeCircleOutline, color: appBarIconColor)),
             onPressed: () {
               query = '';
             },
@@ -83,7 +88,7 @@ class MyCoachesSearch extends SearchDelegate {
   @override
   Widget buildLeading(BuildContext context) {
     return IconButton(
-      icon: Icon(MdiIcons.chevronTripleLeft),
+      icon: Icon(MdiIcons.chevronTripleLeft, color: appBarIconColor),
       onPressed: () {
         close(context, null);
       },

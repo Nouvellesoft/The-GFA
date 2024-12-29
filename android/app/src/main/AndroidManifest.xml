@@ -103,6 +103,10 @@
             android:name="flutterEmbedding"
             android:value="2" />
 
+        <meta-data
+            android:name="com.google.android.gms.wallet.api.enabled"
+            android:value="true" />
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.file provider"
@@ -126,5 +130,8 @@
                 <action android:name="com.htc.intent.action.QUICKBOOT_POWERON" />
             </intent-filter>
         </receiver>
+        <service android:name="com.google.firebase.messaging.FirebaseMessagingService"
+            android:exported="false"/>
+
     </application>
 </manifest>

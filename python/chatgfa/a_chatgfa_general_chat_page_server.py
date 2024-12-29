@@ -1,17 +1,24 @@
-import traceback
-from fuzzywuzzy import process
-import spacy
 import logging
+import os
+import subprocess
+import sys
+import traceback
+from datetime import datetime
+from pathlib import Path
+
+import spacy
+from dotenv import load_dotenv
 from flask import Flask, request, jsonify
+from flask_caching import Cache
 from flask_cors import CORS
+from fuzzywuzzy import process
 from google.cloud import firestore
 from openai import OpenAI
-from dotenv import load_dotenv
-from flask_caching import Cache
-from datetime import datetime
 
-# Load environment variables
-load_dotenv()
+# Get root directory path and load .env
+root_dir = Path(__file__).resolve().parents[2]
+env_path = os.path.join(root_dir, '.env')
+load_dotenv(env_path)
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -26,15 +33,11 @@ cache = Cache(app)
 logging.basicConfig(level=logging.INFO)
 
 # Initialize OpenAI client
-client = OpenAI(api_key='sk-GFTuZzkvMOyU6oJCvDAl5b-V4wx_gJP7nlPJGJZTIyT3BlbkFJCb3wPfhUjA'
-                        'jkwzuW2s4H6iIBsydv41ouQvVLNKynAA')
+client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
 
 # Initialize Firestore client
 FIRESTORE_PROJECT_ID = 'the-gfa'
 db = firestore.Client(project=FIRESTORE_PROJECT_ID)
-
-# Load spaCy model
-nlp = spacy.load("en_core_web_sm")
 
 
 # Function to format date with day suffix
@@ -302,7 +305,8 @@ def detect_intent(input_text):
             or "comment" in input_text_lower):
         return "coach_comment", {"coach_name": extract_coach_name(input_text, [])}
 
-    if "training day" in input_text_lower or "training days" in input_text_lower or "when is the training" in input_text_lower:
+    if ("training day" in input_text_lower or "training days" in input_text_lower
+            or "when is the training" in input_text_lower):
         return "training_days", {}
 
     # Check for general coach queries
@@ -326,7 +330,8 @@ def detect_intent(input_text):
         return "top_performers", {}
 
     # Check for player position query
-    if "where" in input_text_lower and "play" in input_text_lower and "position" not in input_text_lower:
+    if ("where" in input_text_lower and "play" in input_text_lower and "position" not in
+            input_text_lower):
         return "player_position", {"player_name": extract_player_name(input_text)}
 
     # Check for captain queries
@@ -337,11 +342,14 @@ def detect_intent(input_text):
     if "sponsor" in input_text_lower or "sponsorship" in input_text_lower:
         return "club_sponsors", {}
 
-    if "upcoming matches" in input_text_lower or "next matches" in input_text_lower or "fixture" in input_text_lower:
+    if ("upcoming matches" in input_text_lower or "next matches" in input_text_lower
+            or "fixture" in input_text_lower):
         return "upcoming_matches", {}
 
     # Check for past matches
-    if "past match" in input_text_lower or "last match" in input_text_lower or "previous match" in input_text_lower or "recent match" in input_text_lower or "past matches" in input_text_lower or "scores" in input_text_lower:
+    if ("past match" in input_text_lower or "last match" in input_text_lower
+            or "previous match" in input_text_lower or "recent match" in input_text_lower
+            or "past matches" in input_text_lower or "scores" in input_text_lower):
         return "past_matches", {}
 
     # Management Queries
@@ -379,36 +387,85 @@ def detect_intent_and_field(input_text):
 
 
 # Helper function: Extract player name
+
+def ensure_spacy_model():
+    """
+    Attempt to download SpaCy model using subprocess to avoid deployment issues
+    """
+    try:
+        # Try to load the model first
+        spacy.load("en_core_web_sm")
+        return True
+    except OSError:
+        try:
+            # Use subprocess to download the model
+            result = subprocess.run([sys.executable, "-m", "spacy", "download", "en_core_web_sm"],
+                                    capture_output=True, text=True)
+
+            # Log the output for debugging
+            if result.stdout:
+                logging.info(f"SpaCy model download stdout: {result.stdout}")
+            if result.stderr:
+                logging.warning(f"SpaCy model download stderr: {result.stderr}")
+
+            return result.returncode == 0
+        except Exception as e:
+            logging.error(f"Failed to download SpaCy model: {e}")
+            return False
+
+
+# Modify your existing SpaCy initialization
+nlp = None
+try:
+    # Attempt to load or download the model
+    ensure_spacy_model()
+    nlp = spacy.load("en_core_web_sm")
+except Exception as ex:
+    logging.error(f"SpaCy initialization error: {ex}")
+    nlp = None
+
+
 def extract_player_name(input_text):
-    # First try spaCy NER
+    global nlp
+
+    # If no model, attempt to download
+    if nlp is None:
+        ensure_spacy_model()
+        try:
+            nlp = spacy.load("en_core_web_sm")
+        except Exception as e:
+            logging.error(f"Failed to load SpaCy model: {e}")
+            return fallback_name_extraction(input_text)
+
+    # SpaCy-based name extraction
     doc = nlp(input_text)
     player_candidates = [ent.text.strip() for ent in doc.ents if ent.label_ == "PERSON"]
-    logging.info(f"spaCy detected entities: {player_candidates}")
 
-    if player_candidates:
-        # Log the selected name
-        logging.info(f"Using spaCy detected name: {player_candidates[0]}")
-        return player_candidates[0]
+    logging.info(f"SpaCy detected entities: {player_candidates}")
 
-    # Enhanced fallback: Look for name patterns
+    return player_candidates[0] if player_candidates else fallback_name_extraction(input_text)
+
+
+def fallback_name_extraction(input_text):
+    import re
+
+    # Look for potential name patterns
+    name_patterns = [
+        r'\b([A-Z][a-z]+ [A-Z][a-z]+)\b',  # Two capitalized words
+        r'\b(Mr\. [A-Z][a-z]+ [A-Z][a-z]+)\b',  # With Mr.
+        r'\b([A-Z][a-z]+ [A-Z]\.[A-Z][a-z]+)\b'  # Middle initial
+    ]
+
+    for pattern in name_patterns:
+        matches = re.findall(pattern, input_text)
+        if matches:
+            return matches[0]
+
+    # Fallback to first two capitalized words
     words = input_text.split()
-    potential_names = []
-
-    # Look for consecutive capitalized words
-    for i in range(len(words) - 1):
-        if words[i][0].isupper() and words[i + 1][0].isupper():
-            name = f"{words[i]} {words[i + 1]}"
-            potential_names.append(name)
-
-    # Look for "stats for [Name]" pattern
-    if "stats for" in input_text.lower():
-        stats_index = input_text.lower().index("stats for") + 9
-        remaining_text = input_text[stats_index:].strip()
-        words = remaining_text.split()
-        if len(words) >= 2:
-            potential_names.append(f"{words[0]} {words[1]}")
-
-    logging.info(f"Potential names found: {potential_names}")
+    potential_names = [f"{words[i]} {words[i + 1]}"
+                       for i in range(len(words) - 1)
+                       if words[i][0].isupper() and words[i + 1][0].isupper()]
 
     return potential_names[0] if potential_names else None
 
@@ -657,7 +714,8 @@ def handle_club_info_query(about_club_data, input_text):
         instagram = about_club_data.get("instagram_handle", "not available")
         twitter = about_club_data.get("twitter_handle", "not available")
         return jsonify({
-            "message": f"The club's social media handles are:\nFacebook: {facebook}\nInstagram: {instagram}\nTwitter: {twitter}"})
+            "message": f"The club's social media handles are:\nFacebook: "
+                       f"{facebook}\nInstagram: {instagram}\nTwitter: {twitter}"})
 
     return jsonify({"message": "I couldn't find information about that."})
 
@@ -696,7 +754,8 @@ def handle_top_performers_query(players_data):
         if player_of_the_month:
             for player in player_of_the_month:
                 response_message.append(
-                    f"{player.get('player_name', 'Unknown')} is the player of the month, some of his current stats includes: \n\n"
+                    f"{player.get('player_name', 'Unknown')} is the player of the month, "
+                    f"some of his current stats includes: \n\n"
                     f"Position: {player.get('player_position', 'Unknown')}\n"
                     f"Goals: {player.get('goals_scored', 0)}\n"
                     f"Assists: {player.get('assists', 0)}\n"
@@ -780,7 +839,8 @@ def handle_coaches_query(coaches_data, coach_name=None):
         )
         if coach_info:
             response = (
-                f"{coach_info.get('name', 'Unknown Coach')} serves as {coach_info.get('staff_position', 'a coach')}. "
+                f"{coach_info.get('name', 'Unknown Coach')} serves as "
+                f"{coach_info.get('staff_position', 'a coach')}. "
                 f"They believe in '{coach_info.get('philosophy', 'N/A')}'.\n"
                 f"Contact: {coach_info.get('email', 'N/A')} | {coach_info.get('phone', 'N/A')}."
             )
@@ -790,7 +850,8 @@ def handle_coaches_query(coaches_data, coach_name=None):
     # If no specific name, list all coaches
     response = "The coaches at the club are:\n"
     for coach in coaches_data:
-        response += f"- {coach.get('name', 'Unknown Coach')} ({coach.get('staff_position', 'N/A')})\n"
+        response += (f"- {coach.get('name', 'Unknown Coach')} "
+                     f"({coach.get('staff_position', 'N/A')})\n")
 
     return jsonify({"message": response})
 
@@ -806,9 +867,11 @@ def handle_management_query(management_data, manager_name=None):
         )
         if manager_info:
             response = (
-                f"{manager_info.get('name', 'Unknown Manager')} serves as {manager_info.get('staff_position', 'a manager')}. "
+                f"{manager_info.get('name', 'Unknown Manager')} "
+                f"serves as {manager_info.get('staff_position', 'a manager')}. "
                 f"They believe in '{manager_info.get('philosophy', 'N/A')}'.\n"
-                f"Contact: {manager_info.get('email', 'N/A')} | {manager_info.get('phone', 'N/A')}."
+                f"Contact: {manager_info.get('email', 'N/A')} | "
+                f"{manager_info.get('phone', 'N/A')}."
             )
             return jsonify({"message": response})
         return jsonify({"message": f"No manager found with the name {manager_name}."})
@@ -816,7 +879,8 @@ def handle_management_query(management_data, manager_name=None):
     # If no specific name, list all management
     response = "The Managers at the club are:\n"
     for manager in management_data:
-        response += f"- {manager.get('name', 'Unknown Manager')} ({manager.get('staff_position', 'N/A')})\n"
+        response += (f"- {manager.get('name', 'Unknown Manager')} "
+                     f"({manager.get('staff_position', 'N/A')})\n")
 
     return jsonify({"message": response})
 
@@ -838,7 +902,8 @@ def handle_coach_comment_query(coach_name, club_id):
         latest_comment = coach_comments_sorted[0]
 
         response = (
-            f"Coach {latest_comment.get('name', 'Unknown Coach')} commented in {latest_comment.get('date', 'Unknown Date')}: "
+            f"Coach {latest_comment.get('name', 'Unknown Coach')} "
+            f"commented in {latest_comment.get('date', 'Unknown Date')}: "
             f"\"{latest_comment.get('comment', 'No comment available')}\""
         )
         return jsonify({"message": response})
@@ -864,7 +929,8 @@ def handle_founder_comment_query(founder_name, club_id):
         latest_comment = founder_comments_sorted[0]
 
         response = (
-            f"Founder {latest_comment.get('name', 'Unknown Founder')} commented in {latest_comment.get('date', 'Unknown Date')}: "
+            f"Founder {latest_comment.get('name', 'Unknown Founder')} "
+            f"commented in {latest_comment.get('date', 'Unknown Date')}: "
             f"\"{latest_comment.get('comment', 'No comment available')}\""
         )
         return jsonify({"message": response})
@@ -919,7 +985,8 @@ def handle_past_matches_query(past_matches_data):
         away_score = match.get("at_score", "N/A")
 
         # Format the match info
-        match_info = f"Match {idx}: {home_team} vs {away_team} - [{home_score} - {away_score}] on {match_date}"
+        match_info = (f"Match {idx}: {home_team} vs {away_team} - "
+                      f"[{home_score} - {away_score}] on {match_date}")
         # if venue:
         #     match_info += f" at {venue}"
         if competition:
@@ -958,13 +1025,18 @@ def handle_training_days_query(training_data):
     return jsonify({"message": "\n\n".join(response_message)})
 
 
-# Flask endpoint for handling chat requests
-@app.route('/general_chat', methods=['POST'])
-def general_chat():
+# Cloud Functions entry point
+def general_chat(requesting):
+    """
+    Cloud Function entry point for general_chat.
+    """
     try:
-        data = request.json
-        input_text = data.get('text')
-        club_id = data.get('club_id')
+        request_json = requesting.get_json(silent=True)
+        if not request_json:
+            return jsonify({"error": "Invalid JSON payload"}), 400
+
+        input_text = request_json.get('text')
+        club_id = request_json.get('club_id')
 
         if not input_text or not club_id:
             return jsonify({"error": "Both 'text' and 'club_id' are required"}), 400
@@ -1031,7 +1103,3 @@ def general_chat():
         logging.error(f"Error in general_chat: {e}", exc_info=True)
         traceback.print_exc()
         return jsonify({"error": "An internal error occurred"}), 500
-
-
-if __name__ == "__main__":
-    app.run(debug=True)

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -11,10 +12,10 @@ class ClubDetailPage extends StatefulWidget {
   const ClubDetailPage({required this.clubId, super.key});
 
   @override
-  _ClubDetailPageState createState() => _ClubDetailPageState();
+  ClubDetailPageState createState() => ClubDetailPageState();
 }
 
-class _ClubDetailPageState extends State<ClubDetailPage> {
+class ClubDetailPageState extends State<ClubDetailPage> {
   late Future<void> _future;
 
   @override
@@ -53,7 +54,9 @@ class _ClubDetailPageState extends State<ClubDetailPage> {
                     title: Text(players[index].name ?? 'Unknown'),
                     onTap: () {
                       // Handle player selection if needed
-                      print('Selected player: ${players[index].name}');
+                      if (kDebugMode) {
+                        print('Selected player: ${players[index].name}');
+                      }
                     },
                   );
                 },

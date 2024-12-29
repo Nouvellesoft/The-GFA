@@ -238,7 +238,6 @@ class MySocialMediaPageState extends State<MySocialMediaPage> {
               ],
             ),
           );
-
         });
   }
 

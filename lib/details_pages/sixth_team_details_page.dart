@@ -19,6 +19,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sms_autofill/sms_autofill.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../api/d_whatsapp_otp_service.dart';
 import '../notifier/a_club_global_notifier.dart';
 import '../notifier/sixth_team_class_notifier.dart';
 
@@ -84,23 +85,23 @@ String linkedInProfileSharedPreferencesContentTwo = ", on LinkedIn.com";
 String linkedInProfileSharedPreferencesButton = "Go to LinkedIn";
 String linkedInProfileSharedPreferencesButtonTwo = "Lol, No";
 
-Color backgroundColor = const Color.fromRGBO(186, 90, 49, 1);
+Color backgroundColor = const Color.fromRGBO(38, 37, 32, 1.0);
 Color appBarTextColor = Colors.white;
-Color appBarBackgroundColor = const Color.fromRGBO(186, 90, 49, 1);
+Color appBarBackgroundColor = const Color.fromRGBO(38, 37, 32, 1.0);
 Color appBarIconColor = Colors.white;
 Color materialBackgroundColor = Colors.transparent;
-Color shapeDecorationColor = const Color.fromRGBO(186, 90, 49, 1);
-Color shapeDecorationColorTwo = const Color.fromRGBO(186, 90, 49, 1);
-Color shapeDecorationTextColor = const Color.fromRGBO(186, 90, 49, 1);
-Color shapeDecorationIconColor = const Color.fromRGBO(186, 90, 49, 1);
+Color shapeDecorationColor = const Color.fromRGBO(38, 37, 32, 1.0);
+Color shapeDecorationColorTwo = const Color.fromRGBO(38, 37, 32, 1.0);
+Color shapeDecorationTextColor = const Color.fromRGBO(38, 37, 32, 1.0);
+Color shapeDecorationIconColor = const Color.fromRGBO(38, 37, 32, 1.0);
 Color cardBackgroundColor = Colors.white;
 Color splashColor = Colors.white;
 Color splashColorTwo = Colors.white;
 Color splashColorThree = Colors.white;
 Color iconTextColor = Colors.white;
-Color iconTextColorTwo = const Color.fromRGBO(186, 90, 49, 1);
-Color buttonColor = const Color.fromRGBO(186, 90, 49, 1);
-Color textColor = const Color.fromRGBO(186, 90, 49, 1);
+Color iconTextColorTwo = const Color.fromRGBO(38, 37, 32, 1.0);
+Color buttonColor = const Color.fromRGBO(38, 37, 32, 1.0);
+Color textColor = const Color.fromRGBO(38, 37, 32, 1.0);
 
 Color confettiColorOne = Colors.green;
 Color confettiColorTwo = Colors.blue;
@@ -162,14 +163,17 @@ class SixthTeamClassDetailsPage extends StatefulWidget {
 }
 
 class _SixthTeamClassDetailsPage extends State<SixthTeamClassDetailsPage> {
+  final WhatsAppOtpService _whatsAppOtpService = WhatsAppOtpService();
+
   String otpCode = "";
   bool isLoaded = false;
   final FirebaseAuth auth = FirebaseAuth.instance;
-  String _receivedId = ""; // Add this line
+  String _receivedSmsId = '';
+  String _whatsappOtp = '';
   bool isOTPComplete = true;
   bool isOtpVerified = false; // Add this variable
   // Declare a boolean variable to track OTP generation
-  bool isOtpGenerated = true;
+  bool isSmsOtpGenerated = true;
 
   bool isModifyingAutobiography = true; // Assuming modifying autobiography by default
 
@@ -373,7 +377,7 @@ class _SixthTeamClassDetailsPage extends State<SixthTeamClassDetailsPage> {
 
         // Find the corresponding player in the PlayersTable subcollection
         QuerySnapshot generalSnapshot =
-        await firestore.collection('clubs').doc(widget.clubId).collection('PllayersTable').where('player_name', isEqualTo: fullName).get();
+            await firestore.collection('clubs').doc(widget.clubId).collection('PllayersTable').where('player_name', isEqualTo: fullName).get();
 
         if (generalSnapshot.docs.isNotEmpty) {
           // Get the first document from the query results
@@ -4796,7 +4800,7 @@ class _SixthTeamClassDetailsPage extends State<SixthTeamClassDetailsPage> {
         verificationCompleted: (PhoneAuthCredential credential) async {
           await auth.signInWithCredential(credential);
           if (kDebugMode) {
-            print('Logged In Successfully');
+            print('Logged In Successfully via SMS');
           }
 
           Fluttertoast.showToast(
@@ -4809,11 +4813,11 @@ class _SixthTeamClassDetailsPage extends State<SixthTeamClassDetailsPage> {
         },
         verificationFailed: (FirebaseAuthException e) {
           if (kDebugMode) {
-            print("Verification failed: ${e.message}");
+            print("SMS Verification failed: ${e.message}");
           }
 
           Fluttertoast.showToast(
-            msg: 'Hmm. Check your Internet Connection or maybe too many OTP requests',
+            msg: 'For SMS: Hmm. Check your Internet Connection or maybe too many OTP requests',
             toastLength: Toast.LENGTH_LONG,
             gravity: ToastGravity.BOTTOM,
             backgroundColor: Colors.deepOrangeAccent,
@@ -4821,13 +4825,13 @@ class _SixthTeamClassDetailsPage extends State<SixthTeamClassDetailsPage> {
             fontSize: 16.0,
           );
 
-          throw Exception("Error sending OTP: ${e.message}");
+          throw Exception("Error sending SMS OTP: ${e.message}");
         },
         codeSent: (String verificationId, int? resendToken) async {
-          _receivedId = verificationId;
+          _receivedSmsId = verificationId;
 
           Fluttertoast.showToast(
-            msg: 'Success! OTP sent to your phone number',
+            msg: 'Success! OTP sent via SMS',
             gravity: ToastGravity.BOTTOM,
             backgroundColor: Colors.deepOrangeAccent,
             textColor: Colors.white,
@@ -4837,15 +4841,18 @@ class _SixthTeamClassDetailsPage extends State<SixthTeamClassDetailsPage> {
           await Future.delayed(const Duration(seconds: 5));
 
           setState(() {
-            isOtpGenerated = true;
+            isSmsOtpGenerated = true;
           });
         },
         codeAutoRetrievalTimeout: (String verificationId) {
           if (kDebugMode) {
-            print('TimeOut');
+            print('SMS OTP TimeOut');
           }
         },
       );
+
+      // Simultaneously send WhatsApp OTP
+      await sendWhatsAppVerification();
     } catch (e) {
       if (kDebugMode) {
         print('Error sending OTP: $e');
@@ -4861,52 +4868,80 @@ class _SixthTeamClassDetailsPage extends State<SixthTeamClassDetailsPage> {
     }
   }
 
+  Future<void> sendWhatsAppVerification() async {
+    // Assuming you have the phone number stored
+    String phoneNumber = "+$_phone";
+
+    // Generate OTP
+    String generatedOtp = _whatsAppOtpService.generateOtp();
+
+    // Send OTP via WhatsApp
+    bool otpSent = await _whatsAppOtpService.sendWhatsAppOtp(phoneNumber, generatedOtp);
+
+    if (otpSent) {
+      // Store OTP for verification
+      setState(() {
+        _whatsappOtp = generatedOtp;
+      });
+
+      print('WhatsApp number: $phoneNumber  otp: $generatedOtp');
+
+      Fluttertoast.showToast(
+        msg: 'OTP sent via WhatsApp',
+        backgroundColor: Colors.green,
+      );
+    } else {
+      Fluttertoast.showToast(
+        msg: 'Failed to send WhatsApp OTP',
+        backgroundColor: Colors.red,
+      );
+    }
+  }
+
   Future<void> verifyOTPCode() async {
-    PhoneAuthCredential credential = PhoneAuthProvider.credential(
-      verificationId: _receivedId,
-      smsCode: otpCode,
-    );
     try {
-      await auth.signInWithCredential(credential).then((value) async {
-        if (kDebugMode) {
-          print('User verification is Successful');
-        }
+      bool isVerified = otpCode == _whatsappOtp;
+      // Try verification with Firebase SMS
+      try {
+        PhoneAuthCredential smsCredential = PhoneAuthProvider.credential(
+          verificationId: _receivedSmsId,
+          smsCode: otpCode,
+        );
 
-        SharedPreferences prefs = await SharedPreferences.getInstance();
-        String? userProperties = prefs.getString('verificationUserProperties');
-        String currentProperties = _name;
+        await auth.signInWithCredential(smsCredential);
+        isVerified = true;
+        // await _handleSuccessfulVerification();
+        // return;
+      } catch (smsVerificationError) {
+        print('SMS Verification Error: $smsVerificationError');
+      }
 
-        if (userProperties == null || userProperties != currentProperties) {
-          prefs.setString('verificationUserProperties', currentProperties);
-          prefs.setInt('verificationTime', DateTime.now().millisecondsSinceEpoch);
-        }
+      // If SMS verification fails, check WhatsApp OTP
+      if (isVerified) {
+        // if (otpCode == _whatsappOtp) {
+        await _handleSuccessfulVerification();
+        // return;
+      } else {
+        print('WhatsApp OTP Mismatch');
+        print('Entered OTP: $otpCode');
+        print('WhatsApp OTP: $_whatsappOtp');
 
-        setState(() {
-          isOtpVerified = true;
-        });
-
+        // If both methods fail
         Fluttertoast.showToast(
-          msg: 'Verified. Thank you.',
+          msg: 'OTP incorrect. Please retype.',
           gravity: ToastGravity.BOTTOM,
           backgroundColor: Colors.deepOrangeAccent,
           textColor: Colors.white,
           fontSize: 16.0,
         );
 
-        if (mounted) {
-          Navigator.pop(context);
-        }
-
-        if (isModifyingAutobiography) {
-          _showAutobiographyModificationDialog();
-        } else {
-          _showImageModificationDialog();
-        }
-      });
+        throw Exception("OTP Verification Failed");
+      }
     } catch (e) {
       if (kDebugMode) {
         print('Error verifying OTP: $e');
       }
+
       Fluttertoast.showToast(
         msg: 'OTP incorrect. Please retype.',
         gravity: ToastGravity.BOTTOM,
@@ -4916,6 +4951,40 @@ class _SixthTeamClassDetailsPage extends State<SixthTeamClassDetailsPage> {
       );
 
       throw Exception("Error verifying OTP: $e");
+    }
+  }
+
+  // Helper method to handle successful verification
+  Future<void> _handleSuccessfulVerification() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? userProperties = prefs.getString('verificationUserProperties');
+    String currentProperties = _name;
+
+    if (userProperties == null || userProperties != currentProperties) {
+      prefs.setString('verificationUserProperties', currentProperties);
+      prefs.setInt('verificationTime', DateTime.now().millisecondsSinceEpoch);
+    }
+
+    setState(() {
+      isOtpVerified = true;
+    });
+
+    Fluttertoast.showToast(
+      msg: 'Verified. Thank you.',
+      gravity: ToastGravity.BOTTOM,
+      backgroundColor: Colors.deepOrangeAccent,
+      textColor: Colors.white,
+      fontSize: 16.0,
+    );
+
+    if (mounted) {
+      Navigator.pop(context);
+    }
+
+    if (isModifyingAutobiography) {
+      _showAutobiographyModificationDialog();
+    } else {
+      _showImageModificationDialog();
     }
   }
 
@@ -4967,6 +5036,7 @@ class _SixthTeamClassDetailsPage extends State<SixthTeamClassDetailsPage> {
             TextButton(
               onPressed: () async {
                 await _sendOtpToPhoneNumber();
+                await sendWhatsAppVerification();
               },
               child: const Text('Generate OTP', style: TextStyle(color: Colors.black)),
             ),
@@ -4983,12 +5053,12 @@ class _SixthTeamClassDetailsPage extends State<SixthTeamClassDetailsPage> {
           content: Padding(
             padding: const EdgeInsets.all(6.0),
             child: AbsorbPointer(
-              absorbing: !isOtpGenerated,
+              absorbing: !isSmsOtpGenerated,
               child: Form(
                 key: dialogFormKey,
                 child: GestureDetector(
                   onTap: () {
-                    if (!isOtpGenerated) {
+                    if (!isSmsOtpGenerated) {
                       Fluttertoast.showToast(
                         msg: 'Please generate OTP first',
                         gravity: ToastGravity.BOTTOM,
@@ -5004,7 +5074,7 @@ class _SixthTeamClassDetailsPage extends State<SixthTeamClassDetailsPage> {
                     decoration: BoxLooseDecoration(
                       gapSpace: 5,
                       radius: const Radius.circular(8),
-                      strokeColorBuilder: isOtpGenerated ? const FixedColorBuilder(Color(0xFFE16641)) : const FixedColorBuilder(Colors.grey),
+                      strokeColorBuilder: isSmsOtpGenerated ? const FixedColorBuilder(Color(0xFFE16641)) : const FixedColorBuilder(Colors.grey),
                     ),
                     codeLength: 6,
                     onCodeChanged: (code) {

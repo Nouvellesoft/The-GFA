@@ -38,13 +38,13 @@ String collectionSnapshotID = "clubs";
 String subCollectionSnapshotID = "AboutClub";
 String subDocumentSnapshotID = "about_club_page";
 
-Color backgroundColor = const Color.fromRGBO(58, 31, 41, 1);
+Color backgroundColor = const Color.fromRGBO(38, 37, 38, 1.0);
 Color appBarTextColor = Colors.white;
-Color appBarBackgroundColor = const Color.fromRGBO(52, 18, 30, 1);
+Color appBarBackgroundColor = const Color.fromRGBO(38, 37, 38, 1.0);
 Color appBarIconColor = Colors.white;
-Color cardBackgroundColor = const Color.fromRGBO(52, 18, 30, 1);
+Color cardBackgroundColor = const Color.fromRGBO(31, 29, 31, 1.0);
 Color headingCardColor = Colors.white;
-Color headingCardTextColor = const Color.fromRGBO(58, 31, 41, 1);
+Color headingCardTextColor = Color.fromRGBO(38, 37, 38, 1.0);
 Color cardTextColor = Colors.white;
 
 class AcronymsMeanings extends StatefulWidget {

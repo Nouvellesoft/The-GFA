@@ -10,12 +10,12 @@ import '../notifier/club_captains_notifier.dart';
 
 String teamCaptainingTitle = "Team Captaining\n";
 
-Color backgroundColor = const Color.fromRGBO(56, 56, 60, 1);
-Color appBarBackgroundColor = const Color.fromRGBO(56, 56, 60, 1);
+Color backgroundColor = const Color.fromRGBO(33, 33, 33, 1.0);
+Color appBarBackgroundColor = const Color.fromRGBO(33, 33, 33, 1.0);
 Color appBarIconColor = Colors.white70;
 Color materialBackgroundColor = Colors.transparent;
-Color shapeDecorationColor = const Color.fromRGBO(23, 23, 26, 1.0);
-Color cardBackgroundColor = const Color.fromRGBO(23, 23, 26, 1.0);
+Color shapeDecorationColor = const Color.fromRGBO(33, 33, 33, 1.0);
+Color cardBackgroundColor = const Color.fromRGBO(49, 45, 45, 1.0);
 Color splashColor = Colors.white70;
 Color textColor = Colors.white70;
 Color iconColor = Colors.white70;

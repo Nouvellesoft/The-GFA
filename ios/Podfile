@@ -50,6 +50,7 @@ target 'Runner' do
   pod 'Firebase/Performance', '11.4.0'
   pod 'Firebase/ABTesting', '11.4.0'
   pod 'Firebase/RemoteConfig', '11.4.0'
+  pod 'Firebase/Database'
 
   # Specify Lottie version with minimum iOS deployment target of 15.0
   pod 'lottie-ios', '4.4.0'

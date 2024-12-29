@@ -8,20 +8,20 @@ import '../details_pages/first_team_details_page.dart';
 import '../notifier/first_team_class_notifier.dart';
 
 Color backgroundColor = const Color.fromRGBO(33, 37, 41, 1.0);
-Color appBarTextColor = const Color.fromRGBO(255, 107, 53, 1.0);
+Color appBarTextColor = Colors.white70;
 Color appBarBackgroundColor = const Color.fromRGBO(33, 37, 41, 1.0);
-Color appBarIconColor = const Color.fromRGBO(255, 107, 53, 1.0);
+Color appBarIconColor = Colors.white70;
 Color modalColor = Colors.transparent;
 Color modalBackgroundColor = const Color.fromRGBO(33, 37, 41, 1.0);
 Color materialBackgroundColor = Colors.transparent;
-Color cardBackgroundColor = const Color.fromRGBO(255, 107, 53, 1.0);
+Color cardBackgroundColor = const Color.fromRGBO(33, 37, 41, 1.0);
 Color splashColor = const Color.fromRGBO(33, 37, 41, 1.0);
-Color iconColor = const Color.fromRGBO(255, 107, 53, 1.0);
-Color textColor = const Color.fromRGBO(255, 107, 53, 1.0);
+Color iconColor = Colors.white70;
+Color textColor = Colors.white70;
 Color textColorTwo = Colors.white70;
 Color dialogBackgroundColor = const Color.fromRGBO(33, 37, 41, 1.0);
 Color borderColor = Colors.black;
-Color textHighlightColor = const Color.fromRGBO(255, 107, 53, 1.0);
+Color textHighlightColor = Colors.white70;
 
 dynamic queryTech;
 
@@ -40,7 +40,7 @@ class MyFirstTeamClassSearch extends SearchDelegate {
         primarySwatch: Colors.deepOrange,
         appBarTheme: AppBarTheme(backgroundColor: cardBackgroundColor),
         primaryIconTheme: IconThemeData(color: appBarIconColor),
-        textTheme: TextTheme(titleMedium: TextStyle(color: appBarTextColor, fontSize: 25)),
+        textTheme: TextTheme(titleMedium: TextStyle(color: appBarTextColor, fontSize: 25), titleLarge: TextStyle(color: appBarTextColor)),
         inputDecorationTheme: InputDecorationTheme(
           hintStyle: TextStyle(color: appBarTextColor.withAlpha(60)),
         ),
@@ -59,7 +59,12 @@ class MyFirstTeamClassSearch extends SearchDelegate {
         Visibility(
           visible: true,
           child: IconButton(
-            icon: Visibility(visible: true, child: Icon(MdiIcons.closeCircleOutline)),
+            icon: Visibility(
+                visible: true,
+                child: Icon(
+                  MdiIcons.closeCircleOutline,
+                  color: appBarIconColor,
+                )),
             onPressed: () {
               query = '';
             },
@@ -71,7 +76,7 @@ class MyFirstTeamClassSearch extends SearchDelegate {
         Visibility(
           visible: false,
           child: IconButton(
-            icon: Visibility(visible: false, child: Icon(MdiIcons.closeCircleOutline)),
+            icon: Visibility(visible: false, child: Icon(MdiIcons.closeCircleOutline, color: appBarIconColor)),
             onPressed: () {
               query = '';
             },
@@ -84,7 +89,7 @@ class MyFirstTeamClassSearch extends SearchDelegate {
   @override
   Widget buildLeading(BuildContext context) {
     return IconButton(
-      icon: Icon(MdiIcons.chevronTripleLeft),
+      icon: Icon(MdiIcons.chevronTripleLeft, color: appBarIconColor),
       onPressed: () {
         close(context, null);
       },

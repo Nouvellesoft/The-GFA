@@ -1,0 +1,28 @@
+{
+  "thegfa_pricing": {
+    "xxxfc": {
+      "standardMonthly": 9,
+      "advancedMonthly": 29,
+      "standardAnnual": 18,
+      "advancedAnnual": 21,
+      "standardAnnualDiscount": 16,
+      "advancedAnnualDiscount": 66
+    },
+    "yyyfc": {
+      "standardMonthly": 34,
+      "advancedMonthly": 17,
+      "standardAnnual": 53,
+      "advancedAnnual": 24,
+      "standardAnnualDiscount": 42,
+      "advancedAnnualDiscount": 27
+    },
+    "zzzfc": {
+      "standardMonthly": 72,
+      "advancedMonthly": 22,
+      "standardAnnual": 92,
+      "advancedAnnual": 29,
+      "standardAnnualDiscount": 28,
+      "advancedAnnualDiscount": 82
+    }
+  }
+}

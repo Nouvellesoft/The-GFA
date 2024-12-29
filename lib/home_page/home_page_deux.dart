@@ -1,19 +1,20 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:provider/provider.dart';
 
-import '../notifier/a_club_global_notifier.dart';
+import '../club_admin/club_admin_page.dart';
 import '../sidebar/sidebar_layout.dart';
 
-String clubName = '';
+// String clubName = '';
 
 class PandCTransitions extends StatelessWidget {
-  const PandCTransitions({super.key});
+  final String clubId;
+
+  const PandCTransitions({super.key, required this.clubId});
 
   @override
   Widget build(BuildContext context) {
-    clubName = Provider.of<ClubGlobalProvider>(context).clubName;
+    // clubName = Provider.of<ClubGlobalProvider>(context).clubName;
 
     return Scaffold(
       backgroundColor: Colors.black,
@@ -67,8 +68,8 @@ class PandCTransitions extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           // const SizedBox(height: 60),
-           Text(
-            "Welcome to\n + $clubName + App",
+          Text(
+            "Welcome to\n $clubId App",
             style: const TextStyle(
               color: Colors.white,
               fontSize: 18,
@@ -99,8 +100,8 @@ class PandCTransitions extends StatelessWidget {
               );
               Navigator.push(
                 context,
-                SlideTransition1(const SideBarLayout(
-                  clubId: '',
+                SlideTransition1(SideBarLayout(
+                  clubId: clubId,
                 )),
               );
               // You can navigate here if needed
@@ -138,7 +139,7 @@ class PandCTransitions extends StatelessWidget {
         ),
         backgroundColor: const Color.fromRGBO(57, 62, 70, 1),
         title: const Text(
-          'Awesome, Enter the passcode',
+          'This is for club coaches and admins',
           style: TextStyle(
             color: Colors.white,
             fontSize: 16,
@@ -154,40 +155,59 @@ class PandCTransitions extends StatelessWidget {
               decoration: const InputDecoration(
                 hintText: 'Passcode',
                 hintStyle: TextStyle(color: Colors.white70),
+                focusedBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: Colors.white),
+                ),
               ),
               style: const TextStyle(color: Colors.white70),
+              cursorColor: Colors.white,
             ),
             const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () async {
-                String enteredPasscode = passcodeController.text.trim();
-
-                // Retrieve the stored passcode from Firestore
-                DocumentSnapshot<Map<String, dynamic>> snapshot = await FirebaseFirestore.instance
-                    .collection('AboutClub') // Replace with your Firestore collection
-                    .doc('about_club_page') // Replace with your Firestore document
-                    .get();
-
-                String storedPasscode = snapshot.data()!['admin_passcode'] ?? '';
-
-                // Check if the entered passcode matches the stored passcode
-                if (enteredPasscode == storedPasscode) {
-                  if (context.mounted) {
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                TextButton(
+                  onPressed: () {
                     Navigator.pop(context);
+                  },
+                  child: const Text(
+                    'Cancel',
+                    style: TextStyle(color: Colors.indigoAccent),
+                  ),
+                ),
+                ElevatedButton(
+                  onPressed: () async {
+                    String enteredPasscode = passcodeController.text.trim();
 
-                    _showAdminWelcomeToast();
-                    // Navigator.push(context, SlideTransition1(MyClubAdminPage(clubId: widget.clubId)));
-                  }
-                } else {
-                  // Show a toast for incorrect passcode
-                  Fluttertoast.showToast(
-                    msg: 'Incorrect passcode',
-                    backgroundColor: Colors.black,
-                    textColor: Colors.white,
-                  );
-                }
-              },
-              child: const Text('Submit'),
+                    // Retrieve the stored passcode from Firestore
+                    DocumentSnapshot<Map<String, dynamic>> snapshot =
+                        await FirebaseFirestore.instance.collection('clubs').doc(clubId).collection('AboutClub').doc('about_club_page').get();
+
+                    String storedPasscode = snapshot.data()!['admin_passcode'] ?? '';
+
+                    // Check if the entered passcode matches the stored passcode
+                    if (enteredPasscode == storedPasscode) {
+                      if (context.mounted) {
+                        Navigator.pop(context);
+
+                        _showAdminWelcomeToast();
+                        Navigator.push(context, SlideTransition1(MyClubAdminPage(clubId: clubId)));
+                      }
+                    } else {
+                      // Show a toast for incorrect passcode
+                      Fluttertoast.showToast(
+                        msg: 'Incorrect passcode',
+                        backgroundColor: Colors.black,
+                        textColor: Colors.white,
+                      );
+                    }
+                  },
+                  child: const Text(
+                    'Submit',
+                    style: TextStyle(color: Colors.black),
+                  ),
+                ),
+              ],
             ),
           ],
         ),

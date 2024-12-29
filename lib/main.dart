@@ -1,18 +1,21 @@
 import 'dart:async';
+import 'dart:io' show Platform;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/foundation.dart';
+import 'package:flutter/foundation.dart' show kDebugMode, kIsWeb, defaultTargetPlatform;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:provider/provider.dart';
-import 'package:the_gfa/home_page/club_lists.dart';
-import 'package:the_gfa/notifier/a_club_global_notifier.dart';
+import 'package:showcaseview/showcaseview.dart';
 import 'package:the_gfa/notifier/a_past_matches_all_clubs_notifier.dart';
+import 'package:the_gfa/notifier/b_ftc_okaybutton_pressed_notifier.dart';
 import 'package:the_gfa/notifier/b_training_days_notifier.dart';
 import 'package:the_gfa/notifier/b_trial_dates_notifier.dart';
 import 'package:the_gfa/notifier/fifth_team_class_notifier.dart';
@@ -30,11 +33,16 @@ import '/notifier/club_sponsors_notifier.dart';
 import '/notifier/players_notifier.dart';
 import '/notifier/players_table_notifier.dart';
 import 'api/club_sponsors_api.dart';
-import 'api/push_notification_service.dart';
+import 'api/d_birthday_push_notification_service.dart';
+import 'api/d_push_notification_service.dart';
+import 'home_page/club_lists.dart';
+import 'notifier/a_club_global_notifier.dart';
 import 'notifier/a_past_matches_notifier.dart';
 import 'notifier/a_upcoming_matches_all_clubs_notifier.dart';
 import 'notifier/a_upcoming_matches_notifier.dart';
 import 'notifier/achievement_images_notifier.dart';
+import 'notifier/b_app_theme_notifier.dart';
+import 'notifier/b_sidebar_notifier.dart';
 import 'notifier/club_arial_notifier.dart';
 import 'notifier/club_captains_notifier.dart';
 import 'notifier/coaches_reviews_comment_notifier.dart';
@@ -49,7 +57,6 @@ import 'notifier/most_fouled_yc_players_stats_info_notifier.dart';
 import 'notifier/motm_players_stats_info_notifier.dart';
 import 'notifier/player_of_the_month_stats_info_notifier.dart';
 import 'notifier/second_team_class_notifier.dart';
-import 'notifier/sidebar_notifier.dart';
 import 'notifier/third_team_class_notifier.dart';
 import 'notifier/top_defensive_players_stats_info_notifier.dart';
 import 'notifier/top_gk_players_stats_info_notifier.dart';
@@ -61,12 +68,79 @@ Color? appBarIconColor = Colors.indigo[200];
 Color? appBarBackgroundColor = Colors.indigo[400];
 Color? secondStudentChartColor = Colors.indigo[400];
 
+// Background message handler
+@pragma('vm:entry-point')
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp();
+  if (kDebugMode) {
+    print("Handling a background message: ${message.messageId}");
+  }
+}
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  await dotenv.load(fileName: ".env");
+
   await Firebase.initializeApp();
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   await PushNotificationService().setupInteractedMessage();
   FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
   FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterError;
+
+  // Access the keys after dotenv is loaded
+  String? publishableStripeKey = dotenv.env['PUBLISHABLE_STRIPE_KEY'];
+  String? secretStripeKey = dotenv.env['SECRET_STRIPE_KEY'];
+
+  if (publishableStripeKey == null || secretStripeKey == null) {
+    throw Exception("Missing PUBLISHABLE_STRIPE_KEY or SECRET_STRIPE_KEY in .env file");
+  }
+
+  // Configure Stripe
+  Stripe.publishableKey = publishableStripeKey;
+  await Stripe.instance.applySettings();
+
+  // Request notification permissions
+  if (defaultTargetPlatform == TargetPlatform.iOS && !kIsWeb) {
+    FirebaseMessaging messaging = FirebaseMessaging.instance;
+
+    // Check if it's a physical device, not a simulator
+    if (!kDebugMode || (Platform.isIOS && !Platform.environment.containsKey('SIMULATOR_IDENTIFIER'))) {
+      NotificationSettings settings = await messaging.requestPermission(
+        alert: true,
+        badge: true,
+        sound: true,
+        provisional: false,
+      );
+
+      if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+        if (kDebugMode) {
+          print('User granted notification permissions');
+        }
+      } else {
+        if (kDebugMode) {
+          print('User declined notification permissions');
+        }
+      }
+    } else {
+      if (kDebugMode) {
+        print('Running on iOS simulator - skipping notification permissions');
+      }
+    }
+  } else {
+    if (kDebugMode) {
+      print('Running on non-iOS platform, no explicit notification permission needed');
+    }
+  }
+
+  FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+    if (kDebugMode) {
+      print('A new onMessageOpenedApp event was published');
+    }
+
+    // Use the global navigation key to get the current context
+    BirthdayNotificationService.handleBirthdayNotification(navigatorKey.currentContext!, message);
+  });
 
   OneSignal.Debug.setLogLevel(OSLogLevel.verbose);
   OneSignal.Debug.setAlertLevel(OSLogLevel.none);
@@ -203,7 +277,13 @@ void main() async {
       ChangeNotifierProvider(
         create: (context) => ClubGlobalProvider(),
       ),
-    ], child: const MyApp()));
+      ChangeNotifierProvider(
+        create: (context) => FTClassOkayDialogButtonPressedNotifier(),
+      ),
+      ChangeNotifierProvider(
+        create: (context) => AppThemeProvider(),
+      ),
+    ], child: ShowCaseWidget(builder: (context) => const MyApp())));
 
     // Handle initial message
     // FirebaseMessaging.instance.getInitialMessage().then((initialMessage) {
@@ -218,6 +298,9 @@ void main() async {
     }
   }, FirebaseCrashlytics.instance.recordError);
 }
+
+// Global navigation key
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
@@ -292,19 +375,23 @@ class MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     FirebaseAnalytics analytics = FirebaseAnalytics.instance;
     return MaterialApp(
+      navigatorKey: navigatorKey,
       debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
+      title: 'Flutter Live', // 'Not Demo',
       theme: ThemeData(
         primarySwatch: Colors.deepOrange,
       ),
-      // home: const PandCTransitions(),
+      // theme: MyAppThemes.lightTheme,
+      // darkTheme: MyAppThemes.darkTheme,
+      // themeMode: ThemeMode.system, // Default mode
       home: const ClubSelectionPage(),
-      // home: const SideBarLayout(
-      //   clubId: '',
-      // ),
       navigatorObservers: [
         FirebaseAnalyticsObserver(analytics: analytics),
       ],
+      // initialRoute: '/',
+      // routes: {
+      //   '/MyChatGFAPage': (context) => MyChatGFAPage(clubId: ModalRoute.of(context)!.settings.arguments as String),
+      // },
     );
   }
 }

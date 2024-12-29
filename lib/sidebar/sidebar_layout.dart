@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 
 import '../bloc_navigation_bloc/navigation_bloc.dart';
-import '../notifier/sidebar_notifier.dart';
+import '../notifier/b_sidebar_notifier.dart';
 import 'sidebar.dart';
 
 class SideBarLayout extends StatelessWidget {

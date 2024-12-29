@@ -7,22 +7,22 @@ import 'package:provider/provider.dart';
 import '../details_pages/management_details_page.dart';
 import '../notifier/management_body_notifier.dart';
 
-Color backgroundColor = const Color.fromRGBO(238, 235, 235, 1.0);
-Color appBarBackgroundColor = const Color.fromRGBO(238, 235, 235, 1.0);
-Color appBarTextColor = const Color.fromRGBO(208, 104, 47, 1);
-Color appBarIconColor = const Color.fromRGBO(208, 104, 47, 1);
+Color backgroundColor = const Color.fromRGBO(56, 56, 60, 1);
+Color appBarBackgroundColor = const Color.fromRGBO(56, 56, 60, 1);
+Color appBarTextColor = Colors.white70;
+Color appBarIconColor = Colors.white70;
 Color modalColor = Colors.transparent;
-Color modalBackgroundColor = const Color.fromRGBO(238, 235, 235, 1.0);
+Color modalBackgroundColor = const Color.fromRGBO(56, 56, 60, 1);
 Color materialBackgroundColor = Colors.transparent;
-Color cardBackgroundColor = const Color.fromRGBO(208, 104, 47, 1);
-Color splashColor = const Color.fromRGBO(238, 235, 235, 1.0);
+Color cardBackgroundColor = const Color.fromRGBO(56, 56, 60, 1);
+Color splashColor = const Color.fromRGBO(56, 56, 60, 1);
 Color splashColorTwo = Colors.black87;
-Color iconColor = const Color.fromRGBO(208, 104, 47, 1);
-Color textColor = const Color.fromRGBO(208, 104, 47, 1);
+Color iconColor = Colors.white70;
+Color textColor = Colors.white70;
 Color textColorTwo = Colors.white70;
-Color dialogBackgroundColor = const Color.fromRGBO(238, 235, 235, 1.0);
+Color dialogBackgroundColor = const Color.fromRGBO(56, 56, 60, 1);
 Color borderColor = Colors.black;
-Color textHighlightColor = const Color.fromRGBO(208, 104, 47, 1);
+Color textHighlightColor = const Color.fromRGBO(56, 56, 60, 1);
 
 dynamic queryTech;
 
@@ -39,7 +39,7 @@ class MyManagementBodySearch extends SearchDelegate {
         primarySwatch: Colors.deepOrange,
         appBarTheme: AppBarTheme(backgroundColor: cardBackgroundColor),
         primaryIconTheme: IconThemeData(color: appBarIconColor),
-        textTheme: TextTheme(titleMedium: TextStyle(color: appBarTextColor, fontSize: 25)),
+        textTheme: TextTheme(titleMedium: TextStyle(color: appBarTextColor, fontSize: 25), titleLarge: TextStyle(color: appBarTextColor)),
         inputDecorationTheme: InputDecorationTheme(
           hintStyle: TextStyle(color: appBarTextColor.withAlpha(60)),
         ),
@@ -58,7 +58,7 @@ class MyManagementBodySearch extends SearchDelegate {
         Visibility(
           visible: true,
           child: IconButton(
-            icon: Visibility(visible: true, child: Icon(MdiIcons.closeCircleOutline)),
+            icon: Visibility(visible: true, child: Icon(MdiIcons.closeCircleOutline, color: appBarIconColor)),
             onPressed: () {
               query = '';
             },
@@ -70,7 +70,7 @@ class MyManagementBodySearch extends SearchDelegate {
         Visibility(
           visible: false,
           child: IconButton(
-            icon: Visibility(visible: false, child: Icon(MdiIcons.closeCircleOutline)),
+            icon: Visibility(visible: false, child: Icon(MdiIcons.closeCircleOutline, color: appBarIconColor)),
             onPressed: () {
               query = '';
             },
@@ -83,9 +83,7 @@ class MyManagementBodySearch extends SearchDelegate {
   @override
   Widget buildLeading(BuildContext context) {
     return IconButton(
-      icon: Icon(
-        MdiIcons.chevronTripleLeft,
-      ),
+      icon: Icon(MdiIcons.chevronTripleLeft, color: appBarIconColor),
       onPressed: () {
         close(context, null);
       },
@@ -184,7 +182,7 @@ class MyManagementBodySearch extends SearchDelegate {
                                                 children: [
                                                   TextSpan(
                                                       text: search[position].name.substring(queryTech.length),
-                                                      style: GoogleFonts.tenorSans(color: textHighlightColor))
+                                                      style: GoogleFonts.tenorSans(color: textColor))
                                                 ]),
                                           ),
                                           const SizedBox(width: 10),
