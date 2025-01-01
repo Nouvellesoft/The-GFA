@@ -43,7 +43,9 @@ class MyChatGFAPageState extends State<MyChatGFAPage> {
   bool _isAdminAuthenticated = false; // Tracks admin authentication
 
   String? _clubName; // Holds the fetched club name
-  bool _isLoading = true; // Tracks loading state
+  bool _isLoading = true;
+
+  bool _barrierDismissibleTrue = true; // Tracks loading state
 
   Future<void> _fetchClubName() async {
     try {
@@ -866,7 +868,7 @@ class MyChatGFAPageState extends State<MyChatGFAPage> {
 
     showDialog<String>(
       context: context,
-      barrierDismissible: true,
+      barrierDismissible: _barrierDismissibleTrue,
       builder: (BuildContext context) => AlertDialog(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20.0),
@@ -923,8 +925,17 @@ class MyChatGFAPageState extends State<MyChatGFAPage> {
                     String storedPasscode = snapshot.data()?['admin_passcode'] ?? '';
 
                     if (enteredPasscode == storedPasscode && context.mounted) {
-                      setState(() => _isAdminAuthenticated = true);
+                      setState(() {
+                        _isAdminAuthenticated = true;
+                        sharedValue = 1;
+                      });
                       Navigator.pop(context);
+
+                      Fluttertoast.showToast(
+                        msg: 'correct passcode',
+                        backgroundColor: Colors.indigoAccent,
+                        textColor: Colors.white70,
+                      );
                     } else {
                       Fluttertoast.showToast(
                         msg: 'Incorrect passcode',
@@ -937,6 +948,8 @@ class MyChatGFAPageState extends State<MyChatGFAPage> {
                 ),
               ],
             ),
+
+            /// To be used
             // const SizedBox(height: 20),
             // SizedBox(
             //   width: double.infinity,
@@ -971,8 +984,10 @@ class MyChatGFAPageState extends State<MyChatGFAPage> {
       ),
     ).then((_) {
       setState(() {
-        _isAdminAuthenticated = false;
-        sharedValue = 0; // Switch back to general chat
+        if (_barrierDismissibleTrue == true && _isAdminAuthenticated == false) {
+          _isAdminAuthenticated = false;
+          sharedValue = 0; // Switch back to general chat
+        } else {}
       });
     });
   }

@@ -33,7 +33,10 @@ class Assets {
   static const String imagesNouvellesoftFrontPage = 'assets/images/nouvellesoft_front_page.jpg';
   static const String imagesSecondPageSliver = 'assets/images/second_page_sliver.gif';
   static const String imagesSidebarPageSliver = 'assets/images/sidebar_page_sliver.gif';
+  static const String imagesTheGfaLogoAndroid = 'assets/images/the_gfa_logo_ios.png';
+  static const String imagesTheGfaLogoIos = 'assets/images/the_gfa_logo_android.png';
   static const String imagesTimelineBack = 'assets/images/timeline_back.jpeg';
+  static const String jsonAThegfaPricing = 'assets/json/a_thegfa_pricing.json';
   static const String jsonAssistsGif = 'assets/json/assists_gif.json';
   static const String jsonBallsBounce = 'assets/json/balls_bounce.json';
   static const String jsonCc = 'assets/json/cc.json';
@@ -49,11 +52,11 @@ class Assets {
   static const String jsonPotmAward = 'assets/json/potm_award.json';
   static const String jsonRedcardTwoGif = 'assets/json/redcard_two_gif.json';
   static const String jsonSearching = 'assets/json/searching.json';
-  static const String jsonThegfaPricing = 'assets/json/a_thegfa_pricing.json';
   static const String jsonTopGoalKeeperGif = 'assets/json/top_goal_keeper_gif.json';
   static const String jsonTrainingSoccer = 'assets/json/training_soccer.json';
   static const String jsonTrialSoccer = 'assets/json/trial_soccer.json';
   static const String jsonYellowcardGif = 'assets/json/yellowcard_gif.json';
+  static const String theGfa = '.env';
   static const String videosCarIntroBackground1 = 'assets/videos/car_intro_background_1.mov';
   static const String videosFootballFieldIntroBackground1 = 'assets/videos/football_field_intro_background_1.mp4';
 }

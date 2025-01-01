@@ -68,7 +68,6 @@ Color? potmColorSeven = Colors.grey[200];
 Color? potmColorEight = Colors.deepOrangeAccent;
 Color? dialogColor = const Color.fromRGBO(184, 106, 65, 1.0);
 
-
 String topGoalScorersTitle = "Top 10 Goal Scorers";
 String topGoalScorersEmptyTitle = "No Goals Scored Yet";
 String topAssistsPlayersTitle = "Top 10 Most Assists Players";
@@ -2865,617 +2864,628 @@ class _PlayersStatsAndInfoPageState extends State<PlayersStatsAndInfoPage> {
               ),
             )
           ] else ...[
-            AlertDialog(
+            Dialog(
               shape: const RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(Radius.circular(10.0)),
               ),
-              contentPadding: const EdgeInsets.all(10),
+              // contentPadding: const EdgeInsets.all(10),
               backgroundColor: dialogColor,
-              content: ConfettiWidget(
-                createParticlePath: drawStar,
-                confettiController: _controllerTopCenter,
-                blastDirection: -pi / 2,
-                maxBlastForce: 50,
-                // set a lower max blast force
-                minBlastForce: 20,
-                // set a lower min blast force
-                emissionFrequency: 0.035,
-                blastDirectionality: BlastDirectionality.explosive,
-                numberOfParticles: 50,
-                // a lot of particles at once
-                gravity: 0.1,
-                child: SizedBox(
-                  width: MediaQuery.of(context).size.width,
-                  height: MediaQuery.of(context).size.height * 0.6,
-                  child: ListView.builder(
-                    itemExtent: MediaQuery.of(context).size.height * 0.585,
-                    shrinkWrap: true,
-                    itemCount: playerOfTheMonthStatsAndInfoNotifier.playerOfTheMonthStatsAndInfoList.length,
-                    itemBuilder: (context, index) => Stack(
-                      alignment: AlignmentDirectional.topStart,
-                      // fit: StackFit.loose,
-                      children: [
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: SizedBox(
-                            width: MediaQuery.of(context).size.width * .43,
-                            height: MediaQuery.of(context).size.height * 2,
-                            child: Image(
-                              height: double.infinity,
-                              width: double.infinity,
-                              image: CachedNetworkImageProvider(
-                                playerOfTheMonthStatsAndInfoNotifier.playerOfTheMonthStatsAndInfoList[index].image!,
-                                scale: 0.2,
-                              ),
-                              fit: BoxFit.cover,
-                              color: Colors.grey,
-                              colorBlendMode: BlendMode.softLight,
-                              alignment: const Alignment(0.4, -1),
-                            ),
-                          ),
-                        ),
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: SizedBox(
-                            // color: Colors.green,
-                            height: MediaQuery.of(context).size.height,
-                            // height: 500,
-                            width: MediaQuery.of(context).size.width,
-                            child: Image.asset(
-                              assetPOTMBackgroundTitle,
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        ),
-                        Align(
-                          alignment: Alignment.topRight,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.end,
+              child: LayoutBuilder(builder: (context, constraints) {
+                return Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: SizedBox(
+                      width: constraints.maxWidth,
+                      height: constraints.maxHeight * 0.7,
+                      child: Stack(children: [
+                        ListView.builder(
+                          itemExtent: MediaQuery.of(context).size.height * 0.585,
+                          shrinkWrap: true,
+                          itemCount: playerOfTheMonthStatsAndInfoNotifier.playerOfTheMonthStatsAndInfoList.length,
+                          itemBuilder: (context, index) => Stack(
+                            alignment: AlignmentDirectional.topStart,
+                            // fit: StackFit.loose,
                             children: [
-                              Padding(
-                                padding: const EdgeInsets.only(right: 40),
-                                child: Image.asset(
-                                  assetPOTMMVPTitle,
-                                  width: MediaQuery.of(context).size.width * 0.35,
+                              Align(
+                                alignment: Alignment.centerLeft,
+                                child: SizedBox(
+                                  width: MediaQuery.of(context).size.width * .43,
+                                  height: MediaQuery.of(context).size.height * 2,
+                                  child: Image(
+                                    height: double.infinity,
+                                    width: double.infinity,
+                                    image: CachedNetworkImageProvider(
+                                      playerOfTheMonthStatsAndInfoNotifier.playerOfTheMonthStatsAndInfoList[index].image!,
+                                      scale: 0.2,
+                                    ),
+                                    fit: BoxFit.cover,
+                                    color: Colors.grey,
+                                    colorBlendMode: BlendMode.softLight,
+                                    alignment: const Alignment(0.4, -1),
+                                  ),
                                 ),
                               ),
-
-                              if (playerOfTheMonthStatsAndInfoNotifier.playerOfTheMonthStatsAndInfoList[index].playerPosition
-                                      .toString()
-                                      .toLowerCase() ==
-                                  'gk') ...[
-                                Column(
+                              Align(
+                                alignment: Alignment.centerRight,
+                                child: SizedBox(
+                                  // color: Colors.green,
+                                  height: MediaQuery.of(context).size.height,
+                                  // height: 500,
+                                  width: MediaQuery.of(context).size.width,
+                                  child: Image.asset(
+                                    assetPOTMBackgroundTitle,
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                              ),
+                              Align(
+                                alignment: Alignment.topRight,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.end,
                                   children: [
                                     Padding(
-                                      padding: const EdgeInsets.only(right: 10),
-                                      child: SizedBox(
+                                      padding: const EdgeInsets.only(right: 40),
+                                      child: Image.asset(
+                                        assetPOTMMVPTitle,
                                         width: MediaQuery.of(context).size.width * 0.35,
-                                        child: Text(
-                                          playerOfTheMonthStatsAndInfoNotifier.playerOfTheMonthStatsAndInfoList[index].playerName!
-                                              .replaceAll(" ", "\n"),
-                                          style:
-                                              GoogleFonts.rubikMicrobe(color: dialogColor, fontSize: 24, fontWeight: FontWeight.bold, height: 0.81),
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
                                       ),
                                     ),
-                                    const SizedBox(height: 20),
+
+                                    if (playerOfTheMonthStatsAndInfoNotifier.playerOfTheMonthStatsAndInfoList[index].playerPosition
+                                            .toString()
+                                            .toLowerCase() ==
+                                        'gk') ...[
+                                      Column(
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.only(right: 10),
+                                            child: SizedBox(
+                                              width: MediaQuery.of(context).size.width * 0.35,
+                                              child: Text(
+                                                playerOfTheMonthStatsAndInfoNotifier.playerOfTheMonthStatsAndInfoList[index].playerName!
+                                                    .replaceAll(" ", "\n"),
+                                                style: GoogleFonts.rubikMicrobe(
+                                                    color: dialogColor, fontSize: 24, fontWeight: FontWeight.bold, height: 0.81),
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(height: 20),
+                                          Column(
+                                            children: [
+                                              Padding(
+                                                padding: const EdgeInsets.only(right: 10),
+                                                child: SizedBox(
+                                                  width: MediaQuery.of(context).size.width * 0.35,
+                                                  child: Text(
+                                                    playerOfTheMonthStatsAndInfoNotifier.playerOfTheMonthStatsAndInfoList[index].goalsConcededGkDef
+                                                        .toString(),
+                                                    style: GoogleFonts.rubikMicrobe(
+                                                        color: dialogColor, fontSize: 20, fontWeight: FontWeight.bold, fontStyle: FontStyle.italic),
+                                                  ),
+                                                ),
+                                              ),
+                                              Padding(
+                                                padding: const EdgeInsets.only(right: 10),
+                                                child: SizedBox(
+                                                  width: MediaQuery.of(context).size.width * 0.35,
+                                                  child: Text(
+                                                    playerGoalsConcededTwoTitle,
+                                                    style: GoogleFonts.arimo(
+                                                      color: containerColor,
+                                                      fontSize: 12,
+                                                      fontWeight: FontWeight.w200,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              const SizedBox(height: 8),
+                                            ],
+                                          ),
+                                          Column(
+                                            children: [
+                                              Padding(
+                                                padding: const EdgeInsets.only(right: 10),
+                                                child: SizedBox(
+                                                  width: MediaQuery.of(context).size.width * 0.35,
+                                                  child: Text(
+                                                    playerOfTheMonthStatsAndInfoNotifier.playerOfTheMonthStatsAndInfoList[index].cleanSheetGk
+                                                        .toString(),
+                                                    style: GoogleFonts.rubikMicrobe(
+                                                        color: dialogColor, fontSize: 20, fontWeight: FontWeight.bold, fontStyle: FontStyle.italic),
+                                                  ),
+                                                ),
+                                              ),
+                                              Padding(
+                                                padding: const EdgeInsets.only(right: 10),
+                                                child: SizedBox(
+                                                  width: MediaQuery.of(context).size.width * 0.35,
+                                                  child: Text(
+                                                    playerCleanSheetTitle,
+                                                    style: GoogleFonts.arimo(
+                                                      color: containerColor,
+                                                      fontSize: 12,
+                                                      fontWeight: FontWeight.w200,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              const SizedBox(height: 6),
+                                            ],
+                                          ),
+                                          Column(
+                                            children: [
+                                              Padding(
+                                                padding: const EdgeInsets.only(right: 10),
+                                                child: SizedBox(
+                                                  width: MediaQuery.of(context).size.width * 0.35,
+                                                  child: Text(
+                                                    playerOfTheMonthStatsAndInfoNotifier.playerOfTheMonthStatsAndInfoList[index].matchesPlayed
+                                                        .toString(),
+                                                    style: GoogleFonts.rubikMicrobe(
+                                                        color: dialogColor, fontSize: 20, fontWeight: FontWeight.bold, fontStyle: FontStyle.italic),
+                                                  ),
+                                                ),
+                                              ),
+                                              Padding(
+                                                padding: const EdgeInsets.only(right: 10),
+                                                child: SizedBox(
+                                                  width: MediaQuery.of(context).size.width * 0.35,
+                                                  child: Text(
+                                                    matchesPlayedTitle,
+                                                    style: GoogleFonts.arimo(
+                                                      color: containerColor,
+                                                      fontSize: 12,
+                                                      fontWeight: FontWeight.w200,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              const SizedBox(height: 20),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ] else if (playerOfTheMonthStatsAndInfoNotifier.playerOfTheMonthStatsAndInfoList[index].playerPosition
+                                                .toString()
+                                                .toLowerCase() ==
+                                            'cb' ||
+                                        playerOfTheMonthStatsAndInfoNotifier.playerOfTheMonthStatsAndInfoList[index].playerPosition
+                                                .toString()
+                                                .toLowerCase() ==
+                                            'lb' ||
+                                        playerOfTheMonthStatsAndInfoNotifier.playerOfTheMonthStatsAndInfoList[index].playerPosition
+                                                .toString()
+                                                .toLowerCase() ==
+                                            'rb') ...[
+                                      Column(
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.only(right: 10),
+                                            child: SizedBox(
+                                              width: MediaQuery.of(context).size.width * 0.35,
+                                              child: Text(
+                                                playerOfTheMonthStatsAndInfoNotifier.playerOfTheMonthStatsAndInfoList[index].playerName!
+                                                    .replaceAll(" ", "\n"),
+                                                style: GoogleFonts.rubikMicrobe(
+                                                    color: dialogColor, fontSize: 24, fontWeight: FontWeight.bold, height: 0.81),
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(height: 20),
+                                          Column(
+                                            children: [
+                                              Padding(
+                                                padding: const EdgeInsets.only(right: 10),
+                                                child: SizedBox(
+                                                  width: MediaQuery.of(context).size.width * 0.35,
+                                                  child: Text(
+                                                    playerOfTheMonthStatsAndInfoNotifier.playerOfTheMonthStatsAndInfoList[index].playerPosition
+                                                        .toString()
+                                                        .toUpperCase(),
+                                                    style: GoogleFonts.rubikMicrobe(
+                                                        color: dialogColor, fontSize: 20, fontWeight: FontWeight.bold, fontStyle: FontStyle.italic),
+                                                  ),
+                                                ),
+                                              ),
+                                              Padding(
+                                                padding: const EdgeInsets.only(right: 10),
+                                                child: SizedBox(
+                                                  width: MediaQuery.of(context).size.width * 0.35,
+                                                  child: Text(
+                                                    playerPositionTwoTitle,
+                                                    style: GoogleFonts.arimo(
+                                                      color: containerColor,
+                                                      fontSize: 12,
+                                                      fontWeight: FontWeight.w200,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              const SizedBox(height: 8),
+                                            ],
+                                          ),
+                                          Column(
+                                            children: [
+                                              Padding(
+                                                padding: const EdgeInsets.only(right: 10),
+                                                child: SizedBox(
+                                                  width: MediaQuery.of(context).size.width * 0.35,
+                                                  child: Text(
+                                                    playerOfTheMonthStatsAndInfoNotifier.playerOfTheMonthStatsAndInfoList[index].goalsConcededGkDef
+                                                        .toString(),
+                                                    style: GoogleFonts.rubikMicrobe(
+                                                        color: dialogColor, fontSize: 20, fontWeight: FontWeight.bold, fontStyle: FontStyle.italic),
+                                                  ),
+                                                ),
+                                              ),
+                                              Padding(
+                                                padding: const EdgeInsets.only(right: 10),
+                                                child: SizedBox(
+                                                  width: MediaQuery.of(context).size.width * 0.35,
+                                                  child: Text(
+                                                    playerGoalsConcededTwoTitle,
+                                                    style: GoogleFonts.arimo(
+                                                      color: containerColor,
+                                                      fontSize: 12,
+                                                      fontWeight: FontWeight.w200,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              const SizedBox(height: 6),
+                                            ],
+                                          ),
+                                          Column(
+                                            children: [
+                                              Padding(
+                                                padding: const EdgeInsets.only(right: 10),
+                                                child: SizedBox(
+                                                  width: MediaQuery.of(context).size.width * 0.35,
+                                                  child: Text(
+                                                    playerOfTheMonthStatsAndInfoNotifier.playerOfTheMonthStatsAndInfoList[index].matchesPlayed
+                                                        .toString(),
+                                                    style: GoogleFonts.rubikMicrobe(
+                                                        color: dialogColor, fontSize: 20, fontWeight: FontWeight.bold, fontStyle: FontStyle.italic),
+                                                  ),
+                                                ),
+                                              ),
+                                              Padding(
+                                                padding: const EdgeInsets.only(right: 10),
+                                                child: SizedBox(
+                                                  width: MediaQuery.of(context).size.width * 0.35,
+                                                  child: Text(
+                                                    matchesPlayedTitle,
+                                                    style: GoogleFonts.arimo(
+                                                      color: containerColor,
+                                                      fontSize: 12,
+                                                      fontWeight: FontWeight.w200,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              const SizedBox(height: 20),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ] else ...[
+                                      Column(
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.only(right: 10),
+                                            child: SizedBox(
+                                              width: MediaQuery.of(context).size.width * 0.35,
+                                              child: Center(
+                                                child: Text(
+                                                  playerOfTheMonthStatsAndInfoNotifier.playerOfTheMonthStatsAndInfoList[index].playerName!
+                                                      .replaceAll(" ", "\n"),
+                                                  style: GoogleFonts.rubikMicrobe(
+                                                      color: dialogColor, fontSize: 24, fontWeight: FontWeight.bold, height: 0.81),
+                                                  overflow: TextOverflow.ellipsis,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(height: 20),
+                                          Column(
+                                            children: [
+                                              Padding(
+                                                padding: const EdgeInsets.only(right: 10),
+                                                child: SizedBox(
+                                                  width: MediaQuery.of(context).size.width * 0.35,
+                                                  child: Text(
+                                                    playerOfTheMonthStatsAndInfoNotifier.playerOfTheMonthStatsAndInfoList[index].goalsScored
+                                                        .toString(),
+                                                    style: GoogleFonts.rubikMicrobe(
+                                                        color: dialogColor, fontSize: 20, fontWeight: FontWeight.bold, fontStyle: FontStyle.italic),
+                                                  ),
+                                                ),
+                                              ),
+                                              Padding(
+                                                padding: const EdgeInsets.only(right: 10),
+                                                child: SizedBox(
+                                                  width: MediaQuery.of(context).size.width * 0.35,
+                                                  child: Text(
+                                                    playerGoalsScoredTwoTitle,
+                                                    style: GoogleFonts.arimo(
+                                                      color: containerColor,
+                                                      fontSize: 12,
+                                                      fontWeight: FontWeight.w200,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              const SizedBox(height: 8),
+                                            ],
+                                          ),
+                                          Column(
+                                            children: [
+                                              Padding(
+                                                padding: const EdgeInsets.only(right: 10),
+                                                child: SizedBox(
+                                                  width: MediaQuery.of(context).size.width * 0.35,
+                                                  child: Text(
+                                                    playerOfTheMonthStatsAndInfoNotifier.playerOfTheMonthStatsAndInfoList[index].assists.toString(),
+                                                    style: GoogleFonts.rubikMicrobe(
+                                                        color: dialogColor, fontSize: 20, fontWeight: FontWeight.bold, fontStyle: FontStyle.italic),
+                                                  ),
+                                                ),
+                                              ),
+                                              Padding(
+                                                padding: const EdgeInsets.only(right: 10),
+                                                child: SizedBox(
+                                                  width: MediaQuery.of(context).size.width * 0.35,
+                                                  child: Text(
+                                                    playerAssistsTwoTitle,
+                                                    style: GoogleFonts.arimo(
+                                                      color: containerColor,
+                                                      fontSize: 12,
+                                                      fontWeight: FontWeight.w200,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              const SizedBox(height: 6),
+                                            ],
+                                          ),
+                                          Column(
+                                            children: [
+                                              Padding(
+                                                padding: const EdgeInsets.only(right: 10),
+                                                child: SizedBox(
+                                                  width: MediaQuery.of(context).size.width * 0.35,
+                                                  child: Text(
+                                                    playerOfTheMonthStatsAndInfoNotifier.playerOfTheMonthStatsAndInfoList[index].matchesPlayed
+                                                        .toString(),
+                                                    style: GoogleFonts.rubikMicrobe(
+                                                        color: dialogColor, fontSize: 20, fontWeight: FontWeight.bold, fontStyle: FontStyle.italic),
+                                                  ),
+                                                ),
+                                              ),
+                                              Padding(
+                                                padding: const EdgeInsets.only(right: 10),
+                                                child: SizedBox(
+                                                  width: MediaQuery.of(context).size.width * 0.35,
+                                                  child: Text(
+                                                    matchesPlayedTitle,
+                                                    style: GoogleFonts.arimo(
+                                                      color: containerColor,
+                                                      fontSize: 12,
+                                                      fontWeight: FontWeight.w200,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              const SizedBox(height: 20),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+
+                                    // Column(
+                                    //   children: [
+                                    //     Padding(
+                                    //       padding: const EdgeInsets.only(right: 10),
+                                    //       child: Container(
+                                    //         width: MediaQuery.of(context).size.width * 0.35,
+                                    //         child: Text(
+                                    //           playerOfTheMonthStatsAndInfoNotifier.playerOfTheMonthStatsAndInfoList[index].playerName!.replaceAll(" ", "\n"),
+                                    //           style: GoogleFonts.rubikMicrobe(
+                                    //               color: Color.fromRGBO(184, 106, 65, 1.0),
+                                    //               fontSize: 30,
+                                    //             fontWeight: FontWeight.bold,
+                                    //             height: 0.81
+                                    //           ),
+                                    //           overflow: TextOverflow.ellipsis,
+                                    //         ),
+                                    //       ),
+                                    //     ),
+                                    //     const SizedBox(height: 40),
+                                    //     Column(
+                                    //       children: [
+                                    //         Padding(
+                                    //           padding: const EdgeInsets.only(right: 10),
+                                    //           child: Container(
+                                    //             width: MediaQuery.of(context).size.width * 0.35,
+                                    //             child: Text(
+                                    //               playerOfTheMonthStatsAndInfoNotifier.playerOfTheMonthStatsAndInfoList[index].goalsScored.toString(),
+                                    //               style: GoogleFonts.rubikMicrobe(
+                                    //                   color: Color.fromRGBO(184, 106, 65, 1.0),
+                                    //                   fontSize: 30,
+                                    //                   fontWeight: FontWeight.bold,
+                                    //                   fontStyle: FontStyle.italic
+                                    //               ),
+                                    //             ),
+                                    //           ),
+                                    //         ),
+                                    //         Padding(
+                                    //           padding: const EdgeInsets.only(right: 10),
+                                    //           child: Container(
+                                    //             width: MediaQuery.of(context).size.width * 0.35,
+                                    //             child: Text(
+                                    //               'Goals Scored',
+                                    //               style: GoogleFonts.arimo(
+                                    //                 color: Colors.white70,
+                                    //                 fontSize: 14,
+                                    //                 fontWeight: FontWeight.w200,
+                                    //
+                                    //               ),
+                                    //             ),
+                                    //           ),
+                                    //         ),
+                                    //         const SizedBox(height: 15),
+                                    //       ],
+                                    //     ),
+                                    //     Column(
+                                    //       children: [
+                                    //         Padding(
+                                    //           padding: const EdgeInsets.only(right: 10),
+                                    //           child: Container(
+                                    //             width: MediaQuery.of(context).size.width * 0.35,
+                                    //             child: Text(
+                                    //               playerOfTheMonthStatsAndInfoNotifier.playerOfTheMonthStatsAndInfoList[index].assists.toString(),
+                                    //               style: GoogleFonts.rubikMicrobe(
+                                    //                   color: Color.fromRGBO(184, 106, 65, 1.0),
+                                    //                   fontSize: 30,
+                                    //                   fontWeight: FontWeight.bold,
+                                    //                   fontStyle: FontStyle.italic
+                                    //               ),
+                                    //             ),
+                                    //           ),
+                                    //         ),
+                                    //         Padding(
+                                    //           padding: const EdgeInsets.only(right: 10),
+                                    //           child: Container(
+                                    //             width: MediaQuery.of(context).size.width * 0.35,
+                                    //             child: Text(
+                                    //               'Assists Provided',
+                                    //               style: GoogleFonts.arimo(
+                                    //                 color: Colors.white70,
+                                    //                 fontSize: 14,
+                                    //                 fontWeight: FontWeight.w200,
+                                    //
+                                    //               ),
+                                    //             ),
+                                    //           ),
+                                    //         ),
+                                    //         const SizedBox(height: 15),
+                                    //       ],
+                                    //     ),
+                                    //     Column(
+                                    //       children: [
+                                    //         Padding(
+                                    //           padding: const EdgeInsets.only(right: 10),
+                                    //           child: Container(
+                                    //             width: MediaQuery.of(context).size.width * 0.35,
+                                    //             child: Text(
+                                    //               playerOfTheMonthStatsAndInfoNotifier.playerOfTheMonthStatsAndInfoList[index].matchesPlayed.toString(),
+                                    //               style: GoogleFonts.rubikMicrobe(
+                                    //                   color: Color.fromRGBO(184, 106, 65, 1.0),
+                                    //                   fontSize: 30,
+                                    //                   fontWeight: FontWeight.bold,
+                                    //                   fontStyle: FontStyle.italic
+                                    //               ),
+                                    //             ),
+                                    //           ),
+                                    //         ),
+                                    //         Padding(
+                                    //           padding: const EdgeInsets.only(right: 10),
+                                    //           child: Container(
+                                    //             width: MediaQuery.of(context).size.width * 0.35,
+                                    //             child: Text(
+                                    //               'Matches Played',
+                                    //               style: GoogleFonts.arimo(
+                                    //                 color: Colors.white70,
+                                    //                 fontSize: 14,
+                                    //                 fontWeight: FontWeight.w200,
+                                    //
+                                    //               ),
+                                    //             ),
+                                    //           ),
+                                    //         ),
+                                    //         const SizedBox(height: 80),
+                                    //       ],
+                                    //     ),
+                                    //   ],
+                                    // ),
+
                                     Column(
                                       children: [
                                         Padding(
                                           padding: const EdgeInsets.only(right: 10),
                                           child: SizedBox(
-                                            width: MediaQuery.of(context).size.width * 0.35,
-                                            child: Text(
-                                              playerOfTheMonthStatsAndInfoNotifier.playerOfTheMonthStatsAndInfoList[index].goalsConcededGkDef
-                                                  .toString(),
-                                              style: GoogleFonts.rubikMicrobe(
-                                                  color: dialogColor, fontSize: 20, fontWeight: FontWeight.bold, fontStyle: FontStyle.italic),
-                                            ),
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.only(right: 10),
-                                          child: SizedBox(
-                                            width: MediaQuery.of(context).size.width * 0.35,
-                                            child: Text(
-                                              playerGoalsConcededTwoTitle,
-                                              style: GoogleFonts.arimo(
-                                                color: containerColor,
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.w200,
+                                            width: MediaQuery.of(context).size.width * 0.65,
+                                            child: FittedBox(
+                                              fit: BoxFit.scaleDown,
+                                              child: Text(
+                                                potmTwoTitle,
+                                                style: GoogleFonts.orbitron(
+                                                  color: dialogColor,
+                                                  fontSize: 11,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                                textAlign: TextAlign.center,
+                                                overflow: TextOverflow.ellipsis,
                                               ),
                                             ),
                                           ),
                                         ),
-                                        const SizedBox(height: 8),
-                                      ],
-                                    ),
-                                    Column(
-                                      children: [
                                         Padding(
-                                          padding: const EdgeInsets.only(right: 10),
+                                          padding: const EdgeInsets.only(top: 4),
                                           child: SizedBox(
-                                            width: MediaQuery.of(context).size.width * 0.35,
+                                            width: MediaQuery.of(context).size.width * 0.65,
                                             child: Text(
-                                              playerOfTheMonthStatsAndInfoNotifier.playerOfTheMonthStatsAndInfoList[index].cleanSheetGk.toString(),
-                                              style: GoogleFonts.rubikMicrobe(
-                                                  color: dialogColor, fontSize: 20, fontWeight: FontWeight.bold, fontStyle: FontStyle.italic),
-                                            ),
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.only(right: 10),
-                                          child: SizedBox(
-                                            width: MediaQuery.of(context).size.width * 0.35,
-                                            child: Text(
-                                              playerCleanSheetTitle,
+                                              presentedByTitle,
                                               style: GoogleFonts.arimo(
-                                                color: containerColor,
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.w200,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                        const SizedBox(height: 6),
-                                      ],
-                                    ),
-                                    Column(
-                                      children: [
-                                        Padding(
-                                          padding: const EdgeInsets.only(right: 10),
-                                          child: SizedBox(
-                                            width: MediaQuery.of(context).size.width * 0.35,
-                                            child: Text(
-                                              playerOfTheMonthStatsAndInfoNotifier.playerOfTheMonthStatsAndInfoList[index].matchesPlayed.toString(),
-                                              style: GoogleFonts.rubikMicrobe(
-                                                  color: dialogColor, fontSize: 20, fontWeight: FontWeight.bold, fontStyle: FontStyle.italic),
+                                                  color: containerColor, fontSize: 14, fontWeight: FontWeight.w200, fontStyle: FontStyle.italic),
+                                              textAlign: TextAlign.center,
                                             ),
                                           ),
                                         ),
                                         Padding(
-                                          padding: const EdgeInsets.only(right: 10),
+                                          padding: const EdgeInsets.only(top: 5),
                                           child: SizedBox(
-                                            width: MediaQuery.of(context).size.width * 0.35,
+                                            width: MediaQuery.of(context).size.width * 0.65,
                                             child: Text(
-                                              matchesPlayedTitle,
-                                              style: GoogleFonts.arimo(
+                                              nouvellesoftTitle,
+                                              style: GoogleFonts.zenDots(
                                                 color: containerColor,
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.w200,
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.bold,
                                               ),
+                                              textAlign: TextAlign.center,
+                                              overflow: TextOverflow.ellipsis,
                                             ),
                                           ),
                                         ),
-                                        const SizedBox(height: 20),
                                       ],
                                     ),
                                   ],
                                 ),
-                              ] else if (playerOfTheMonthStatsAndInfoNotifier.playerOfTheMonthStatsAndInfoList[index].playerPosition
-                                          .toString()
-                                          .toLowerCase() ==
-                                      'cb' ||
-                                  playerOfTheMonthStatsAndInfoNotifier.playerOfTheMonthStatsAndInfoList[index].playerPosition
-                                          .toString()
-                                          .toLowerCase() ==
-                                      'lb' ||
-                                  playerOfTheMonthStatsAndInfoNotifier.playerOfTheMonthStatsAndInfoList[index].playerPosition
-                                          .toString()
-                                          .toLowerCase() ==
-                                      'rb') ...[
-                                Column(
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.only(right: 10),
-                                      child: SizedBox(
-                                        width: MediaQuery.of(context).size.width * 0.35,
-                                        child: Text(
-                                          playerOfTheMonthStatsAndInfoNotifier.playerOfTheMonthStatsAndInfoList[index].playerName!
-                                              .replaceAll(" ", "\n"),
-                                          style:
-                                              GoogleFonts.rubikMicrobe(color: dialogColor, fontSize: 24, fontWeight: FontWeight.bold, height: 0.81),
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(height: 20),
-                                    Column(
-                                      children: [
-                                        Padding(
-                                          padding: const EdgeInsets.only(right: 10),
-                                          child: SizedBox(
-                                            width: MediaQuery.of(context).size.width * 0.35,
-                                            child: Text(
-                                              playerOfTheMonthStatsAndInfoNotifier.playerOfTheMonthStatsAndInfoList[index].playerPosition
-                                                  .toString()
-                                                  .toUpperCase(),
-                                              style: GoogleFonts.rubikMicrobe(
-                                                  color: dialogColor, fontSize: 20, fontWeight: FontWeight.bold, fontStyle: FontStyle.italic),
-                                            ),
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.only(right: 10),
-                                          child: SizedBox(
-                                            width: MediaQuery.of(context).size.width * 0.35,
-                                            child: Text(
-                                              playerPositionTwoTitle,
-                                              style: GoogleFonts.arimo(
-                                                color: containerColor,
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.w200,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                        const SizedBox(height: 8),
-                                      ],
-                                    ),
-                                    Column(
-                                      children: [
-                                        Padding(
-                                          padding: const EdgeInsets.only(right: 10),
-                                          child: SizedBox(
-                                            width: MediaQuery.of(context).size.width * 0.35,
-                                            child: Text(
-                                              playerOfTheMonthStatsAndInfoNotifier.playerOfTheMonthStatsAndInfoList[index].goalsConcededGkDef
-                                                  .toString(),
-                                              style: GoogleFonts.rubikMicrobe(
-                                                  color: dialogColor, fontSize: 20, fontWeight: FontWeight.bold, fontStyle: FontStyle.italic),
-                                            ),
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.only(right: 10),
-                                          child: SizedBox(
-                                            width: MediaQuery.of(context).size.width * 0.35,
-                                            child: Text(
-                                              playerGoalsConcededTwoTitle,
-                                              style: GoogleFonts.arimo(
-                                                color: containerColor,
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.w200,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                        const SizedBox(height: 6),
-                                      ],
-                                    ),
-                                    Column(
-                                      children: [
-                                        Padding(
-                                          padding: const EdgeInsets.only(right: 10),
-                                          child: SizedBox(
-                                            width: MediaQuery.of(context).size.width * 0.35,
-                                            child: Text(
-                                              playerOfTheMonthStatsAndInfoNotifier.playerOfTheMonthStatsAndInfoList[index].matchesPlayed.toString(),
-                                              style: GoogleFonts.rubikMicrobe(
-                                                  color: dialogColor, fontSize: 20, fontWeight: FontWeight.bold, fontStyle: FontStyle.italic),
-                                            ),
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.only(right: 10),
-                                          child: SizedBox(
-                                            width: MediaQuery.of(context).size.width * 0.35,
-                                            child: Text(
-                                              matchesPlayedTitle,
-                                              style: GoogleFonts.arimo(
-                                                color: containerColor,
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.w200,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                        const SizedBox(height: 20),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ] else ...[
-                                Column(
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.only(right: 10),
-                                      child: SizedBox(
-                                        width: MediaQuery.of(context).size.width * 0.35,
-                                        child: Center(
-                                          child: Text(
-                                            playerOfTheMonthStatsAndInfoNotifier.playerOfTheMonthStatsAndInfoList[index].playerName!
-                                                .replaceAll(" ", "\n"),
-                                            style:
-                                                GoogleFonts.rubikMicrobe(color: dialogColor, fontSize: 24, fontWeight: FontWeight.bold, height: 0.81),
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(height: 20),
-                                    Column(
-                                      children: [
-                                        Padding(
-                                          padding: const EdgeInsets.only(right: 10),
-                                          child: SizedBox(
-                                            width: MediaQuery.of(context).size.width * 0.35,
-                                            child: Text(
-                                              playerOfTheMonthStatsAndInfoNotifier.playerOfTheMonthStatsAndInfoList[index].goalsScored.toString(),
-                                              style: GoogleFonts.rubikMicrobe(
-                                                  color: dialogColor, fontSize: 20, fontWeight: FontWeight.bold, fontStyle: FontStyle.italic),
-                                            ),
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.only(right: 10),
-                                          child: SizedBox(
-                                            width: MediaQuery.of(context).size.width * 0.35,
-                                            child: Text(
-                                              playerGoalsScoredTwoTitle,
-                                              style: GoogleFonts.arimo(
-                                                color: containerColor,
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.w200,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                        const SizedBox(height: 8),
-                                      ],
-                                    ),
-                                    Column(
-                                      children: [
-                                        Padding(
-                                          padding: const EdgeInsets.only(right: 10),
-                                          child: SizedBox(
-                                            width: MediaQuery.of(context).size.width * 0.35,
-                                            child: Text(
-                                              playerOfTheMonthStatsAndInfoNotifier.playerOfTheMonthStatsAndInfoList[index].assists.toString(),
-                                              style: GoogleFonts.rubikMicrobe(
-                                                  color: dialogColor, fontSize: 20, fontWeight: FontWeight.bold, fontStyle: FontStyle.italic),
-                                            ),
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.only(right: 10),
-                                          child: SizedBox(
-                                            width: MediaQuery.of(context).size.width * 0.35,
-                                            child: Text(
-                                              playerAssistsTwoTitle,
-                                              style: GoogleFonts.arimo(
-                                                color: containerColor,
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.w200,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                        const SizedBox(height: 6),
-                                      ],
-                                    ),
-                                    Column(
-                                      children: [
-                                        Padding(
-                                          padding: const EdgeInsets.only(right: 10),
-                                          child: SizedBox(
-                                            width: MediaQuery.of(context).size.width * 0.35,
-                                            child: Text(
-                                              playerOfTheMonthStatsAndInfoNotifier.playerOfTheMonthStatsAndInfoList[index].matchesPlayed.toString(),
-                                              style: GoogleFonts.rubikMicrobe(
-                                                  color: dialogColor, fontSize: 20, fontWeight: FontWeight.bold, fontStyle: FontStyle.italic),
-                                            ),
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.only(right: 10),
-                                          child: SizedBox(
-                                            width: MediaQuery.of(context).size.width * 0.35,
-                                            child: Text(
-                                              matchesPlayedTitle,
-                                              style: GoogleFonts.arimo(
-                                                color: containerColor,
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.w200,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                        const SizedBox(height: 20),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ],
-
-                              // Column(
-                              //   children: [
-                              //     Padding(
-                              //       padding: const EdgeInsets.only(right: 10),
-                              //       child: Container(
-                              //         width: MediaQuery.of(context).size.width * 0.35,
-                              //         child: Text(
-                              //           playerOfTheMonthStatsAndInfoNotifier.playerOfTheMonthStatsAndInfoList[index].playerName!.replaceAll(" ", "\n"),
-                              //           style: GoogleFonts.rubikMicrobe(
-                              //               color: Color.fromRGBO(184, 106, 65, 1.0),
-                              //               fontSize: 30,
-                              //             fontWeight: FontWeight.bold,
-                              //             height: 0.81
-                              //           ),
-                              //           overflow: TextOverflow.ellipsis,
-                              //         ),
-                              //       ),
-                              //     ),
-                              //     const SizedBox(height: 40),
-                              //     Column(
-                              //       children: [
-                              //         Padding(
-                              //           padding: const EdgeInsets.only(right: 10),
-                              //           child: Container(
-                              //             width: MediaQuery.of(context).size.width * 0.35,
-                              //             child: Text(
-                              //               playerOfTheMonthStatsAndInfoNotifier.playerOfTheMonthStatsAndInfoList[index].goalsScored.toString(),
-                              //               style: GoogleFonts.rubikMicrobe(
-                              //                   color: Color.fromRGBO(184, 106, 65, 1.0),
-                              //                   fontSize: 30,
-                              //                   fontWeight: FontWeight.bold,
-                              //                   fontStyle: FontStyle.italic
-                              //               ),
-                              //             ),
-                              //           ),
-                              //         ),
-                              //         Padding(
-                              //           padding: const EdgeInsets.only(right: 10),
-                              //           child: Container(
-                              //             width: MediaQuery.of(context).size.width * 0.35,
-                              //             child: Text(
-                              //               'Goals Scored',
-                              //               style: GoogleFonts.arimo(
-                              //                 color: Colors.white70,
-                              //                 fontSize: 14,
-                              //                 fontWeight: FontWeight.w200,
-                              //
-                              //               ),
-                              //             ),
-                              //           ),
-                              //         ),
-                              //         const SizedBox(height: 15),
-                              //       ],
-                              //     ),
-                              //     Column(
-                              //       children: [
-                              //         Padding(
-                              //           padding: const EdgeInsets.only(right: 10),
-                              //           child: Container(
-                              //             width: MediaQuery.of(context).size.width * 0.35,
-                              //             child: Text(
-                              //               playerOfTheMonthStatsAndInfoNotifier.playerOfTheMonthStatsAndInfoList[index].assists.toString(),
-                              //               style: GoogleFonts.rubikMicrobe(
-                              //                   color: Color.fromRGBO(184, 106, 65, 1.0),
-                              //                   fontSize: 30,
-                              //                   fontWeight: FontWeight.bold,
-                              //                   fontStyle: FontStyle.italic
-                              //               ),
-                              //             ),
-                              //           ),
-                              //         ),
-                              //         Padding(
-                              //           padding: const EdgeInsets.only(right: 10),
-                              //           child: Container(
-                              //             width: MediaQuery.of(context).size.width * 0.35,
-                              //             child: Text(
-                              //               'Assists Provided',
-                              //               style: GoogleFonts.arimo(
-                              //                 color: Colors.white70,
-                              //                 fontSize: 14,
-                              //                 fontWeight: FontWeight.w200,
-                              //
-                              //               ),
-                              //             ),
-                              //           ),
-                              //         ),
-                              //         const SizedBox(height: 15),
-                              //       ],
-                              //     ),
-                              //     Column(
-                              //       children: [
-                              //         Padding(
-                              //           padding: const EdgeInsets.only(right: 10),
-                              //           child: Container(
-                              //             width: MediaQuery.of(context).size.width * 0.35,
-                              //             child: Text(
-                              //               playerOfTheMonthStatsAndInfoNotifier.playerOfTheMonthStatsAndInfoList[index].matchesPlayed.toString(),
-                              //               style: GoogleFonts.rubikMicrobe(
-                              //                   color: Color.fromRGBO(184, 106, 65, 1.0),
-                              //                   fontSize: 30,
-                              //                   fontWeight: FontWeight.bold,
-                              //                   fontStyle: FontStyle.italic
-                              //               ),
-                              //             ),
-                              //           ),
-                              //         ),
-                              //         Padding(
-                              //           padding: const EdgeInsets.only(right: 10),
-                              //           child: Container(
-                              //             width: MediaQuery.of(context).size.width * 0.35,
-                              //             child: Text(
-                              //               'Matches Played',
-                              //               style: GoogleFonts.arimo(
-                              //                 color: Colors.white70,
-                              //                 fontSize: 14,
-                              //                 fontWeight: FontWeight.w200,
-                              //
-                              //               ),
-                              //             ),
-                              //           ),
-                              //         ),
-                              //         const SizedBox(height: 80),
-                              //       ],
-                              //     ),
-                              //   ],
-                              // ),
-
-                              Column(
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.only(right: 10),
-                                    child: SizedBox(
-                                      width: MediaQuery.of(context).size.width * 0.65,
-                                      child: FittedBox(
-                                        fit: BoxFit.scaleDown,
-                                        child: Text(
-                                          potmTwoTitle,
-                                          style: GoogleFonts.orbitron(
-                                            color: dialogColor,
-                                            fontSize: 11,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                          textAlign: TextAlign.center,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(top: 4),
-                                    child: SizedBox(
-                                      width: MediaQuery.of(context).size.width * 0.65,
-                                      child: Text(
-                                        presentedByTitle,
-                                        style: GoogleFonts.arimo(
-                                            color: containerColor, fontSize: 14, fontWeight: FontWeight.w200, fontStyle: FontStyle.italic),
-                                        textAlign: TextAlign.center,
-                                      ),
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(top: 5),
-                                    child: SizedBox(
-                                      width: MediaQuery.of(context).size.width * 0.65,
-                                      child: Text(
-                                        nouvellesoftTitle,
-                                        style: GoogleFonts.zenDots(
-                                          color: containerColor,
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                        textAlign: TextAlign.center,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ),
-                                  ),
-                                ],
                               ),
                             ],
                           ),
                         ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
+                        ConfettiWidget(
+                          createParticlePath: drawStar,
+                          confettiController: _controllerTopCenter,
+                          blastDirection: -pi / 2,
+                          maxBlastForce: 50,
+                          // set a lower max blast force
+                          minBlastForce: 20,
+                          // set a lower min blast force
+                          emissionFrequency: 0.035,
+                          blastDirectionality: BlastDirectionality.explosive,
+                          numberOfParticles: 50,
+                          // a lot of particles at once
+                          gravity: 0.1,
+                        ),
+                      ])),
+                );
+              }),
             ),
             if (Platform.isAndroid) ...[
               Positioned(
@@ -3563,617 +3573,628 @@ class _PlayersStatsAndInfoPageState extends State<PlayersStatsAndInfoPage> {
               ),
             )
           ] else ...[
-            AlertDialog(
+            Dialog(
               shape: const RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(Radius.circular(10.0)),
               ),
-              contentPadding: const EdgeInsets.all(10),
+              // contentPadding: const EdgeInsets.all(10),
               backgroundColor: dialogColor,
-              content: ConfettiWidget(
-                createParticlePath: drawStar,
-                confettiController: _controllerTopCenter,
-                blastDirection: -pi / 2,
-                maxBlastForce: 50,
-                // set a lower max blast force
-                minBlastForce: 20,
-                // set a lower min blast force
-                emissionFrequency: 0.035,
-                blastDirectionality: BlastDirectionality.explosive,
-                numberOfParticles: 50,
-                // a lot of particles at once
-                gravity: 0.1,
-                child: SizedBox(
-                  width: MediaQuery.of(context).size.width,
-                  height: MediaQuery.of(context).size.height * 0.6,
-                  child: ListView.builder(
-                    itemExtent: MediaQuery.of(context).size.height * 0.585,
-                    shrinkWrap: true,
-                    itemCount: playerOfTheMonthStatsAndInfoNotifier.playerOfTheMonthStatsAndInfoList.length,
-                    itemBuilder: (context, index) => Stack(
-                      alignment: AlignmentDirectional.topStart,
-                      // fit: StackFit.loose,
-                      children: [
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: SizedBox(
-                            width: MediaQuery.of(context).size.width * .43,
-                            height: MediaQuery.of(context).size.height * 2,
-                            child: Image(
-                              height: double.infinity,
-                              width: double.infinity,
-                              image: CachedNetworkImageProvider(
-                                playerOfTheMonthStatsAndInfoNotifier.playerOfTheMonthStatsAndInfoList[index].image!,
-                                scale: 0.2,
-                              ),
-                              fit: BoxFit.cover,
-                              color: Colors.grey,
-                              colorBlendMode: BlendMode.softLight,
-                              alignment: const Alignment(0.4, -1),
-                            ),
-                          ),
-                        ),
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: SizedBox(
-                            // color: Colors.green,
-                            height: MediaQuery.of(context).size.height,
-                            // height: 500,
-                            width: MediaQuery.of(context).size.width,
-                            child: Image.asset(
-                              assetPOTMBackgroundTitle,
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        ),
-                        Align(
-                          alignment: Alignment.topRight,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.end,
+              child: LayoutBuilder(builder: (context, constraints) {
+                return Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: SizedBox(
+                      width: constraints.maxWidth,
+                      height: constraints.maxHeight * 0.7,
+                      child: Stack(children: [
+                        ListView.builder(
+                          itemExtent: MediaQuery.of(context).size.height * 0.585,
+                          shrinkWrap: true,
+                          itemCount: playerOfTheMonthStatsAndInfoNotifier.playerOfTheMonthStatsAndInfoList.length,
+                          itemBuilder: (context, index) => Stack(
+                            alignment: AlignmentDirectional.topStart,
+                            // fit: StackFit.loose,
                             children: [
-                              Padding(
-                                padding: const EdgeInsets.only(right: 40),
-                                child: Image.asset(
-                                  assetPOTMMVPTitle,
-                                  width: MediaQuery.of(context).size.width * 0.35,
+                              Align(
+                                alignment: Alignment.centerLeft,
+                                child: SizedBox(
+                                  width: MediaQuery.of(context).size.width * .43,
+                                  height: MediaQuery.of(context).size.height * 2,
+                                  child: Image(
+                                    height: double.infinity,
+                                    width: double.infinity,
+                                    image: CachedNetworkImageProvider(
+                                      playerOfTheMonthStatsAndInfoNotifier.playerOfTheMonthStatsAndInfoList[index].image!,
+                                      scale: 0.2,
+                                    ),
+                                    fit: BoxFit.cover,
+                                    color: Colors.grey,
+                                    colorBlendMode: BlendMode.softLight,
+                                    alignment: const Alignment(0.4, -1),
+                                  ),
                                 ),
                               ),
-
-                              if (playerOfTheMonthStatsAndInfoNotifier.playerOfTheMonthStatsAndInfoList[index].playerPosition
-                                      .toString()
-                                      .toLowerCase() ==
-                                  'gk') ...[
-                                Column(
+                              Align(
+                                alignment: Alignment.centerRight,
+                                child: SizedBox(
+                                  // color: Colors.green,
+                                  height: MediaQuery.of(context).size.height,
+                                  // height: 500,
+                                  width: MediaQuery.of(context).size.width,
+                                  child: Image.asset(
+                                    assetPOTMBackgroundTitle,
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                              ),
+                              Align(
+                                alignment: Alignment.topRight,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.end,
                                   children: [
                                     Padding(
-                                      padding: const EdgeInsets.only(right: 10),
-                                      child: SizedBox(
+                                      padding: const EdgeInsets.only(right: 40),
+                                      child: Image.asset(
+                                        assetPOTMMVPTitle,
                                         width: MediaQuery.of(context).size.width * 0.35,
-                                        child: Text(
-                                          playerOfTheMonthStatsAndInfoNotifier.playerOfTheMonthStatsAndInfoList[index].playerName!
-                                              .replaceAll(" ", "\n"),
-                                          style:
-                                              GoogleFonts.rubikMicrobe(color: dialogColor, fontSize: 25, fontWeight: FontWeight.bold, height: 0.81),
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
                                       ),
                                     ),
-                                    const SizedBox(height: 30),
+
+                                    if (playerOfTheMonthStatsAndInfoNotifier.playerOfTheMonthStatsAndInfoList[index].playerPosition
+                                            .toString()
+                                            .toLowerCase() ==
+                                        'gk') ...[
+                                      Column(
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.only(right: 10),
+                                            child: SizedBox(
+                                              width: MediaQuery.of(context).size.width * 0.35,
+                                              child: Text(
+                                                playerOfTheMonthStatsAndInfoNotifier.playerOfTheMonthStatsAndInfoList[index].playerName!
+                                                    .replaceAll(" ", "\n"),
+                                                style: GoogleFonts.rubikMicrobe(
+                                                    color: dialogColor, fontSize: 25, fontWeight: FontWeight.bold, height: 0.81),
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(height: 30),
+                                          Column(
+                                            children: [
+                                              Padding(
+                                                padding: const EdgeInsets.only(right: 10),
+                                                child: SizedBox(
+                                                  width: MediaQuery.of(context).size.width * 0.35,
+                                                  child: Text(
+                                                    playerOfTheMonthStatsAndInfoNotifier.playerOfTheMonthStatsAndInfoList[index].goalsConcededGkDef
+                                                        .toString(),
+                                                    style: GoogleFonts.rubikMicrobe(
+                                                        color: dialogColor, fontSize: 30, fontWeight: FontWeight.bold, fontStyle: FontStyle.italic),
+                                                  ),
+                                                ),
+                                              ),
+                                              Padding(
+                                                padding: const EdgeInsets.only(right: 10),
+                                                child: SizedBox(
+                                                  width: MediaQuery.of(context).size.width * 0.35,
+                                                  child: Text(
+                                                    playerGoalsConcededTwoTitle,
+                                                    style: GoogleFonts.arimo(
+                                                      color: containerColor,
+                                                      fontSize: 14,
+                                                      fontWeight: FontWeight.w200,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              const SizedBox(height: 15),
+                                            ],
+                                          ),
+                                          Column(
+                                            children: [
+                                              Padding(
+                                                padding: const EdgeInsets.only(right: 10),
+                                                child: SizedBox(
+                                                  width: MediaQuery.of(context).size.width * 0.35,
+                                                  child: Text(
+                                                    playerOfTheMonthStatsAndInfoNotifier.playerOfTheMonthStatsAndInfoList[index].cleanSheetGk
+                                                        .toString(),
+                                                    style: GoogleFonts.rubikMicrobe(
+                                                        color: dialogColor, fontSize: 30, fontWeight: FontWeight.bold, fontStyle: FontStyle.italic),
+                                                  ),
+                                                ),
+                                              ),
+                                              Padding(
+                                                padding: const EdgeInsets.only(right: 10),
+                                                child: SizedBox(
+                                                  width: MediaQuery.of(context).size.width * 0.35,
+                                                  child: Text(
+                                                    playerCleanSheetTitle,
+                                                    style: GoogleFonts.arimo(
+                                                      color: containerColor,
+                                                      fontSize: 14,
+                                                      fontWeight: FontWeight.w200,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              const SizedBox(height: 15),
+                                            ],
+                                          ),
+                                          Column(
+                                            children: [
+                                              Padding(
+                                                padding: const EdgeInsets.only(right: 10),
+                                                child: SizedBox(
+                                                  width: MediaQuery.of(context).size.width * 0.35,
+                                                  child: Text(
+                                                    playerOfTheMonthStatsAndInfoNotifier.playerOfTheMonthStatsAndInfoList[index].matchesPlayed
+                                                        .toString(),
+                                                    style: GoogleFonts.rubikMicrobe(
+                                                        color: dialogColor, fontSize: 30, fontWeight: FontWeight.bold, fontStyle: FontStyle.italic),
+                                                  ),
+                                                ),
+                                              ),
+                                              Padding(
+                                                padding: const EdgeInsets.only(right: 10),
+                                                child: SizedBox(
+                                                  width: MediaQuery.of(context).size.width * 0.35,
+                                                  child: Text(
+                                                    matchesPlayedTitle,
+                                                    style: GoogleFonts.arimo(
+                                                      color: containerColor,
+                                                      fontSize: 14,
+                                                      fontWeight: FontWeight.w200,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              const SizedBox(height: 20),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ] else if (playerOfTheMonthStatsAndInfoNotifier.playerOfTheMonthStatsAndInfoList[index].playerPosition
+                                                .toString()
+                                                .toLowerCase() ==
+                                            'cb' ||
+                                        playerOfTheMonthStatsAndInfoNotifier.playerOfTheMonthStatsAndInfoList[index].playerPosition
+                                                .toString()
+                                                .toLowerCase() ==
+                                            'lb' ||
+                                        playerOfTheMonthStatsAndInfoNotifier.playerOfTheMonthStatsAndInfoList[index].playerPosition
+                                                .toString()
+                                                .toLowerCase() ==
+                                            'rb') ...[
+                                      Column(
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.only(right: 10),
+                                            child: SizedBox(
+                                              width: MediaQuery.of(context).size.width * 0.35,
+                                              child: Text(
+                                                playerOfTheMonthStatsAndInfoNotifier.playerOfTheMonthStatsAndInfoList[index].playerName!
+                                                    .replaceAll(" ", "\n"),
+                                                style: GoogleFonts.rubikMicrobe(
+                                                    color: dialogColor, fontSize: 25, fontWeight: FontWeight.bold, height: 0.81),
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(height: 30),
+                                          Column(
+                                            children: [
+                                              Padding(
+                                                padding: const EdgeInsets.only(right: 10),
+                                                child: SizedBox(
+                                                  width: MediaQuery.of(context).size.width * 0.35,
+                                                  child: Text(
+                                                    playerOfTheMonthStatsAndInfoNotifier.playerOfTheMonthStatsAndInfoList[index].playerPosition
+                                                        .toString()
+                                                        .toUpperCase(),
+                                                    style: GoogleFonts.rubikMicrobe(
+                                                        color: dialogColor, fontSize: 30, fontWeight: FontWeight.bold, fontStyle: FontStyle.italic),
+                                                  ),
+                                                ),
+                                              ),
+                                              Padding(
+                                                padding: const EdgeInsets.only(right: 10),
+                                                child: SizedBox(
+                                                  width: MediaQuery.of(context).size.width * 0.35,
+                                                  child: Text(
+                                                    playerPositionTwoTitle,
+                                                    style: GoogleFonts.arimo(
+                                                      color: containerColor,
+                                                      fontSize: 14,
+                                                      fontWeight: FontWeight.w200,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              const SizedBox(height: 15),
+                                            ],
+                                          ),
+                                          Column(
+                                            children: [
+                                              Padding(
+                                                padding: const EdgeInsets.only(right: 10),
+                                                child: SizedBox(
+                                                  width: MediaQuery.of(context).size.width * 0.35,
+                                                  child: Text(
+                                                    playerOfTheMonthStatsAndInfoNotifier.playerOfTheMonthStatsAndInfoList[index].goalsConcededGkDef
+                                                        .toString(),
+                                                    style: GoogleFonts.rubikMicrobe(
+                                                        color: dialogColor, fontSize: 30, fontWeight: FontWeight.bold, fontStyle: FontStyle.italic),
+                                                  ),
+                                                ),
+                                              ),
+                                              Padding(
+                                                padding: const EdgeInsets.only(right: 10),
+                                                child: SizedBox(
+                                                  width: MediaQuery.of(context).size.width * 0.35,
+                                                  child: Text(
+                                                    playerGoalsConcededTwoTitle,
+                                                    style: GoogleFonts.arimo(
+                                                      color: containerColor,
+                                                      fontSize: 14,
+                                                      fontWeight: FontWeight.w200,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              const SizedBox(height: 10),
+                                            ],
+                                          ),
+                                          Column(
+                                            children: [
+                                              Padding(
+                                                padding: const EdgeInsets.only(right: 10),
+                                                child: SizedBox(
+                                                  width: MediaQuery.of(context).size.width * 0.35,
+                                                  child: Text(
+                                                    playerOfTheMonthStatsAndInfoNotifier.playerOfTheMonthStatsAndInfoList[index].matchesPlayed
+                                                        .toString(),
+                                                    style: GoogleFonts.rubikMicrobe(
+                                                        color: dialogColor, fontSize: 30, fontWeight: FontWeight.bold, fontStyle: FontStyle.italic),
+                                                  ),
+                                                ),
+                                              ),
+                                              Padding(
+                                                padding: const EdgeInsets.only(right: 10),
+                                                child: SizedBox(
+                                                  width: MediaQuery.of(context).size.width * 0.35,
+                                                  child: Text(
+                                                    matchesPlayedTitle,
+                                                    style: GoogleFonts.arimo(
+                                                      color: containerColor,
+                                                      fontSize: 14,
+                                                      fontWeight: FontWeight.w200,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              const SizedBox(height: 20),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ] else ...[
+                                      Column(
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.only(right: 10),
+                                            child: SizedBox(
+                                              width: MediaQuery.of(context).size.width * 0.35,
+                                              child: Center(
+                                                child: Text(
+                                                  playerOfTheMonthStatsAndInfoNotifier.playerOfTheMonthStatsAndInfoList[index].playerName!
+                                                      .replaceAll(" ", "\n"),
+                                                  style: GoogleFonts.rubikMicrobe(
+                                                      color: dialogColor, fontSize: 25, fontWeight: FontWeight.bold, height: 0.81),
+                                                  overflow: TextOverflow.ellipsis,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(height: 30),
+                                          Column(
+                                            children: [
+                                              Padding(
+                                                padding: const EdgeInsets.only(right: 10),
+                                                child: SizedBox(
+                                                  width: MediaQuery.of(context).size.width * 0.35,
+                                                  child: Text(
+                                                    playerOfTheMonthStatsAndInfoNotifier.playerOfTheMonthStatsAndInfoList[index].goalsScored
+                                                        .toString(),
+                                                    style: GoogleFonts.rubikMicrobe(
+                                                        color: dialogColor, fontSize: 30, fontWeight: FontWeight.bold, fontStyle: FontStyle.italic),
+                                                  ),
+                                                ),
+                                              ),
+                                              Padding(
+                                                padding: const EdgeInsets.only(right: 10),
+                                                child: SizedBox(
+                                                  width: MediaQuery.of(context).size.width * 0.35,
+                                                  child: Text(
+                                                    playerGoalsScoredTwoTitle,
+                                                    style: GoogleFonts.arimo(
+                                                      color: containerColor,
+                                                      fontSize: 14,
+                                                      fontWeight: FontWeight.w200,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              const SizedBox(height: 15),
+                                            ],
+                                          ),
+                                          Column(
+                                            children: [
+                                              Padding(
+                                                padding: const EdgeInsets.only(right: 10),
+                                                child: SizedBox(
+                                                  width: MediaQuery.of(context).size.width * 0.35,
+                                                  child: Text(
+                                                    playerOfTheMonthStatsAndInfoNotifier.playerOfTheMonthStatsAndInfoList[index].assists.toString(),
+                                                    style: GoogleFonts.rubikMicrobe(
+                                                        color: dialogColor, fontSize: 30, fontWeight: FontWeight.bold, fontStyle: FontStyle.italic),
+                                                  ),
+                                                ),
+                                              ),
+                                              Padding(
+                                                padding: const EdgeInsets.only(right: 10),
+                                                child: SizedBox(
+                                                  width: MediaQuery.of(context).size.width * 0.35,
+                                                  child: Text(
+                                                    playerAssistsTwoTitle,
+                                                    style: GoogleFonts.arimo(
+                                                      color: containerColor,
+                                                      fontSize: 14,
+                                                      fontWeight: FontWeight.w200,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              const SizedBox(height: 15),
+                                            ],
+                                          ),
+                                          Column(
+                                            children: [
+                                              Padding(
+                                                padding: const EdgeInsets.only(right: 10),
+                                                child: SizedBox(
+                                                  width: MediaQuery.of(context).size.width * 0.35,
+                                                  child: Text(
+                                                    playerOfTheMonthStatsAndInfoNotifier.playerOfTheMonthStatsAndInfoList[index].matchesPlayed
+                                                        .toString(),
+                                                    style: GoogleFonts.rubikMicrobe(
+                                                        color: dialogColor, fontSize: 30, fontWeight: FontWeight.bold, fontStyle: FontStyle.italic),
+                                                  ),
+                                                ),
+                                              ),
+                                              Padding(
+                                                padding: const EdgeInsets.only(right: 10),
+                                                child: SizedBox(
+                                                  width: MediaQuery.of(context).size.width * 0.35,
+                                                  child: Text(
+                                                    matchesPlayedTitle,
+                                                    style: GoogleFonts.arimo(
+                                                      color: containerColor,
+                                                      fontSize: 14,
+                                                      fontWeight: FontWeight.w200,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              const SizedBox(height: 20),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+
+                                    // Column(
+                                    //   children: [
+                                    //     Padding(
+                                    //       padding: const EdgeInsets.only(right: 10),
+                                    //       child: Container(
+                                    //         width: MediaQuery.of(context).size.width * 0.35,
+                                    //         child: Text(
+                                    //           playerOfTheMonthStatsAndInfoNotifier.playerOfTheMonthStatsAndInfoList[index].playerName!.replaceAll(" ", "\n"),
+                                    //           style: GoogleFonts.rubikMicrobe(
+                                    //               color: Color.fromRGBO(184, 106, 65, 1.0),
+                                    //               fontSize: 30,
+                                    //             fontWeight: FontWeight.bold,
+                                    //             height: 0.81
+                                    //           ),
+                                    //           overflow: TextOverflow.ellipsis,
+                                    //         ),
+                                    //       ),
+                                    //     ),
+                                    //     const SizedBox(height: 40),
+                                    //     Column(
+                                    //       children: [
+                                    //         Padding(
+                                    //           padding: const EdgeInsets.only(right: 10),
+                                    //           child: Container(
+                                    //             width: MediaQuery.of(context).size.width * 0.35,
+                                    //             child: Text(
+                                    //               playerOfTheMonthStatsAndInfoNotifier.playerOfTheMonthStatsAndInfoList[index].goalsScored.toString(),
+                                    //               style: GoogleFonts.rubikMicrobe(
+                                    //                   color: Color.fromRGBO(184, 106, 65, 1.0),
+                                    //                   fontSize: 30,
+                                    //                   fontWeight: FontWeight.bold,
+                                    //                   fontStyle: FontStyle.italic
+                                    //               ),
+                                    //             ),
+                                    //           ),
+                                    //         ),
+                                    //         Padding(
+                                    //           padding: const EdgeInsets.only(right: 10),
+                                    //           child: Container(
+                                    //             width: MediaQuery.of(context).size.width * 0.35,
+                                    //             child: Text(
+                                    //               'Goals Scored',
+                                    //               style: GoogleFonts.arimo(
+                                    //                 color: Colors.white70,
+                                    //                 fontSize: 14,
+                                    //                 fontWeight: FontWeight.w200,
+                                    //
+                                    //               ),
+                                    //             ),
+                                    //           ),
+                                    //         ),
+                                    //         const SizedBox(height: 15),
+                                    //       ],
+                                    //     ),
+                                    //     Column(
+                                    //       children: [
+                                    //         Padding(
+                                    //           padding: const EdgeInsets.only(right: 10),
+                                    //           child: Container(
+                                    //             width: MediaQuery.of(context).size.width * 0.35,
+                                    //             child: Text(
+                                    //               playerOfTheMonthStatsAndInfoNotifier.playerOfTheMonthStatsAndInfoList[index].assists.toString(),
+                                    //               style: GoogleFonts.rubikMicrobe(
+                                    //                   color: Color.fromRGBO(184, 106, 65, 1.0),
+                                    //                   fontSize: 30,
+                                    //                   fontWeight: FontWeight.bold,
+                                    //                   fontStyle: FontStyle.italic
+                                    //               ),
+                                    //             ),
+                                    //           ),
+                                    //         ),
+                                    //         Padding(
+                                    //           padding: const EdgeInsets.only(right: 10),
+                                    //           child: Container(
+                                    //             width: MediaQuery.of(context).size.width * 0.35,
+                                    //             child: Text(
+                                    //               'Assists Provided',
+                                    //               style: GoogleFonts.arimo(
+                                    //                 color: Colors.white70,
+                                    //                 fontSize: 14,
+                                    //                 fontWeight: FontWeight.w200,
+                                    //
+                                    //               ),
+                                    //             ),
+                                    //           ),
+                                    //         ),
+                                    //         const SizedBox(height: 15),
+                                    //       ],
+                                    //     ),
+                                    //     Column(
+                                    //       children: [
+                                    //         Padding(
+                                    //           padding: const EdgeInsets.only(right: 10),
+                                    //           child: Container(
+                                    //             width: MediaQuery.of(context).size.width * 0.35,
+                                    //             child: Text(
+                                    //               playerOfTheMonthStatsAndInfoNotifier.playerOfTheMonthStatsAndInfoList[index].matchesPlayed.toString(),
+                                    //               style: GoogleFonts.rubikMicrobe(
+                                    //                   color: Color.fromRGBO(184, 106, 65, 1.0),
+                                    //                   fontSize: 30,
+                                    //                   fontWeight: FontWeight.bold,
+                                    //                   fontStyle: FontStyle.italic
+                                    //               ),
+                                    //             ),
+                                    //           ),
+                                    //         ),
+                                    //         Padding(
+                                    //           padding: const EdgeInsets.only(right: 10),
+                                    //           child: Container(
+                                    //             width: MediaQuery.of(context).size.width * 0.35,
+                                    //             child: Text(
+                                    //               'Matches Played',
+                                    //               style: GoogleFonts.arimo(
+                                    //                 color: Colors.white70,
+                                    //                 fontSize: 14,
+                                    //                 fontWeight: FontWeight.w200,
+                                    //
+                                    //               ),
+                                    //             ),
+                                    //           ),
+                                    //         ),
+                                    //         const SizedBox(height: 80),
+                                    //       ],
+                                    //     ),
+                                    //   ],
+                                    // ),
+
                                     Column(
                                       children: [
                                         Padding(
                                           padding: const EdgeInsets.only(right: 10),
                                           child: SizedBox(
-                                            width: MediaQuery.of(context).size.width * 0.35,
-                                            child: Text(
-                                              playerOfTheMonthStatsAndInfoNotifier.playerOfTheMonthStatsAndInfoList[index].goalsConcededGkDef
-                                                  .toString(),
-                                              style: GoogleFonts.rubikMicrobe(
-                                                  color: dialogColor, fontSize: 30, fontWeight: FontWeight.bold, fontStyle: FontStyle.italic),
-                                            ),
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.only(right: 10),
-                                          child: SizedBox(
-                                            width: MediaQuery.of(context).size.width * 0.35,
-                                            child: Text(
-                                              playerGoalsConcededTwoTitle,
-                                              style: GoogleFonts.arimo(
-                                                color: containerColor,
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.w200,
+                                            width: MediaQuery.of(context).size.width * 0.65,
+                                            child: FittedBox(
+                                              fit: BoxFit.scaleDown,
+                                              child: Text(
+                                                potmTwoTitle,
+                                                style: GoogleFonts.orbitron(
+                                                  color: dialogColor,
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                                textAlign: TextAlign.center,
+                                                overflow: TextOverflow.ellipsis,
                                               ),
                                             ),
                                           ),
                                         ),
-                                        const SizedBox(height: 15),
-                                      ],
-                                    ),
-                                    Column(
-                                      children: [
                                         Padding(
-                                          padding: const EdgeInsets.only(right: 10),
+                                          padding: const EdgeInsets.only(top: 4),
                                           child: SizedBox(
-                                            width: MediaQuery.of(context).size.width * 0.35,
+                                            width: MediaQuery.of(context).size.width * 0.65,
                                             child: Text(
-                                              playerOfTheMonthStatsAndInfoNotifier.playerOfTheMonthStatsAndInfoList[index].cleanSheetGk.toString(),
-                                              style: GoogleFonts.rubikMicrobe(
-                                                  color: dialogColor, fontSize: 30, fontWeight: FontWeight.bold, fontStyle: FontStyle.italic),
-                                            ),
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.only(right: 10),
-                                          child: SizedBox(
-                                            width: MediaQuery.of(context).size.width * 0.35,
-                                            child: Text(
-                                              playerCleanSheetTitle,
+                                              presentedByTitle,
                                               style: GoogleFonts.arimo(
-                                                color: containerColor,
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.w200,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                        const SizedBox(height: 15),
-                                      ],
-                                    ),
-                                    Column(
-                                      children: [
-                                        Padding(
-                                          padding: const EdgeInsets.only(right: 10),
-                                          child: SizedBox(
-                                            width: MediaQuery.of(context).size.width * 0.35,
-                                            child: Text(
-                                              playerOfTheMonthStatsAndInfoNotifier.playerOfTheMonthStatsAndInfoList[index].matchesPlayed.toString(),
-                                              style: GoogleFonts.rubikMicrobe(
-                                                  color: dialogColor, fontSize: 30, fontWeight: FontWeight.bold, fontStyle: FontStyle.italic),
+                                                  color: containerColor, fontSize: 14, fontWeight: FontWeight.w200, fontStyle: FontStyle.italic),
+                                              textAlign: TextAlign.center,
                                             ),
                                           ),
                                         ),
                                         Padding(
-                                          padding: const EdgeInsets.only(right: 10),
+                                          padding: const EdgeInsets.only(top: 5),
                                           child: SizedBox(
-                                            width: MediaQuery.of(context).size.width * 0.35,
+                                            width: MediaQuery.of(context).size.width * 0.65,
                                             child: Text(
-                                              matchesPlayedTitle,
-                                              style: GoogleFonts.arimo(
+                                              nouvellesoftTitle,
+                                              style: GoogleFonts.zenDots(
                                                 color: containerColor,
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.w200,
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.bold,
                                               ),
+                                              textAlign: TextAlign.center,
+                                              overflow: TextOverflow.ellipsis,
                                             ),
                                           ),
                                         ),
-                                        const SizedBox(height: 20),
                                       ],
                                     ),
                                   ],
                                 ),
-                              ] else if (playerOfTheMonthStatsAndInfoNotifier.playerOfTheMonthStatsAndInfoList[index].playerPosition
-                                          .toString()
-                                          .toLowerCase() ==
-                                      'cb' ||
-                                  playerOfTheMonthStatsAndInfoNotifier.playerOfTheMonthStatsAndInfoList[index].playerPosition
-                                          .toString()
-                                          .toLowerCase() ==
-                                      'lb' ||
-                                  playerOfTheMonthStatsAndInfoNotifier.playerOfTheMonthStatsAndInfoList[index].playerPosition
-                                          .toString()
-                                          .toLowerCase() ==
-                                      'rb') ...[
-                                Column(
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.only(right: 10),
-                                      child: SizedBox(
-                                        width: MediaQuery.of(context).size.width * 0.35,
-                                        child: Text(
-                                          playerOfTheMonthStatsAndInfoNotifier.playerOfTheMonthStatsAndInfoList[index].playerName!
-                                              .replaceAll(" ", "\n"),
-                                          style:
-                                              GoogleFonts.rubikMicrobe(color: dialogColor, fontSize: 25, fontWeight: FontWeight.bold, height: 0.81),
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(height: 30),
-                                    Column(
-                                      children: [
-                                        Padding(
-                                          padding: const EdgeInsets.only(right: 10),
-                                          child: SizedBox(
-                                            width: MediaQuery.of(context).size.width * 0.35,
-                                            child: Text(
-                                              playerOfTheMonthStatsAndInfoNotifier.playerOfTheMonthStatsAndInfoList[index].playerPosition
-                                                  .toString()
-                                                  .toUpperCase(),
-                                              style: GoogleFonts.rubikMicrobe(
-                                                  color: dialogColor, fontSize: 30, fontWeight: FontWeight.bold, fontStyle: FontStyle.italic),
-                                            ),
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.only(right: 10),
-                                          child: SizedBox(
-                                            width: MediaQuery.of(context).size.width * 0.35,
-                                            child: Text(
-                                              playerPositionTwoTitle,
-                                              style: GoogleFonts.arimo(
-                                                color: containerColor,
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.w200,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                        const SizedBox(height: 15),
-                                      ],
-                                    ),
-                                    Column(
-                                      children: [
-                                        Padding(
-                                          padding: const EdgeInsets.only(right: 10),
-                                          child: SizedBox(
-                                            width: MediaQuery.of(context).size.width * 0.35,
-                                            child: Text(
-                                              playerOfTheMonthStatsAndInfoNotifier.playerOfTheMonthStatsAndInfoList[index].goalsConcededGkDef
-                                                  .toString(),
-                                              style: GoogleFonts.rubikMicrobe(
-                                                  color: dialogColor, fontSize: 30, fontWeight: FontWeight.bold, fontStyle: FontStyle.italic),
-                                            ),
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.only(right: 10),
-                                          child: SizedBox(
-                                            width: MediaQuery.of(context).size.width * 0.35,
-                                            child: Text(
-                                              playerGoalsConcededTwoTitle,
-                                              style: GoogleFonts.arimo(
-                                                color: containerColor,
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.w200,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                        const SizedBox(height: 10),
-                                      ],
-                                    ),
-                                    Column(
-                                      children: [
-                                        Padding(
-                                          padding: const EdgeInsets.only(right: 10),
-                                          child: SizedBox(
-                                            width: MediaQuery.of(context).size.width * 0.35,
-                                            child: Text(
-                                              playerOfTheMonthStatsAndInfoNotifier.playerOfTheMonthStatsAndInfoList[index].matchesPlayed.toString(),
-                                              style: GoogleFonts.rubikMicrobe(
-                                                  color: dialogColor, fontSize: 30, fontWeight: FontWeight.bold, fontStyle: FontStyle.italic),
-                                            ),
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.only(right: 10),
-                                          child: SizedBox(
-                                            width: MediaQuery.of(context).size.width * 0.35,
-                                            child: Text(
-                                              matchesPlayedTitle,
-                                              style: GoogleFonts.arimo(
-                                                color: containerColor,
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.w200,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                        const SizedBox(height: 20),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ] else ...[
-                                Column(
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.only(right: 10),
-                                      child: SizedBox(
-                                        width: MediaQuery.of(context).size.width * 0.35,
-                                        child: Center(
-                                          child: Text(
-                                            playerOfTheMonthStatsAndInfoNotifier.playerOfTheMonthStatsAndInfoList[index].playerName!
-                                                .replaceAll(" ", "\n"),
-                                            style:
-                                                GoogleFonts.rubikMicrobe(color: dialogColor, fontSize: 25, fontWeight: FontWeight.bold, height: 0.81),
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(height: 30),
-                                    Column(
-                                      children: [
-                                        Padding(
-                                          padding: const EdgeInsets.only(right: 10),
-                                          child: SizedBox(
-                                            width: MediaQuery.of(context).size.width * 0.35,
-                                            child: Text(
-                                              playerOfTheMonthStatsAndInfoNotifier.playerOfTheMonthStatsAndInfoList[index].goalsScored.toString(),
-                                              style: GoogleFonts.rubikMicrobe(
-                                                  color: dialogColor, fontSize: 30, fontWeight: FontWeight.bold, fontStyle: FontStyle.italic),
-                                            ),
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.only(right: 10),
-                                          child: SizedBox(
-                                            width: MediaQuery.of(context).size.width * 0.35,
-                                            child: Text(
-                                              playerGoalsScoredTwoTitle,
-                                              style: GoogleFonts.arimo(
-                                                color: containerColor,
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.w200,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                        const SizedBox(height: 15),
-                                      ],
-                                    ),
-                                    Column(
-                                      children: [
-                                        Padding(
-                                          padding: const EdgeInsets.only(right: 10),
-                                          child: SizedBox(
-                                            width: MediaQuery.of(context).size.width * 0.35,
-                                            child: Text(
-                                              playerOfTheMonthStatsAndInfoNotifier.playerOfTheMonthStatsAndInfoList[index].assists.toString(),
-                                              style: GoogleFonts.rubikMicrobe(
-                                                  color: dialogColor, fontSize: 30, fontWeight: FontWeight.bold, fontStyle: FontStyle.italic),
-                                            ),
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.only(right: 10),
-                                          child: SizedBox(
-                                            width: MediaQuery.of(context).size.width * 0.35,
-                                            child: Text(
-                                              playerAssistsTwoTitle,
-                                              style: GoogleFonts.arimo(
-                                                color: containerColor,
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.w200,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                        const SizedBox(height: 15),
-                                      ],
-                                    ),
-                                    Column(
-                                      children: [
-                                        Padding(
-                                          padding: const EdgeInsets.only(right: 10),
-                                          child: SizedBox(
-                                            width: MediaQuery.of(context).size.width * 0.35,
-                                            child: Text(
-                                              playerOfTheMonthStatsAndInfoNotifier.playerOfTheMonthStatsAndInfoList[index].matchesPlayed.toString(),
-                                              style: GoogleFonts.rubikMicrobe(
-                                                  color: dialogColor, fontSize: 30, fontWeight: FontWeight.bold, fontStyle: FontStyle.italic),
-                                            ),
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.only(right: 10),
-                                          child: SizedBox(
-                                            width: MediaQuery.of(context).size.width * 0.35,
-                                            child: Text(
-                                              matchesPlayedTitle,
-                                              style: GoogleFonts.arimo(
-                                                color: containerColor,
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.w200,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                        const SizedBox(height: 20),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ],
-
-                              // Column(
-                              //   children: [
-                              //     Padding(
-                              //       padding: const EdgeInsets.only(right: 10),
-                              //       child: Container(
-                              //         width: MediaQuery.of(context).size.width * 0.35,
-                              //         child: Text(
-                              //           playerOfTheMonthStatsAndInfoNotifier.playerOfTheMonthStatsAndInfoList[index].playerName!.replaceAll(" ", "\n"),
-                              //           style: GoogleFonts.rubikMicrobe(
-                              //               color: Color.fromRGBO(184, 106, 65, 1.0),
-                              //               fontSize: 30,
-                              //             fontWeight: FontWeight.bold,
-                              //             height: 0.81
-                              //           ),
-                              //           overflow: TextOverflow.ellipsis,
-                              //         ),
-                              //       ),
-                              //     ),
-                              //     const SizedBox(height: 40),
-                              //     Column(
-                              //       children: [
-                              //         Padding(
-                              //           padding: const EdgeInsets.only(right: 10),
-                              //           child: Container(
-                              //             width: MediaQuery.of(context).size.width * 0.35,
-                              //             child: Text(
-                              //               playerOfTheMonthStatsAndInfoNotifier.playerOfTheMonthStatsAndInfoList[index].goalsScored.toString(),
-                              //               style: GoogleFonts.rubikMicrobe(
-                              //                   color: Color.fromRGBO(184, 106, 65, 1.0),
-                              //                   fontSize: 30,
-                              //                   fontWeight: FontWeight.bold,
-                              //                   fontStyle: FontStyle.italic
-                              //               ),
-                              //             ),
-                              //           ),
-                              //         ),
-                              //         Padding(
-                              //           padding: const EdgeInsets.only(right: 10),
-                              //           child: Container(
-                              //             width: MediaQuery.of(context).size.width * 0.35,
-                              //             child: Text(
-                              //               'Goals Scored',
-                              //               style: GoogleFonts.arimo(
-                              //                 color: Colors.white70,
-                              //                 fontSize: 14,
-                              //                 fontWeight: FontWeight.w200,
-                              //
-                              //               ),
-                              //             ),
-                              //           ),
-                              //         ),
-                              //         const SizedBox(height: 15),
-                              //       ],
-                              //     ),
-                              //     Column(
-                              //       children: [
-                              //         Padding(
-                              //           padding: const EdgeInsets.only(right: 10),
-                              //           child: Container(
-                              //             width: MediaQuery.of(context).size.width * 0.35,
-                              //             child: Text(
-                              //               playerOfTheMonthStatsAndInfoNotifier.playerOfTheMonthStatsAndInfoList[index].assists.toString(),
-                              //               style: GoogleFonts.rubikMicrobe(
-                              //                   color: Color.fromRGBO(184, 106, 65, 1.0),
-                              //                   fontSize: 30,
-                              //                   fontWeight: FontWeight.bold,
-                              //                   fontStyle: FontStyle.italic
-                              //               ),
-                              //             ),
-                              //           ),
-                              //         ),
-                              //         Padding(
-                              //           padding: const EdgeInsets.only(right: 10),
-                              //           child: Container(
-                              //             width: MediaQuery.of(context).size.width * 0.35,
-                              //             child: Text(
-                              //               'Assists Provided',
-                              //               style: GoogleFonts.arimo(
-                              //                 color: Colors.white70,
-                              //                 fontSize: 14,
-                              //                 fontWeight: FontWeight.w200,
-                              //
-                              //               ),
-                              //             ),
-                              //           ),
-                              //         ),
-                              //         const SizedBox(height: 15),
-                              //       ],
-                              //     ),
-                              //     Column(
-                              //       children: [
-                              //         Padding(
-                              //           padding: const EdgeInsets.only(right: 10),
-                              //           child: Container(
-                              //             width: MediaQuery.of(context).size.width * 0.35,
-                              //             child: Text(
-                              //               playerOfTheMonthStatsAndInfoNotifier.playerOfTheMonthStatsAndInfoList[index].matchesPlayed.toString(),
-                              //               style: GoogleFonts.rubikMicrobe(
-                              //                   color: Color.fromRGBO(184, 106, 65, 1.0),
-                              //                   fontSize: 30,
-                              //                   fontWeight: FontWeight.bold,
-                              //                   fontStyle: FontStyle.italic
-                              //               ),
-                              //             ),
-                              //           ),
-                              //         ),
-                              //         Padding(
-                              //           padding: const EdgeInsets.only(right: 10),
-                              //           child: Container(
-                              //             width: MediaQuery.of(context).size.width * 0.35,
-                              //             child: Text(
-                              //               'Matches Played',
-                              //               style: GoogleFonts.arimo(
-                              //                 color: Colors.white70,
-                              //                 fontSize: 14,
-                              //                 fontWeight: FontWeight.w200,
-                              //
-                              //               ),
-                              //             ),
-                              //           ),
-                              //         ),
-                              //         const SizedBox(height: 80),
-                              //       ],
-                              //     ),
-                              //   ],
-                              // ),
-
-                              Column(
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.only(right: 10),
-                                    child: SizedBox(
-                                      width: MediaQuery.of(context).size.width * 0.65,
-                                      child: FittedBox(
-                                        fit: BoxFit.scaleDown,
-                                        child: Text(
-                                          potmTwoTitle,
-                                          style: GoogleFonts.orbitron(
-                                            color: dialogColor,
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                          textAlign: TextAlign.center,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(top: 4),
-                                    child: SizedBox(
-                                      width: MediaQuery.of(context).size.width * 0.65,
-                                      child: Text(
-                                        presentedByTitle,
-                                        style: GoogleFonts.arimo(
-                                            color: containerColor, fontSize: 14, fontWeight: FontWeight.w200, fontStyle: FontStyle.italic),
-                                        textAlign: TextAlign.center,
-                                      ),
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(top: 5),
-                                    child: SizedBox(
-                                      width: MediaQuery.of(context).size.width * 0.65,
-                                      child: Text(
-                                        nouvellesoftTitle,
-                                        style: GoogleFonts.zenDots(
-                                          color: containerColor,
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                        textAlign: TextAlign.center,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ),
-                                  ),
-                                ],
                               ),
                             ],
                           ),
                         ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
+                        ConfettiWidget(
+                          createParticlePath: drawStar,
+                          confettiController: _controllerTopCenter,
+                          blastDirection: -pi / 2,
+                          maxBlastForce: 50,
+                          // set a lower max blast force
+                          minBlastForce: 20,
+                          // set a lower min blast force
+                          emissionFrequency: 0.035,
+                          blastDirectionality: BlastDirectionality.explosive,
+                          numberOfParticles: 50,
+                          // a lot of particles at once
+                          gravity: 0.1,
+                        ),
+                      ])),
+                );
+              }),
             ),
             if (Platform.isAndroid) ...[
               Positioned(

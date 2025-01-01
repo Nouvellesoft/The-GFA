@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
-<dict>
+  <dict>
     <key>API_KEY</key>
     <string>AIzaSyAmQo0wHsRCQrdYFeT3wreRXxzXgXsOPpw</string>
     <key>CADisableMinimumFrameDurationOnPhone</key>
@@ -9,7 +9,7 @@
     <key>CFBundleDevelopmentRegion</key>
     <string>$(DEVELOPMENT_LANGUAGE)</string>
     <key>CFBundleDisplayName</key>
-    <string>The Gfa</string>
+    <string>The GFA</string>
     <key>CFBundleExecutable</key>
     <string>$(EXECUTABLE_NAME)</string>
     <key>CFBundleIdentifier</key>
@@ -26,22 +26,22 @@
     <string>????</string>
     <key>CFBundleURLTypes</key>
     <array>
-        <dict>
-            <key>CFBundleTypeRole</key>
-            <string>Editor</string>
-            <key>CFBundleURLSchemes</key>
-            <array>
-                <string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
-            </array>
-        </dict>
-        <dict>
-            <key>CFBundleTypeRole</key>
-            <string></string>
-            <key>CFBundleURLSchemes</key>
-            <array>
-                <string>app-1-24652197499-ios-2e7409bb80b9dea311fcde</string>
-            </array>
-        </dict>
+      <dict>
+        <key>CFBundleTypeRole</key>
+        <string>Editor</string>
+        <key>CFBundleURLSchemes</key>
+        <array>
+          <string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+        </array>
+      </dict>
+      <dict>
+        <key>CFBundleTypeRole</key>
+        <string></string>
+        <key>CFBundleURLSchemes</key>
+        <array>
+          <string>app-1-24652197499-ios-2e7409bb80b9dea311fcde</string>
+        </array>
+      </dict>
     </array>
     <key>CFBundleVersion</key>
     <string>1</string>
@@ -55,15 +55,15 @@
     <true/>
     <key>NSAppTransportSecurity</key>
     <dict>
-        <key>NSAllowsArbitraryLoads</key>
-        <true/>
+      <key>NSAllowsArbitraryLoads</key>
+      <true/>
     </dict>
     <key>UIApplicationSupportsIndirectInputEvents</key>
     <true/>
     <key>UIBackgroundModes</key>
     <array>
-        <string>fetch</string>
-        <string>remote-notification</string>
+      <string>fetch</string>
+      <string>remote-notification</string>
     </array>
     <key>UILaunchStoryboardName</key>
     <string>Main</string>
@@ -77,17 +77,17 @@
     <string>We need access to your contacts</string>
     <key>UISupportedInterfaceOrientations</key>
     <array>
-        <string>UIInterfaceOrientationPortrait</string>
-        <string>UIInterfaceOrientationPortraitUpsideDown</string>
+      <string>UIInterfaceOrientationPortrait</string>
+      <string>UIInterfaceOrientationPortraitUpsideDown</string>
     </array>
     <key>UISupportedInterfaceOrientations~ipad</key>
     <array>
-        <string>UIInterfaceOrientationLandscapeLeft</string>
-        <string>UIInterfaceOrientationLandscapeRight</string>
-        <string>UIInterfaceOrientationPortrait</string>
-        <string>UIInterfaceOrientationPortraitUpsideDown</string>
+      <string>UIInterfaceOrientationLandscapeLeft</string>
+      <string>UIInterfaceOrientationLandscapeRight</string>
+      <string>UIInterfaceOrientationPortrait</string>
+      <string>UIInterfaceOrientationPortraitUpsideDown</string>
     </array>
     <key>UIViewControllerBasedStatusBarAppearance</key>
     <false/>
-</dict>
+  </dict>
 </plist>

@@ -4885,7 +4885,9 @@ class _FourthTeamClassDetailsPage extends State<FourthTeamClassDetailsPage> {
         _whatsappOtp = generatedOtp;
       });
 
-      print('WhatsApp number: $phoneNumber  otp: $generatedOtp');
+      if (kDebugMode) {
+        print('WhatsApp number: $phoneNumber  otp: $generatedOtp');
+      }
 
       Fluttertoast.showToast(
         msg: 'OTP sent via WhatsApp',
@@ -4914,7 +4916,9 @@ class _FourthTeamClassDetailsPage extends State<FourthTeamClassDetailsPage> {
         // await _handleSuccessfulVerification();
         // return;
       } catch (smsVerificationError) {
-        print('SMS Verification Error: $smsVerificationError');
+        if (kDebugMode) {
+          print('SMS Verification Error: $smsVerificationError');
+        }
       }
 
       // If SMS verification fails, check WhatsApp OTP
@@ -4923,9 +4927,12 @@ class _FourthTeamClassDetailsPage extends State<FourthTeamClassDetailsPage> {
         await _handleSuccessfulVerification();
         // return;
       } else {
-        print('WhatsApp OTP Mismatch');
-        print('Entered OTP: $otpCode');
-        print('WhatsApp OTP: $_whatsappOtp');
+        if (kDebugMode) {
+          print('WhatsApp OTP Mismatch');
+
+          print('Entered OTP: $otpCode');
+          print('WhatsApp OTP: $_whatsappOtp');
+        }
 
         // If both methods fail
         Fluttertoast.showToast(

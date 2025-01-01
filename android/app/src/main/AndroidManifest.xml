@@ -1,67 +1,57 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.nouvellesoft.thegfa">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.nouvellesoft.thegfa">
 
     <!--    <uses-sdk-->
     <!--        android:minSdkVersion="23"-->
     <!--        tools:overrideLibrary="com.google.android.gms.auth.api,com.google.android.gms.base,com.google.android.gms.tasks,com.google.android.gms.common" />-->
 
-    <uses-permission android:name="android.permission.VIBRATE" />
-    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
 
-    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
+    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT"/>
 
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
 
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
 
     <uses-permission android:name="android.permission.SEND_EMAIL"/>
 
     <!-- Mandatory permissions for Android 12 and above.-->
     <!-- Also, they should be asked in runtime. -->
-    <uses-permission
-        android:name="android.permission.BLUETOOTH_SCAN"
-        android:minSdkVersion="33"
-        android:usesPermissionFlags="neverForLocation" />
-    <uses-permission android:name="android.permission.BLUETOOTH_ADVERTISE" />
-    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+    <uses-permission android:name="android.permission.BLUETOOTH_SCAN" android:minSdkVersion="33" android:usesPermissionFlags="neverForLocation"/>
+    <uses-permission android:name="android.permission.BLUETOOTH_ADVERTISE"/>
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT"/>
 
     <!-- Mandatory permissions for Android 13 and above. -->
     <!-- Also, should be asked in runtime. -->
-    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
 
     <queries>
         <!-- If your app opens https URLs -->
         <intent>
-            <action android:name="android.intent.action.VIEW" />
-            <data android:scheme="https" />
+            <action android:name="android.intent.action.VIEW"/>
+            <data android:scheme="https"/>
         </intent>
         <!-- If your app makes calls -->
         <intent>
-            <action android:name="android.intent.action.DIAL" />
-            <data android:scheme="tel" />
+            <action android:name="android.intent.action.DIAL"/>
+            <data android:scheme="tel"/>
         </intent>
         <!-- If your app emails -->
         <intent>
-            <action android:name="android.intent.action.SEND" />
-            <data android:mimeType="*/*" />
+            <action android:name="android.intent.action.SEND"/>
+            <data android:mimeType="*/*"/>
         </intent>
         <!-- Add this filter, if you want to support sharing multiple files of any type -->
         <intent>
-            <action android:name="android.intent.action.SEND_MULTIPLE" />
-            <category android:name="android.intent.category.DEFAULT" />
-            <data android:mimeType="*/*" />
+            <action android:name="android.intent.action.SEND_MULTIPLE"/>
+            <category android:name="android.intent.category.DEFAULT"/>
+            <data android:mimeType="*/*"/>
         </intent>
     </queries>
 
-    <application
-        android:name="${applicationName}"
-        android:allowBackup="true"
-        android:dataExtractionRules="@xml/data_extraction_rules"
-        android:fullBackupContent="true"
-        android:icon="@mipmap/ic_launcher"
-        android:label="The GFA">
+    <application android:name="${applicationName}" android:allowBackup="true" android:dataExtractionRules="@xml/data_extraction_rules" android:fullBackupContent="true" android:icon="@mipmap/ic_launcher" android:label="The GFA">
         <activity
             android:name=".MainActivity"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
@@ -76,62 +66,43 @@
                  to determine the Window background behind the Flutter UI. -->
 
 
-            <meta-data
-                android:name="io.flutter.embedding.android.NormalTheme"
-                android:resource="@style/NormalTheme" />
+            <meta-data android:name="io.flutter.embedding.android.NormalTheme" android:resource="@style/NormalTheme"/>
 
-            <meta-data
-                android:name="io.flutter.embedding.android.SplashScreenDrawable"
-                android:resource="@drawable/launch_background" />
+            <meta-data android:name="io.flutter.embedding.android.SplashScreenDrawable" android:resource="@drawable/launch_background"/>
 
 
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
                 <!--                <category android:name="android.intent.category.LEANBACK_LAUNCHER"/>  // This is to remove the launcher icon from the home screen.-->
-                <action android:name="android.intent.action.VIEW" />
+                <action android:name="android.intent.action.VIEW"/>
             </intent-filter>
 
             <intent-filter>
-                <action android:name="FLUTTER_NOTIFICATION_CLICK" />
-                <category android:name="android.intent.category.DEFAULT" />
+                <action android:name="FLUTTER_NOTIFICATION_CLICK"/>
+                <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </activity>
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
-        <meta-data
-            android:name="flutterEmbedding"
-            android:value="2" />
+        <meta-data android:name="flutterEmbedding" android:value="2"/>
 
-        <meta-data
-            android:name="com.google.android.gms.wallet.api.enabled"
-            android:value="true" />
+        <meta-data android:name="com.google.android.gms.wallet.api.enabled" android:value="true"/>
 
-        <provider
-            android:name="androidx.core.content.FileProvider"
-            android:authorities="${applicationId}.file provider"
-            android:exported="false"
-            android:grantUriPermissions="true">
-            <meta-data
-                android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/provider_paths" />
+        <provider android:name="androidx.core.content.FileProvider" android:authorities="${applicationId}.file provider" android:exported="false" android:grantUriPermissions="true">
+            <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/provider_paths"/>
         </provider>
 
-        <receiver
-            android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver"
-            android:exported="false" />
-        <receiver
-            android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationBootReceiver"
-            android:exported="false">
+        <receiver android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver" android:exported="false"/>
+        <receiver android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationBootReceiver" android:exported="false">
             <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
-                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
-                <action android:name="com.htc.intent.action.QUICKBOOT_POWERON" />
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED"/>
+                <action android:name="android.intent.action.QUICKBOOT_POWERON"/>
+                <action android:name="com.htc.intent.action.QUICKBOOT_POWERON"/>
             </intent-filter>
         </receiver>
-        <service android:name="com.google.firebase.messaging.FirebaseMessagingService"
-            android:exported="false"/>
+        <service android:name="com.google.firebase.messaging.FirebaseMessagingService" android:exported="false"/>
 
     </application>
 </manifest>
