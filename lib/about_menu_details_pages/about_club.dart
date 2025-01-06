@@ -59,9 +59,9 @@ String coreValues = "OUR CORE VALUES";
 
 String populationChartText = 'Population Chart';
 String populationChartTitle = '';
-String playerBody = "Player Body\n\n";
 
-String playerPopulationChart = "$clubName Players Population Chart";
+// String playerBody = "Player Body\n\n";
+// String playerPopulationChart = "$clubName Players Population Chart";
 
 String trainingSessionSwipe = "Swipe up for all Training exercises offered";
 

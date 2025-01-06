@@ -97,106 +97,110 @@ class MyChatGFAPageState extends State<MyChatGFAPage> {
 
   @override
   Widget build(BuildContext context) {
-    return PopScope(
-      canPop: false, // Prevent default pop behavior
-      onPopInvokedWithResult: (bool didPop, result) {
-        if (!didPop) {
-          // This block runs when the user tries to pop (go back)
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => SideBarLayout(
-                clubId: widget.clubId, // Pass actual clubId here
+    return Container(
+      // Add this container to fill the entire screen
+      color: Colors.white, // This will cover the splash screen color
+      child: PopScope(
+        canPop: false, // Prevent default pop behavior
+        onPopInvokedWithResult: (bool didPop, result) {
+          if (!didPop) {
+            // This block runs when the user tries to pop (go back)
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => SideBarLayout(
+                  clubId: widget.clubId, // Pass actual clubId here
+                ),
               ),
-            ),
-          );
-        }
-      },
-      child: SafeArea(
-        child: Scaffold(
-          backgroundColor: Colors.white70,
-          appBar: PreferredSize(
-            preferredSize: Size.fromHeight(MediaQuery.of(context).size.height * 0.13),
-            child: AppBar(
-              backgroundColor: Colors.white70,
-              elevation: appBarElevation,
-              leading: IconButton(
-                icon: const Icon(Icons.arrow_back, color: Colors.black),
-                onPressed: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => SideBarLayout(
-                        clubId: widget.clubId,
-                      ),
-                    ),
-                  );
-                },
-              ),
-              title: _isLoading
-                  ? const CircularProgressIndicator(color: Colors.black) // Show loading spinner
-                  : Text(
-                      _clubName ?? 'Unknown Club',
-                      style: const TextStyle(color: Colors.black),
-                    ),
-              centerTitle: true,
-              bottom: PreferredSize(
-                preferredSize: Size.fromHeight(MediaQuery.of(context).size.height * 0.08),
-                child: Container(
-                  width: double.infinity,
-                  color: const Color.fromRGBO(255, 255, 255, 1.0),
-                  margin: EdgeInsets.symmetric(
-                    horizontal: MediaQuery.of(context).size.width * 0.05,
-                    vertical: MediaQuery.of(context).size.height * 0.01,
-                  ),
-                  child: CupertinoSlidingSegmentedControl<int>(
-                    padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.02),
-                    thumbColor: Colors.white70,
-                    backgroundColor: Colors.transparent,
-                    children: {
-                      0: Padding(
-                        padding: EdgeInsets.symmetric(
-                          vertical: MediaQuery.of(context).size.width * 0.01,
+            );
+          }
+        },
+        child: SafeArea(
+          child: Scaffold(
+            backgroundColor: Colors.white70,
+            appBar: PreferredSize(
+              preferredSize: Size.fromHeight(MediaQuery.of(context).size.height * 0.13),
+              child: AppBar(
+                backgroundColor: Colors.white70,
+                elevation: appBarElevation,
+                leading: IconButton(
+                  icon: const Icon(Icons.arrow_back, color: Colors.black),
+                  onPressed: () {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => SideBarLayout(
+                          clubId: widget.clubId,
                         ),
-                        child: Text(
-                          generalChat,
-                          style: GoogleFonts.andadaPro(
-                            color: const Color.fromRGBO(38, 34, 35, 1.0),
-                            fontSize: MediaQuery.of(context).size.width * 0.055,
-                            fontWeight: FontWeight.w600,
+                      ),
+                    );
+                  },
+                ),
+                title: _isLoading
+                    ? const CircularProgressIndicator(color: Colors.black) // Show loading spinner
+                    : Text(
+                        _clubName ?? 'Unknown Club',
+                        style: const TextStyle(color: Colors.black),
+                      ),
+                centerTitle: true,
+                bottom: PreferredSize(
+                  preferredSize: Size.fromHeight(MediaQuery.of(context).size.height * 0.08),
+                  child: Container(
+                    width: double.infinity,
+                    color: const Color.fromRGBO(255, 255, 255, 1.0),
+                    margin: EdgeInsets.symmetric(
+                      horizontal: MediaQuery.of(context).size.width * 0.05,
+                      vertical: MediaQuery.of(context).size.height * 0.01,
+                    ),
+                    child: CupertinoSlidingSegmentedControl<int>(
+                      padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.02),
+                      thumbColor: Colors.white70,
+                      backgroundColor: Colors.transparent,
+                      children: {
+                        0: Padding(
+                          padding: EdgeInsets.symmetric(
+                            vertical: MediaQuery.of(context).size.width * 0.01,
+                          ),
+                          child: Text(
+                            generalChat,
+                            style: GoogleFonts.andadaPro(
+                              color: const Color.fromRGBO(38, 34, 35, 1.0),
+                              fontSize: MediaQuery.of(context).size.width * 0.055,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                         ),
-                      ),
-                      1: Padding(
-                        padding: EdgeInsets.symmetric(
-                          vertical: MediaQuery.of(context).size.width * 0.01,
-                        ),
-                        child: Text(
-                          adminMatchDayChat,
-                          style: GoogleFonts.agbalumo(
-                            color: const Color.fromRGBO(38, 34, 35, 1.0),
-                            fontSize: MediaQuery.of(context).size.width * 0.055,
-                            fontWeight: FontWeight.w400,
+                        1: Padding(
+                          padding: EdgeInsets.symmetric(
+                            vertical: MediaQuery.of(context).size.width * 0.01,
+                          ),
+                          child: Text(
+                            adminMatchDayChat,
+                            style: GoogleFonts.agbalumo(
+                              color: const Color.fromRGBO(38, 34, 35, 1.0),
+                              fontSize: MediaQuery.of(context).size.width * 0.055,
+                              fontWeight: FontWeight.w400,
+                            ),
                           ),
                         ),
-                      ),
-                    },
-                    onValueChanged: (int? value) {
-                      setState(() {
-                        sharedValue = value!;
-                      });
+                      },
+                      onValueChanged: (int? value) {
+                        setState(() {
+                          sharedValue = value!;
+                        });
 
-                      if (sharedValue == 1 && !_isAdminAuthenticated) {
-                        _showAdminDialog(context);
-                      }
-                    },
-                    groupValue: sharedValue,
+                        if (sharedValue == 1 && !_isAdminAuthenticated) {
+                          _showAdminDialog(context);
+                        }
+                      },
+                      groupValue: sharedValue,
+                    ),
                   ),
                 ),
               ),
             ),
+            body: sharedValue == 0 ? _buildGeneralChatView() : _buildAdminMatchDayChatView(),
           ),
-          body: sharedValue == 0 ? _buildGeneralChatView() : _buildAdminMatchDayChatView(),
         ),
       ),
     );

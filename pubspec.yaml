@@ -89,7 +89,6 @@ dependencies:
   pdf: ^3.11.1
   permission_handler: ^11.3.1
   photo_view: ^0.15.0
-  pie_chart: ^5.4.0
   printing: ^5.13.4
   provider: ^6.1.2
   rename_app: ^1.6.1

@@ -4955,7 +4955,9 @@ class _SubPageState extends State<SubPage> {
         // await _handleSuccessfulVerification();
         // return;
       } catch (smsVerificationError) {
-        print('SMS Verification Error: $smsVerificationError');
+        if (kDebugMode) {
+          print('SMS Verification Error: $smsVerificationError');
+        }
       }
 
       // If SMS verification fails, check WhatsApp OTP

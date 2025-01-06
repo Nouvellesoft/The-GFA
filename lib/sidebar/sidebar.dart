@@ -37,7 +37,7 @@ const String defaultThirdTeamClassTitle = "Reserve Team Players";
 const String defaultFourthTeamClassTitle = "Fourth Team Players";
 const String defaultFifthTeamClassTitle = "Fifth Team Players";
 const String defaultSixthTeamClassTitle = "Sixth Team Players";
-const String defaultCaptainsTitle = "CPFC Captains";
+const String defaultCaptainsTitle = "XYXY Captains";
 const String defaultCoachesTitle = "Coaching Staff";
 const String defaultManagementBodyTitle = "Management Body";
 String sponsorsTitle = "Club Sponsors";
@@ -51,7 +51,7 @@ String exitAppSubtitle = "Do you really really want to?";
 String exitAppNo = "Oh No";
 String exitAppYes = "I Have To";
 
-String fmTitle = "CPFC More";
+String fmTitle = "XYXY More";
 String tmTitle = "Teams";
 String ytTitle = "Youtube Page";
 String aptTitle = "All Players Table";
@@ -412,7 +412,7 @@ class _SideBarState extends State<SideBar> with SingleTickerProviderStateMixin<S
                                         final String managementBodyTitle =
                                             teamData['ManagementBody']?['title'] as String? ?? defaultManagementBodyTitle;
 
-                                        // If 5 or fewer teams are visible, don't use Theme and ExpansionTile
+                                        /// If 5 or fewer teams are visible, don't use Theme and ExpansionTile
                                         if (visibleTeams.length <= 5) {
                                           return Column(
                                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -493,7 +493,7 @@ class _SideBarState extends State<SideBar> with SingleTickerProviderStateMixin<S
                                           );
                                         }
 
-                                        // If more than 5 teams are visible, use Theme and ExpansionTile
+                                        /// If more than 5 teams are visible, use Theme and ExpansionTile
                                         return Theme(
                                           data: ThemeData.dark().copyWith(primaryColor: Colors.white),
                                           child: ExpansionTile(
