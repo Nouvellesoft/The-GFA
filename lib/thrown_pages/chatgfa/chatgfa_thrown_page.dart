@@ -45,7 +45,7 @@ class MyChatGFAPageState extends State<MyChatGFAPage> {
   String? _clubName; // Holds the fetched club name
   bool _isLoading = true;
 
-  bool _barrierDismissibleTrue = true; // Tracks loading state
+  final bool _barrierDismissibleTrue = true; // Tracks loading state
 
   Future<void> _fetchClubName() async {
     try {
